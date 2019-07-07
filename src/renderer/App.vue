@@ -11,5 +11,10 @@
 </script>
 
 <style>
-  /* CSS */
+body{
+    background: black;
+    color: #ccc;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    text-align: center;
+}
 </style>
