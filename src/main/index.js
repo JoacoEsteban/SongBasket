@@ -1,6 +1,13 @@
 import electron from 'electron'
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, session } from 'electron'
 const ipc = electron.ipcMain
+
+// Modify the user agent for all requests to the following urls.
+const filter = {
+  urls: ['http://*.localhost:5000/*']
+}
+
+
 
 /**
  * Set `__static` path to static files in production
@@ -29,6 +36,18 @@ function createWindow () {
 
   mainWindow.on('closed', () => {
     mainWindow = null
+  })
+
+  session.defaultSession.webRequest.onHeadersReceived(filter, (details, callback) => {
+    let user = details.responseHeaders.user;
+    if(user !== undefined)
+    {
+
+      console.log('user: ', user);
+    }
+    
+    // details.requestHeaders['User-Agent'] = 'MyAgent'
+    callback({ requestHeaders: details.requestHeaders })
   })
 }
 
@@ -62,20 +81,26 @@ ipc.on('login', function(event){
   })
   
   loginWindow.loadURL(`${Backend}/init`)
-   
-  loginWindow.webContents.on('did-finish-load', () =>
-  {
-    loginWindow.webContents.executeJavaScript('console.log(document.documentElement.innerHTML);')
+  
+  loginWindow.webContents.on('will-navigate', function (event, newUrl) {
+    console.log('New URL: ', newUrl)
 
-    console.log('New url: ')
   })
 
-  loginWindow.on('closed', () => {
-    loginWindow = null
+  
+  
+  
+  // loginWindow.webContents.on('did-finish-load', () =>
+  // {
+    //   loginWindow.webContents.executeJavaScript('console.log(document.documentElement.innerHTML);')
+    
+    // })
+    
+    loginWindow.on('closed', () => {
+      loginWindow = null
+    })
   })
-})
-
-
+  
 
 
 
