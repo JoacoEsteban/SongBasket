@@ -1,31 +1,27 @@
 import electron from 'electron'
 import { app, BrowserWindow, session } from 'electron'
+import fetch from 'electron-fetch'
+import * as sbFetch from './sbFetch'
 const ipc = electron.ipcMain
 
-// Modify the user agent for all requests to the following urls.
-const filter = {
+const localBackend = 'http://localhost:5000';
+const herokuBackend = 'https://songbasket-backend.herokuapp.com';
+const Backend = localBackend;
+
+const filter = { //when logging in
   urls: ['http://*.localhost:5000/*']
 }
 
+var USER_ID = 'joaqo.esteban';
 
-
-/**
- * Set `__static` path to static files in production
- * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
- */
 if (process.env.NODE_ENV !== 'development') {
   global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
 
 let mainWindow
-const winURL = process.env.NODE_ENV === 'development'
-  ? `http://localhost:9080`
-  : `file://${__dirname}/index.html`
+const winURL = process.env.NODE_ENV === 'development' ? `http://localhost:9080` : `file://${__dirname}/index.html`;
 
 function createWindow () {
-  /**
-   * Initial window options
-   */
   mainWindow = new BrowserWindow({
     height: 563,
     useContentSize: true,
@@ -37,19 +33,40 @@ function createWindow () {
   mainWindow.on('closed', () => {
     mainWindow = null
   })
-
-  session.defaultSession.webRequest.onHeadersReceived(filter, (details, callback) => {
-    let user = details.responseHeaders.user;
-    if(user !== undefined)
-    {
-
-      console.log('user: ', user);
-    }
-    
-    // details.requestHeaders['User-Agent'] = 'MyAgent'
-    callback({ requestHeaders: details.requestHeaders })
-  })
 }
+
+function createLoginWindow(){
+  let loginWindow = new BrowserWindow({
+    height: 500,
+    useContentSize: true,
+    width: 500
+  })
+  
+  loginWindow.loadURL(`${Backend}/init`)
+  
+  loginWindow.on('closed', () => {
+    loginWindow = null
+  })
+
+
+    //Gets user ID From backend
+    session.defaultSession.webRequest.onHeadersReceived(filter, (details, callback) => 
+    {
+      let user_id = details.responseHeaders.user_id;
+      if(user_id !== undefined)
+      {
+        USER_ID = user_id;
+        console.log('id: ', USER_ID);
+  
+        sbFetch.fetchPlaylists(USER_ID); //Gets plaulist list from backend
+      }
+      callback({ requestHeaders: details.requestHeaders })
+    })
+};
+
+
+
+
 
 app.on('ready', createWindow)
 
@@ -66,41 +83,23 @@ app.on('activate', () => {
 })
 
 
-const localBackend = 'http://localhost:5000';
-const herokuBackend = 'https://songbasket-backend.herokuapp.com';
-const Backend = localBackend;
 
 
 
 
 ipc.on('login', function(event){
-  let loginWindow = new BrowserWindow({
-    height: 500,
-    useContentSize: true,
-    width: 500
-  })
   
-  loginWindow.loadURL(`${Backend}/init`)
-  
-  loginWindow.webContents.on('will-navigate', function (event, newUrl) {
-    console.log('New URL: ', newUrl)
-
-  })
-
-  
-  
-  
-  // loginWindow.webContents.on('did-finish-load', () =>
-  // {
-    //   loginWindow.webContents.executeJavaScript('console.log(document.documentElement.innerHTML);')
+  var useridtemp = false;
+  //Gets user id from storage. IF NULL =>
+  if(useridtemp){
+    createLoginWindow();
+  }else{
+    //ELSE init login and get user details =>
+    sbFetch.fetchPlaylists().then(resolve => console.log(resolve));
     
-    // })
-    
-    loginWindow.on('closed', () => {
-      loginWindow = null
-    })
-  })
+  }
   
+  })
 
 
 
