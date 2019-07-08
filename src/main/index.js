@@ -62,6 +62,13 @@ ipc.on('login', function(event){
   })
   
   loginWindow.loadURL(`${Backend}/init`)
+   
+  loginWindow.webContents.on('did-finish-load', () =>
+  {
+    loginWindow.webContents.executeJavaScript('console.log(document.documentElement.innerHTML);')
+
+    console.log('New url: ')
+  })
 
   loginWindow.on('closed', () => {
     loginWindow = null
