@@ -11,6 +11,9 @@
 </template>
 
 <script>
+const electron = require('electron')
+const ipc = electron.ipcRenderer;
+
 export default {
     data(){
         return{
@@ -20,12 +23,14 @@ export default {
     },
   methods:{
     login(){
-        const localBackend = 'http://localhost:5000';
-        const herokuBackend = 'https://songbasket-backend.herokuapp.com';
-        const Backend = localBackend;
+        ipc.send('login')
         
-        // window.open('https://accounts.spotify.com/authorize?client_id=30e3ebd25fd04ac5b1e2dfe889fdc90c&redirect_uri=https://spotify-api-wrapper-joaco.herokuapp.com/&scope=user-read-private%20user-read-email%20playlist-read-private&response_type=token&show_dialog=true')
-        window.open(`${Backend}/init`)
+        
+        // const localBackend = 'http://localhost:5000';
+        // const herokuBackend = 'https://songbasket-backend.herokuapp.com';
+        // const Backend = localBackend;
+        
+        // window.open(`${Backend}/init`)
          
          // fetchPlaylists();
     }

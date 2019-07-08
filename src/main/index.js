@@ -1,4 +1,6 @@
+import electron from 'electron'
 import { app, BrowserWindow } from 'electron'
+const ipc = electron.ipcMain
 
 /**
  * Set `__static` path to static files in production
@@ -43,6 +45,52 @@ app.on('activate', () => {
     createWindow()
   }
 })
+
+
+const localBackend = 'http://localhost:5000';
+const herokuBackend = 'https://songbasket-backend.herokuapp.com';
+const Backend = localBackend;
+
+
+
+
+ipc.on('login', function(event){
+  let loginWindow = new BrowserWindow({
+    height: 500,
+    useContentSize: true,
+    width: 500
+  })
+  
+  loginWindow.loadURL(`${Backend}/init`)
+
+  loginWindow.on('closed', () => {
+    loginWindow = null
+  })
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
  * Auto Updater
