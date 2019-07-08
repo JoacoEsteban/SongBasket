@@ -13,6 +13,11 @@ export default new Router({
     {
       path: '*',
       redirect: '/'
-    }
+    },
+    {
+      path: '/playlists/',
+      name: 'playlists',
+      component: require('@/components/PlaylistView').default
+    },
   ]
 })

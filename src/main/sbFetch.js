@@ -12,14 +12,4 @@ export async function fetchPlaylists(){
     let res = await fetch(`${Backend}/get_playlists?user_id=${'joaqo.esteban'}`);
     let body = await res.text();
     return Promise.resolve(JSON.parse(body));
-
-    // console.log(user);
-
-    // fetch(`${Backend}/get_playlists?user_id=${'joaqo.esteban'}`)
-    // .then(res => res.text())
-    // .then(body => {
-    //     var response = JSON.parse(body);
-    //     console.log(response)
-    //     return Promise.resolve(response);
-    // })
 }
