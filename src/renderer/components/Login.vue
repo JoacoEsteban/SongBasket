@@ -20,15 +20,14 @@ export default {
     },
   methods:{
     login(){
-      let loginSuccess = true
+        const localBackend = 'http://localhost:5000';
+        const herokuBackend = 'https://songbasket-backend.herokuapp.com';
+        const Backend = localBackend;
+        
         // window.open('https://accounts.spotify.com/authorize?client_id=30e3ebd25fd04ac5b1e2dfe889fdc90c&redirect_uri=https://spotify-api-wrapper-joaco.herokuapp.com/&scope=user-read-private%20user-read-email%20playlist-read-private&response_type=token&show_dialog=true')
-        if (loginSuccess)
-        {
-            // fetchPlaylists();
-            fetch('http://localhost:5000/temp-playlists')
-            .then(response => response.json())
-            .then(json => {console.log(json.items); this.playlists = json.items});
-        }
+        window.open(`${Backend}/init`)
+         
+         // fetchPlaylists();
     }
     },
 }
