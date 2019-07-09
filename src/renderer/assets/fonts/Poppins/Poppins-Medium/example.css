@@ -1,0 +1,9 @@
+@font-face {
+  font-family: 'Poppins Medium';
+  src: url('Poppins-Medium.eot'); /* IE9 Compat Modes */
+  src: url('Poppins-Medium.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('Poppins-Medium.woff2') format('woff2'), /* Super Modern Browsers */
+       url('Poppins-Medium.woff') format('woff'), /* Pretty Modern Browsers */
+       url('Poppins-Medium.ttf')  format('truetype'), /* Safari, Android, iOS */
+       url('Poppins-Medium.svg#svgFontName') format('svg'); /* Legacy iOS */
+}

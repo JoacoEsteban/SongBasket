@@ -1,0 +1,9 @@
+@font-face {
+  font-family: 'DM Sans Bold';
+  src: url('DM-Sans-Bold.eot'); /* IE9 Compat Modes */
+  src: url('DM-Sans-Bold.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('DM-Sans-Bold.woff2') format('woff2'), /* Super Modern Browsers */
+       url('DM-Sans-Bold.woff') format('woff'), /* Pretty Modern Browsers */
+       url('DM-Sans-Bold.ttf')  format('truetype'), /* Safari, Android, iOS */
+       url('DM-Sans-Bold.svg#svgFontName') format('svg'); /* Legacy iOS */
+}

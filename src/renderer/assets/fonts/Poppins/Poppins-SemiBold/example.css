@@ -1,0 +1,9 @@
+@font-face {
+  font-family: 'Poppins SemiBold';
+  src: url('Poppins-SemiBold.eot'); /* IE9 Compat Modes */
+  src: url('Poppins-SemiBold.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('Poppins-SemiBold.woff2') format('woff2'), /* Super Modern Browsers */
+       url('Poppins-SemiBold.woff') format('woff'), /* Pretty Modern Browsers */
+       url('Poppins-SemiBold.ttf')  format('truetype'), /* Safari, Android, iOS */
+       url('Poppins-SemiBold.svg#svgFontName') format('svg'); /* Legacy iOS */
+}

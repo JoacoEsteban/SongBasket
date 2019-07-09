@@ -1,0 +1,9 @@
+@font-face {
+  font-family: 'Poppins Light';
+  src: url('Poppins-Light.eot'); /* IE9 Compat Modes */
+  src: url('Poppins-Light.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('Poppins-Light.woff2') format('woff2'), /* Super Modern Browsers */
+       url('Poppins-Light.woff') format('woff'), /* Pretty Modern Browsers */
+       url('Poppins-Light.ttf')  format('truetype'), /* Safari, Android, iOS */
+       url('Poppins-Light.svg#svgFontName') format('svg'); /* Legacy iOS */
+}

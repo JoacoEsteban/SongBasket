@@ -25,7 +25,7 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     height: 563,
     useContentSize: true,
-    width: 1000
+    width: 1000,
   })
 
   mainWindow.loadURL(winURL)
@@ -95,11 +95,12 @@ ipc.on('login', function(event){
     createLoginWindow();
   }else{
     //ELSE init login and get user details =>
-    sbFetch.fetchPlaylists().then(resolve => console.log(resolve));
+    sbFetch.fetchPlaylists().then(resolve => console.log(resolve))
+    // .then(unused => {});
     
   }
   
-  })
+})
 
 
 

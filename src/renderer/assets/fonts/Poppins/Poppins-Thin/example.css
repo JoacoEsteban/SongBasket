@@ -1,0 +1,9 @@
+@font-face {
+  font-family: 'Poppins Thin';
+  src: url('Poppins-Thin.eot'); /* IE9 Compat Modes */
+  src: url('Poppins-Thin.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('Poppins-Thin.woff2') format('woff2'), /* Super Modern Browsers */
+       url('Poppins-Thin.woff') format('woff'), /* Pretty Modern Browsers */
+       url('Poppins-Thin.ttf')  format('truetype'), /* Safari, Android, iOS */
+       url('Poppins-Thin.svg#svgFontName') format('svg'); /* Legacy iOS */
+}

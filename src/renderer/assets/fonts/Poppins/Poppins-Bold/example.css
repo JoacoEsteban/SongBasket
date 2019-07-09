@@ -1,0 +1,9 @@
+@font-face {
+  font-family: 'Poppins Bold';
+  src: url('Poppins-Bold.eot'); /* IE9 Compat Modes */
+  src: url('Poppins-Bold.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('Poppins-Bold.woff2') format('woff2'), /* Super Modern Browsers */
+       url('Poppins-Bold.woff') format('woff'), /* Pretty Modern Browsers */
+       url('Poppins-Bold.ttf')  format('truetype'), /* Safari, Android, iOS */
+       url('Poppins-Bold.svg#svgFontName') format('svg'); /* Legacy iOS */
+}

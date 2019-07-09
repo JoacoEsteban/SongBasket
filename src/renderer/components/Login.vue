@@ -2,7 +2,7 @@
     <div>
             <h1>SongBasket</h1>
             <p>Using Vue.JS </p>
-            <button @click="login">Login to Spotify</button>
+            <button class="login-button" @click="login">Login to Spotify</button>
 
             <div v-for="playlist in playlists" :key="playlist.id">
                 {{ playlist.name }}
@@ -24,16 +24,11 @@ export default {
   methods:{
     login(){
         ipc.send('login')
-        
-        
-        // const localBackend = 'http://localhost:5000';
-        // const herokuBackend = 'https://songbasket-backend.herokuapp.com';
-        // const Backend = localBackend;
-        
-        // window.open(`${Backend}/init`)
-         
-         // fetchPlaylists();
     }
     },
 }
 </script>
+
+<style>
+    @import url('../CSS/global.css');
+</style>

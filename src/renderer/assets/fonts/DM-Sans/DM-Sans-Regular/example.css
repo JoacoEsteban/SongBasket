@@ -1,0 +1,9 @@
+@font-face {
+  font-family: 'DM Sans Regular';
+  src: url('DM-Sans-Regular.eot'); /* IE9 Compat Modes */
+  src: url('DM-Sans-Regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('DM-Sans-Regular.woff2') format('woff2'), /* Super Modern Browsers */
+       url('DM-Sans-Regular.woff') format('woff'), /* Pretty Modern Browsers */
+       url('DM-Sans-Regular.ttf')  format('truetype'), /* Safari, Android, iOS */
+       url('DM-Sans-Regular.svg#svgFontName') format('svg'); /* Legacy iOS */
+}
