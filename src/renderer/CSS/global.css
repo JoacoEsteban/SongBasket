@@ -14,7 +14,7 @@ body{
     margin: 0;
     user-select: none;
 }
-.login-button{
+.button{
     outline: none;
     font-family: 'Poppins medium';
     font-size: 0.7rem;
@@ -26,7 +26,7 @@ body{
     background: #fff;
     transition: transform .15s ease, background .2s ease;
 }
-.login-button:hover{
+.button:hover{
     transform: scale(1.05);
     background: #9900cc;
     color: #fff;

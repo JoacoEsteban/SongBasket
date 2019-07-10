@@ -1,16 +1,22 @@
 <template>
     <div>
-        <h1>{{user.display_name}} Playlists</h1>
-        <Playlist :playlists="playlists.items" ></Playlist>
+        <router-link to="/" tag="button" class="button">Logout</router-link>
+        <div v-if="user !== undefined" >
+
+            <user-data :user="user" ></user-data>
+            <playlist v-for="playlist in playlists.items" :playlist="playlist" :key="playlist.id" />
+        </div>
     </div>
 </template>
 
 <script>
 import Playlist from './Playlist.vue';
+import UserData from './UserData.vue';
 
 export default {
     components:{
-        Playlist
+        Playlist,
+        UserData,
     },
     data(){
         return{

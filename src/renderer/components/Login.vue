@@ -1,9 +1,9 @@
 <template>
     <div>
             <h1>SongBasket</h1>
-            <button class="login-button" @click="login">Login to Spotify</button>
+            <button class="button" @click="login">Login to Spotify</button>
             <div>or</div>
-            <button class="login-button no-login" >Continue without Logging in</button>
+            <button class="button" >Continue without Logging in</button>
 
             <div v-for="playlist in playlists" :key="playlist.id">
                 {{ playlist.name }}

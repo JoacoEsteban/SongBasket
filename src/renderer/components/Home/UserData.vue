@@ -1,15 +1,11 @@
 <template>
-    <div>
-        <h4>
-            {{playlist.name}}
-        </h4>
-    </div>
+        <h1>{{user.display_name}} Playlists</h1>    
 </template>
 
 <script>
 export default {
     props:{
-        playlist: Object,
+        user: Object,
     },
     data(){
     }
