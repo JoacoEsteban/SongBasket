@@ -12,6 +12,7 @@ export default {
         playlist: Object,
     },
     data(){
+        return{}
     }
 }
 </script>

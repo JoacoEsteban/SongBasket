@@ -3,8 +3,9 @@
         <div v-if="user !== undefined" >
             <status-bar :user="user" ></status-bar>
 
-            <user-data :user="user" :playlistCount="playlists.total" ></user-data>
-            <!-- <playlist v-for="playlist in playlists.items" :playlist="playlist" :key="playlist.id" /> -->
+            <playlist v-for="playlist in playlists.items" :playlist="playlist" :key="playlist.id" />
+            
+            <user-data :user="user" :playlistCount="playlists.total.toString()" ></user-data>
         </div>
         <router-link to="/" tag="button" class="button">Logout</router-link>
     </div>

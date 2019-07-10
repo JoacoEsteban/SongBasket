@@ -1,7 +1,8 @@
 <template>
 <div class="ud-container dev-border-w">
-    <div class="ud-name-container dev-border-w">
-        <span class="ud-text dev-border-w">{{user.display_name}}</span>
+    <div class="ud-name-container dev-border">
+        <div class="ud-user-img" :style="{'background-image': `url(${user.images[0].url})`}" />
+        <span class="ud-text dev-border">{{user.display_name}}</span>
     </div>
     <div class="ud-playlist-count dev-border-w">
         {{playlistCount}} Playlists
@@ -22,7 +23,7 @@ export default {
     },
     data(){
         return{}
-    }
+    },
 }
 </script>
 
@@ -37,20 +38,51 @@ export default {
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: space-between;
+    align-items: center;
+    align-content: center;
+}
+
+
+/* Name Container */
+.ud-name-container{
+    display: flex;
+    align-items: center;
+}
+.ud-user-img{
+    margin: 0 .3rem;
+
+
+    display: inline-block;
+
+    height: 1rem;
+    width: 1rem;
+
+    background-position: center;
+    background-size: cover;
+
+    border: 1px solid white;
+    border-radius: 2rem;
 }
 .ud-text{
-    /* border: 1px solid white; */
+    margin: 0;
+
     display: inline-block;
-    margin: 0 .8rem;
-    font-size: .7rem;
+    font-size: .5rem;
     font-weight: 800;
 }
+
+
 .ud-playlist-count{
-    display: inline
+    display: inline-block;
 }
+
+
+
+
+
 .ud-settings{
-    width: 20px;
-    height: 20px;
+    width: 6rem;
+    height: 2rem;
     background: #666;
 }
 </style>

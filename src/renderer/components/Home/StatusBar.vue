@@ -6,7 +6,9 @@
 
 <script>
 export default {
-
+    props:{
+        user: Object,
+    }
 }
 </script>
 
@@ -15,7 +17,7 @@ export default {
     height: 2.7rem;
     width: 100%;
     display: flex;
-    position: fixed;
+    position: sticky;
     top: 0;
     background: #333;
     flex-direction: row;
