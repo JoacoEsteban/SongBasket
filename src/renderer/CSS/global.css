@@ -31,3 +31,9 @@ body{
     background: #9900cc;
     color: #fff;
 }
+.dev-border-w{
+    border: 1px solid white;
+}
+.dev-border-b{
+    border: 1px solid black;
+}

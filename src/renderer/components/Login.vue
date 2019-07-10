@@ -3,7 +3,7 @@
             <h1>SongBasket</h1>
             <button class="button" @click="login">Login to Spotify</button>
             <div>or</div>
-            <button class="button" >Continue without Logging in</button>
+            <router-link to="/home" tag="button" class="button"  >Continue without Logging in</router-link>
 
             <div v-for="playlist in playlists" :key="playlist.id">
                 {{ playlist.name }}

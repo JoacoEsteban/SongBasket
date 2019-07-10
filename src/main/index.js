@@ -22,11 +22,11 @@ const winURL = process.env.NODE_ENV === 'development' ? `http://localhost:9080` 
 
 function createWindow () {
   mainWindow = new BrowserWindow({
-    width: 700,
-    height: 350,
+    width: 800,
+    height: 500,
 
-    minWidth: 700,
-    minHeight: 350,
+    minWidth: 800,
+    minHeight: 500,
     useContentSize: true,
   })
 
@@ -97,7 +97,11 @@ ipc.on('login', function(event){
     createLoginWindow();
   }else{
     //ELSE init login and get user details =>
-    sbFetch.fetchPlaylists().then(function(resolve){ console.log(resolve); mainWindow.webContents.send('playlists done', resolve) });
+    sbFetch.fetchPlaylists()
+    .then(function(resolve){ 
+      console.log(resolve);
+      mainWindow.webContents.send('playlists done', resolve)
+    });
 
     
   }
