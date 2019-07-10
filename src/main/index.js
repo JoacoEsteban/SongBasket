@@ -1,6 +1,5 @@
 import electron from 'electron'
 import { app, BrowserWindow, session } from 'electron'
-import fetch from 'electron-fetch'
 import * as sbFetch from './sbFetch'
 const ipc = electron.ipcMain
 
@@ -23,9 +22,12 @@ const winURL = process.env.NODE_ENV === 'development' ? `http://localhost:9080` 
 
 function createWindow () {
   mainWindow = new BrowserWindow({
-    height: 563,
+    width: 700,
+    height: 350,
+
+    minWidth: 700,
+    minHeight: 350,
     useContentSize: true,
-    width: 1000,
   })
 
   mainWindow.loadURL(winURL)
@@ -95,8 +97,8 @@ ipc.on('login', function(event){
     createLoginWindow();
   }else{
     //ELSE init login and get user details =>
-    sbFetch.fetchPlaylists().then(resolve => console.log(resolve))
-    // .then(unused => {});
+    sbFetch.fetchPlaylists().then(function(resolve){ console.log(resolve); mainWindow.webContents.send('playlists done', resolve) });
+
     
   }
   
