@@ -1,0 +1,30 @@
+.noselect {
+    user-select: none;
+}
+.select{
+    user-select: all;
+}
+h1{
+    user-select: none;
+    cursor: default;
+}
+h2{
+    user-select: none;
+    cursor: default;
+}
+h3{
+    user-select: none;
+    cursor: default;
+}
+h4{
+    user-select: none;
+    cursor: default;
+}
+h5{
+    user-select: none;
+    cursor: default;
+}
+h6{
+    user-select: none;
+    cursor: default;
+}

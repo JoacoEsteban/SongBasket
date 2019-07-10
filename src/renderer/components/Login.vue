@@ -1,8 +1,9 @@
 <template>
     <div>
             <h1>SongBasket</h1>
-            <p>Using Vue.JS </p>
             <button class="login-button" @click="login">Login to Spotify</button>
+            <div>or</div>
+            <button class="login-button no-login" >Continue without Logging in</button>
 
             <div v-for="playlist in playlists" :key="playlist.id">
                 {{ playlist.name }}
@@ -27,9 +28,9 @@ export default {
     }
     },
     //Auto login For dev speed purposes
-    mounted(){
-        this.login();
-    }
+    // mounted(){
+    //     this.login();
+    // }
 }
 </script>
 

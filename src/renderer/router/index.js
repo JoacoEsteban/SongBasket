@@ -15,9 +15,9 @@ export default new Router({
       redirect: '/'
     },
     {
-      path: '/playlists',
-      name: 'playlists',
-      component: require('@/components/PlaylistView').default
+      path: '/home',
+      name: 'home',
+      component: require('@/components/Home/Home').default
     },
   ]
 })

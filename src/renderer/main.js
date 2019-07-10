@@ -22,5 +22,5 @@ new Vue({
 
 ipc.on('playlists done', (e, userObject) => {
   console.log(userObject);
-  router.push({name: 'playlists', params:{user: userObject}})
+  router.push({name: 'home', params:{user: userObject}})
   } )
