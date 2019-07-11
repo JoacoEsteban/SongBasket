@@ -1,21 +1,23 @@
 <template>
-<div class="ud-container dev-border-w">
+<div class="ud-container dev-border">
     <div class="ud-name-container dev-border">
         <div class="ud-user-img" :style="{'background-image': `url(${user.images[0].url})`}" />
         <span class="ud-text dev-border">{{user.display_name}}</span>
     </div>
-    <div class="ud-playlist-count dev-border-w">
+    <div class="ud-playlist-count dev-border">
         {{playlistCount}} Playlists
 
     </div>
-    <div class="ud-settings dev-border-w">
-
+    <div class="ud-settings dev-border">
+        <!-- <settings-icon /> -->
     </div>
 
 </div>
 </template>
 
 <script>
+// import settingsIcon from '../../assets/icons/settings-icon'
+
 export default {
     props:{
         user: Object,
@@ -23,6 +25,9 @@ export default {
     },
     data(){
         return{}
+    },
+    components:{
+        // settingsIcon
     },
 }
 </script>
