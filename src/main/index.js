@@ -39,33 +39,37 @@ function createWindow () {
 
 function createLoginWindow(){
   let loginWindow = new BrowserWindow({
-    height: 500,
+    width: 550,
+    height: 830,
     useContentSize: true,
-    width: 500
   })
   
-  loginWindow.loadURL(`${Backend}/init`)
+  loginWindow.loadURL(`${Backend}/init`, {"extraHeaders" : "pragma: no-cache\n"})
   
-  loginWindow.on('closed', () => {
-    loginWindow = null
-  })
+  loginWindow.on('closed', () => loginWindow = null  )
 
 
     //Gets user ID From backend
     session.defaultSession.webRequest.onHeadersReceived(filter, (details, callback) => 
     {
       let user_id = details.responseHeaders.user_id;
-      if(user_id !== undefined)
+      let success = details.responseHeaders.success; //if true close window and continue
+
+      if(success == 'false') loginWindow.loadURL(`${Backend}/fail`, {"extraHeaders" : "pragma: no-cache\n"});
+
+
+      if(user_id !== undefined && success == 'true')
       {
         USER_ID = user_id;
         console.log('id: ', USER_ID);
-  
+
+        
         //Gets playlist list from backend
         sbFetch.fetchPlaylists(USER_ID)
-        .then(res => {
-          console.log('RESPONSE XD: ', res);
-          mainWindow.webContents.send('playlists done', res)
-
+        .then(function(resolve){ 
+          console.log(resolve);
+          mainWindow.webContents.send('playlists done', resolve)
+          loginWindow.close();
         });
       }
       callback({ requestHeaders: details.requestHeaders })
@@ -103,7 +107,7 @@ ipc.on('login', function(event){
     createLoginWindow();
   }else{
     //ELSE init login and get user details =>
-    sbFetch.fetchPlaylists()
+    sbFetch.fetchPlaylists('joaqo.esteban')
     .then(function(resolve){ 
       console.log(resolve);
       mainWindow.webContents.send('playlists done', resolve)
