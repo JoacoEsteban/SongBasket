@@ -60,7 +60,13 @@ function createLoginWindow(){
         USER_ID = user_id;
         console.log('id: ', USER_ID);
   
-        sbFetch.fetchPlaylists(USER_ID); //Gets plaulist list from backend
+        //Gets playlist list from backend
+        sbFetch.fetchPlaylists(USER_ID)
+        .then(res => {
+          console.log('RESPONSE XD: ', res);
+          mainWindow.webContents.send('playlists done', res)
+
+        });
       }
       callback({ requestHeaders: details.requestHeaders })
     })
@@ -93,7 +99,7 @@ ipc.on('login', function(event){
   
   var useridtemp = false;
   //Gets user id from storage. IF NULL =>
-  if(useridtemp){
+  if(!useridtemp){
     createLoginWindow();
   }else{
     //ELSE init login and get user details =>

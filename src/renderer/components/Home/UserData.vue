@@ -1,8 +1,8 @@
 <template>
 <div class="ud-container dev-border">
     <div class="ud-name-container dev-border">
-        <div class="ud-user-img" :style="{'background-image': `url(${user.images[0].url})`}" />
-        <span class="ud-text dev-border">{{user.display_name}}</span>
+        <div v-if="user.images[0] !== undefined" class="ud-user-img" :style="{'background-image': `url(${user.images[0].url})`}" />
+        <span class="ud-text dev-border">{{user.id}}</span>
     </div>
     <div class="ud-playlist-count dev-border">
         {{playlistCount}} Playlists

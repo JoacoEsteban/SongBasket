@@ -4,10 +4,6 @@
             <button class="button" @click="login">Login to Spotify</button>
             <div>or</div>
             <router-link to="/home" tag="button" class="button"  >Continue without Logging in</router-link>
-
-            <div v-for="playlist in playlists" :key="playlist.id">
-                {{ playlist.name }}
-            </div>
     </div>
 </template>
 
@@ -16,12 +12,6 @@ const electron = require('electron')
 const ipc = electron.ipcRenderer;
 
 export default {
-    data(){
-        return{
-            playlists: undefined,
-
-        }
-    },
   methods:{
     login(){
         ipc.send('login')
