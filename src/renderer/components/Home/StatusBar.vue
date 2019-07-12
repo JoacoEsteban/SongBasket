@@ -23,5 +23,6 @@ export default {
     flex-direction: row;
     flex-wrap: nowrap;
     margin-bottom: 1rem;
+    z-index: 10;
 }
 </style>

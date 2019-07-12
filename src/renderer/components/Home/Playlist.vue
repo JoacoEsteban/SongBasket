@@ -1,5 +1,6 @@
 <template>
     <div class="pl-container">
+        <div class="pl-track-count">{{playlist.tracks.total}} Tracks</div>
         <div class="pl-img" :style="{backgroundImage: `url(${playlist.images[0].url})`}">
 
         </div>
@@ -32,6 +33,15 @@ export default {
     .pl-container:hover {
         transform: scale(1.1);
     }
+    .pl-track-count {
+        position: absolute;
+        box-sizing: border-box;
+        font-size: .6rem;
+        width: 8rem;
+        height: 1rem;
+        background-color: rgba(79, 79, 79, 0.9);
+        font-family: "Poppins Semibold"
+    }
     .pl-img {
         width: 8rem;
         height: 8rem;
@@ -41,7 +51,7 @@ export default {
     .pl-name {
         text-align: left;
         font-size: .6rem;
-        font-family: "poppins semibold";
+        font-family: "Poppins Semibold";
         padding: 0 .2rem;
         height: 1.5rem;
         display: flex;
