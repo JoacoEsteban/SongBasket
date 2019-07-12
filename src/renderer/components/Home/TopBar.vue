@@ -13,23 +13,23 @@
 
 
         <div class="tb-mid-section">
-            Last Sync: {{Date.now()}}
+            Last Sync: {{now}}
         </div>
 
 
         <div class="tb-button-panel">
             <div class="tb-button-container">
                     
-                <div class="tb-button dl-icon">
-                    <donwload-icon></donwload-icon>
+                <div class="tb-button sync-icon">
+                    <sync-icon></sync-icon>
                 </div>
          
-                <div class="tb-button dl-icon">
-                    <donwload-icon></donwload-icon>
+                <div class="tb-button cloud-search-icon">
+                    <cloud-search-icon></cloud-search-icon>
                 </div>
          
-                <div class="tb-button dl-icon">
-                    <donwload-icon></donwload-icon>
+                <div class="tb-button download-icon">
+                    <download-icon></download-icon>
                 </div>
          
             </div>
@@ -38,13 +38,23 @@
 </template>
 
 <script>
-import DonwloadIcon from '../../assets/icons/download-icon.vue'
+import SyncIcon from '../../assets/icons/sync-icon.vue'
+import CloudSearchIcon from '../../assets/icons/cloud-search-icon.vue'
+import DownloadIcon from '../../assets/icons/download-icon.vue'
 export default {
     props:{
         user: Object,
     },
     components:{
-        DonwloadIcon: DonwloadIcon,
+        DownloadIcon: DownloadIcon,
+        SyncIcon: SyncIcon,
+        CloudSearchIcon: CloudSearchIcon,
+    },
+    data(){
+        return{
+
+            now: new Date(),
+        }
     }
 }
 </script>
@@ -102,5 +112,9 @@ export default {
 .tb-button{
     width: 1.2rem;
     height: 1.2rem;
+    /* transition: transform .1s ease; */
+}
+.tb-button:hover{
+
 }
 </style>

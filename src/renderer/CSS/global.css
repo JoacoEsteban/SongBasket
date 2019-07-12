@@ -40,7 +40,7 @@ body{
 .icon {
     width: 1rem;
     height: 1rem;
-    transition: transform .3s ease;
+    transition: transform .1s ease;
 }
 .icon:hover {
     transform: scale(1.25);
