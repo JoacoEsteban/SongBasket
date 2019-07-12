@@ -36,6 +36,7 @@ export default {
     .pl-track-count {
         position: absolute;
         box-sizing: border-box;
+        text-align: center;
         font-size: .6rem;
         width: 8rem;
         height: 1rem;

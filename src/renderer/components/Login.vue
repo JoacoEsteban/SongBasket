@@ -1,6 +1,6 @@
 <template>
-    <div>
-            <h1>SongBasket</h1>
+    <div class="login-container">
+            <h1 class="login-sb-title">SongBasket</h1>
             <button class="button" @click="login">Login to Spotify</button>
             <div>or</div>
             <router-link to="/home" tag="button" class="button"  >Continue without Logging in</router-link>
@@ -26,4 +26,10 @@ export default {
 
 <style>
     @import url('../CSS/global.css');
+    .login-container{
+        text-align: center;
+    }
+    .login-sb-title{
+        font-family: "poppins light"
+    }
 </style>

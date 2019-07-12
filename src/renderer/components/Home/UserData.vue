@@ -34,10 +34,11 @@ export default {
 
 <style>
 .ud-container{
-    height: 2rem;
+    position: sticky;
+    margin-top: 1rem;
+    height: 1.4rem;
     width: 100%;
     display: flex;
-    position: fixed;
     bottom: 0;
     background: #333;
     flex-direction: row;
@@ -53,6 +54,7 @@ export default {
     display: flex;
     align-items: center;
     width: 10rem;
+    font-family: "poppins regular";
     box-sizing: border-box;
 }
 .ud-user-img{
@@ -80,6 +82,8 @@ export default {
 
 
 .ud-playlist-count{
+    font-size: 0.7rem;
+    font-family: "poppins bold";
 }
 
 
@@ -94,8 +98,8 @@ export default {
     box-sizing: border-box;
 }
 .settings-icon {
-    width: 1.2rem;
-    height: 1.2rem;
+    width: 1rem;
+    height: 1rem;
     transition: transform .3s ease;
 }
 .settings-icon:hover {
