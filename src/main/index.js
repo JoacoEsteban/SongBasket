@@ -17,7 +17,8 @@ if (process.env.NODE_ENV !== 'development') {
   global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
 
-let mainWindow
+let mainWindow;
+let loginWindow;
 const winURL = process.env.NODE_ENV === 'development' ? `http://localhost:9080` : `file://${__dirname}/index.html`;
 
 function createWindow () {
@@ -38,42 +39,47 @@ function createWindow () {
 }
 
 function createLoginWindow(){
-  let loginWindow = new BrowserWindow({
-    width: 550,
-    height: 830,
-    useContentSize: true,
-  })
-  
-  loginWindow.loadURL(`${Backend}/init`, {"extraHeaders" : "pragma: no-cache\n"})
-  
-  loginWindow.on('closed', () => loginWindow = null  )
+  if(!loginWindow) //Prevents creating multiple loginWindows
+  {
 
-
-    //Gets user ID From backend
-    session.defaultSession.webRequest.onHeadersReceived(filter, (details, callback) => 
-    {
-      let user_id = details.responseHeaders.user_id;
-      let success = details.responseHeaders.success; //if true close window and continue
-
-      if(success == 'false') loginWindow.loadURL(`${Backend}/fail`, {"extraHeaders" : "pragma: no-cache\n"});
-
-
-      if(user_id !== undefined && success == 'true')
-      {
-        USER_ID = user_id;
-        console.log('id: ', USER_ID);
-
-        
-        //Gets playlist list from backend
-        sbFetch.fetchPlaylists(USER_ID)
-        .then(function(resolve){ 
-          console.log(resolve);
-          mainWindow.webContents.send('playlists done', resolve)
-          loginWindow.close();
-        });
-      }
-      callback({ requestHeaders: details.requestHeaders })
+    loginWindow = new BrowserWindow({
+      width: 550,
+      height: 830,
+      useContentSize: true,
     })
+    
+    loginWindow.loadURL(`${Backend}/init`, {"extraHeaders" : "pragma: no-cache\n"})
+    
+    loginWindow.on('closed', () => loginWindow = null  )
+
+
+      //Gets user ID From backend
+      session.defaultSession.webRequest.onHeadersReceived(filter, (details, callback) => 
+      {
+        let user_id = details.responseHeaders.user_id;
+        let success = details.responseHeaders.success; //if true close window and continue
+
+        if(success == 'false') loginWindow.loadURL(`${Backend}/fail`, {"extraHeaders" : "pragma: no-cache\n"});
+
+
+        if(user_id !== undefined && success == 'true')
+        {
+          USER_ID = user_id;
+          console.log('id: ', USER_ID);
+
+          
+          //Gets playlist list from backend
+          sbFetch.fetchPlaylists(USER_ID)
+          .then(function(resolve){ 
+            console.log(resolve);
+            mainWindow.webContents.send('playlists done', resolve)
+            loginWindow.close();
+          });
+        }
+        callback({ requestHeaders: details.requestHeaders })
+      })
+  }
+
 };
 
 

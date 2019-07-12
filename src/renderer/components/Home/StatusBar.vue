@@ -22,5 +22,6 @@ export default {
     background: #333;
     flex-direction: row;
     flex-wrap: nowrap;
+    margin-bottom: 1rem;
 }
 </style>

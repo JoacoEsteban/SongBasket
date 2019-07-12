@@ -3,7 +3,9 @@
         <div v-if="user !== undefined" >
             <status-bar :user="user" ></status-bar>
 
-            <playlist v-for="playlist in playlists.items" :playlist="playlist" :key="playlist.id" />
+            <div class="home-playlists-container">
+                <playlist v-for="playlist in playlists.items" :playlist="playlist" :key="playlist.id" />
+            </div>
             
             <user-data :user="user" :playlistCount="playlists.total.toString()" ></user-data>
         </div>
