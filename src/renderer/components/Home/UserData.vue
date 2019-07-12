@@ -2,21 +2,21 @@
 <div class="ud-container dev-border">
     <div class="ud-name-container dev-border">
         <div v-if="user.images[0] !== undefined" class="ud-user-img" :style="{'background-image': `url(${user.images[0].url})`}" />
-        <span class="ud-text dev-border">{{user.id}}</span>
+        <span class="ud-text dev-border">{{user.display_name !== undefined ? user.display_name : user.id}}</span>
     </div>
     <div class="ud-playlist-count dev-border">
         {{playlistCount}} Playlists
 
     </div>
     <div class="ud-settings dev-border">
-        <!-- <settings-icon /> -->
+        <settings-icon />
     </div>
 
 </div>
 </template>
 
 <script>
-// import settingsIcon from '../../assets/icons/settings-icon'
+import settingsIcon from '../../assets/icons/settings-icon.vue'
 
 export default {
     props:{
@@ -27,7 +27,7 @@ export default {
         return{}
     },
     components:{
-        // settingsIcon
+        settingsIcon
     },
 }
 </script>
@@ -52,6 +52,8 @@ export default {
 .ud-name-container{
     display: flex;
     align-items: center;
+    width: 10rem;
+    box-sizing: border-box;
 }
 .ud-user-img{
     margin: 0 .3rem;
@@ -78,7 +80,6 @@ export default {
 
 
 .ud-playlist-count{
-    display: inline-block;
 }
 
 
@@ -86,8 +87,19 @@ export default {
 
 
 .ud-settings{
-    width: 6rem;
-    height: 2rem;
-    background: #666;
+    width: 10rem;
+    height: 1.2rem;
+    padding-right: .5rem;
+    text-align: end;
+    box-sizing: border-box;
+}
+.settings-icon {
+    width: 1.2rem;
+    height: 1.2rem;
+    transition: transform .3s ease;
+}
+.settings-icon:hover {
+    transform: scale(1.25) rotate(90deg);
+    cursor: pointer;
 }
 </style>

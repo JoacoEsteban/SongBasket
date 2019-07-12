@@ -18,9 +18,9 @@ export default {
     }
     },
     //Auto login For dev speed purposes
-    // mounted(){
-    //     this.login();
-    // }
+    mounted(){
+        this.login();
+    }
 }
 </script>
 

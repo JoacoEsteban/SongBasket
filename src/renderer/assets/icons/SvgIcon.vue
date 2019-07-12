@@ -5,7 +5,7 @@
     xmlns="http://www.w3.org/2000/svg" 
     viewBox="0 0 24 24"
 >
-        <path :d="props.path" />
+        <path :d="path" />
 </svg>
 
 </template>
@@ -17,20 +17,26 @@ export default {
       type: String,
       require: true
     },
-    iconColor: String,
-    class: String,
+    iconColor:{
+      type: String,
+      require: true
+    },
+    className:{
+      type: String,
+      require: true
+    },
   },
   data(){
     return{
+      customClasses: 'icon '+ this.className,
+      style: {
+        background: 'none',
+        fill: this.iconColor,
+      },
 
     }
   },
   computed:{
-    customClasses: 'icon '+ $props.class,
-    style: {
-      background: 'none',
-      fill: $props.iconColor,
-    },
   }
 }
 </script>
