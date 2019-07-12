@@ -97,13 +97,7 @@ export default {
     text-align: end;
     box-sizing: border-box;
 }
-.settings-icon {
-    width: 1rem;
-    height: 1rem;
-    transition: transform .3s ease;
-}
 .settings-icon:hover {
     transform: scale(1.25) rotate(90deg);
-    cursor: pointer;
 }
 </style>

@@ -5,7 +5,7 @@ html{
     font-size: 30px;
 }
 body{
-    background: #222;
+    background: #151515;
     color: #ccc;
     font-family: 'Poppins regular';
     font-size: 1rem;
@@ -34,4 +34,15 @@ body{
 }
 .dev-border-b{
     border: 1px solid black;
+}
+
+
+.icon {
+    width: 1rem;
+    height: 1rem;
+    transition: transform .3s ease;
+}
+.icon:hover {
+    transform: scale(1.25);
+    cursor: pointer;
 }

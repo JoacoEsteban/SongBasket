@@ -18,16 +18,34 @@
 
 
         <div class="tb-button-panel">
-
+            <div class="tb-button-container">
+                    
+                <div class="tb-button dl-icon">
+                    <donwload-icon></donwload-icon>
+                </div>
+         
+                <div class="tb-button dl-icon">
+                    <donwload-icon></donwload-icon>
+                </div>
+         
+                <div class="tb-button dl-icon">
+                    <donwload-icon></donwload-icon>
+                </div>
+         
+            </div>
         </div>
     </div>
 </template>
 
 <script>
+import DonwloadIcon from '../../assets/icons/download-icon.vue'
 export default {
     props:{
         user: Object,
     },
+    components:{
+        DonwloadIcon: DonwloadIcon,
+    }
 }
 </script>
 
@@ -67,9 +85,22 @@ export default {
 }
 
 .tb-button-panel{
-    border: 1px solid white;
     width: 10rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     box-sizing: border-box;
-    
+    border: 1px solid white;
+}
+.tb-button-container{
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 7rem;
+    border: 1px solid white;
+}
+.tb-button{
+    width: 1.2rem;
+    height: 1.2rem;
 }
 </style>
