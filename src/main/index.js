@@ -116,7 +116,9 @@ app.on('activate', () => {
 
 ipc.on('login', function(event){
   
-  var useridtemp = false;
+  var useridtemp = null;
+  var guest = true;
+
   //Gets user id from storage. IF NULL =>
   if(!useridtemp){
     createLoginWindow();
@@ -128,6 +130,15 @@ ipc.on('login', function(event){
     
   }
   
+})
+
+ipc.on('guestSearch', function(event, { userQuery }){
+  logme(`Searching Guest user ${userQuery}`)
+
+  sbFetch.fetchPlaylists(userQuery, false)
+  .then(resolve => storePlaylists(resolve) );
+
+    
 })
 
 

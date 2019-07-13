@@ -3,7 +3,7 @@
             <h1 class="login-sb-title">SongBasket</h1>
             <button class="button" @click="login">Login to Spotify</button>
             <div>or</div>
-            <router-link to="/home" tag="button" class="button"  >Continue without Logging in</router-link>
+            <router-link to="/guest" tag="button" class="button"  >Continue without Logging in</router-link>
     </div>
 </template>
 
