@@ -3,7 +3,8 @@ import {logme} from '../UTILS'
 import electron from 'electron'
 import { app, BrowserWindow, session } from 'electron'
 import * as sbFetch from './sbFetch'
-import '../renderer/store'
+// import '../renderer/store'
+import store from '../renderer/store';
 const ipc = electron.ipcMain
 
 const localBackend = 'http://localhost:5000';
@@ -84,7 +85,9 @@ function createLoginWindow(){
 function storePlaylists(resolve)
 {
   console.log(resolve);
-  mainWindow.webContents.send('playlists done', resolve)
+  store.dispatch('UPDATE_USER_N_PLAYLISTS', resolve)
+  .then(() => mainWindow.webContents.send('playlists done') )
+
   if(loginWindow) loginWindow.close();
 }
 

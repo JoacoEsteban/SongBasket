@@ -42,9 +42,6 @@ import SyncIcon from '../../assets/icons/sync-icon.vue'
 import CloudSearchIcon from '../../assets/icons/cloud-search-icon.vue'
 import DownloadIcon from '../../assets/icons/download-icon.vue'
 export default {
-    props:{
-        user: Object,
-    },
     components:{
         DownloadIcon: DownloadIcon,
         SyncIcon: SyncIcon,
@@ -52,7 +49,7 @@ export default {
     },
     data(){
         return{
-
+            user: this.$store.state.CurrentUser.user,
             now: new Date(),
         }
     }

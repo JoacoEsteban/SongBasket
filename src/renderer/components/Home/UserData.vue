@@ -19,12 +19,11 @@
 import settingsIcon from '../../assets/icons/settings-icon.vue'
 
 export default {
-    props:{
-        user: Object,
-        playlistCount: String,
-    },
     data(){
-        return{}
+        return{
+            user: this.$store.state.CurrentUser.user,
+            playlistCount: this.$store.state.CurrentUser.playlists.total.toString()
+        }
     },
     components:{
         settingsIcon
