@@ -1,6 +1,9 @@
+import {logme} from '../UTILS'
+
 import electron from 'electron'
 import { app, BrowserWindow, session } from 'electron'
 import * as sbFetch from './sbFetch'
+import '../renderer/store'
 const ipc = electron.ipcMain
 
 const localBackend = 'http://localhost:5000';
@@ -70,19 +73,20 @@ function createLoginWindow(){
           
           //Gets playlist list from backend
           sbFetch.fetchPlaylists(USER_ID)
-          .then(function(resolve){ 
-            console.log(resolve);
-            mainWindow.webContents.send('playlists done', resolve)
-            loginWindow.close();
-          });
-        }
+          .then((resolve) => storePlaylists(resolve));
+        }else logme('FAILED TO AUTHORIZE')
         callback({ requestHeaders: details.requestHeaders })
       })
   }
 
 };
 
-
+function storePlaylists(resolve)
+{
+  console.log(resolve);
+  mainWindow.webContents.send('playlists done', resolve)
+  if(loginWindow) loginWindow.close();
+}
 
 
 
@@ -107,17 +111,14 @@ app.on('activate', () => {
 
 ipc.on('login', function(event){
   
-  var useridtemp = false;
+  var useridtemp = true;
   //Gets user id from storage. IF NULL =>
   if(!useridtemp){
     createLoginWindow();
   }else{
     //ELSE init login and get user details =>
     sbFetch.fetchPlaylists('joaqo.esteban')
-    .then(function(resolve){ 
-      console.log(resolve);
-      mainWindow.webContents.send('playlists done', resolve)
-    });
+    .then(resolve => storePlaylists(resolve) );
 
     
   }

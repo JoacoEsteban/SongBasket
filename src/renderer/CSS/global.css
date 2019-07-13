@@ -12,6 +12,9 @@ body{
     margin: 0;
     user-select: none;
 }
+body:hover{
+    cursor: default;
+}
 .button{
     outline: none;
     font-family: 'Poppins medium';
@@ -25,6 +28,7 @@ body{
     transition: transform .15s ease, background .2s ease;
 }
 .button:hover{
+    cursor: pointer;
     transform: scale(1.05);
     background: #9900cc;
     color: #fff;

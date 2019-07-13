@@ -79,7 +79,6 @@ export default {
     margin: 0 0 0 .3rem;
     box-sizing: border-box;
     width: 10rem;
-    border: 1px solid white;
 }
 .tb-selection-num{
     font-size: .9rem;
@@ -90,24 +89,21 @@ export default {
 
 .tb-mid-section{
     font-size: .5rem;
-    border: 1px solid white;
 
 }
 
 .tb-button-panel{
     width: 10rem;
+    padding-right: .6rem;
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
     align-items: center;
     box-sizing: border-box;
-    border: 1px solid white;
 }
 .tb-button-container{
     display: flex;
-    justify-content: space-evenly;
-    align-items: center;
-    width: 7rem;
-    border: 1px solid white;
+    justify-content: space-between;
+    width: 5rem;
 }
 .tb-button{
     width: 1.2rem;
