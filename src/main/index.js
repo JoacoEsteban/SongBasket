@@ -15,8 +15,6 @@ const filter = { //when logging in
   urls: ['http://*.localhost:5000/*']
 }
 
-var USER_ID = 'joaqo.esteban';
-
 if (process.env.NODE_ENV !== 'development') {
   global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
@@ -57,27 +55,31 @@ function createLoginWindow(){
     loginWindow.on('closed', () => loginWindow = null  )
 
 
-      //Gets user ID From backend
-      session.defaultSession.webRequest.onHeadersReceived(filter, (details, callback) => 
+    //Gets user ID From backend
+    session.defaultSession.webRequest.onHeadersReceived(filter, (details, callback) => 
+    {
+      let user_id = details.responseHeaders.user_id;
+      let SBID = details.responseHeaders.SBID;
+      let success = details.responseHeaders.success; //if true close window and continue
+
+      logme(SBID);
+      logme(success);
+
+      // if(success == 'false') loginWindow.loadURL(`${Backend}/fail`, {"extraHeaders" : "pragma: no-cache\n"});
+
+
+      if(SBID !== undefined && success == 'true')
       {
-        let user_id = details.responseHeaders.user_id;
-        let success = details.responseHeaders.success; //if true close window and continue
+        console.log('id: ', user_id);
 
-        if(success == 'false') loginWindow.loadURL(`${Backend}/fail`, {"extraHeaders" : "pragma: no-cache\n"});
+        //Gets playlist list from backend
+        sbFetch.fetchPlaylists(user_id, true, SBID)
+        .then((resolve) => storePlaylists(resolve));
 
+      }else logme('FAILED TO AUTHORIZE')
 
-        if(user_id !== undefined && success == 'true')
-        {
-          USER_ID = user_id;
-          console.log('id: ', USER_ID);
-
-          
-          //Gets playlist list from backend
-          sbFetch.fetchPlaylists(USER_ID)
-          .then((resolve) => storePlaylists(resolve));
-        }else logme('FAILED TO AUTHORIZE')
-        callback({ requestHeaders: details.requestHeaders })
-      })
+      callback({ requestHeaders: details.requestHeaders })
+    })
   }
 
 };
@@ -114,7 +116,7 @@ app.on('activate', () => {
 
 ipc.on('login', function(event){
   
-  var useridtemp = true;
+  var useridtemp = false;
   //Gets user id from storage. IF NULL =>
   if(!useridtemp){
     createLoginWindow();

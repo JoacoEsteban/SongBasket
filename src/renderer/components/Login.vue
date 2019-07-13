@@ -17,10 +17,10 @@ export default {
         ipc.send('login')
     }
     },
-    //Auto login For dev speed purposes
-    mounted(){
-        this.login();
-    }
+    // //Auto login For dev speed purposes
+    // mounted(){
+    //     this.login();
+    // }
 }
 </script>
 

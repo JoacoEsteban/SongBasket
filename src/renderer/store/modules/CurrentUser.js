@@ -33,13 +33,9 @@ const mutations = {
   },
 
 }
-const getters = {
-  playlistCount: state => state.playlists.total.toString()
-}
 
 export default {
   state,
   mutations,
   actions,
-  getters
 }
