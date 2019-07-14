@@ -13,9 +13,6 @@
 <script>
 const electron = require('electron')
 const ipc = electron.ipcRenderer;
-// console.log($vm0)
-
-
 
 export default {
     data(){
@@ -35,14 +32,13 @@ export default {
             }
         }
     },
-},
+    },
     mounted () 
     {
         document.getElementById('guestSearchInput').focus();
         ipc.on('not-found', () => 
         {
             this.found = 'User not found';
-
         })
     }
 }

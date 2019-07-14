@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="home-container" v-if="user !== undefined" >
+        <div v-if="playlists.items.length" class="home-container" >
             <top-bar ></top-bar>
 
             <div class="home-playlists-container">
@@ -9,6 +9,7 @@
             </div>
             <user-data ></user-data>
         </div>
+        <empty v-if="!playlists.items.length" />
         <!-- <router-link to="/" tag="button" class="button">Logout</router-link> -->
     </div>
 </template>
@@ -19,12 +20,14 @@ import 'vuex'
 import TopBar from './TopBar.vue';
 import Playlist from './Playlist.vue';
 import UserData from './UserData.vue';
+import Empty from './Empty.vue';
 
 export default {
     components:{
         TopBar,
         Playlist,
         UserData,
+        Empty,
     },
     data(){
         return{
