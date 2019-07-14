@@ -1,7 +1,10 @@
 <template>
 <div class="ud-container dev-border">
     <div class="ud-name-container dev-border">
-        <div v-if="user.images[0] !== undefined" class="ud-user-img" :style="{'background-image': `url(${user.images[0].url})`}" />
+
+        <div class="ud-user-img" :style="user.images[0] !== undefined ? {'background-image': `url(${user.images[0].url})`} : null" >
+           <user-icon v-if="user.images[0] === undefined" />   
+        </div>
         <span class="ud-text dev-border">{{user.display_name !== null ? user.display_name : user.id}}</span>
     </div>
     <div class="ud-playlist-count dev-border">
@@ -18,6 +21,7 @@
 
 <script>
 import settingsIcon from '../../assets/icons/settings-icon.vue'
+import userIcon from '../../assets/icons/user-icon.vue'
 
 export default {
     data(){
@@ -27,7 +31,8 @@ export default {
         }
     },
     components:{
-        settingsIcon
+        settingsIcon,
+        userIcon
     },
     methods:{
         loggg() {console.log('holaxd')}
@@ -63,17 +68,23 @@ export default {
 .ud-user-img{
     margin: 0 .3rem;
 
-
-    display: inline-block;
-
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
     height: 1rem;
     width: 1rem;
 
+    background-color: #282828;
     background-position: center;
     background-size: cover;
 
-    border: 1px solid white;
+    border: 1px solid #B3B3B3;
     border-radius: 2rem;
+}
+.user-icon{
+    width: .52rem;
+    height: .52rem;
 }
 .ud-text{
     margin: 0;

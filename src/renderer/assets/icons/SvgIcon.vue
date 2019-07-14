@@ -28,7 +28,7 @@ export default {
   },
   data(){
     return{
-      customClasses: 'icon '+ this.className,
+      customClasses: this.className,
       style: {
         background: 'none',
         fill: this.iconColor,
