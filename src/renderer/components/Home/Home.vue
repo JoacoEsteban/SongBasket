@@ -1,16 +1,18 @@
 <template>
     <div>
-        <div v-if="playlists.items.length" class="home-container" >
+        <div v-if="playlists.length" class="home-container" >
+        
             <top-bar ></top-bar>
 
             <div class="home-playlists-container">
-                <playlist v-for="playlist in playlists.items" :playlist="playlist" :key="playlist.id" />
+                <playlist v-for="playlist in playlists" :playlist="playlist" :key="playlist.id" />
                 <div><button class="button">Load More</button></div>
             </div>
+        
             <user-data ></user-data>
+        
         </div>
-        <empty v-if="!playlists.items.length" />
-        <!-- <router-link to="/" tag="button" class="button">Logout</router-link> -->
+        <empty v-if="!playlists.length" />
     </div>
 </template>
 
@@ -37,8 +39,12 @@ export default {
     },
     mounted(){
         console.log(this.$store.state)
-    }
+    },
+    destroyed(){
+        console.log("DESTROYINNNN:::::")
+        this.$store.dispatch('CLEAR_USER_N_PLAYLISTS')
 
+    }
 
 }
 </script>

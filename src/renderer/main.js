@@ -21,6 +21,5 @@ new Vue({
 }).$mount('#app')
 
 ipc.on('playlists done', (e) => {
-  // console.log(userObject);
   router.push({name: 'home'})
   } )
