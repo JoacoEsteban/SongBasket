@@ -6,7 +6,7 @@
 
             <div class="home-playlists-container">
                 <playlist v-for="playlist in playlists" :playlist="playlist" :key="playlist.id" />
-                <div><button class="button">Load More</button></div>
+                <div v-if="!allLoaded"><button class="button">Load More</button></div>
             </div>
         
             <user-data ></user-data>
@@ -34,8 +34,12 @@ export default {
     data(){
         return{
             user: this.$store.state.CurrentUser.user,
+            control: this.$store.state.CurrentUser.control,
             playlists: this.$store.state.CurrentUser.playlists,
         }
+    },
+    computed:{
+        allLoaded: function() {return this.control.total - this.control.loaded <= 0},
     },
     mounted(){
         console.log(this.$store.state)

@@ -33,7 +33,7 @@ const mutations = {
     state.playlists = [...state.playlists , ...object.playlists.items];
     state.control = {
       total: object.playlists.total,
-      current: state.playlists.length,
+      loaded: state.playlists.length,
       offset: object.playlists.offset,
     }
   },
