@@ -5,11 +5,11 @@
 
             <div class="home-playlists-container">
                 <playlist v-for="playlist in playlists.items" :playlist="playlist" :key="playlist.id" />
+                <div><button class="button">Load More</button></div>
             </div>
-            <button class="button">Load More</button>
             <user-data ></user-data>
         </div>
-        <router-link to="/" tag="button" class="button">Logout</router-link>
+        <!-- <router-link to="/" tag="button" class="button">Logout</router-link> -->
     </div>
 </template>
 
@@ -29,7 +29,6 @@ export default {
     data(){
         return{
             user: this.$store.state.CurrentUser.user,
-            // user: {display_name: 'Joaco Esteban'},
             playlists: this.$store.state.CurrentUser.playlists,
         }
     },
@@ -45,7 +44,8 @@ export default {
 .home-container{
     text-align: center;
 }
-    .home-playlists-container{
-        text-align: center;
-    }
+.home-playlists-container{
+    margin-bottom: 2.4rem;
+    text-align: center;
+}
 </style>

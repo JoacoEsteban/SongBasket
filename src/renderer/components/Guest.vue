@@ -1,26 +1,50 @@
 <template>
     <div class="login-container">
+            <!-- <router-link to="/" tag="button" class="button"  >Log in</router-link> -->
             <h1 class="login-sb-title">Guest</h1>
-                <input autofocus class="guest-search-box" type="text" v-model="userQuery" @keyup.enter.prevent="guestSearch" />
+                <input id="guestSearchInput" autofocus class="guest-search-box" type="text" v-model.trim="userQuery" @keyup.enter.prevent="guestSearch" />
             <button class="button" @click="guestSearch">Search User</button>
+            <div v-if="found !== undefined" class="guest-not-found">
+                {{found}}
+            </div>
     </div>
 </template>
 
 <script>
 const electron = require('electron')
 const ipc = electron.ipcRenderer;
+// console.log($vm0)
+
+
 
 export default {
     data(){
         return{
             userQuery: '',
+            found: undefined,
         }
-    },
+    },  
   methods:{
     guestSearch(){
-        ipc.send('guestSearch', { userQuery: this.userQuery })
-    }
+        if(this.found !== 'Loading')
+        {
+            if(this.userQuery !== '')
+            {
+                this.found = 'Loading';
+                ipc.send('guestSearch', { userQuery: this.userQuery })
+            }
+        }
     },
+},
+    mounted () 
+    {
+        document.getElementById('guestSearchInput').focus();
+        ipc.on('not-found', () => 
+        {
+            this.found = 'User not found';
+
+        })
+    }
 }
 </script>
 
@@ -38,5 +62,9 @@ export default {
     color: white;
     background: none;
     transition: transform .15s ease, background .2s ease;
+}
+.guest-not-found{
+    margin-top: 1rem;
+    font-size: 1.5rem;
 }
 </style>

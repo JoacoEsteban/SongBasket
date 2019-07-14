@@ -2,14 +2,15 @@
 <div class="ud-container dev-border">
     <div class="ud-name-container dev-border">
         <div v-if="user.images[0] !== undefined" class="ud-user-img" :style="{'background-image': `url(${user.images[0].url})`}" />
-        <span class="ud-text dev-border">{{user.display_name !== undefined ? user.display_name : user.id}}</span>
+        <span class="ud-text dev-border">{{user.display_name !== null ? user.display_name : user.id}}</span>
     </div>
     <div class="ud-playlist-count dev-border">
         {{playlistCount}} Playlists
 
     </div>
     <div class="ud-settings dev-border">
-        <settings-icon />
+        <router-link to="/" tag="span"><settings-icon /></router-link>
+
     </div>
 
 </div>
@@ -28,13 +29,16 @@ export default {
     components:{
         settingsIcon
     },
+    methods:{
+        loggg() {console.log('holaxd')}
+    }
 }
 </script>
 
 <style>
 .ud-container{
-    position: sticky;
-    margin-top: 1rem;
+    position: fixed;
+    /* margin-top: 1rem; */
     height: 1.4rem;
     width: 100%;
     display: flex;

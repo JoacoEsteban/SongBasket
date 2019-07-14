@@ -65,13 +65,9 @@ function createLoginWindow(){
       logme(SBID);
       logme(success);
 
-      // if(success == 'false') loginWindow.loadURL(`${Backend}/fail`, {"extraHeaders" : "pragma: no-cache\n"});
-
 
       if(SBID !== undefined && success == 'true')
       {
-        console.log('id: ', user_id);
-
         //Gets playlist list from backend
         sbFetch.fetchPlaylists(user_id, true, SBID)
         .then((resolve) => storePlaylists(resolve));
@@ -86,11 +82,13 @@ function createLoginWindow(){
 
 function storePlaylists(resolve)
 {
-  console.log(resolve);
   store.dispatch('UPDATE_USER_N_PLAYLISTS', resolve)
-  .then(() => mainWindow.webContents.send('playlists done') )
+  .then(() => 
+  {
+    mainWindow.webContents.send('playlists done');
+    if(loginWindow) loginWindow.close();
+  })
 
-  if(loginWindow) loginWindow.close();
 }
 
 
@@ -115,7 +113,7 @@ app.on('activate', () => {
 
 
 ipc.on('login', function(event){
-  
+
   var useridtemp = null;
   var guest = true;
 
@@ -136,7 +134,15 @@ ipc.on('guestSearch', function(event, { userQuery }){
   logme(`Searching Guest user ${userQuery}`)
 
   sbFetch.fetchPlaylists(userQuery, false)
-  .then(resolve => storePlaylists(resolve) );
+  .then(resolve => {
+    logme(resolve)
+    if(resolve.code == 404)
+    {
+      mainWindow.webContents.send('not-found');
+    }else{
+      storePlaylists(resolve)
+    }
+  } );
 
     
 })
