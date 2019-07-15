@@ -7,9 +7,15 @@ const localBackend = 'http://localhost:5000';
 const herokuBackend = 'https://songbasket-backend.herokuapp.com';
 const Backend = localBackend;
 
-export async function fetchPlaylists(user_id, logged, SBID)
+export async function fetchPlaylists({user_id, logged, SBID, control})
 {
-    let res = await fetch(`${Backend}/get_playlists?user_id=${user_id}&logged=${logged.toString()}&SBID=${SBID}`);
+    var limit = 30;
+    let res = await fetch(`${Backend}/get_playlists?user_id=${user_id}&logged=${logged.toString()}&SBID=${SBID}&limit=${limit}&offset=${0}`);
     let body = await res.text();
     return Promise.resolve(JSON.parse(body));
+}
+
+export async function loadMore({user_id, logged, SBID, control})
+{
+
 }

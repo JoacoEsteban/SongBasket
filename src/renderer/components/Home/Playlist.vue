@@ -1,8 +1,9 @@
 <template>
     <div class="pl-container">
         <div class="pl-track-count">{{playlist.tracks.total}} Tracks</div>
-        <div class="pl-img" :style="{backgroundImage: `url(${playlist.images[0].url})`}">
-
+        <!-- TODO Handle missing image -->
+        <div class="pl-img" :style="playlist.images.length > 0 ? {backgroundImage: `url(${playlist.images[0].url})`} : null">
+            <playlist-icon v-if="playlist.images.length === 0" />
         </div>
         <div class="pl-name">
             <!-- TODO handle multi line names -->
@@ -12,12 +13,17 @@
 </template>
 
 <script>
+import PlaylistIcon from '../../assets/icons/playlist-icon'
+
 export default {
     props:{
         playlist: Object,
     },
     data(){
         return{}
+    },
+    components:{
+        PlaylistIcon,
     }
 }
 </script>
@@ -48,6 +54,13 @@ export default {
     .pl-img {
         width: 8rem;
         height: 8rem;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        background-color: #282828;
+
         background-position: center;
         background-size: cover;
     }

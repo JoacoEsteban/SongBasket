@@ -6,7 +6,7 @@
 
             <div class="home-playlists-container">
                 <playlist v-for="playlist in playlists" :playlist="playlist" :key="playlist.id" />
-                <div v-if="!allLoaded"><button class="button">Load More</button></div>
+                <div v-if="!allLoaded"><button class="button" @click="loadMore" >Load More</button></div>
             </div>
         
             <user-data ></user-data>
@@ -17,6 +17,9 @@
 </template>
 
 <script>
+const electron = require('electron')
+const ipc = electron.ipcRenderer;
+
 import 'vuex'
 
 import TopBar from './TopBar.vue';
@@ -41,6 +44,15 @@ export default {
     computed:{
         allLoaded: function() {return this.control.total - this.control.loaded <= 0},
     },
+
+
+    methods:{
+        loadMore(){
+            ipc.send('loadMore')
+        }
+    },
+
+
     mounted(){
         console.log(this.$store.state)
     },

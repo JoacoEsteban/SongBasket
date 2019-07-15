@@ -3,7 +3,6 @@ import {logme} from '../UTILS'
 import electron from 'electron'
 import { app, BrowserWindow, session } from 'electron'
 import * as sbFetch from './sbFetch'
-// import '../renderer/store'
 import store from '../renderer/store';
 const ipc = electron.ipcMain
 
@@ -50,12 +49,13 @@ function createLoginWindow(){
       useContentSize: true,
     })
     
+    //user logs into spotify and backend retrieves access tokens
     loginWindow.loadURL(`${Backend}/init`, {"extraHeaders" : "pragma: no-cache\n"})
     
     loginWindow.on('closed', () => loginWindow = null  )
 
 
-    //Gets user ID From backend
+    //Then, Backend retrieves user data and sends it back with a unique SBID
     session.defaultSession.webRequest.onHeadersReceived(filter, (details, callback) => 
     {
       let user_id = details.responseHeaders.user_id;
@@ -68,7 +68,7 @@ function createLoginWindow(){
 
       if(SBID !== undefined && success == 'true')
       {
-        //Gets playlist list from backend
+        //Gets playlist list from backend and stores them in vuex
         sbFetch.fetchPlaylists(user_id, true, SBID)
         .then((resolve) => storePlaylists(resolve));
 
@@ -82,7 +82,7 @@ function createLoginWindow(){
 
 function storePlaylists(resolve)
 {
-  store.dispatch('UPDATE_USER_N_PLAYLISTS', resolve)
+  store.dispatch('INIT_USER', resolve)
   .then(() => 
   {
     mainWindow.webContents.send('playlists done');
@@ -110,7 +110,7 @@ app.on('activate', () => {
 
 
 
-
+// :::::::::::::::::::::::::::::::::IPC:::::::::::::::::::::::::::::::::
 
 ipc.on('login', function(event){
 
@@ -133,7 +133,7 @@ ipc.on('login', function(event){
 ipc.on('guestSearch', function(event, { userQuery }){
   logme(`Searching Guest user ${userQuery}`)
 
-  sbFetch.fetchPlaylists(userQuery, false)
+  sbFetch.fetchPlaylists({user_id: userQuery, logged: false, SBID: null})
   .then(resolve => {
     logme(resolve)
     if(resolve.code == 404)
@@ -148,7 +148,14 @@ ipc.on('guestSearch', function(event, { userQuery }){
 })
 
 
+ipc.on('loadMore', function(event){
+  logme('LOADING MORE:::::::::');
+  
+  //gets user_id, SBID and Control object
+  sbFetch.loadMore( store.getters.getMorePlaylistsData )
+  .then();
 
+})
 
 
 

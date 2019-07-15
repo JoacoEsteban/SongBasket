@@ -11,14 +11,11 @@ const getDefaultState = () => {
 const state = getDefaultState();
 
 const actions = {
-  updateUserData( { commit, user } ){
-    commit('UPDATE_USER_DATA', user )
-  },
-  updatePlaylists( { commit, playlists } ){
+  UPDATE_PLAYLISTS( { commit, playlists } ){
     commit('UPDATE_PLAYLISTS', playlists )
   },
-  UPDATE_USER_N_PLAYLISTS( { commit }, object  ){
-    commit('UPDATE_USER_N_PLAYLISTS', object);
+  INIT_USER( { commit }, object  ){
+    commit('INIT_USER', object);
   },
   CLEAR_USER_N_PLAYLISTS( { commit } ){
     commit('CLEAR_USER_N_PLAYLISTS');
@@ -26,26 +23,26 @@ const actions = {
 }
 
 const mutations = {
-  UPDATE_USER_N_PLAYLISTS(state, object)
+  INIT_USER(state, object)
   {
-    console.log('UPDATING USER:::' , object.playlists.items)
+    console.log(`INITIALIZING USER::: ${object.user.id}`)
+
     state.user = object.user;
-    state.playlists = [...state.playlists , ...object.playlists.items];
+    state.playlists = object.playlists.items;
+    
     state.control = {
       total: object.playlists.total,
       loaded: state.playlists.length,
       offset: object.playlists.offset,
     }
   },
-  UPDATE_USER_DATA(state, user)
-  {
-    state.user = user;
-  },
+
   UPDATE_PLAYLISTS(state, playlists)
   {
-    state.playlists = playlists;
+    state.playlists = [...state.playlists, ...playlists.items];
     console.log('PLAYLISTS UPDATE::::::', state.playlists)
   },
+  
   CLEAR_USER_N_PLAYLISTS(state)
   {
     console.log('CLEARING::::::::');
@@ -55,8 +52,21 @@ const mutations = {
 
 }
 
+const getters = {
+  getMorePlaylistsData: state =>
+  {
+    return {
+      user_id: state.user.id,
+      logged: state.user.logged,
+      SBID: state.user.SBID,
+      control: state.control,
+    }
+  }
+}
+
 export default {
   state,
-  mutations,
   actions,
+  mutations,
+  getters
 }
