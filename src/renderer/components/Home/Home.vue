@@ -61,7 +61,6 @@ export default {
     mounted(){
         ipc.on('done loading', () => {
             this.loading = false
-            console.log('jejexd')
         });
     },
     destroyed(){

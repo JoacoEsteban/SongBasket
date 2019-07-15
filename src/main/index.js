@@ -86,6 +86,7 @@ function storePlaylists(resolve)
   .then(() => 
   {
     mainWindow.webContents.send('playlists done');
+    mainWindow.webContents.send(`hola ${store.state.CurrentUser.playlists[0].id}`);
     if(loginWindow) loginWindow.close();
   })
 
@@ -161,6 +162,12 @@ ipc.on('loadMore', function(event)
       mainWindow.webContents.send('done loading');
     })
   })
+})
+
+ipc.on('get tracks from', function(event, id)
+{
+  console.log('LOADING FROM ', id, );
+  // sbFetch.getTracks()
 })
 
 
