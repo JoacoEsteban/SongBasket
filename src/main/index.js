@@ -148,15 +148,19 @@ ipc.on('guestSearch', function(event, { userQuery }){
 })
 
 
-ipc.on('loadMore', function(event){
+ipc.on('loadMore', function(event)
+{
   logme('LOADING MORE:::::::::');
   
   //gets user_id, SBID and Control object
   sbFetch.fetchPlaylists( store.getters.getMorePlaylistsData )
-  .then(resolve => {
-      store.dispatch('UPDATE_PLAYLISTS', resolve.playlists)
-  } );
-
+  .then(resolve => 
+  {
+    store.dispatch('UPDATE_PLAYLISTS', resolve.playlists).then(resgaudio => 
+    {
+      mainWindow.webContents.send('done loading');
+    })
+  })
 })
 
 

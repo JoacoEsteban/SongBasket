@@ -6,7 +6,7 @@
 
             <div class="home-playlists-container">
                 <playlist v-for="playlist in playlists" :playlist="playlist" :key="playlist.id" />
-                <div v-if="!allLoaded"><button class="button" @click="loadMore" >Load More</button></div>
+                <div v-if="!allLoaded"><button class="button" @click="loadMore" >{{ loading ? 'Loading' : 'Load More'}}</button></div>
             </div>
         
             <user-data ></user-data>
@@ -39,6 +39,7 @@ export default {
             user: this.$store.state.CurrentUser.user,
             control: this.$store.state.CurrentUser.control,
             playlists: this.$store.state.CurrentUser.playlists,
+            loading: false,
         }
     },
     computed:{
@@ -48,18 +49,24 @@ export default {
 
     methods:{
         loadMore(){
-            ipc.send('loadMore')
+            if(!this.loading)
+            {
+                this.loading = true;
+                ipc.send('loadMore');
+            }
         }
     },
 
 
     mounted(){
-        console.log(this.$store.state)
+        ipc.on('done loading', () => {
+            this.loading = false
+            console.log('jejexd')
+        });
     },
     destroyed(){
-        console.log("DESTROYINNNN:::::")
+        console.log("DESTROYING:::::")
         this.$store.dispatch('CLEAR_USER_N_PLAYLISTS')
-
     }
 
 }

@@ -1,6 +1,5 @@
 import Vuex from 'vuex'
 import Vue from 'vue'
-import { logme } from "../../../UTILS";
 
 const getDefaultState = () => {
   return {
