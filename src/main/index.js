@@ -69,7 +69,7 @@ function createLoginWindow(){
       if(SBID !== undefined && success == 'true')
       {
         //Gets playlist list from backend and stores them in vuex
-        sbFetch.fetchPlaylists(user_id, true, SBID)
+        sbFetch.fetchPlaylists({user_id: user_id, logged: true, SBID: SBID, control:{offset: 0}})
         .then((resolve) => storePlaylists(resolve));
 
       }else logme('FAILED TO AUTHORIZE')

@@ -1,13 +1,12 @@
 <template>
     <div class="pl-container">
         <div class="pl-track-count">{{playlist.tracks.total}} {{playlist.tracks.total === 1 ? 'Track' : 'Tracks'}}</div>
-        <!-- TODO Handle missing image -->
         <div class="pl-img" :style="playlist.images.length > 0 ? {backgroundImage: `url(${playlist.images[0].url})`} : null">
             <playlist-icon v-if="playlist.images.length === 0" />
         </div>
-        <div class="pl-name">
+        <div class="pl-name" ref="plname">
             <!-- TODO handle multi line names -->
-            {{playlist.name}}
+            {{playlistName}}
         </div>
     </div>
 </template>
@@ -20,7 +19,11 @@ export default {
         playlist: Object,
     },
     data(){
-        return{}
+        return{
+            playlistName: this.$props.playlist.name.length > 20 ? this.$props.playlist.name.substring(0, 20) + '...' : this.$props.playlist.name,
+        }
+    },
+    mounted(){
     },
     components:{
         PlaylistIcon,
