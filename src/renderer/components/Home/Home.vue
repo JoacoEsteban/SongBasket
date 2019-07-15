@@ -42,7 +42,7 @@ export default {
         }
     },
     computed:{
-        allLoaded: function() {return this.control.total - this.control.loaded <= 0},
+        allLoaded: function() {return this.control.total - this.control.offset <= 0},
     },
 
 

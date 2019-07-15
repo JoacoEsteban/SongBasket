@@ -1,6 +1,6 @@
 <template>
     <div class="pl-container">
-        <div class="pl-track-count">{{playlist.tracks.total}} Tracks</div>
+        <div class="pl-track-count">{{playlist.tracks.total}} {{playlist.tracks.total === 1 ? 'Track' : 'Tracks'}}</div>
         <!-- TODO Handle missing image -->
         <div class="pl-img" :style="playlist.images.length > 0 ? {backgroundImage: `url(${playlist.images[0].url})`} : null">
             <playlist-icon v-if="playlist.images.length === 0" />
@@ -59,7 +59,7 @@ export default {
         align-items: center;
         justify-content: center;
 
-        background-color: #282828;
+        background-color: #2e2e2e;
 
         background-position: center;
         background-size: cover;

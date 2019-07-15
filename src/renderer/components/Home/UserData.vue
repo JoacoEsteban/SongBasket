@@ -8,7 +8,7 @@
         <span class="ud-text dev-border">{{user.display_name !== null ? user.display_name : user.id}}</span>
     </div>
     <div class="ud-playlist-total dev-border">
-        {{playlistLoaded}} of {{playlistTotal}} Playlists
+        {{this.$store.state.CurrentUser.control.offset.toString()}} of {{this.$store.state.CurrentUser.control.total.toString()}} Playlists
 
     </div>
     <div class="ud-settings dev-border">
@@ -27,8 +27,6 @@ export default {
     data(){
         return{
             user: this.$store.state.CurrentUser.user,
-            playlistTotal: this.$store.state.CurrentUser.control.total.toString(),
-            playlistLoaded: this.$store.state.CurrentUser.control.loaded.toString(),
         }
     },
     components:{

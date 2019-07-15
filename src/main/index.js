@@ -133,7 +133,7 @@ ipc.on('login', function(event){
 ipc.on('guestSearch', function(event, { userQuery }){
   logme(`Searching Guest user ${userQuery}`)
 
-  sbFetch.fetchPlaylists({user_id: userQuery, logged: false, SBID: null})
+  sbFetch.fetchPlaylists({user_id: userQuery, logged: false, SBID: null, control:{offset: 0}})
   .then(resolve => {
     logme(resolve)
     if(resolve.code == 404)
@@ -152,8 +152,10 @@ ipc.on('loadMore', function(event){
   logme('LOADING MORE:::::::::');
   
   //gets user_id, SBID and Control object
-  sbFetch.loadMore( store.getters.getMorePlaylistsData )
-  .then();
+  sbFetch.fetchPlaylists( store.getters.getMorePlaylistsData )
+  .then(resolve => {
+      store.dispatch('UPDATE_PLAYLISTS', resolve.playlists)
+  } );
 
 })
 

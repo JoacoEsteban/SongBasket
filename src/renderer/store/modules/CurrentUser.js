@@ -1,3 +1,5 @@
+import Vuex from 'vuex'
+import Vue from 'vue'
 import { logme } from "../../../UTILS";
 
 const getDefaultState = () => {
@@ -11,7 +13,7 @@ const getDefaultState = () => {
 const state = getDefaultState();
 
 const actions = {
-  UPDATE_PLAYLISTS( { commit, playlists } ){
+  UPDATE_PLAYLISTS( { commit}, playlists  ){
     commit('UPDATE_PLAYLISTS', playlists )
   },
   INIT_USER( { commit }, object  ){
@@ -32,15 +34,22 @@ const mutations = {
     
     state.control = {
       total: object.playlists.total,
-      loaded: state.playlists.length,
-      offset: object.playlists.offset,
+      offset: state.playlists.length
     }
   },
 
   UPDATE_PLAYLISTS(state, playlists)
   {
-    state.playlists = [...state.playlists, ...playlists.items];
-    console.log('PLAYLISTS UPDATE::::::', state.playlists)
+    
+    for(let i = 0; i < playlists.items.length; i++)
+    {
+      Vue.set(state.playlists, state.playlists.length, playlists.items[i])
+      // console.log(playlists.items[i])
+    }
+
+    Vue.set(state.control, 'offset', state.playlists.length)
+    
+    console.log('PLAYLISTS UPDATE::::::')
   },
   
   CLEAR_USER_N_PLAYLISTS(state)

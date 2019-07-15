@@ -9,8 +9,8 @@ const Backend = localBackend;
 
 export async function fetchPlaylists({user_id, logged, SBID, control})
 {
-    var limit = 30;
-    let res = await fetch(`${Backend}/get_playlists?user_id=${user_id}&logged=${logged.toString()}&SBID=${SBID}&limit=${limit}&offset=${0}`);
+    var limit = 20;
+    let res = await fetch(`${Backend}/get_playlists?user_id=${user_id}&logged=${logged.toString()}&SBID=${SBID}&limit=${limit}&offset=${control.offset}`);
     let body = await res.text();
     return Promise.resolve(JSON.parse(body));
 }
