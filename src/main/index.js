@@ -167,7 +167,17 @@ ipc.on('loadMore', function(event)
 ipc.on('get tracks from', function(event, id)
 {
   console.log('LOADING FROM ', id, );
-  // sbFetch.getTracks()
+  sbFetch.getTracks(store.getters.getMorePlaylistsData, id)
+  .then(tracks => 
+  {
+
+    console.log(tracks)
+    //STORE THEM
+    // store.dispatch('UPDATE_TRACKS', tracks).then(resgaudio => 
+    // {
+    //   mainWindow.webContents.send('done loading');
+    // })
+  })
 })
 
 

@@ -15,7 +15,10 @@ export async function fetchPlaylists({user_id, logged, SBID, control})
     return Promise.resolve(JSON.parse(body));
 }
 
-export async function getTracks({user_id, logged, SBID, control})
+export async function getTracks({user_id, logged, SBID, control}, playlist_id)
 {
+    let res = await fetch(`${Backend}/retrieve?user_id=${user_id}&logged=${logged.toString()}&SBID=${SBID}&limit=100&offset=${control.offset}&retrieve=playlist_tracks&playlist_id=${playlist_id}`);
+    let body = await res.text();
+    return Promise.resolve(JSON.parse(body));
 
 }
