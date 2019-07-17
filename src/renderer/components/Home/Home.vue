@@ -59,6 +59,8 @@ export default {
 
 
     mounted(){
+        console.log(this.user)
+
         ipc.on('done loading', () => {
             this.loading = false
         });
