@@ -82,6 +82,7 @@ function createLoginWindow(){
 
 function storePlaylists(resolve)
 {
+  console.log(' A bWr GaSrRoN:: ', resolve)
   store.dispatch('INIT_USER', resolve)
   .then(() => 
   {
@@ -154,6 +155,7 @@ ipc.on('loadMore', function(event)
   logme('LOADING MORE:::::::::');
   
   //gets user_id, SBID and Control object
+  console.log('A VER FORRO: ', store.getters.getMorePlaylistsData)
   sbFetch.fetchPlaylists( store.getters.getMorePlaylistsData )
   .then(resolve => 
   {
@@ -167,6 +169,7 @@ ipc.on('loadMore', function(event)
 ipc.on('get tracks from', function(event, id)
 {
   console.log('LOADING FROM ', id, );
+  console.log('A VER FORRO: ', store.getters.getMorePlaylistsData)
   sbFetch.getTracks(store.getters.getMorePlaylistsData, id)
   .then(tracks => 
   {

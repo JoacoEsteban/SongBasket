@@ -10,14 +10,15 @@ const Backend = localBackend;
 export async function fetchPlaylists({user_id, logged, SBID, control})
 {
     var limit = 20;
-    let res = await fetch(`${Backend}/retrieve?user_id=${user_id}&logged=${logged.toString()}&SBID=${SBID}&limit=${limit}&offset=${control.offset}&retrieve=playlists`);
+    let res = await fetch(`${Backend}/retrieve?user_id=${user_id}&logged=${logged.toString()}&SBID=${SBID}&limit=${limit}&offset=${control.offset}&retrieve=playlists&retrieve_user_data=true`);
     let body = await res.text();
     return Promise.resolve(JSON.parse(body));
 }
 
 export async function getTracks({user_id, logged, SBID, control}, playlist_id)
 {
-    let res = await fetch(`${Backend}/retrieve?user_id=${user_id}&logged=${logged.toString()}&SBID=${SBID}&limit=100&offset=${control.offset}&retrieve=playlist_tracks&playlist_id=${playlist_id}`);
+    logme(SBID)
+    let res = await fetch(`${Backend}/retrieve?user_id=${user_id}&logged=${logged.toString()}&SBID=${SBID}&limit=100&offset=${control.offset}&retrieve=playlist_tracks&playlist_id=${playlist_id}retrieve_user_data=false`);
     let body = await res.text();
     return Promise.resolve(JSON.parse(body));
 
