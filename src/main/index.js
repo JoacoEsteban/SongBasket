@@ -123,11 +123,8 @@ ipc.on('login', function(event){
   if(!useridtemp){
     createLoginWindow();
   }else{
-    //ELSE init login and get user details =>
-    sbFetch.fetchPlaylists('joaqo.esteban')
-    .then(resolve => storePlaylists(resolve) );
+    //TODO ELSE init login and get user details =>
 
-    
   }
   
 })
@@ -142,6 +139,7 @@ ipc.on('guestSearch', function(event, { userQuery }){
     {
       mainWindow.webContents.send('not-found');
     }else{
+      console.log('a ver gasti: ', resolve)
       storePlaylists(resolve)
     }
   } );
@@ -152,14 +150,13 @@ ipc.on('guestSearch', function(event, { userQuery }){
 
 ipc.on('loadMore', function(event)
 {
-  logme('LOADING MORE:::::::::');
+  logme('LOADING MORE PLAYLISTS:::::::::');
   
   //gets user_id, SBID and Control object
-  console.log('A VER FORRO: ', store.getters.getMorePlaylistsData)
-  sbFetch.fetchPlaylists( store.getters.getMorePlaylistsData )
+  sbFetch.fetchPlaylists( store.getters.RequestParams )
   .then(resolve => 
   {
-    store.dispatch('UPDATE_PLAYLISTS', resolve.playlists).then(resgaudio => 
+    store.dispatch('UPDATE_PLAYLISTS', resolve.playlists).then( () => 
     {
       mainWindow.webContents.send('done loading');
     })
@@ -169,17 +166,15 @@ ipc.on('loadMore', function(event)
 ipc.on('get tracks from', function(event, id)
 {
   console.log('LOADING FROM ', id, );
-  console.log('A VER FORRO: ', store.getters.getMorePlaylistsData)
-  sbFetch.getTracks(store.getters.getMorePlaylistsData, id)
-  .then(tracks => 
+  sbFetch.getTracks(store.getters.RequestParams, id)
+  .then(response => 
   {
-
-    console.log(tracks)
+    
     //STORE THEM
-    // store.dispatch('UPDATE_TRACKS', tracks).then(resgaudio => 
-    // {
-    //   mainWindow.webContents.send('done loading');
-    // })
+    store.dispatch('PLAYLIST_STORE_TRACKS', {id, tracks: response.tracks}).then( () => 
+    {
+      mainWindow.webContents.send('tracks loaded', id);
+    })
   })
 })
 

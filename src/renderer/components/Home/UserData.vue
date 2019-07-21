@@ -43,10 +43,10 @@ export default {
 .ud-container{
     position: fixed;
     /* margin-top: 1rem; */
-    height: 1.4rem;
+    height: 1.6rem;
     width: 100%;
     display: flex;
-    bottom: 0;
+    bottom: -.1rem;
     background: #333;
     flex-direction: row;
     flex-wrap: nowrap;
