@@ -1,4 +1,4 @@
-import {logme} from '../UTILS'
+import { logme } from '../UTILS'
 
 import electron from 'electron'
 import { app, BrowserWindow, session } from 'electron'
@@ -22,7 +22,7 @@ let mainWindow;
 let loginWindow;
 const winURL = process.env.NODE_ENV === 'development' ? `http://localhost:9080` : `file://${__dirname}/index.html`;
 
-function createWindow () {
+function createWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 500,
@@ -39,8 +39,8 @@ function createWindow () {
   })
 }
 
-function createLoginWindow(){
-  if(!loginWindow) //Prevents creating multiple loginWindows
+function createLoginWindow() {
+  if (!loginWindow) //Prevents creating multiple loginWindows
   {
 
     loginWindow = new BrowserWindow({
@@ -48,16 +48,15 @@ function createLoginWindow(){
       height: 830,
       useContentSize: true,
     })
-    
+
     //user logs into spotify and backend retrieves access tokens
-    loginWindow.loadURL(`${Backend}/init`, {"extraHeaders" : "pragma: no-cache\n"})
-    
-    loginWindow.on('closed', () => loginWindow = null  )
+    loginWindow.loadURL(`${Backend}/init`, { "extraHeaders": "pragma: no-cache\n" })
+
+    loginWindow.on('closed', () => loginWindow = null)
 
 
     //Then, Backend retrieves user data and sends it back with a unique SBID
-    session.defaultSession.webRequest.onHeadersReceived(filter, (details, callback) => 
-    {
+    session.defaultSession.webRequest.onHeadersReceived(filter, (details, callback) => {
       let user_id = details.responseHeaders.user_id;
       let SBID = details.responseHeaders.SBID;
       let success = details.responseHeaders.success; //if true close window and continue
@@ -66,13 +65,12 @@ function createLoginWindow(){
       logme(success);
 
 
-      if(SBID !== undefined && success == 'true')
-      {
+      if (SBID !== undefined && success == 'true') {
         //Gets playlist list from backend and stores them in vuex
-        sbFetch.fetchPlaylists({user_id: user_id, logged: true, SBID: SBID, control:{offset: 0}})
-        .then((resolve) => storePlaylists(resolve));
+        sbFetch.fetchPlaylists({ user_id: user_id, logged: true, SBID: SBID, control: { offset: 0 } })
+          .then((resolve) => storePlaylists(resolve));
 
-      }else logme('FAILED TO AUTHORIZE')
+      } else logme('FAILED TO AUTHORIZE')
 
       callback({ requestHeaders: details.requestHeaders })
     })
@@ -80,16 +78,12 @@ function createLoginWindow(){
 
 };
 
-function storePlaylists(resolve)
-{
-  console.log(' A bWr GaSrRoN:: ', resolve)
+function storePlaylists(resolve) {
   store.dispatch('INIT_USER', resolve)
-  .then(() => 
-  {
-    mainWindow.webContents.send('playlists done');
-    mainWindow.webContents.send(`hola ${store.state.CurrentUser.playlists[0].id}`);
-    if(loginWindow) loginWindow.close();
-  })
+    .then(() => {
+      mainWindow.webContents.send('playlists done');
+      if (loginWindow) loginWindow.close();
+    })
 
 }
 
@@ -114,68 +108,60 @@ app.on('activate', () => {
 
 // :::::::::::::::::::::::::::::::::IPC:::::::::::::::::::::::::::::::::
 
-ipc.on('login', function(event){
+ipc.on('login', function (event) {
 
   var useridtemp = null;
   var guest = true;
 
   //Gets user id from storage. IF NULL =>
-  if(!useridtemp){
+  if (!useridtemp) {
     createLoginWindow();
-  }else{
+  } else {
     //TODO ELSE init login and get user details =>
 
   }
-  
+
 })
 
-ipc.on('guestSearch', function(event, { userQuery }){
+ipc.on('guestSearch', function (event, { userQuery }) {
   logme(`Searching Guest user ${userQuery}`)
 
-  sbFetch.fetchPlaylists({user_id: userQuery, logged: false, SBID: null, control:{offset: 0}})
-  .then(resolve => {
-    logme(resolve)
-    if(resolve.code == 404)
-    {
-      mainWindow.webContents.send('not-found');
-    }else{
-      console.log('a ver gasti: ', resolve)
-      storePlaylists(resolve)
-    }
-  } );
+  sbFetch.fetchPlaylists({ user_id: userQuery, logged: false, SBID: null, control: { offset: 0 } })
+    .then(resolve => {
+      logme(resolve)
+      if (resolve.code == 404) {
+        mainWindow.webContents.send('not-found');
+      } else {
+        storePlaylists(resolve)
+      }
+    });
 
-    
+
 })
 
 
-ipc.on('loadMore', function(event)
-{
+ipc.on('loadMore', function (event) {
   logme('LOADING MORE PLAYLISTS:::::::::');
-  
+
   //gets user_id, SBID and Control object
-  sbFetch.fetchPlaylists( store.getters.RequestParams )
-  .then(resolve => 
-  {
-    store.dispatch('UPDATE_PLAYLISTS', resolve.playlists).then( () => 
-    {
-      mainWindow.webContents.send('done loading');
+  sbFetch.fetchPlaylists(store.getters.RequestParams)
+    .then(resolve => {
+      store.dispatch('UPDATE_PLAYLISTS', resolve.playlists).then(() => {
+        mainWindow.webContents.send('done loading');
+      })
     })
-  })
 })
 
-ipc.on('get tracks from', function(event, id)
-{
-  console.log('LOADING FROM ', id, );
+ipc.on('get tracks from', function (event, id) {
+  console.log('LOADING FROM ', id);
   sbFetch.getTracks(store.getters.RequestParams, id)
-  .then(response => 
-  {
-    
-    //STORE THEM
-    store.dispatch('PLAYLIST_STORE_TRACKS', {id, tracks: response.tracks}).then( () => 
-    {
-      mainWindow.webContents.send('tracks loaded', id);
+    .then(response => {
+
+      //STORE THEM
+      store.dispatch('PLAYLIST_STORE_TRACKS', { id, tracks: response.tracks }).then(() => {
+        mainWindow.webContents.send('open playlist', id);
+      })
     })
-  })
 })
 
 

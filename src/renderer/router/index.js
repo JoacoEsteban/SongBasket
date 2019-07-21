@@ -24,5 +24,10 @@ export default new Router({
       name: 'home',
       component: require('@/components/Home/Home').default
     },
+    {
+      path: '/playlist',
+      name: 'playlist-view',
+      component: require('@/components/Home/PlaylistView').default
+    },
   ]
 })

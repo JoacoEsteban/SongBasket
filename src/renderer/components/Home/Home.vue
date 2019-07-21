@@ -4,6 +4,7 @@
         
             <top-bar ></top-bar>
 
+<!-- TODO Change into a router view. Enables changing middle section between the playlist list and the playlist view -->
             <div class="home-playlists-container">
                 <playlist v-for="playlist in playlists" :playlist="playlist" :key="playlist.id" />
                 <div v-if="!allLoaded"><button class="button" @click="loadMore" >{{ loading ? 'Loading' : 'Load More'}}</button></div>
@@ -64,6 +65,8 @@ export default {
         ipc.on('done loading', () => {
             this.loading = false
         });
+
+
     },
     destroyed(){
         console.log("DESTROYING:::::")
