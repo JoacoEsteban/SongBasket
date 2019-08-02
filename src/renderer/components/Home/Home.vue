@@ -10,7 +10,7 @@
                 <div v-if="!allLoaded"><button class="button" @click="loadMore" >{{ loading ? 'Loading' : 'Load More'}}</button></div>
             </div>
         
-            <user-data ></user-data>
+            <user-data @logOut="logOut" ></user-data>
         
         </div>
         <empty v-if="!playlists.length" />
@@ -55,23 +55,25 @@ export default {
                 this.loading = true;
                 ipc.send('loadMore');
             }
+        },
+        logOut(){
+            console.log("DESTROYING:::::")
+            this.$router.push('/')
+            this.$store.dispatch('CLEAR_USER_N_PLAYLISTS')
         }
     },
 
 
     mounted(){
-        console.log(this.user)
+        console.log('USER::::', this.user)
 
         ipc.on('done loading', () => {
             this.loading = false
         });
 
 
-    },
-    destroyed(){
-        console.log("DESTROYING:::::")
-        this.$store.dispatch('CLEAR_USER_N_PLAYLISTS')
     }
+    
 
 }
 </script>

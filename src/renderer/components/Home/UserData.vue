@@ -12,7 +12,7 @@
 
     </div>
     <div class="ud-settings dev-border">
-        <router-link to="/" tag="span"><settings-icon /></router-link>
+        <span @click="$emit('logOut')"><settings-icon /></span>
 
     </div>
 
