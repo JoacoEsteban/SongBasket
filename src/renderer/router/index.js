@@ -6,6 +6,10 @@ Vue.use(Router)
 export default new Router({
   routes: [
     {
+      path: '*',
+      redirect: '/'
+    },
+    {
       path: '/',
       name: 'login',
       component: require('@/components/Login').default
@@ -16,18 +20,21 @@ export default new Router({
       component: require('@/components/Guest').default
     },
     {
-      path: '*',
-      redirect: '/'
-    },
-    {
       path: '/home',
       name: 'home',
-      component: require('@/components/Home/Home').default
-    },
-    {
-      path: '/playlist',
-      name: 'playlist-view',
-      component: require('@/components/Home/PlaylistView').default
+      component: require('@/components/Home/Home').default,
+      children:[
+        {
+          path: '',
+          name: 'playlists-list',
+          component: require('@/components/Home/PlaylistsList').default
+        },
+        {
+          path: 'playlist-view',
+          name: 'playlist-view',
+          component: require('@/components/Home/PlaylistView').default
+        },
+      ]
     },
   ]
 })

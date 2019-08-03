@@ -21,10 +21,5 @@ new Vue({
 }).$mount('#app')
 
 ipc.on('playlists done', (e) => {
-  router.push({name: 'home'})
+  router.push({path: '/home'})
 } )
-
-ipc.on('open playlist', (event, id) => {
-  console.log('TRACKS LOADED FOM PL WITH ID ', id)
-  router.push({name: 'playlist-view', id: id})
-});
