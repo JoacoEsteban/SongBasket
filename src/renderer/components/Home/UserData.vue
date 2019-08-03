@@ -43,7 +43,7 @@ export default {
 .ud-container{
     /* position: static; */
     /* margin-top: 1rem; */
-    height: 1.6rem;
+    min-height: 1.6rem;
     width: 100%;
     display: flex;
     bottom: -.1rem;

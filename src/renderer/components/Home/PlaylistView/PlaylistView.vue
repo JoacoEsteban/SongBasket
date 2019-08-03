@@ -6,7 +6,7 @@
     </div>
     <div class="plv-rightpanel">
       <div class="plv-rp-data">
-        <h1>{{playlist.name}}</h1>
+        <div class="plv-rp-data-plname">{{playlist.name}}</div>
       </div>
       <div class="plv-rp-tracklist">
       </div>
@@ -51,27 +51,36 @@ export default {
 .plv-container{
   display: flex;
   flex-direction: row;
-  border: 1px solid white;
+  /* border: 1px solid white; */
   padding: 0;
+  padding-top: .2rem;
 }
 .plv-leftpanel{
   display: flex;
   flex-direction: column;
   align-items: center;
-  border: 1px solid white;
-  width: 25%;
+  /* border: 1px solid white; */
+  width: 9rem;
 
 }
-.plv-rightpanel{
-  width: 75%;
-}
 .plv-lp-img{
-  width: 7rem;
-  height: 7rem;
+  width: 75%;
+  padding-bottom: 75%;
   background-size: cover;
 }
+
+.plv-rightpanel{
+  width: 75%;
+  /* border: 1px solid white; */
+}
+.plv-rp-data-plname{
+  font-family: 'Poppins Black';
+  text-align: left;
+  font-size: 1.5rem;
+  line-height: .8;
+}
 .plv-rp-tracklist{
-  height: 150%;
-  overflow: auto;
+  /* height: 150%; */
+  overflow-y: scroll;
 }
 </style>

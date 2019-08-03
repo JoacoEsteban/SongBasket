@@ -60,7 +60,7 @@ export default {
 <style>
 .tb-container {
   text-align: left;
-  height: 2.7rem;
+  min-height: 2.7rem;
   width: 100%;
   display: flex;
   /* position: sticky; */

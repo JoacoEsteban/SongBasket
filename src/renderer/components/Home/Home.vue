@@ -88,7 +88,7 @@ export default {
   justify-content: space-between;
 }
 .home-router{
-  height: 81.1%;
+  height: 100%;
   padding: 1rem 0;
   box-sizing: border-box;
 }
