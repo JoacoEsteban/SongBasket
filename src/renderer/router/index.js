@@ -20,6 +20,11 @@ export default new Router({
       component: require('@/components/Guest').default
     },
     {
+      path: '/empty',
+      name: 'empty',
+      component: require('@/components/Empty').default
+    },
+    {
       path: '/home',
       name: 'home',
       component: require('@/components/Home/Home').default,

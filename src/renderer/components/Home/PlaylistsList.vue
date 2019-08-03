@@ -1,6 +1,7 @@
 <template>
   <div class="home-playlists-container">
-    <playlist v-for="playlist in playlists" :playlist="playlist" :key="playlist.id" />
+    <playlist v-for="playlist in playlists" :playlist="playlist" :key="playlist.id"
+    @openPlaylist="$emit('openPlaylist', playlist.id)" />
 
     <div v-if="!allLoaded">
       <button class="button" @click="loadMore">{{ loading ? 'Loading' : 'Load More'}}</button>

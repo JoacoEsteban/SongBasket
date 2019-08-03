@@ -1,11 +1,13 @@
 import Vuex from 'vuex'
 import Vue from 'vue'
+import { isNullOrUndefined } from 'util';
 
 const getDefaultState = () => {
   return {
     user: {}, //Includes name, number of playlists, image url
     playlists: [],
-    control: {}
+    control: {},
+    currentPlaylist: ''
   }
 }
 
@@ -24,6 +26,12 @@ const actions = {
   PLAYLIST_STORE_TRACKS({ commit }, {id, tracks}) {
     console.log({id, tracks})
     commit('PLAYLIST_STORE_TRACKS', {id, tracks});
+  },
+  SET_CURRENT_PLAYLIST({ commit }, id) {
+    return new Promise((resolve, reject) =>{
+      commit('SET_CURRENT_PLAYLIST', id);
+      resolve();
+    })
   }
 }
 
@@ -64,7 +72,6 @@ const mutations = {
     
     console.log('STORING ' + tracks.length + ' TRACKS FOR PLAYLIST WITH ID ' + id);
     
-    
     let done = false;
     for (let i = 0; i < state.playlists.length; i++) {
       let pl = state.playlists[i]
@@ -72,12 +79,16 @@ const mutations = {
       if (pl.id === id) {
         pl.tracks.items = tracks
         done = true
-        console.log('TRACKS SET FOR PLAYLIST WITH ID ' + id)
+        console.log('DONE')
       }
     
     }
     if(!done) console.log('PLAYLIST NOT FOUND WHEN SETTING TRACKS INSIDE STATE (VUEX)')
 
+  },
+  SET_CURRENT_PLAYLIST(state, id){
+    console.log('SETTING PLAYLIST WITH ID ' + id + ' AS SELECTED')
+    state.currentPlaylist = id
   }
 
 }
@@ -90,8 +101,23 @@ const getters = {
       SBID: state.user.SBID,
       control: state.control,
     }
+  },
+  CurrentPlaylist: (state) => {
+      let done = false;
+      for (let i = 0; i < state.playlists.length; i++) {
+        let pl = state.playlists[i]
+      
+        if (pl.id === state.currentPlaylist) {
+          if(isNullOrUndefined(pl.tracks)) return null
+          
+          return pl
+        }
+      
+      }
+      return null
+
+    }
   }
-}
 
 export default {
   state,

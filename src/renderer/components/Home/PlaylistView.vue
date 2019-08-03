@@ -3,7 +3,9 @@
     <router-link to="/home" tag="span">
       <settings-icon />
     </router-link>
-    <h1>PLAYLIST {{id}}</h1>
+    
+    <h1>{{playlist.name}}</h1>
+      <div v-for="(song, index) in playlist.tracks.items" :key="index"> {{song.track.name}} </div>
   </div>
 </template>
 
@@ -18,13 +20,19 @@ export default {
   data() {
     return {
       //TODO make it work
-      id: this.$route.params.id
     };
   },
   components:{
     settingsIcon
   },
-  computed: {}
+  computed: {
+    playlist(){
+      return this.$store.getters.CurrentPlaylist
+    }
+  },
+  mounted(){
+    console.log('PLAYLISTTTTT:::::', this.playlist)
+  }
 };
 </script>
 

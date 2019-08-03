@@ -2,7 +2,7 @@
     <div class="pl-container">
         <div class="pl-track-count">{{playlist.tracks.total}} {{playlist.tracks.total === 1 ? 'Track' : 'Tracks'}}</div>
         <div class="pl-img" :style="playlist.images.length > 0 ? {backgroundImage: `url(${playlist.images[0].url})`} : null">
-            <button class="button" @click="getTracks">Open</button>
+            <button class="button" @click="$emit('openPlaylist')">Open</button>
             <playlist-icon v-if="playlist.images.length === 0" />
         </div>
         <div class="pl-name" ref="plname">
@@ -35,7 +35,6 @@ export default {
         PlaylistIcon,
     },
     methods:{
-        getTracks(){ipc.send('get tracks from', this.playlist.id)}
     }
 }
 </script>

@@ -3,13 +3,10 @@
     <div class="home-container">
       <top-bar></top-bar>
 
-      <!-- TODO Change into a router view. Enables changing middle section between the playlist list and the playlist view -->
-      <router-view path="playlists-list"></router-view>
-      <!-- <playlists-list> </playlists-list > -->
+      <router-view @openPlaylist="getTracks($event)" path="playlists-list"></router-view>
 
       <user-data @logOut="logOut"></user-data>
     </div>
-    <!-- <empty v-if="!playlists.length" /> -->
   </div>
 </template>
 
@@ -23,7 +20,6 @@ import TopBar from "./TopBar.vue";
 import PlaylistsList from "./PlaylistsList.vue";
 import Playlist from "./Playlist.vue";
 import UserData from "./UserData.vue";
-import Empty from "./Empty.vue";
 
 export default {
   components: {
@@ -31,7 +27,6 @@ export default {
     PlaylistsList,
     Playlist,
     UserData,
-    Empty
   },
   data() {
     return {
@@ -53,6 +48,10 @@ export default {
         ipc.send("loadMore");
       }
     },
+     getTracks(id){
+       ipc.send('get tracks from', id)
+       },
+
     logOut() {
       console.log("DESTROYING:::::");
       this.$router.push("/");
@@ -63,15 +62,17 @@ export default {
   mounted() {
     console.log("USER::::", this.user);
 
+    if (this.$store.state.CurrentUser.playlists.length === 0)
+      this.$router.push("/empty");
+
     ipc.on("done loading", () => {
       this.loading = false;
     });
 
-
-
     ipc.on("open playlist", (event, id) => {
-      console.log("TRACKS LOADED FOM PL WITH ID ", id);
-      this.$router.push({ name: "playlist-view", id: id });
+      this.$store.dispatch('SET_CURRENT_PLAYLIST', id)
+      // .then( () => )
+      this.$router.push('/home/playlist-view');
     });
   }
 };
