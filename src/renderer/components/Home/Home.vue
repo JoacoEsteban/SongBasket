@@ -2,7 +2,7 @@
   <div>
     <div class="home-container">
       <top-bar></top-bar>
-
+      
       <router-view @openPlaylist="getTracks($event)" path="playlists-list"></router-view>
 
       <user-data @logOut="logOut"></user-data>
@@ -80,10 +80,17 @@ export default {
 
 <style>
 .home-container {
+  display: flex;
   text-align: center;
+  height: 100vh;
+  overflow: hidden;
+  flex-direction: column;
+  justify-content: space-between;
 }
-.home-playlists-container {
-  margin-bottom: 2.4rem;
-  text-align: center;
+.home-router{
+  height: 81.1%;
+  padding: 1rem 0;
+  box-sizing: border-box;
 }
+
 </style>

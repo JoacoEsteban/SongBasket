@@ -41,7 +41,7 @@ export default {
 
 <style>
 .ud-container{
-    position: fixed;
+    /* position: static; */
     /* margin-top: 1rem; */
     height: 1.6rem;
     width: 100%;
@@ -95,7 +95,7 @@ export default {
 
 
 .ud-playlist-total{
-    font-size: 0.7rem;
+    font-size: 0.69rem;
     font-family: "poppins bold";
 }
 

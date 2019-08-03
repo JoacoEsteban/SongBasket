@@ -3,6 +3,8 @@
 
 html{
     font-size: 30px;
+    height: 100vh;
+    overflow: hidden;
 }
 body{
     background: #151515;
@@ -11,6 +13,7 @@ body{
     font-size: 1rem;
     margin: 0;
     user-select: none;
+    overflow: hidden;
 }
 body:hover{
     cursor: default;

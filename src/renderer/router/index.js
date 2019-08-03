@@ -37,7 +37,7 @@ export default new Router({
         {
           path: 'playlist-view',
           name: 'playlist-view',
-          component: require('@/components/Home/PlaylistView').default
+          component: require('@/components/Home/PlaylistView/PlaylistView').default
         },
       ]
     },
