@@ -8,3 +8,14 @@ export function resize_to_fit(outer, inner) {
             break;
     }
 }
+
+export function convertMS( milliseconds ) {
+    var day, hour, minutes, seconds;
+    seconds = Math.floor(milliseconds / 1000);
+    minutes = Math.floor(seconds / 60);
+    seconds = seconds % 60;
+    return {
+        minutes,
+        seconds
+    };
+}
