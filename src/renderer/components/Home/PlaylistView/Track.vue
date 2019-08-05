@@ -1,18 +1,23 @@
 <template>
   <div class="pl-track-container">
-    <div class="pl-track-img-container">
-      <div class="pl-track-img" :style="'background-image: url('+track.album.images[0].url+')'" />
-    </div>
-    <div class="pl-track-data">
-      <div class="pl-track-data-up">
-        <div class="pl-track-data-name">{{track.name}}</div>
-        <div class="pl-track-data-albumname">{{track.album.name}}</div>
-        <div class="pl-track-data-byartist">by {{artists}}</div>
+    <div class="pl-track-info-container">
+      <div class="pl-track-img-container">
+        <div class="pl-track-img" :style="'background-image: url('+track.album.images[0].url+')'" />
       </div>
+      <div class="pl-track-data">
+        <div class="pl-track-data-up">
+          <div class="pl-track-data-name">{{track.name}}</div>
+          <div class="pl-track-data-albumname">{{track.album.name}}</div>
+          <div class="pl-track-data-byartist">by {{artists}}</div>
+        </div>
 
-      <div class="pl-track-data-down">
-        <div class="pl-track-data-duration">Duration: {{durationFormatted}}</div>
+        <div class="pl-track-data-down">
+          <div class="pl-track-data-duration">Duration: {{durationFormatted}}</div>
+        </div>
       </div>
+    </div>
+    <div class="pl-track-controls-container">
+      <button class="button">Convert</button>
     </div>
   </div>
 </template>
@@ -74,6 +79,13 @@ export default {
   display: flex;
   flex-direction: row;
 }
+.pl-track-info-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  width: 100%;
+}
 .pl-track-img-container {
   height: 2.8rem;
   width: 2.8rem;
@@ -117,5 +129,8 @@ export default {
   font-family: "Poppins Semibold";
   line-height: 1;
   font-size: 0.3rem;
+}
+.pl-track-controls-container{
+  padding-right: .2rem;
 }
 </style>
