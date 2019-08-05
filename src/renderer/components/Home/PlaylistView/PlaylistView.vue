@@ -71,6 +71,12 @@ export default {
   
   /* border: 1px solid white; */
 }
+.plv-rp-data {
+  /* display: flex;
+  flex-direction: column; */
+  /* justify-content: space-evenly; */
+  min-height: 3rem;
+}
 .plv-rp-data-plname {
   font-family: "Poppins Black";
   text-align: left;

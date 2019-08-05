@@ -1,9 +1,12 @@
 <template>
-  <div class="login-container">
-    <h1 class="login-sb-title">SongBasket</h1>
-    <button class="button" @click="login">Login to Spotify</button>
-    <div>or</div>
-    <router-link to="/guest" tag="button" class="button">Continue without Logging in</router-link>
+  <div class="login-flex">
+    <div class="login-container">
+      <div class="login-sb-welcome">welcome to</div>
+      <div class="login-sb-title">SongBasket</div>
+      <button class="button" @click="login">Login to Spotify</button>
+      <div>or</div>
+      <router-link to="/guest" tag="button" class="button">Continue without Logging in</router-link>
+    </div>
   </div>
 </template>
 
@@ -26,10 +29,25 @@ export default {
 
 <style>
 @import url("../CSS/global.css");
+.login-flex {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100vh;
+
+}
 .login-container {
   text-align: center;
 }
+.login-sb-welcome{
+  font-size: 1rem;
+  font-family: 'Poppins thin'
+}
 .login-sb-title {
-  font-family: "poppins light";
+  font-size: 4.2rem;
+  font-weight: bold;
+  font-family: "poppins regular";
+  margin-bottom: 1rem;
+  line-height: 1
 }
 </style>

@@ -6,6 +6,30 @@ html{
     height: 100vh;
     overflow: hidden;
 }
+ /* width */
+::-webkit-scrollbar {
+width: 7px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+background: #333;
+padding-top: 2rem;
+/* border-radius: 1rem; */
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+background: #c4c4c4;
+transition: background-color
+/* border-radius: 1rem; */
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+background: #fff;
+} 
+
 body{
     background: #151515;
     color: #f5f5f5;
