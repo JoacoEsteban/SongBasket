@@ -47,7 +47,7 @@ export default {
   font-size: 4.2rem;
   font-weight: bold;
   font-family: "poppins regular";
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   line-height: 1
 }
 </style>

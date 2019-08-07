@@ -17,7 +17,7 @@
       </div>
     </div>
     <div class="pl-track-controls-container">
-      <button class="button">Convert</button>
+      <button class="button" @click="$emit('searchOnYoutube')">Convert</button>
     </div>
   </div>
 </template>
@@ -114,9 +114,9 @@ export default {
   height: 100%;
 }
 .pl-track-data-name {
-  font-family: "Poppins Black";
+  font-family: "Poppins Bold";
   font-size: 0.9rem;
-  line-height: 0.9;
+  line-height: 1.3;
 }
 .pl-track-data-albumname {
   font-family: "Poppins Bold";

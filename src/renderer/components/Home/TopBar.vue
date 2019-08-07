@@ -20,7 +20,7 @@
 
     <div class="tb-button-panel">
       <div class="tb-button-container">
-        <div class="tb-button sync-icon">
+        <div @click="refreshPlaylists" class="tb-button sync-icon">
           <sync-icon></sync-icon>
         </div>
 
@@ -53,6 +53,11 @@ export default {
       user: this.$store.state.CurrentUser.user,
       now: new Date()
     };
+  },
+  methods:{
+    refreshPlaylists(){
+      
+    }
   }
 };
 </script>

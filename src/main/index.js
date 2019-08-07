@@ -1,3 +1,6 @@
+import FileSystemUser from './FileSystem/index'
+let USER = FileSystemUser.checkForUser()
+
 import { logme } from '../UTILS'
 
 import electron from 'electron'
@@ -23,6 +26,7 @@ let loginWindow;
 const winURL = process.env.NODE_ENV === 'development' ? `http://localhost:9080` : `file://${__dirname}/index.html`;
 
 function createWindow() {
+  if(USER) guestFetch(USER.user)
   mainWindow = new BrowserWindow({
     width: 800,
     height: 500,
@@ -104,37 +108,30 @@ app.on('activate', () => {
 })
 
 
+function guestFetch(query) {
+  sbFetch.fetchPlaylists({ user_id: query, logged: false, SBID: null, control: { offset: 0 } })
+  .then(resolve => {
+    logme(resolve)
+    if (resolve.code == 404) {
+      mainWindow.webContents.send('not-found');
+    } else {
+      storePlaylists(resolve)
+    }
+  });
+}
+
 
 
 // :::::::::::::::::::::::::::::::::IPC:::::::::::::::::::::::::::::::::
 
 ipc.on('login', function (event) {
-
-  var useridtemp = null;
-  var guest = true;
-
-  //Gets user id from storage. IF NULL =>
-  if (!useridtemp) {
     createLoginWindow();
-  } else {
-    //TODO ELSE init login and get user details =>
-
-  }
-
 })
 
 ipc.on('guestSearch', function (event, { userQuery }) {
   logme(`Searching Guest user ${userQuery}`)
 
-  sbFetch.fetchPlaylists({ user_id: userQuery, logged: false, SBID: null, control: { offset: 0 } })
-    .then(resolve => {
-      logme(resolve)
-      if (resolve.code == 404) {
-        mainWindow.webContents.send('not-found');
-      } else {
-        storePlaylists(resolve)
-      }
-    });
+  guestFetch(userQuery)
 
 
 })

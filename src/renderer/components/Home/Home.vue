@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="home-container">
-      <top-bar></top-bar>
+      <top-bar/>
       
       <router-view @openPlaylist="getTracks($event)" path="playlists-list"></router-view>
 
