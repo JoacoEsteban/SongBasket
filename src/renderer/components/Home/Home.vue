@@ -11,71 +11,70 @@
 </template>
 
 <script>
-const electron = require("electron");
-const ipc = electron.ipcRenderer;
+import 'vuex'
 
-import "vuex";
+import TopBar from './TopBar.vue'
+import PlaylistsList from './PlaylistsList.vue'
+import Playlist from './Playlist.vue'
+import UserData from './UserData.vue'
 
-import TopBar from "./TopBar.vue";
-import PlaylistsList from "./PlaylistsList.vue";
-import Playlist from "./Playlist.vue";
-import UserData from "./UserData.vue";
+const electron = require('electron')
+const ipc = electron.ipcRenderer
 
 export default {
   components: {
     TopBar,
     PlaylistsList,
     Playlist,
-    UserData,
+    UserData
   },
-  data() {
+  data () {
     return {
       user: this.$store.state.CurrentUser.user,
       control: this.$store.state.CurrentUser.control,
       loading: false
-    };
+    }
   },
   computed: {
-    allLoaded: function() {
-      return this.control.total - this.control.offset <= 0;
+    allLoaded: function () {
+      return this.control.total - this.control.offset <= 0
     }
   },
 
   methods: {
-    loadMore() {
+    loadMore () {
       if (!this.loading) {
-        this.loading = true;
-        ipc.send("loadMore");
+        this.loading = true
+        ipc.send('loadMore')
       }
     },
-     getTracks(id){
-       ipc.send('get tracks from', id)
-       },
+    getTracks (id) {
+      ipc.send('get tracks from', id)
+    },
 
-    logOut() {
-      console.log("DESTROYING:::::");
-      this.$router.push("/");
-      this.$store.dispatch("CLEAR_USER_N_PLAYLISTS");
+    logOut () {
+      console.log('DESTROYING:::::')
+      this.$router.push('/')
+      this.$store.dispatch('CLEAR_USER_N_PLAYLISTS')
     }
   },
 
-  mounted() {
-    console.log("USER::::", this.user);
+  mounted () {
+    console.log('USER::::', this.user)
 
-    if (this.$store.state.CurrentUser.playlists.length === 0)
-      this.$router.push("/empty");
+    if (this.$store.state.CurrentUser.playlists.length === 0) { this.$router.push('/empty') }
 
-    ipc.on("done loading", () => {
-      this.loading = false;
-    });
+    ipc.on('done loading', () => {
+      this.loading = false
+    })
 
-    ipc.on("open playlist", (event, id) => {
+    ipc.on('open playlist', (event, id) => {
       this.$store.dispatch('SET_CURRENT_PLAYLIST', id)
       // .then( () => )
-      this.$router.push('/home/playlist-view');
-    });
+      this.$router.push('/home/playlist-view')
+    })
   }
-};
+}
 </script>
 
 <style>

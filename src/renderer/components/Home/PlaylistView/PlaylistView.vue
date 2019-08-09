@@ -18,34 +18,32 @@
 </template>
 
 <script>
-const electron = require("electron");
-const ipc = electron.ipcRenderer;
-import "vuex";
-import Track from "./Track";
+import 'vuex'
+import Track from './Track'
 
 export default {
-  data() {
+  data () {
     return {
-      //TODO make it work
-    };
+      // TODO make it work
+    }
   },
   components: {
     Track
   },
   computed: {
-    playlist() {
-      return this.$store.getters.CurrentPlaylist;
+    playlist () {
+      return this.$store.getters.CurrentPlaylist
     }
   },
-  mounted() {
-    console.log("PLAYLISTTTTT:::::", this.playlist);
+  mounted () {
+    console.log('PLAYLISTTTTT:::::', this.playlist)
   },
-  methods:{
-    searchOnYoutube(id){
+  methods: {
+    searchOnYoutube (id) {
       console.log(id)
     }
   }
-};
+}
 </script>
 
 <style>

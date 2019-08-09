@@ -1,4 +1,3 @@
 // import * as index from './index'
 
-var currentUser={};
-
+// var currentUser = {}

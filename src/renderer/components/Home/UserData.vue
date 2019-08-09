@@ -24,18 +24,18 @@ import settingsIcon from '../../assets/icons/settings-icon.vue'
 import userIcon from '../../assets/icons/user-icon.vue'
 
 export default {
-    data(){
-        return{
-            user: this.$store.state.CurrentUser.user,
-        }
-    },
-    components:{
-        settingsIcon,
-        userIcon
-    },
-    methods:{
-    },
-    
+  data () {
+    return {
+      user: this.$store.state.CurrentUser.user
+    }
+  },
+  components: {
+    settingsIcon,
+    userIcon
+  },
+  methods: {
+  }
+
 }
 </script>
 

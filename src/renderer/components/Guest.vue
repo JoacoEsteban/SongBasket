@@ -12,35 +12,31 @@
 
 <script>
 const electron = require('electron')
-const ipc = electron.ipcRenderer;
+const ipc = electron.ipcRenderer
 
 export default {
-    data(){
-        return{
-            userQuery: '',
-            found: undefined,
-        }
-    },  
-  methods:{
-    guestSearch(){
-        if(this.found !== 'Loading')
-        {
-            if(this.userQuery !== '')
-            {
-                this.found = 'Loading';
-                ipc.send('guestSearch', { userQuery: this.userQuery })
-            }
-        }
-    },
-    },
-    mounted () 
-    {
-        document.getElementById('guestSearchInput').focus();
-        ipc.on('not-found', () => 
-        {
-            this.found = 'User not found';
-        })
+  data () {
+    return {
+      userQuery: '',
+      found: undefined
     }
+  },
+  methods: {
+    guestSearch () {
+      if (this.found !== 'Loading') {
+        if (this.userQuery !== '') {
+          this.found = 'Loading'
+          ipc.send('guestSearch', { userQuery: this.userQuery })
+        }
+      }
+    }
+  },
+  mounted () {
+    document.getElementById('guestSearchInput').focus()
+    ipc.on('not-found', () => {
+      this.found = 'User not found'
+    })
+  }
 }
 </script>
 

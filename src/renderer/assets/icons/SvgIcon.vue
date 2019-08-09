@@ -12,31 +12,31 @@
 
 <script>
 export default {
-  props:{
+  props: {
     path: {
       type: String,
       require: true
     },
-    iconColor:{
+    iconColor: {
       type: String,
       require: true
     },
-    className:{
+    className: {
       type: String,
       require: true
-    },
+    }
   },
-  data(){
-    return{
+  data () {
+    return {
       customClasses: this.className,
       style: {
         background: 'none',
-        fill: this.iconColor,
-      },
+        fill: this.iconColor
+      }
 
     }
   },
-  computed:{
+  computed: {
   }
 }
 </script>

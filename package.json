@@ -1,9 +1,9 @@
 {
   "name": "songbasket",
   "version": "0.0.1",
-  "author": "",
+  "author": "Joaco Esteban <dev.joaco.esteban@gmail.com>",
   "description": "Download your Spotify Playlists as MP3",
-  "license": null,
+  "license": "MIT",
   "main": "./dist/electron/main.js",
   "scripts": {
     "build": "node .electron-vue/build.js && electron-builder",
@@ -14,7 +14,14 @@
     "pack": "npm run pack:main && npm run pack:renderer",
     "pack:main": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.main.config.js",
     "pack:renderer": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.renderer.config.js",
-    "postinstall": ""
+    "postinstall": "npm run lint:fix",
+
+    "e2e": "npm run pack && mocha test/e2e",
+    "lint": "eslint --ext .js,.vue -f ./node_modules/eslint-friendly-formatter src test",
+    "lint:fix": "eslint --ext .js,.vue -f ./node_modules/eslint-friendly-formatter --fix src test",
+    "test": "npm run unit && npm run e2e",
+    "unit": "karma start test/unit/karma.conf.js"
+
   },
   "build": {
     "productName": "songbasket",
@@ -79,11 +86,46 @@
     "electron-builder": "^20.19.2",
     "electron-debug": "^1.5.0",
     "electron-devtools-installer": "^2.2.4",
+
+    "babel-eslint": "^8.2.3",
+    "eslint": "^4.19.1",
+    "eslint-friendly-formatter": "^4.0.1",
+    "eslint-loader": "^2.0.0",
+    "eslint-plugin-html": "^4.0.3",
+    "eslint-config-standard": "^11.0.0",
+    "eslint-plugin-import": "^2.12.0",
+    "eslint-plugin-node": "^6.0.1",
+    "eslint-plugin-promise": "^3.8.0",
+    "eslint-plugin-standard": "^3.1.0",
+
+
     "file-loader": "^1.1.11",
     "html-webpack-plugin": "^3.2.0",
     "mini-css-extract-plugin": "0.4.0",
+
+    "inject-loader": "^4.0.1",
+    "karma": "^2.0.2",
+    "karma-chai": "^0.1.0",
+    "karma-coverage": "^1.1.2",
+    "karma-electron": "^6.0.0",
+    "karma-mocha": "^1.3.0",
+    "karma-sourcemap-loader": "^0.3.7",
+    "karma-spec-reporter": "^0.0.32",
+    "karma-webpack": "^3.0.0",
+    "require-dir": "^1.0.0",
+    "spectron": "^3.8.0",
+    "babel-plugin-istanbul": "^4.1.6",
+    "chai": "^4.1.2",
+    "mocha": "^5.2.0",
+
+
     "multispinner": "^0.2.1",
     "node-loader": "^0.6.0",
+
+    "node-sass": "^4.9.2",
+    "sass-loader": "^7.0.3",
+
+
     "style-loader": "^0.21.0",
     "url-loader": "^1.0.1",
     "vue-html-loader": "^1.2.4",

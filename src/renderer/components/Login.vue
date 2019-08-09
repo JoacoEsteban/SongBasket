@@ -11,20 +11,20 @@
 </template>
 
 <script>
-const electron = require("electron");
-const ipc = electron.ipcRenderer;
+const electron = require('electron')
+const ipc = electron.ipcRenderer
 
 export default {
   methods: {
-    login() {
-      ipc.send("login");
+    login () {
+      ipc.send('login')
     }
   }
   // //Auto login For dev speed purposes
   // mounted(){
   //     this.login();
   // }
-};
+}
 </script>
 
 <style>

@@ -14,28 +14,28 @@
 
 <script>
 import electron from 'electron'
-const ipc = electron.ipcRenderer;
 import PlaylistIcon from '../../assets/icons/playlist-icon'
+const ipc = electron.ipcRenderer
 
 export default {
-    props:{
-        playlist: Object,
-    },
-    data(){
-        return{
-            playlistName: this.$props.playlist.name.length > 20 ? this.$props.playlist.name.substring(0, 20) + '...' : this.$props.playlist.name,
-        }
-    },
-    mounted(){
-        ipc.on(`hola ${this.playlist.id}`, () => {
-            console.log('Recibido Compa: ', this.playlist.name, this.playlist.id)
-        })
-    },
-    components:{
-        PlaylistIcon,
-    },
-    methods:{
+  props: {
+    playlist: Object
+  },
+  data () {
+    return {
+      playlistName: this.$props.playlist.name.length > 20 ? this.$props.playlist.name.substring(0, 20) + '...' : this.$props.playlist.name
     }
+  },
+  mounted () {
+    ipc.on(`hola ${this.playlist.id}`, () => {
+      console.log('Recibido Compa: ', this.playlist.name, this.playlist.id)
+    })
+  },
+  components: {
+    PlaylistIcon
+  },
+  methods: {
+  }
 }
 </script>
 

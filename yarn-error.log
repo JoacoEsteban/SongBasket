@@ -1,28 +1,33 @@
 Arguments: 
-  /usr/local/bin/node /usr/local/Cellar/yarn/1.16.0/libexec/bin/yarn.js upgrade
+  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js i
 
 PATH: 
-  /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin
+  C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\dotnet\;D:\apps\TortoiseSVN\bin;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Program Files (x86)\Yarn\bin\;C:\Users\joaco\.windows-build-tools\python27\;C:\Program Files\nodejs\node_modules\npm\node_modules\npm-lifecycle\node-gyp-bin;C:\Users\joaco\AppData\Roaming\npm\node_modules\windows-build-tools\node_modules\.bin;C:\Users\joaco\AppData\Roaming\npm\node_modules\.bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\dotnet\;D:\apps\TortoiseSVN\bin;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Users\joaco\AppData\Local\Microsoft\WindowsApps;C:\Users\joaco\AppData\Local\hyper\app-3.0.2\resources\bin;D:\apps\Microsoft VS Code\bin;C:\Users\joaco\AppData\Roaming\npm;C:\Program Files\heroku\bin;C:\Users\joaco\AppData\Local\Yarn\bin
 
 Yarn version: 
   1.16.0
 
 Node version: 
-  12.2.0
+  10.16.0
 
 Platform: 
-  darwin x64
+  win32 x64
 
 Trace: 
-  Error: EACCES: permission denied, unlink '/Users/joaco/Repos/ELECTRON/songbasket/node_modules/.bin/7z'
+  SyntaxError: D:\repos\ELECTRON\AVER\package.json: Unexpected token M in JSON at position 179
+      at JSON.parse (<anonymous>)
+      at C:\Program Files (x86)\Yarn\lib\cli.js:1625:59
+      at Generator.next (<anonymous>)
+      at step (C:\Program Files (x86)\Yarn\lib\cli.js:304:30)
+      at C:\Program Files (x86)\Yarn\lib\cli.js:315:13
 
 npm manifest: 
   {
     "name": "songbasket",
     "version": "0.0.1",
-    "author": "",
+    "author": "Joaco Esteban <dev.joaco.esteban@gmail.com>",
     "description": "Download your Spotify Playlists as MP3",
-    "license": null,
+    "license": MIT,
     "main": "./dist/electron/main.js",
     "scripts": {
       "build": "node .electron-vue/build.js && electron-builder",
@@ -33,7 +38,14 @@ npm manifest:
       "pack": "npm run pack:main && npm run pack:renderer",
       "pack:main": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.main.config.js",
       "pack:renderer": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.renderer.config.js",
-      "postinstall": ""
+      "postinstall": "npm run lint:fix",
+  
+      "e2e": "npm run pack && mocha test/e2e",
+      "lint": "eslint --ext .js,.vue -f ./node_modules/eslint-friendly-formatter src test",
+      "lint:fix": "eslint --ext .js,.vue -f ./node_modules/eslint-friendly-formatter --fix src test",
+      "test": "npm run unit && npm run e2e",
+      "unit": "karma start test/unit/karma.conf.js"
+  
     },
     "build": {
       "productName": "songbasket",
@@ -98,11 +110,46 @@ npm manifest:
       "electron-builder": "^20.19.2",
       "electron-debug": "^1.5.0",
       "electron-devtools-installer": "^2.2.4",
+  
+      "babel-eslint": "^8.2.3",
+      "eslint": "^4.19.1",
+      "eslint-friendly-formatter": "^4.0.1",
+      "eslint-loader": "^2.0.0",
+      "eslint-plugin-html": "^4.0.3",
+      "eslint-config-standard": "^11.0.0",
+      "eslint-plugin-import": "^2.12.0",
+      "eslint-plugin-node": "^6.0.1",
+      "eslint-plugin-promise": "^3.8.0",
+      "eslint-plugin-standard": "^3.1.0",
+  
+  
       "file-loader": "^1.1.11",
       "html-webpack-plugin": "^3.2.0",
       "mini-css-extract-plugin": "0.4.0",
+  
+      "inject-loader": "^4.0.1",
+      "karma": "^2.0.2",
+      "karma-chai": "^0.1.0",
+      "karma-coverage": "^1.1.2",
+      "karma-electron": "^6.0.0",
+      "karma-mocha": "^1.3.0",
+      "karma-sourcemap-loader": "^0.3.7",
+      "karma-spec-reporter": "^0.0.32",
+      "karma-webpack": "^3.0.0",
+      "require-dir": "^1.0.0",
+      "spectron": "^3.8.0",
+      "babel-plugin-istanbul": "^4.1.6",
+      "chai": "^4.1.2",
+      "mocha": "^5.2.0",
+  
+  
       "multispinner": "^0.2.1",
       "node-loader": "^0.6.0",
+  
+      "node-sass": "^4.9.2",
+      "sass-loader": "^7.0.3",
+  
+  
       "style-loader": "^0.21.0",
       "url-loader": "^1.0.1",
       "vue-html-loader": "^1.2.4",
@@ -172,9 +219,9 @@ Lockfile:
     integrity sha512-tHq6qdbT9U1IRSGf14CL0pUlULksvY9OZ+5eEgl1N7t+OA3tGvNpxJCzuKQlsNgCVwbAs670L1vcVQi8j9HjnA==
   
   "@types/node@*":
-    version "12.6.1"
-    resolved "https://registry.yarnpkg.com/@types/node/-/node-12.6.1.tgz#d5544f6de0aae03eefbb63d5120f6c8be0691946"
-    integrity sha512-rp7La3m845mSESCgsJePNL/JQyhkOJA6G4vcwvVgkDAwHhGdq5GCumxmPjEk1MZf+8p5ZQAUE7tqgQRQTXN7uQ==
+    version "12.6.2"
+    resolved "https://registry.yarnpkg.com/@types/node/-/node-12.6.2.tgz#a5ccec6abb6060d5f20d256fb03ed743e9774999"
+    integrity sha512-gojym4tX0FWeV2gsW4Xmzo5wxGjXGm550oVUII7f7G5o4BV6c7DBdiG1RRQd+y1bvqRyYtPfMK85UM95vsapqQ==
   
   "@types/node@^8.0.24":
     version "8.10.50"
@@ -2004,14 +2051,14 @@ Lockfile:
       lodash.uniq "^4.5.0"
   
   caniuse-db@^1.0.30000529, caniuse-db@^1.0.30000634, caniuse-db@^1.0.30000639:
-    version "1.0.30000981"
-    resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30000981.tgz#b3060ce34bd2d4b4eecde708ee23bdbdee005461"
-    integrity sha512-P40dvZDtxygQJBYdNFPgHQ5aE4GVAYcvVjSkr+w1darNKEuTil6Ltcj8379fxQF42bblk4fY5F5Ki9f+Cvb0tA==
+    version "1.0.30000983"
+    resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30000983.tgz#9bf82a9ea8ec5ffd802aa5214ee46eee7ed417b0"
+    integrity sha512-LS3aD+ti+fezwo8oN01l5vfZF9/CIN/4pxV5SeakHo5leudiHjE66rVHl+XqoCGw4GpO2u5ab6LOpftTfCN9cw==
   
   caniuse-lite@^1.0.30000844:
-    version "1.0.30000981"
-    resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000981.tgz#5b6828803362363e5a1deba2eb550185cf6cec8f"
-    integrity sha512-JTByHj4DQgL2crHNMK6PibqAMrqqb/Vvh0JrsTJVSWG4VSUrT16EklkuRZofurlMjgA9e+zlCM4Y39F3kootMQ==
+    version "1.0.30000983"
+    resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000983.tgz#ab3c70061ca2a3467182a10ac75109b199b647f8"
+    integrity sha512-/llD1bZ6qwNkt41AsvjsmwNOoA4ZB+8iqmf5LVyeSXuBODT/hAMFNVOh84NdUzoiYiSKqo5vQ3ZzeYHSi/olDQ==
   
   caseless@~0.12.0:
     version "0.12.0"
@@ -3202,9 +3249,9 @@ Lockfile:
       conf "^2.0.0"
   
   electron-to-chromium@^1.2.7, electron-to-chromium@^1.3.47:
-    version "1.3.188"
-    resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.188.tgz#e28e1afe4bb229989e280bfd3b395c7ec03c8b7a"
-    integrity sha512-tEQcughYIMj8WDMc59EGEtNxdGgwal/oLLTDw+NEqJRJwGflQvH3aiyiexrWeZOETP4/ko78PVr6gwNhdozvuQ==
+    version "1.3.191"
+    resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.191.tgz#c451b422cd8b2eab84dedabab5abcae1eaefb6f0"
+    integrity sha512-jasjtY5RUy/TOyiUYM2fb4BDaPZfm6CXRFeJDMfFsXYADGxUN49RBqtgB7EL2RmJXeIRUk9lM1U6A5yk2YJMPQ==
   
   electron@^2.0.4:
     version "2.0.18"
@@ -4763,9 +4810,9 @@ Lockfile:
       buffer-alloc "^1.2.0"
   
   isbinaryfile@^4.0.1:
-    version "4.0.1"
-    resolved "https://registry.yarnpkg.com/isbinaryfile/-/isbinaryfile-4.0.1.tgz#85dadd12ba236c9225fdf4648d6069956eaba640"
-    integrity sha512-bvJxbNWm72dy/1+qeBm9F8wUM4siDnlzid7NN5Ib4nQcc0tNIx/YWgEih1ZRHXr8xVbpGk1ccLlA9gOSlyx3gw==
+    version "4.0.2"
+    resolved "https://registry.yarnpkg.com/isbinaryfile/-/isbinaryfile-4.0.2.tgz#bfc45642da645681c610cca831022e30af426488"
+    integrity sha512-C3FSxJdNrEr2F4z6uFtNzECDM5hXk+46fxaa+cwBe5/XrWSmzdG8DDgyjfX6/NRdBB21q2JXuRAzPCUs+fclnQ==
   
   isexe@^2.0.0:
     version "2.0.0"
@@ -5212,9 +5259,9 @@ Lockfile:
     integrity sha1-0CJTc662Uq3BvILklFM5qEJ1R3M=
   
   lodash@^4.17.11, lodash@^4.17.3, lodash@^4.17.4, lodash@^4.17.5:
-    version "4.17.11"
-    resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.11.tgz#b39ea6229ef607ecd89e2c8df12536891cac9b8d"
-    integrity sha512-cQKh8igo5QUhZ7lg38DYWAxMvjSAKG0A8wGSVimP07SIUEK2UO+arSRKbRZWtelMtN5V0Hkwh5ryOto/SshYIg==
+    version "4.17.14"
+    resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.14.tgz#9ce487ae66c96254fe20b599f21b6816028078ba"
+    integrity sha512-mmKYbW3GLuJeX+iGP+Y7Gp1AiGHGbXHCOh/jZmrawMmsE7MS4znI3RL2FsjbqOyMayHInjOeykW7PEajUk1/xw==
   
   log-update@^1.0.2:
     version "1.0.2"
@@ -6262,9 +6309,9 @@ Lockfile:
       xmldom "0.1.x"
   
   portfinder@^1.0.20:
-    version "1.0.20"
-    resolved "https://registry.yarnpkg.com/portfinder/-/portfinder-1.0.20.tgz#bea68632e54b2e13ab7b0c4775e9b41bf270e44a"
-    integrity sha512-Yxe4mTyDzTd59PZJY4ojZR8F+E5e97iq2ZOHPz3HDgSvYC5siNad2tLooQ5y5QHyQhc3xVqvyk/eNA3wuoa7Sw==
+    version "1.0.21"
+    resolved "https://registry.yarnpkg.com/portfinder/-/portfinder-1.0.21.tgz#60e1397b95ac170749db70034ece306b9a27e324"
+    integrity sha512-ESabpDCzmBS3ekHbmpAIiESq3udRsCBGiBZLsC+HgBKv2ezb0R4oG+7RnYEVZ/ZCfhel5Tx3UzdNWA0Lox2QCA==
     dependencies:
       async "^1.5.2"
       debug "^2.2.0"
@@ -7474,9 +7521,9 @@ Lockfile:
       spdx-license-ids "^3.0.0"
   
   spdx-license-ids@^3.0.0:
-    version "3.0.4"
-    resolved "https://registry.yarnpkg.com/spdx-license-ids/-/spdx-license-ids-3.0.4.tgz#75ecd1a88de8c184ef015eafb51b5b48bfd11bb1"
-    integrity sha512-7j8LYJLeY/Yb6ACbQ7F76qy5jHkp0U6jgBfJsk97bwWlVUnUWsAgpyaCvo17h0/RQGnQ036tVDomiwoI4pDkQA==
+    version "3.0.5"
+    resolved "https://registry.yarnpkg.com/spdx-license-ids/-/spdx-license-ids-3.0.5.tgz#3694b5804567a458d3c8045842a6358632f62654"
+    integrity sha512-J+FWzZoynJEXGphVIS+XEh3kFSjZX/1i9gFBaWQcB+/tmpe2qUsSBABpcxqxnAxFdiUFEgAX1bjYGQvIZmoz9Q==
   
   spdy-transport@^3.0.0:
     version "3.0.0"

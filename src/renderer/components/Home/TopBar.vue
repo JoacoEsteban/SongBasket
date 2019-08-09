@@ -37,10 +37,10 @@
 </template>
 
 <script>
-import SyncIcon from "../../assets/icons/sync-icon.vue";
-import CloudSearchIcon from "../../assets/icons/cloud-search-icon.vue";
-import DownloadIcon from "../../assets/icons/download-icon.vue";
-import HomeIcon from "../../assets/icons/home-icon.vue";
+import SyncIcon from '../../assets/icons/sync-icon.vue'
+import CloudSearchIcon from '../../assets/icons/cloud-search-icon.vue'
+import DownloadIcon from '../../assets/icons/download-icon.vue'
+import HomeIcon from '../../assets/icons/home-icon.vue'
 export default {
   components: {
     DownloadIcon,
@@ -48,18 +48,18 @@ export default {
     CloudSearchIcon,
     HomeIcon
   },
-  data() {
+  data () {
     return {
       user: this.$store.state.CurrentUser.user,
       now: new Date()
-    };
+    }
   },
-  methods:{
-    refreshPlaylists(){
-      
+  methods: {
+    refreshPlaylists () {
+
     }
   }
-};
+}
 </script>
 
 <style>

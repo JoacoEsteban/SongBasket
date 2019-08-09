@@ -3,19 +3,19 @@
 </template>
 
 <script>
-import SvgIcon from './SvgIcon.vue';
+import SvgIcon from './SvgIcon.vue'
 
 export default {
-    components:{
-        SvgIcon,
-    },
-    data(){
-        return{
-            path: 'M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z',
-            iconColor: '#fff',
-            className: 'icon home-icon'
-        }
+  components: {
+    SvgIcon
+  },
+  data () {
+    return {
+      path: 'M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z',
+      iconColor: '#fff',
+      className: 'icon home-icon'
     }
+  }
 }
 </script>
 

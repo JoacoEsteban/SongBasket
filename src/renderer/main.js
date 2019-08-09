@@ -6,8 +6,7 @@ import router from './router'
 import store from './store'
 
 const electron = require('electron')
-const ipc = electron.ipcRenderer;
-
+const ipc = electron.ipcRenderer
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.http = Vue.prototype.$http = axios
@@ -22,4 +21,4 @@ new Vue({
 
 ipc.on('playlists done', (e) => {
   router.push({path: '/home'})
-} )
+})

@@ -12,7 +12,7 @@
         </div>
 
         <div class="pl-track-data-down">
-          <div class="pl-track-data-duration">Duration: {{durationFormatted}}</div>
+          <div class="pl-track-data-duration">Duration: <span>{{durationFormatted}}</span></div>
         </div>
       </div>
     </div>
@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import * as utils from "../../../utils";
+import * as utils from '../../../utils'
 
 export default {
   props: {
@@ -33,41 +33,41 @@ export default {
     }
   },
   computed: {
-    artists() {
-      console.log(this.track.artists.length);
+    artists () {
+      console.log(this.track.artists.length)
       if (this.track.artists.length > 1) {
-        let artists = "";
+        let artists = ''
         for (let i = 0; i < this.track.artists.length; i++) {
-          artists += this.track.artists[i].name + ", ";
+          artists += this.track.artists[i].name + ', '
         }
-        return artists.substring(0, artists.length - 2);
+        return artists.substring(0, artists.length - 2)
       } else {
-        return this.track.artists[0].name;
+        return this.track.artists[0].name
       }
     },
 
-    songDuration() {
-      let { minutes, seconds } = utils.convertMS(this.track.duration_ms);
-      return { minutes, seconds };
+    songDuration () {
+      let { minutes, seconds } = utils.convertMS(this.track.duration_ms)
+      return { minutes, seconds }
     },
-    durationFormatted() {
+    durationFormatted () {
       let min =
         this.songDuration.minutes < 10
-          ? "0" + this.songDuration.minutes
-          : this.songDuration.minutes.toString();
+          ? '0' + this.songDuration.minutes
+          : this.songDuration.minutes.toString()
       let sec =
         this.songDuration.seconds < 10
-          ? "0" + this.songDuration.seconds
-          : this.songDuration.seconds.toString();
+          ? '0' + this.songDuration.seconds
+          : this.songDuration.seconds.toString()
 
-      return min + ":" + sec;
+      return min + ':' + sec
     }
   },
-  mounted() {}
-};
+  mounted () {}
+}
 </script>
 
-<style>
+<style lang="scss">
 /* TODO Media Query for List View */
 .pl-track-container {
   display: flex;
@@ -127,9 +127,12 @@ export default {
   font-size: 0.4rem;
 }
 .pl-track-data-duration {
-  font-family: "Poppins Semibold";
+  font-family: "Poppins regular";
   line-height: 1;
   font-size: 0.3rem;
+  span{
+    font-family: 'Poppins Bold';
+  }
 }
 .pl-track-controls-container{
   padding-right: .2rem;

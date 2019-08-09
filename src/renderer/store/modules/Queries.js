@@ -1,6 +1,6 @@
 const state = {
-  selectedPlaylists:{},
-  selectedTracks:{},
+  selectedPlaylists: {},
+  selectedTracks: {}
 }
 
 // const actions = {
@@ -38,7 +38,7 @@ const state = {
 // }
 
 export default {
-  state,
+  state
   // mutations,
   // actions,
   // getters

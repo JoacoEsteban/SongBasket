@@ -28,7 +28,7 @@ export default new Router({
       path: '/home',
       name: 'home',
       component: require('@/components/Home/Home').default,
-      children:[
+      children: [
         {
           path: '',
           name: 'playlists-list',
@@ -38,8 +38,8 @@ export default new Router({
           path: 'playlist-view',
           name: 'playlist-view',
           component: require('@/components/Home/PlaylistView/PlaylistView').default
-        },
+        }
       ]
-    },
+    }
   ]
 })
