@@ -33,10 +33,11 @@ export async function getTracks ({userId, logged, SBID, control}, playlistId) {
   return Promise.resolve(JSON.parse(body))
 }
 
-export function searchTrackOnYT (track) {
-  console.log(track)
+export function searchTrackOnYT (tracks) {
+  console.log(tracks)
+  tracks = JSON.stringify(tracks)
   return new Promise((resolve, reject) => {
-    fetch(`${Backend}/retrieve?limit=${limit}&offset=${control.offset}&retrieve=playlists&retrieve_user_data=true`)
+    fetch(`${Backend}/retrieve?retrieve=tracks&track=${tracks}`)
       .then(res => {
         res.text()
           .then(body => {

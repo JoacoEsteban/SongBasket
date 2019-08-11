@@ -34,7 +34,7 @@ video.on('data', (chunk) => {
 
 video.on('end', function () {
   try {
-    let audio = new ffmpeg(pathmp4, function (err, video) {
+    ffmpeg(pathmp4, function (err, video) {
       if (!err) {
         console.log('The video is ready to be processed')
 
