@@ -33,9 +33,17 @@ export async function getTracks ({userId, logged, SBID, control}, playlistId) {
   return Promise.resolve(JSON.parse(body))
 }
 
-export async function searchTrackOnYT (track) {
+export function searchTrackOnYT (track) {
   console.log(track)
-  // let res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=dont+you+know+ben+rau&key=AIzaSyATLB1QL1fgIxUL4YMLlzqnubrN8XydAfQ`)
-  // let body = await res.text()
-  // return Promise.resolve(JSON.parse(body))
+  return new Promise((resolve, reject) => {
+    fetch(`${Backend}/retrieve?limit=${limit}&offset=${control.offset}&retrieve=playlists&retrieve_user_data=true`)
+      .then(res => {
+        res.text()
+          .then(body => {
+            console.log(body)
+          })
+      })
+
+    // resolve(JSON.parse(body))
+  })
 }
