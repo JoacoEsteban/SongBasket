@@ -101,15 +101,34 @@ app.on('activate', () => {
 })
 
 function guestFetch (query) {
+  console.log('denuevo: ', query)
   sbFetch.fetchPlaylists({ userId: query, logged: false, SBID: null, control: { offset: 0 } })
     .then(resolve => {
-      logme(resolve)
-      if (resolve.code === 404) {
-        mainWindow.webContents.send('not-found')
-      } else {
+      console.log('resolveee', resolve)
+      if (resolve.code === 200) {
+        console.log('llegamo')
         storePlaylists(resolve)
       }
     })
+}
+
+function guestLogin (userId) {
+  if (userId !== null && userId !== undefined) {
+    sbFetch.guestLogin(userId)
+      .then(resolve => {
+        console.log('A VER:', userId)
+        if (resolve.code === 404) {
+          mainWindow.webContents.send('not-found')
+        }
+        if (resolve.code === 400) {
+          mainWindow.webContents.send('invalid')
+        }
+        if (resolve.code === 200) {
+          guestFetch(userId)
+        }
+      })
+      .catch(err => logme(err))
+  }
 }
 
 // :::::::::::::::::::::::::::::::::IPC:::::::::::::::::::::::::::::::::
@@ -122,6 +141,12 @@ ipc.on('guestSearch', function (event, { userQuery }) {
   logme(`Searching Guest user ${userQuery}`)
 
   guestFetch(userQuery)
+})
+
+ipc.on('guestSignIn', function (event, { userQuery }) {
+  logme(`Logging Guest user ${userQuery}`)
+
+  guestLogin(userQuery)
 })
 
 ipc.on('loadMore', function (event) {
@@ -145,6 +170,18 @@ ipc.on('get tracks from', function (event, id) {
         mainWindow.webContents.send('open playlist', id)
       })
     })
+})
+
+ipc.on('Search Track', function (event, track) {
+  console.log('LOADING FROM ', track.id)
+
+  sbFetch.searchTrackOnYT(track)
+  // .then(response => {
+  // // STORE THEM
+  //   store.dispatch('PLAYLIST_STORE_TRACKS', { id, tracks: response.tracks }).then(() => {
+  //     mainWindow.webContents.send('open playlist', id)
+  //   })
+  // })
 })
 
 /**

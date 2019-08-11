@@ -13,13 +13,14 @@
       </div>
     </div>
 
-    <!-- <div v-for="(song, index) in playlist.tracks.items" :key="index"> {{song.track.name}} </div> -->
   </div>
 </template>
 
 <script>
 import 'vuex'
 import Track from './Track'
+const electron = require('electron')
+const ipc = electron.ipcRenderer
 
 export default {
   data () {
@@ -39,8 +40,9 @@ export default {
     console.log('PLAYLISTTTTT:::::', this.playlist)
   },
   methods: {
-    searchOnYoutube (id) {
-      console.log(id)
+    searchOnYoutube (track) {
+      console.log(track)
+      ipc.send('Search Track', track)
     }
   }
 }

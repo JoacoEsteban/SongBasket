@@ -26,7 +26,7 @@ export default {
       if (this.found !== 'Loading') {
         if (this.userQuery !== '') {
           this.found = 'Loading'
-          ipc.send('guestSearch', { userQuery: this.userQuery })
+          ipc.send('guestSignIn', { userQuery: this.userQuery })
         }
       }
     }
@@ -35,6 +35,9 @@ export default {
     document.getElementById('guestSearchInput').focus()
     ipc.on('not-found', () => {
       this.found = 'User not found'
+    })
+    ipc.on('invalid', () => {
+      this.found = 'Invalid User ID'
     })
   }
 }
