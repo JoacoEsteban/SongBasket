@@ -41,7 +41,7 @@ export default {
   },
   methods: {
     searchOnYoutube (track) {
-      console.log(track)
+      console.log('From vue:', track)
       ipc.send('Search Track', track)
     }
   }
