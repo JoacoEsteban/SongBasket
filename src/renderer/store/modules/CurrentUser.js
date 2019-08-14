@@ -124,11 +124,6 @@ const getters = {
       }
     }
     return null
-  },
-  CachedPlaylists: (state) => {
-    console.log('aaaa', state.cachedPlaylists, state.cachedPlaylists.length)
-    if (state.cachedPlaylists.length === 0) return false
-    return state.cachedPlaylists
   }
 }
 
