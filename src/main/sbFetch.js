@@ -35,16 +35,13 @@ export async function getTracks ({userId, logged, SBID, control}, playlistId) {
 
 export function searchTrackOnYT (track) {
   track = JSON.stringify(track)
-  console.log('From fetch::', track)
   return new Promise((resolve, reject) => {
     fetch(`${Backend}/retrieve?retrieve=youtube_convert&track=${track}`)
       .then(res => {
         res.text()
           .then(body => {
-            console.log(body)
+            resolve(JSON.parse(body))
           })
       })
-
-    // resolve(JSON.parse(body))
   })
 }

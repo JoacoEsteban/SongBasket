@@ -100,23 +100,10 @@ app.on('activate', () => {
   }
 })
 
-function guestFetch (query) {
-  console.log('denuevo: ', query)
-  sbFetch.fetchPlaylists({ userId: query, logged: false, SBID: null, control: { offset: 0 } })
-    .then(resolve => {
-      console.log('resolveee', resolve)
-      if (resolve.code === 200) {
-        console.log('llegamo')
-        storePlaylists(resolve)
-      }
-    })
-}
-
 function guestLogin (userId) {
   if (userId !== null && userId !== undefined) {
     sbFetch.guestLogin(userId)
       .then(resolve => {
-        console.log('A VER:', userId)
         if (resolve.code === 404) {
           mainWindow.webContents.send('not-found')
         }
@@ -129,6 +116,15 @@ function guestLogin (userId) {
       })
       .catch(err => logme(err))
   }
+}
+
+function guestFetch (query) {
+  sbFetch.fetchPlaylists({ userId: query, logged: false, SBID: null, control: { offset: 0 } })
+    .then(resolve => {
+      if (resolve.code === 200) {
+        storePlaylists(resolve)
+      }
+    })
 }
 
 // :::::::::::::::::::::::::::::::::IPC:::::::::::::::::::::::::::::::::
@@ -165,7 +161,6 @@ ipc.on('get tracks from', function (event, id) {
   console.log('LOADING FROM ', id)
   sbFetch.getTracks(store.getters.RequestParams, id)
     .then(response => {
-      // STORE THEM
       store.dispatch('PLAYLIST_STORE_TRACKS', { id, tracks: response.tracks }).then(() => {
         mainWindow.webContents.send('open playlist', id)
       })
@@ -176,6 +171,7 @@ ipc.on('Search Track', function (event, track) {
   console.log('LOADING FROM ', track.id)
 
   sbFetch.searchTrackOnYT(track)
+    .then(ytRes => console.log(ytRes))
   // .then(response => {
   // // STORE THEM
   //   store.dispatch('PLAYLIST_STORE_TRACKS', { id, tracks: response.tracks }).then(() => {

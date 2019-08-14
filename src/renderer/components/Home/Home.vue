@@ -38,6 +38,9 @@ export default {
   computed: {
     allLoaded: function () {
       return this.control.total - this.control.offset <= 0
+    },
+    cachedPlaylists: function () {
+      return this.$store.state.CurrentUser.cachedPlaylists
     }
   },
 
@@ -49,14 +52,26 @@ export default {
       }
     },
     getTracks (id) {
-      ipc.send('get tracks from', id)
+      if (this.playlistCached(id)) this.setPlaylistNPush(id)
+      else ipc.send('get tracks from', id)
     },
-
+    setPlaylistNPush (id) {
+      this.$store.dispatch('SET_CURRENT_PLAYLIST', id)
+      // .then( () => )
+      this.$router.push('/home/playlist-view')
+    },
     logOut () {
       console.log('DESTROYING:::::')
       this.$router.push('/')
       this.$store.dispatch('CLEAR_USER_N_PLAYLISTS')
+    },
+    playlistCached (id) {
+      for (let i = 0; i < this.cachedPlaylists.length; i++) {
+        if (this.cachedPlaylists[i].id === id) return true
+      }
+      return false
     }
+
   },
 
   mounted () {
@@ -69,9 +84,7 @@ export default {
     })
 
     ipc.on('open playlist', (event, id) => {
-      this.$store.dispatch('SET_CURRENT_PLAYLIST', id)
-      // .then( () => )
-      this.$router.push('/home/playlist-view')
+      this.setPlaylistNPush(id)
     })
   }
 }

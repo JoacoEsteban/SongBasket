@@ -4,6 +4,7 @@ const getDefaultState = () => {
   return {
     user: {}, // Includes name, number of playlists, image url
     playlists: [],
+    cachedPlaylists: [],
     control: {},
     currentPlaylist: ''
   }
@@ -22,8 +23,10 @@ const actions = {
     commit('CLEAR_USER_N_PLAYLISTS')
   },
   PLAYLIST_STORE_TRACKS ({ commit }, {id, tracks}) {
-    console.log({id, tracks})
     commit('PLAYLIST_STORE_TRACKS', {id, tracks})
+  },
+  PLAYLIST_UPDATE_CACHED ({ commit }, id) {
+    commit('PLAYLIST_UPDATE_CACHED', id)
   },
   SET_CURRENT_PLAYLIST ({ commit }, id) {
     return new Promise((resolve, reject) => {
@@ -75,10 +78,24 @@ const mutations = {
       if (pl.id === id) {
         pl.tracks.items = tracks
         done = true
+        this.dispatch('PLAYLIST_UPDATE_CACHED', id)
         console.log('DONE')
       }
     }
     if (!done) console.log('PLAYLIST NOT FOUND WHEN SETTING TRACKS INSIDE STATE (VUEX)')
+  },
+
+  PLAYLIST_UPDATE_CACHED (state, id) {
+    for (let i = 0; i < state.cachedPlaylists.length; i++) {
+      let p = state.cachedPlaylists[i]
+      if (p.id === id) {
+        p = {id: p.id, time: Date.now()}
+        console.log('UPDATING CACHE LOG FOR PLAYLIST WITH ID' + id)
+        return
+      }
+    }
+    console.log('UPDATING CACHE LOG')
+    state.cachedPlaylists = [ ...state.cachedPlaylists, { id: id, time: Date.now() } ]
   },
   SET_CURRENT_PLAYLIST (state, id) {
     console.log('SETTING PLAYLIST WITH ID ' + id + ' AS SELECTED')
@@ -107,6 +124,11 @@ const getters = {
       }
     }
     return null
+  },
+  CachedPlaylists: (state) => {
+    console.log('aaaa', state.cachedPlaylists, state.cachedPlaylists.length)
+    if (state.cachedPlaylists.length === 0) return false
+    return state.cachedPlaylists
   }
 }
 
