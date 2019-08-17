@@ -35,7 +35,7 @@ export default {
   },
   mounted () {
     ipc.on('continueToLogin', () => this.$router.push('login'))
-    this.header = {show: true, text: "Let's Find your Music"}
+    this.header = {show: true, text: "Let's find your music"}
   }
 }
 </script>
@@ -55,7 +55,7 @@ export default {
   height: 100vh;
 }
 .login-header {
-  min-height: 10rem;
+  min-height: 8.5rem;
   display: flex;
   justify-content: center;
   align-items: center;
