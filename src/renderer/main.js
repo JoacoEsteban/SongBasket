@@ -5,9 +5,6 @@ import App from './App'
 import router from './router'
 import store from './store'
 
-const electron = require('electron')
-const ipc = electron.ipcRenderer
-
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.http = Vue.prototype.$http = axios
 Vue.config.productionTip = false
@@ -18,7 +15,3 @@ new Vue({
   store,
   template: '<App/>'
 }).$mount('#app')
-
-ipc.on('playlists done', (e) => {
-  router.push({path: '/home'})
-})

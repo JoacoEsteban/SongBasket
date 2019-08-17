@@ -1,7 +1,11 @@
 <template>
     <div  class="login-flex">
       <div v-if="$route.name !== 'set-home-folder'" class="login-header">{{header.text}}</div>
-      <router-view path="/set-home-folder" @init="setHomeFolder" > </router-view>
+      <router-view
+      path="/set-home-folder"
+      @init="setHomeFolder" 
+      @guestSearch="guestSearch($event)" 
+      > </router-view>
   </div>
 </template>
 
@@ -14,13 +18,17 @@ export default {
     return {
       header: {
         show: false,
-        text: null
+        text: null,
+        state: null
       }
     }
   },
   computed: {
     action () {
       return this.$route.params.action
+    },
+    loadingState () {
+      return this.$store.state.loadingState
     }
   },
   watch: {
@@ -31,10 +39,29 @@ export default {
   methods: {
     setHomeFolder () {
       ipc.send('setHomeFolder')
+    },
+    guestSearch (userQuery) {
+      if (this.loadingState !== 'Loading' && userQuery !== '' && userQuery !== undefined && userQuery !== null) {
+        this.$store.dispatch('SET_LOADING_STATE', 'loading')
+        ipc.send('guestSignIn', { userQuery: userQuery })
+      }
     }
   },
   mounted () {
     ipc.on('continueToLogin', () => this.$router.push('login'))
+
+    ipc.on('not-found', () => {
+      this.$store.dispatch('SET_LOADING_STATE', 'not found')
+    })
+    ipc.on('invalid', () => {
+      this.$store.dispatch('SET_LOADING_STATE', 'invalid id')
+    })
+
+    ipc.on('playlists done', (e) => {
+      this.$store.dispatch('SET_LOADING_STATE', 'found')
+      this.$router.push({path: '/home'})
+    })
+
     this.header = {show: true, text: "Let's find your music"}
   }
 }
