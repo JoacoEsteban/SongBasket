@@ -1,7 +1,7 @@
 <template>
     <div class="login-container">
             <!-- <router-link to="/" tag="button" class="button"  >Log in</router-link> -->
-            <h1 class="login-sb-title">Guest</h1>
+            <h1 class="login-sb-title"></h1>
                 <input id="guestSearchInput" autofocus class="guest-search-box" type="text" v-model.trim="userQuery" @keyup.enter.prevent="guestSearch" />
             <button class="button" @click="guestSearch">Search User</button>
             <div v-if="found !== undefined" class="guest-not-found">

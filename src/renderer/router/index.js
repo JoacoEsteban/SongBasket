@@ -17,17 +17,18 @@ export default new Router({
         path: '',
         name: 'set-home-folder',
         component: require('@/components/Setup/SetHomeFolder').default
-      }]
-    },
-    {
-      path: '/login',
-      name: 'login',
-      component: require('@/components/Login').default
-    },
-    {
-      path: '/guest',
-      name: 'guest',
-      component: require('@/components/Guest').default
+      },
+      {
+        path: 'login',
+        name: 'login',
+        component: require('@/components/Login').default
+      },
+      {
+        path: 'guest',
+        name: 'guest',
+        component: require('@/components/Guest').default
+      }
+      ]
     },
     {
       path: '/empty',

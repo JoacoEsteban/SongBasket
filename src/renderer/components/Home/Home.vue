@@ -62,7 +62,7 @@ export default {
     },
     logOut () {
       console.log('DESTROYING:::::')
-      this.$router.push('/')
+      this.$router.push('setup')
       this.$store.dispatch('CLEAR_USER_N_PLAYLISTS')
     },
     playlistCached (id) {

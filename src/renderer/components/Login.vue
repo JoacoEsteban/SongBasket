@@ -1,12 +1,12 @@
 <template>
-  <div class="login-flex">
-    <div class="login-header">Let's Find your Music</div>
-    <div class="login-container">
-      <button class="button" @click="login">Login to Spotify</button>
-      <div>or</div>
-      <router-link to="/guest" tag="button" class="button">Continue without Logging in</router-link>
+
+    <div class="display-whole-container">
+      <div class="">
+        <button class="button" @click="login">Login to Spotify</button>
+        <div>or</div>
+        <router-link to="/guest" tag="button" class="button">Continue without Logging in</router-link>
+      </div>
     </div>
-  </div>
 </template>
 
 <script>
@@ -28,24 +28,8 @@ export default {
 
 <style lang="scss">
 @import url("../CSS/global.scss");
-.login-flex {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  height: 100vh;
-}
-.login-container {
-  text-align: center;
-}
-.login-header {
-  height: 10rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 3rem;
-  font-family: 'Poppins Bold'
 
-}
+
 .login-sb-welcome{
   font-size: 1rem;
   font-family: 'Poppins thin'
