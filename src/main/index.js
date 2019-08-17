@@ -28,7 +28,7 @@ let loginWindow
 const winURL = process.env.NODE_ENV === 'development' ? `http://localhost:9080` : `file://${__dirname}/index.html`
 
 function createWindow () {
-  if (USER) guestFetch(USER.user)
+  // if (USER) guestFetch(USER.user)
   mainWindow = new BrowserWindow({
     width: 800,
     height: 500,

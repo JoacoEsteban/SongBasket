@@ -11,6 +11,16 @@ export default new Router({
     },
     {
       path: '/',
+      name: 'setup',
+      component: require('@/components/Setup/Setup').default,
+      children: [{
+        path: '',
+        name: 'set-home-folder',
+        component: require('@/components/Setup/SetHomeFolder').default
+      }]
+    },
+    {
+      path: '/login',
       name: 'login',
       component: require('@/components/Login').default
     },
