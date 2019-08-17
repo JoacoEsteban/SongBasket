@@ -112,7 +112,9 @@ function guestLogin (userId) {
           mainWindow.webContents.send('invalid')
         }
         if (resolve.code === 200) {
-          guestFetch(userId)
+          mainWindow.webContents.send('user-found', resolve)
+
+          // guestFetch(userId)
         }
       })
       .catch(err => logme(err))

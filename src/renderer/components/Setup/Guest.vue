@@ -20,7 +20,7 @@
             </div>
 
             <div class="mid">
-              <input ref="guestSearchInput" autofocus class="guest-search-box" type="text" v-model.trim="userQuery" @keyup.enter.prevent="guestSearch" />
+              <input ref="guestSearchInput" class="guest-search-box" type="text" v-model.trim="userQuery" @keyup.enter.prevent="guestSearch" />
             </div>
 
             <div class="bot">
@@ -38,7 +38,8 @@ export default {
   data () {
     return {
       userQuery: '',
-      mode: 0
+      mode: 0,
+      lastmode: 0
     }
   },
   computed: {
@@ -46,7 +47,7 @@ export default {
       let x = this.$store.state.SharedStates.loadingState
       switch (x) {
         case 'loading': return 'Loading'
-        case 'not found': return this.mode ? 'User not Found' : 'Playlist not Found'
+        case 'not found': return !this.lastmode ? 'User not Found' : 'Playlist not Found'
         case 'invalid id': return 'Invalid ID'
         case 'found': return null
         default: return null
@@ -55,6 +56,7 @@ export default {
   },
   methods: {
     guestSearch () {
+      this.lastmode = this.mode
       this.$emit('guestSearch', this.userQuery)
     },
     changeMode (mode) {
@@ -111,7 +113,7 @@ export default {
   align-items: center;
   min-width: 2.7rem;
   min-height: 1.5rem;
-  background: var(--white-text);
+  background: var(--text-white);
   border-radius: 500px;
 
   &:hover {
@@ -179,7 +181,7 @@ export default {
   z-index: -1;
   color: var(--text-white);
   position: absolute;
-  bottom: 2rem;
+  bottom: 2.5rem;
   left: 0;
   right: 0;
   font-size: 1.1rem;

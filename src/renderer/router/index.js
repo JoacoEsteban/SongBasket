@@ -26,7 +26,12 @@ export default new Router({
       {
         path: 'guest',
         name: 'guest',
-        component: require('@/components/Guest').default
+        component: require('@/components/Setup/Guest').default
+      },
+      {
+        path: 'guest-verify',
+        name: 'guest-verify',
+        component: require('@/components/Setup/GuestVerify').default
       }
       ]
     },
