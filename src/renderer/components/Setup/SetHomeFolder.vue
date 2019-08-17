@@ -17,6 +17,9 @@ export default {
     init () {
       ipc.send('setHomeFolder')
     }
+  },
+  mounted () {
+    ipc.on('continueToLogin', () => this.$router.push('login'))
   }
 
 }

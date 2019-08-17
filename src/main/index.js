@@ -5,6 +5,7 @@ import { logme } from '../UTILS'
 import * as sbFetch from './sbFetch'
 import store from '../renderer/store'
 import electron from 'electron'
+const dialog = electron.dialog
 
 let { app, BrowserWindow, session } = electron
 
@@ -28,7 +29,7 @@ let loginWindow
 const winURL = process.env.NODE_ENV === 'development' ? `http://localhost:9080` : `file://${__dirname}/index.html`
 
 function createWindow () {
-  // if (USER) guestFetch(USER.user)
+  if (USER) guestFetch(USER.user)
   mainWindow = new BrowserWindow({
     width: 800,
     height: 500,
@@ -128,6 +129,16 @@ function guestFetch (query) {
 }
 
 // :::::::::::::::::::::::::::::::::IPC:::::::::::::::::::::::::::::::::
+
+ipc.on('setHomeFolder', function (event) {
+  // console.log('goty')
+  dialog.showOpenDialog(mainWindow, {
+    properties: ['openDirectory']
+  }, path => {
+    store.dispatch('SET_HOME_FOLDER', path)
+      .then(() => mainWindow.webContents.send('continueToLogin'))
+  })
+})
 
 ipc.on('login', function (event) {
   createLoginWindow()

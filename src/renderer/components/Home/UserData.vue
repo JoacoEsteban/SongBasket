@@ -39,7 +39,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 .ud-container{
     /* position: static; */
     /* margin-top: 1rem; */
@@ -47,7 +47,7 @@ export default {
     width: 100%;
     display: flex;
     bottom: -.1rem;
-    background: #333;
+    background: var(--global-grey);
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: space-between;

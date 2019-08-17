@@ -2,6 +2,9 @@ import Vue from 'vue'
 
 const getDefaultState = () => {
   return {
+    fileSystem: {
+      homeFolder: null
+    },
     user: {}, // Includes name, number of playlists, image url
     playlists: [],
     cachedPlaylists: [],
@@ -13,6 +16,9 @@ const getDefaultState = () => {
 const state = getDefaultState()
 
 const actions = {
+  SET_HOME_FOLDER ({ commit }, path) {
+    commit('SET_HOME_FOLDER', path)
+  },
   UPDATE_PLAYLISTS ({ commit }, playlists) {
     commit('UPDATE_PLAYLISTS', playlists)
   },
@@ -37,6 +43,10 @@ const actions = {
 }
 
 const mutations = {
+  SET_HOME_FOLDER (state, path) {
+    console.log(`SETTING HOME FOLDER::: ${path}`)
+    state.fileSystem.homeFolder = path
+  },
   INIT_USER (state, object) {
     console.log(`INITIALIZING USER::: ${object.user.id}`)
 

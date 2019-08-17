@@ -1,5 +1,6 @@
-@import url('./fonts.css');
-@import url('./user-select.css');
+@import 'colors.css';
+@import 'fonts.css';
+@import 'user-select.css';
 
 html{
     font-size: 30px;
@@ -13,7 +14,7 @@ width: 7px;
 
 /* Track */
 ::-webkit-scrollbar-track {
-background: #333;
+background: var(--global-grey);
 padding-top: 2rem;
 /* border-radius: 1rem; */
 }
@@ -31,8 +32,8 @@ background: #fff;
 } 
 
 body{
-    background: #151515;
-    color: #f5f5f5;
+    background: var(--body-dark);
+    color: var(--white-text);
     font-family: 'Poppins regular';
     font-size: 1rem;
     margin: 0;
@@ -57,7 +58,7 @@ body:hover{
 .button:hover{
     cursor: pointer;
     transform: scale(1.05);
-    background: #9900cc;
+    background: var(--button-purple);
     color: #fff;
 }
 .dev-border-w{

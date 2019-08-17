@@ -62,7 +62,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 .tb-container {
   text-align: left;
   min-height: 2.7rem;
@@ -70,7 +70,7 @@ export default {
   display: flex;
   /* position: sticky; */
   /* top: 0; */
-  background: #333;
+  background: var(--global-grey);
   flex-direction: row;
   flex-wrap: nowrap;
   /* margin-bottom: 1rem; */

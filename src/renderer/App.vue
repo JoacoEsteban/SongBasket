@@ -10,5 +10,5 @@ export default {
 </script>
 
 <style>
-  @import url('./CSS/global.css');
+  @import url('./CSS/global.scss');
 </style>
