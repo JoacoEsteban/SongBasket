@@ -12,7 +12,6 @@ const actions = {
 
 const mutations = {
   SET_LOADING_STATE (state, loadingState) {
-    console.log('setting loading state', loadingState)
     state.loadingState = loadingState
   }
 }

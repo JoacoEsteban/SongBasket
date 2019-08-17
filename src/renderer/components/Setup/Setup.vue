@@ -6,6 +6,7 @@
       @init="setHomeFolder" 
       @guestSearch="guestSearch($event)" 
       @not-user="redirect('guest')"
+      @confirm-user="confirmUser"
       > </router-view>
   </div>
 </template>
@@ -19,7 +20,8 @@ export default {
     return {
       header: {
         show: true,
-        text: "Let's find your music"
+        text: "Let's find your music",
+        userOnHold: null
       }
     }
   },
@@ -68,6 +70,9 @@ export default {
           break
         }
       }
+    },
+    confirmUser () {
+      ipc.send('guestConfirm', this.userOnHold.id)
     }
 
   },
@@ -85,6 +90,7 @@ export default {
 
     ipc.on('user-found', (event, user) => {
       this.$store.dispatch('SET_LOADING_STATE', 'found')
+      this.userOnHold = user
       this.redirect('guest-verify', user)
     })
 

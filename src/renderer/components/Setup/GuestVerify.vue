@@ -26,7 +26,10 @@
 
 
             <div class="half">
-              <button class="button accept" >Sounds Good</button>
+              <button 
+              class="button accept" 
+              @click="$emit('confirm-user')" 
+              >Sounds Good</button>
               <button class="button cancel"
               @click="$emit('not-user')"
               >Never Seen Him</button>

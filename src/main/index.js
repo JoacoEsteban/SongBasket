@@ -61,14 +61,14 @@ function createLoginWindow () {
 
     // Then, Backend retrieves user data and sends it back with a unique SBID
     session.defaultSession.webRequest.onHeadersReceived(filter, (details, callbackFunc) => {
-      let userId = details.responseHeaders.user_id
-      let SBID = details.responseHeaders.SBID
-      let success = details.responseHeaders.success // if true close window and continue
+      if (details.responseHeaders.SBID !== undefined) {
+        let userId = details.responseHeaders.user_id[0]
+        let SBID = details.responseHeaders.SBID[0]
+        let success = details.responseHeaders.success[0] // if true close window and continue
 
-      logme(SBID)
-      logme(success)
+        logme(SBID)
+        logme(success)
 
-      if (SBID !== undefined && success === 'true') {
         // Gets playlist list from backend and stores them in vuex
         sbFetch.fetchPlaylists({ userId: userId, logged: true, SBID: SBID, control: { offset: 0 } })
           .then((resolve) => storePlaylists(resolve))
@@ -146,10 +146,10 @@ ipc.on('login', function (event) {
   createLoginWindow()
 })
 
-ipc.on('guestSearch', function (event, { userQuery }) {
-  logme(`Searching Guest user ${userQuery}`)
+ipc.on('guestConfirm', function (event, userID) {
+  logme(`Fetching Playlists from Guest user ${userID}`)
 
-  guestFetch(userQuery)
+  guestFetch(userID)
 })
 
 ipc.on('guestSignIn', function (event, { userQuery }) {
