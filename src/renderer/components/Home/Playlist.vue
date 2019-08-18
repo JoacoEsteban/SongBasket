@@ -92,7 +92,7 @@ export default {
       flex-direction: column;
       height: 100%;
       width: 100%;
-      padding: .3rem;
+      padding: 0 .3rem;
       justify-content: space-evenly;
     }
     .pl-name {

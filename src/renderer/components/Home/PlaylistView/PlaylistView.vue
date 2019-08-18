@@ -1,7 +1,8 @@
 <template>
   <div class="home-router plv-container">
     <div class="plv-leftpanel">
-      <div class="plv-lp-img" :style="'background-image: url('+playlist.images[0].url+')'"></div>
+      <div class="plv-lp-img" :style="'background-image: url('+playlist.images[0].url+')'" />
+      
     </div>
     <div class="plv-rightpanel">
       <div class="plv-rp-data">

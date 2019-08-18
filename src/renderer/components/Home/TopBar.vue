@@ -12,7 +12,7 @@
     </div>
 
     <div class="tb-mid-section">
-      Last Sync: {{now}}
+      Last Sync: {{now.date + ' @' + now.hours}}
       <router-link to="/home" tag="span">
         <home-icon />
       </router-link>
@@ -37,6 +37,8 @@
 </template>
 
 <script>
+import {dateFormatter} from '../../../UTILS'
+
 import SyncIcon from '../../assets/icons/sync-icon.vue'
 import CloudSearchIcon from '../../assets/icons/cloud-search-icon.vue'
 import DownloadIcon from '../../assets/icons/download-icon.vue'
@@ -50,8 +52,7 @@ export default {
   },
   data () {
     return {
-      user: this.$store.state.CurrentUser.user,
-      now: new Date()
+      user: this.$store.state.CurrentUser.user
     }
   },
   computed: {
@@ -68,6 +69,18 @@ export default {
         ]
       }
       return ret
+    },
+    now () {
+      let separator = ' / '
+      let thisDate = dateFormatter(new Date())
+      console.log('thisDate', thisDate)
+      let hours = thisDate.time.hours + ':' + thisDate.time.minutes
+      let date = ''
+      if (thisDate.date.today) date = 'Today'
+      else date = thisDate.date.month + separator + thisDate.date.date + (!thisDate.date.sameYear ? (separator + thisDate.date.year) : '')
+
+      console.log('asdfasdfadsf', thisDate.month)
+      return { date, hours }
     }
   },
   methods: {
