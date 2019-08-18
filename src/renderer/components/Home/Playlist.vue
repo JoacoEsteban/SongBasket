@@ -6,7 +6,7 @@
         <div class="pl-img" :style="playlist.images.length > 0 ? {backgroundImage: `url(${playlist.images[0].url})`} : null">
           <div class="pl-button-container">
             <button class="button" @click="$emit('openPlaylist')">Explore</button>
-            <button class="button" @click="$emit('addPlaylistToSyncQueue')">Queue</button>
+            <button class="button" @click="$emit('addPlaylistToSyncQueue')">{{queued ? 'Unqueue' : 'Queue'}}</button>
           </div>
             <playlist-icon v-if="playlist.images.length === 0" />
         </div>
@@ -91,6 +91,8 @@ export default {
       display: flex;
       flex-direction: column;
       height: 100%;
+      width: 100%;
+      padding: .3rem;
       justify-content: space-evenly;
     }
     .pl-name {
