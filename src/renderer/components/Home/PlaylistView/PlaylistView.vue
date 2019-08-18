@@ -10,7 +10,9 @@
         <div class="plv-rp-data-byuser">by {{$store.state.CurrentUser.user.display_name}}</div>
       </div>
       <div class="plv-rp-tracklist">
-        <Track v-for="(track, index) in playlist.tracks.items" :key="index" :track="track" @searchOnYoutube="searchOnYoutube(track)" />
+        <Track v-for="(track, index) in playlist.tracks.items" :key="index" :track="track"
+        @searchOnYoutube="$emit('searchTrackOnYoutube', track)"
+        />
       </div>
     </div>
 
@@ -42,7 +44,6 @@ export default {
   },
   methods: {
     searchOnYoutube (track) {
-      console.log('From vue:', track)
       ipc.send('Search Track', track)
     }
   }

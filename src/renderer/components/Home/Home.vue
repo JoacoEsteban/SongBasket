@@ -8,6 +8,7 @@
       <router-view
       path="playlists-list"
       @openPlaylist="getTracks($event)"
+      @searchTrackOnYoutube="(searchOnYoutube($event))"
       @addPlaylistToSyncQueue="addPlaylistToSyncQueue($event)"
       ></router-view>
 
@@ -79,6 +80,9 @@ export default {
     },
     addPlaylistToSyncQueue (id) {
       this.$store.dispatch('queuePlaylist', id)
+    },
+    searchOnYoutube (track) {
+      ipc.send('Search Track', track)
     },
     youtubeConvert () {
       ipc.send('Youtube Convert')

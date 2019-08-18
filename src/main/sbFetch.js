@@ -45,3 +45,15 @@ export function searchTrackOnYT (track) {
       })
   })
 }
+export function youtubizeAll (tracks) {
+  tracks = JSON.stringify(tracks)
+  return new Promise((resolve, reject) => {
+    fetch(`${Backend}/retrieve?retrieve=youtubize&tracks=${tracks}`)
+      .then(res => {
+        res.text()
+          .then(body => {
+            resolve(JSON.parse(body))
+          })
+      })
+  })
+}
