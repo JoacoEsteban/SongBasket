@@ -141,17 +141,20 @@ const getters = {
       control: state.control
     }
   },
-  CurrentPlaylist: (state) => {
+  PlaylistById: (state) => function (id) {
     for (let i = 0; i < state.playlists.length; i++) {
       let pl = state.playlists[i]
 
-      if (pl.id === state.currentPlaylist) {
+      if (pl.id === id) {
         if (pl.tracks === null || pl.tracks === undefined) return null
 
         return pl
       }
     }
     return null
+  },
+  CurrentPlaylist: (state, getters) => {
+    return getters.PlaylistById(state.currentPlaylist)
   },
   SelectedPlaylistsCompute: (state) => {
     let q = state.queuedPlaylists
