@@ -3,7 +3,8 @@
       <div v-if="$route.name !== 'set-home-folder'" class="login-header">{{header.text}}</div>
       <router-view
       path="/set-home-folder"
-      @init="setHomeFolder" 
+      @setHomeFolder="setHomeFolder" 
+      @login="login"
       @guestSearch="guestSearch($event)" 
       @not-user="redirect('guest')"
       @confirm-user="confirmUser"
@@ -41,6 +42,9 @@ export default {
   methods: {
     setHomeFolder () {
       ipc.send('setHomeFolder')
+    },
+    login () {
+      ipc.send('login')
     },
     guestSearch (userQuery) {
       if (this.loadingState !== 'Loading' && userQuery !== '' && userQuery !== undefined && userQuery !== null) {

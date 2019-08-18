@@ -3,7 +3,11 @@
     <div class="home-container">
       <top-bar/>
       
-      <router-view @openPlaylist="getTracks($event)" path="playlists-list"></router-view>
+      <router-view
+      path="playlists-list"
+      @openPlaylist="getTracks($event)"
+      @addPlaylistToSyncQueue="addPlaylistToSyncQueue($event)"
+      ></router-view>
 
       <user-data @logOut="logOut"></user-data>
     </div>
@@ -56,20 +60,23 @@ export default {
       else ipc.send('get tracks from', id)
     },
     setPlaylistNPush (id) {
-      this.$store.dispatch('SET_CURRENT_PLAYLIST', id)
+      this.$store.dispatch('setCurrentPlaylist', id)
       // .then( () => )
       this.$router.push('/home/playlist-view')
     },
     logOut () {
       console.log('DESTROYING:::::')
       this.$router.push('setup')
-      this.$store.dispatch('CLEAR_USER_N_PLAYLISTS')
+      this.$store.dispatch('clearUserNPlaylists')
     },
     playlistCached (id) {
       for (let i = 0; i < this.cachedPlaylists.length; i++) {
         if (this.cachedPlaylists[i].id === id) return true
       }
       return false
+    },
+    addPlaylistToSyncQueue (id) {
+      this.$store.dispatch('queuePlaylist', id)
     }
 
   },

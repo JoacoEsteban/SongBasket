@@ -2,7 +2,10 @@
     <div class="pl-container">
         <div class="pl-track-count">{{playlist.tracks.total}} {{playlist.tracks.total === 1 ? 'Track' : 'Tracks'}}</div>
         <div class="pl-img" :style="playlist.images.length > 0 ? {backgroundImage: `url(${playlist.images[0].url})`} : null">
-            <button class="button" @click="$emit('openPlaylist')">Open</button>
+          <div class="pl-button-container">
+            <button class="button" @click="$emit('openPlaylist')">Explore</button>
+            <button class="button" @click="$emit('addPlaylistToSyncQueue')">Queue</button>
+          </div>
             <playlist-icon v-if="playlist.images.length === 0" />
         </div>
         <div class="pl-name" ref="plname">
@@ -74,6 +77,12 @@ export default {
 
         background-position: center;
         background-size: cover;
+    }
+    .pl-button-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      justify-content: space-evenly;
     }
     .pl-name {
         text-align: left;

@@ -3,7 +3,7 @@
   <div class="home-folder-container">
       <div class="login-sb-welcome">welcome to</div>
       <div class="login-sb-title">SongBasket</div>
-      <button class="button" @click="$emit('init')">Set a Home Folder</button>
+      <button class="button" @click="$emit('setHomeFolder')">Set a Home Folder</button>
   </div>
 </div>
 </template>

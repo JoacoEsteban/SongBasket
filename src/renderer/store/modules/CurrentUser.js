@@ -9,34 +9,41 @@ const getDefaultState = () => {
     playlists: [],
     cachedPlaylists: [],
     control: {},
-    currentPlaylist: ''
+    currentPlaylist: '',
+    syncedPlaylists: []
   }
 }
 
 const state = getDefaultState()
 
 const actions = {
-  SET_HOME_FOLDER ({ commit }, path) {
+  setHomeFolder ({ commit }, path) {
     commit('SET_HOME_FOLDER', path)
   },
-  UPDATE_PLAYLISTS ({ commit }, playlists) {
-    commit('UPDATE_PLAYLISTS', playlists)
-  },
-  INIT_USER ({ commit }, object) {
+  initUser ({ commit }, object) {
     commit('INIT_USER', object)
   },
-  CLEAR_USER_N_PLAYLISTS ({ commit }) {
+  updatePlaylists ({ commit }, playlists) {
+    commit('UPDATE_PLAYLISTS', playlists)
+  },
+  clearUserNPlaylists ({ commit }) {
     commit('CLEAR_USER_N_PLAYLISTS')
   },
-  PLAYLIST_STORE_TRACKS ({ commit }, {id, tracks}) {
+  playlistStoreTracks ({ commit }, {id, tracks}) {
     commit('PLAYLIST_STORE_TRACKS', {id, tracks})
   },
-  PLAYLIST_UPDATE_CACHED ({ commit }, id) {
+  playlistUpdateCached ({ commit }, id) {
     commit('PLAYLIST_UPDATE_CACHED', id)
   },
-  SET_CURRENT_PLAYLIST ({ commit }, id) {
+  setCurrentPlaylist ({ commit }, id) {
     return new Promise((resolve, reject) => {
       commit('SET_CURRENT_PLAYLIST', id)
+      resolve()
+    })
+  },
+  queuePlaylist ({ commit }, id) {
+    return new Promise((resolve, reject) => {
+      commit('QUEUE_PLAYLIST', id)
       resolve()
     })
   }
@@ -88,7 +95,7 @@ const mutations = {
       if (pl.id === id) {
         pl.tracks.items = tracks
         done = true
-        this.dispatch('PLAYLIST_UPDATE_CACHED', id)
+        this.dispatch('playlistUpdateCached', id)
         console.log('DONE')
       }
     }
@@ -110,6 +117,20 @@ const mutations = {
   SET_CURRENT_PLAYLIST (state, id) {
     console.log('SETTING PLAYLIST WITH ID ' + id + ' AS SELECTED')
     state.currentPlaylist = id
+  },
+  QUEUE_PLAYLIST (state, id) {
+    console.log('QUEUEING PLAYLIST WITH ID ' + id)
+    let found = false
+    for (let i = 0; i < state.syncedPlaylists.length; i++) {
+      let pl = state.syncedPlaylists[i]
+      if (pl === id) {
+        console.log('FOUND')
+        found = true
+        state.syncedPlaylists.splice(i, 1)
+      }
+    }
+    if (!found) state.syncedPlaylists = [...state.syncedPlaylists, id]
+    console.log(found, state.syncedPlaylists)
   }
 
 }

@@ -11,7 +11,6 @@ export default new Router({
     },
     {
       path: '/',
-      name: 'setup',
       component: require('@/components/Setup/Setup').default,
       children: [{
         path: '',
@@ -42,7 +41,6 @@ export default new Router({
     },
     {
       path: '/home',
-      name: 'home',
       component: require('@/components/Home/Home').default,
       children: [
         {

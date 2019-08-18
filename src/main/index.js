@@ -80,7 +80,7 @@ function createLoginWindow () {
 };
 
 function storePlaylists (resolve) {
-  store.dispatch('INIT_USER', resolve)
+  store.dispatch('initUser', resolve)
     .then(() => {
       mainWindow.webContents.send('playlists done')
       if (loginWindow) loginWindow.close()
@@ -137,7 +137,8 @@ ipc.on('setHomeFolder', function (event) {
   dialog.showOpenDialog(mainWindow, {
     properties: ['openDirectory']
   }, path => {
-    store.dispatch('SET_HOME_FOLDER', path)
+    if (path === undefined) return
+    store.dispatch('setHomeFolder', path)
       .then(() => mainWindow.webContents.send('continueToLogin'))
   })
 })
@@ -164,7 +165,7 @@ ipc.on('loadMore', function (event) {
   // gets user_id, SBID and Control object
   sbFetch.fetchPlaylists(store.getters.RequestParams)
     .then(resolve => {
-      store.dispatch('UPDATE_PLAYLISTS', resolve.playlists).then(() => {
+      store.dispatch('updatePlaylists', resolve.playlists).then(() => {
         mainWindow.webContents.send('done loading')
       })
     })
@@ -174,7 +175,7 @@ ipc.on('get tracks from', function (event, id) {
   console.log('LOADING FROM ', id)
   sbFetch.getTracks(store.getters.RequestParams, id)
     .then(response => {
-      store.dispatch('PLAYLIST_STORE_TRACKS', { id, tracks: response.tracks }).then(() => {
+      store.dispatch('playlistStoreTracks', { id, tracks: response.tracks }).then(() => {
         mainWindow.webContents.send('open playlist', id)
       })
     })
@@ -187,7 +188,7 @@ ipc.on('Search Track', function (event, track) {
     .then(ytRes => console.log(ytRes))
   // .then(response => {
   // // STORE THEM
-  //   store.dispatch('PLAYLIST_STORE_TRACKS', { id, tracks: response.tracks }).then(() => {
+  //   store.dispatch('playlistStoreTracks', { id, tracks: response.tracks }).then(() => {
   //     mainWindow.webContents.send('open playlist', id)
   //   })
   // })

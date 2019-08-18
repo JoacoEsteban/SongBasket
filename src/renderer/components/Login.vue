@@ -10,13 +10,10 @@
 </template>
 
 <script>
-const electron = require('electron')
-const ipc = electron.ipcRenderer
-
 export default {
   methods: {
     login () {
-      ipc.send('login')
+      this.$emit('login')
     }
   }
   // //Auto login For dev speed purposes

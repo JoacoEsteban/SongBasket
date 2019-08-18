@@ -1,6 +1,7 @@
 <template>
   <div class="home-router pll-container">
     <playlist v-for="playlist in playlists" :playlist="playlist" :key="playlist.id"
+    @addPlaylistToSyncQueue="$emit('addPlaylistToSyncQueue', playlist.id)"
     @openPlaylist="$emit('openPlaylist', playlist.id)" />
 
     <div v-if="!allLoaded">
