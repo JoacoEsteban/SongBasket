@@ -2,11 +2,11 @@
   <div class="tb-container">
     <div class="tb-selection-numbers-container">
       <div>
-        <span class="tb-selection-num">4</span>
+        <span class="tb-selection-num">{{selectedPlaylistsData.playlists}}</span>
         Playlists Selected
       </div>
       <div>
-        <span class="tb-selection-num">255</span>
+        <span class="tb-selection-num">{{selectedPlaylistsData.tracks}}</span>
         Tracks
       </div>
     </div>
@@ -53,6 +53,9 @@ export default {
       user: this.$store.state.CurrentUser.user,
       now: new Date()
     }
+  },
+  computed: {
+    selectedPlaylistsData: function () { return this.$store.getters.SelectedPlaylistsCompute }
   },
   methods: {
     refreshPlaylists () {

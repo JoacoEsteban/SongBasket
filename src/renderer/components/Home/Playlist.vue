@@ -1,5 +1,7 @@
 <template>
-    <div class="pl-container">
+    <div 
+    :class="{'queued': queued}"
+    class="pl-container">
         <div class="pl-track-count">{{playlist.tracks.total}} {{playlist.tracks.total === 1 ? 'Track' : 'Tracks'}}</div>
         <div class="pl-img" :style="playlist.images.length > 0 ? {backgroundImage: `url(${playlist.images[0].url})`} : null">
           <div class="pl-button-container">
@@ -22,7 +24,11 @@ const ipc = electron.ipcRenderer
 
 export default {
   props: {
-    playlist: Object
+    playlist: Object,
+    queued: {
+      type: Boolean,
+      required: true
+    }
   },
   data () {
     return {
@@ -42,7 +48,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
     .pl-container {
         display: inline-block;
         width: 8rem;
@@ -51,6 +57,9 @@ export default {
         transition: transform .2s ease;
         /* border: .2rem solid #4f4f4f; */
         color: #f0f0f0;
+        &.queued {
+          background: #f0f;
+        }
     }
     .pl-container:hover {
         transform: scale(1.1);

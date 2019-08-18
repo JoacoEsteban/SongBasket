@@ -10,7 +10,7 @@ const getDefaultState = () => {
     cachedPlaylists: [],
     control: {},
     currentPlaylist: '',
-    syncedPlaylists: []
+    queuedPlaylists: []
   }
 }
 
@@ -119,18 +119,15 @@ const mutations = {
     state.currentPlaylist = id
   },
   QUEUE_PLAYLIST (state, id) {
-    console.log('QUEUEING PLAYLIST WITH ID ' + id)
     let found = false
-    for (let i = 0; i < state.syncedPlaylists.length; i++) {
-      let pl = state.syncedPlaylists[i]
+    for (let i = 0; i < state.queuedPlaylists.length; i++) {
+      let pl = state.queuedPlaylists[i]
       if (pl === id) {
-        console.log('FOUND')
         found = true
-        state.syncedPlaylists.splice(i, 1)
+        state.queuedPlaylists.splice(i, 1)
       }
     }
-    if (!found) state.syncedPlaylists = [...state.syncedPlaylists, id]
-    console.log(found, state.syncedPlaylists)
+    if (!found) state.queuedPlaylists = [...state.queuedPlaylists, id]
   }
 
 }
@@ -155,6 +152,26 @@ const getters = {
       }
     }
     return null
+  },
+  SelectedPlaylistsCompute: (state) => {
+    let q = state.queuedPlaylists
+    let p = [ ...state.playlists ]
+
+    let selectedPlaylists = {
+      playlists: q.length,
+      tracks: 0
+    }
+
+    for (let i = 0; i < state.queuedPlaylists.length; i++) {
+      for (let o = 0; o < p.length; o++) {
+        if (q[i] === p[o].id) {
+          selectedPlaylists.tracks += p[o].tracks.total
+          p.splice(o, 1)
+        }
+      }
+    }
+
+    return selectedPlaylists
   }
 }
 
