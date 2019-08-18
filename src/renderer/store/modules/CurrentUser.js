@@ -26,8 +26,8 @@ const actions = {
   updatePlaylists ({ commit }, playlists) {
     commit('UPDATE_PLAYLISTS', playlists)
   },
-  clearUserNPlaylists ({ commit }) {
-    commit('CLEAR_USER_N_PLAYLISTS')
+  logout ({ commit }) {
+    commit('LOGOUT')
   },
   playlistStoreTracks ({ commit }, {id, tracks}) {
     commit('PLAYLIST_STORE_TRACKS', {id, tracks})
@@ -79,7 +79,7 @@ const mutations = {
     console.log('PLAYLISTS UPDATE::::::')
   },
 
-  CLEAR_USER_N_PLAYLISTS (state) {
+  LOGOUT (state) {
     console.log('CLEARING::::::::')
     Object.assign(state, getDefaultState())
     console.log(state)
@@ -155,6 +155,35 @@ const getters = {
   },
   CurrentPlaylist: (state, getters) => {
     return getters.PlaylistById(state.currentPlaylist)
+  },
+  QueuedPlaylists: (state, getters) => {
+    let all = []
+    for (let i = 0; i < state.queuedPlaylists.length; i++) {
+      all = [...all, getters.PlaylistById(state.queuedPlaylists[i])]
+    }
+    return all
+  },
+  UnCachedPlaylists: (state) => {
+    let q = [...state.queuedPlaylists]
+    let c = [...state.cachedPlaylists]
+    let ret = []
+
+    if (c.length === 0) return q
+
+    for (let i = 0; i < q.length; i++) {
+      let found = false
+
+      for (let o = 0; o < c.length; o++) {
+        if (q[i] === c[o].id) {
+          found = true
+          c.splice(o, 1)
+        }
+      }
+
+      if (!found) ret = [...ret, q[i]]
+    }
+    if (ret.length === 0) ret = null
+    return ret
   },
   SelectedPlaylistsCompute: (state) => {
     let q = state.queuedPlaylists

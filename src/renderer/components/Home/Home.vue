@@ -1,7 +1,9 @@
 <template>
   <div>
     <div class="home-container">
-      <top-bar/>
+      <top-bar
+      @youtubeConvert="youtubeConvert"
+      />
       
       <router-view
       path="playlists-list"
@@ -65,9 +67,9 @@ export default {
       this.$router.push('/home/playlist-view')
     },
     logOut () {
-      console.log('DESTROYING:::::')
+      console.log('Logging Out:::::')
       this.$router.push('setup')
-      this.$store.dispatch('clearUserNPlaylists')
+      this.$store.dispatch('logout')
     },
     playlistCached (id) {
       for (let i = 0; i < this.cachedPlaylists.length; i++) {
@@ -77,6 +79,9 @@ export default {
     },
     addPlaylistToSyncQueue (id) {
       this.$store.dispatch('queuePlaylist', id)
+    },
+    youtubeConvert () {
+      ipc.send('Youtube Convert')
     }
 
   },

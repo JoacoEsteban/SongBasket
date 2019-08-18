@@ -2,8 +2,9 @@ import FileSystemUser from './FileSystem/index'
 
 import { logme } from '../UTILS'
 
-import * as sbFetch from './sbFetch'
 import store from '../renderer/store'
+import * as sbFetch from './sbFetch'
+import * as youtubeHandler from './youtubeHandler'
 import electron from 'electron'
 const dialog = electron.dialog
 
@@ -179,6 +180,14 @@ ipc.on('get tracks from', function (event, id) {
         mainWindow.webContents.send('open playlist', id)
       })
     })
+})
+
+ipc.on('Youtube Convert', function () {
+  console.log('FETCHING YT')
+  if (store.state.CurrentUser.queuedPlaylists.length === 0) return
+  let unCached = store.getters.UnCachedPlaylists
+  console.log('unCached', unCached)
+  if (unCached === null) youtubeHandler.youtubizeAll()
 })
 
 ipc.on('Search Track', function (event, track) {

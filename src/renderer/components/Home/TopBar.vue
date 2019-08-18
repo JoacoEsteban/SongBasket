@@ -24,7 +24,9 @@
           <sync-icon></sync-icon>
         </div>
 
-        <div class="tb-button cloud-search-icon">
+        <div class="tb-button cloud-search-icon"
+        @click="$emit('youtubeConvert')"
+        >
           <cloud-search-icon></cloud-search-icon>
         </div>
 
