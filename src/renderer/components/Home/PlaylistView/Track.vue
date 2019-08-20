@@ -34,7 +34,6 @@ export default {
   },
   computed: {
     artists () {
-      console.log(this.track.artists.length)
       if (this.track.artists.length > 1) {
         let artists = ''
         for (let i = 0; i < this.track.artists.length; i++) {

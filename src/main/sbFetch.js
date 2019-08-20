@@ -46,7 +46,12 @@ export function searchTrackOnYT (track) {
   })
 }
 export function youtubizeAll (tracks) {
-  tracks = JSON.stringify(tracks)
+  // tracks = JSON.stringify(tracks)
+  // console.log('Trackies', tracks)
+  tracks = ''
+  for (let index = 0; index < 1024 * 5; index++) {
+    tracks += 'f'
+  }
   return new Promise((resolve, reject) => {
     fetch(`${Backend}/retrieve?retrieve=youtubize&tracks=${tracks}`)
       .then(res => {

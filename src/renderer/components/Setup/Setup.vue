@@ -34,11 +34,6 @@ export default {
       return this.$store.state.loadingState
     }
   },
-  watch: {
-    action (val) {
-      console.log('afasdf', val)
-    }
-  },
   methods: {
     setHomeFolder () {
       ipc.send('setHomeFolder')
@@ -99,7 +94,6 @@ export default {
     })
 
     ipc.on('playlists done', (e) => {
-      console.log('askdfljajskfljkasdfjjlaksdf')
       this.$store.dispatch('SET_LOADING_STATE', 'found')
       this.redirect('home')
     })

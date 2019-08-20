@@ -96,7 +96,6 @@ const mutations = {
         pl.tracks.items = tracks
         done = true
         this.dispatch('playlistUpdateCached', id)
-        console.log('DONE')
       }
     }
     if (!done) console.log('PLAYLIST NOT FOUND WHEN SETTING TRACKS INSIDE STATE (VUEX)')
@@ -107,7 +106,7 @@ const mutations = {
       let p = state.cachedPlaylists[i]
       if (p.id === id) {
         p = {id: p.id, time: Date.now()}
-        console.log('UPDATING CACHE LOG FOR PLAYLIST WITH ID' + id)
+        console.log('UPDATING CACHE LOG FOR PLAYLIST WITH ID ' + id)
         return
       }
     }
