@@ -13,12 +13,12 @@ let { app, BrowserWindow, session } = electron
 let USER = FileSystemUser.checkForUser()
 const ipc = electron.ipcMain
 
-const localBackend = 'http://localhost:5000'
+const localBackend = 'http://192.168.0.69:5000'
 // const herokuBackend = 'https://songbasket-backend.herokuapp.com'
 const Backend = localBackend
 
 const filter = { // when logging in
-  urls: ['http://*.localhost:5000/*']
+  urls: ['http://*.192.168.0.69:5000/*']
 }
 
 if (process.env.NODE_ENV !== 'development') {

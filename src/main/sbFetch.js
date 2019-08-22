@@ -1,7 +1,7 @@
 import fetch from 'electron-fetch'
 import {logme} from '../UTILS'
 
-const localBackend = 'http://localhost:5000'
+const localBackend = 'http://192.168.0.69:5000'
 // const herokuBackend = 'https://songbasket-backend.herokuapp.com'
 const Backend = localBackend
 
