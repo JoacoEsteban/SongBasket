@@ -25,6 +25,7 @@ export function youtubizeAll () {
   sbFetch.youtubizeAll(pls)
     .then(convertion => {
       console.log('REITERAMO::::: ', convertion)
+      store.dispatch('youtubizeResult', convertion)
     })
 
   // TODO sbfetch and Backend endpoint

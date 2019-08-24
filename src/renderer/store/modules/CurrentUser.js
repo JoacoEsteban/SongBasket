@@ -10,7 +10,8 @@ const getDefaultState = () => {
     cachedPlaylists: [],
     control: {},
     currentPlaylist: '',
-    queuedPlaylists: []
+    queuedPlaylists: [],
+    youtubizedPlaylists: []
   }
 }
 
@@ -44,6 +45,12 @@ const actions = {
   queuePlaylist ({ commit }, id) {
     return new Promise((resolve, reject) => {
       commit('QUEUE_PLAYLIST', id)
+      resolve()
+    })
+  },
+  youtubizeResult ({ commit }, result) {
+    return new Promise((resolve, reject) => {
+      commit('YOUTUBIZE_RESULT', result)
       resolve()
     })
   }
@@ -127,6 +134,41 @@ const mutations = {
       }
     }
     if (!found) state.queuedPlaylists = [...state.queuedPlaylists, id]
+  },
+  YOUTUBIZE_RESULT (state, youtubizedResult) {
+    if (state.youtubizedPlaylists.length === 0) {
+      state.youtubizedPlaylists = youtubizedResult
+      return
+    }
+
+    for (let i = 0; i < state.youtubizedPlaylists.length; i++) {
+      let pl = state.youtubizedPlaylists[i]
+
+      for (let o = 0; o < youtubizedResult.length; o++) {
+        let ytpl = youtubizedResult[o]
+
+        if (pl.id === ytpl.id) {
+          for (let u = 0; u < pl.tracks.length; u++) {
+            let trackSt = pl.tracks[u]
+
+            for (let y = 0; y < ytpl.tracks.length; y++) {
+              let trackYt = ytpl.tracks[y]
+              if (trackSt.id === trackYt.id) {
+                // Vue.set({object, key, value)
+                trackSt = trackYt
+                ytpl.tracks.splice(y, 1)
+                break
+              }
+            }
+          }
+          if (ytpl.tracks.length > 0) pl.tracks = [...pl.tracks, ...ytpl.tracks]
+
+          youtubizedResult.splice(o, 1)
+          break
+        }
+      }
+    }
+    if (youtubizedResult.length > 0) state.youtubizedPlaylists = [...state.youtubizedPlaylists, ...youtubizedResult]
   }
 
 }
