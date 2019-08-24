@@ -1,7 +1,8 @@
 import fetch from 'electron-fetch'
 import {logme} from '../UTILS'
+const axios = require('axios')
 
-const localBackend = 'http://192.168.0.69:5000'
+const localBackend = 'http://localhost:5000'
 // const herokuBackend = 'https://songbasket-backend.herokuapp.com'
 const Backend = localBackend
 
@@ -46,19 +47,14 @@ export function searchTrackOnYT (track) {
   })
 }
 export function youtubizeAll (tracks) {
-  // tracks = JSON.stringify(tracks)
-  // console.log('Trackies', tracks)
-  tracks = ''
-  for (let index = 0; index < 1024 * 5; index++) {
-    tracks += 'f'
-  }
+  tracks = JSON.stringify(tracks)
+  console.log('Trackies', tracks)
   return new Promise((resolve, reject) => {
-    fetch(`${Backend}/retrieve?retrieve=youtubize&tracks=${tracks}`)
+    axios.post(`${Backend}/youtubize`, {
+      tracks
+    })
       .then(res => {
-        res.text()
-          .then(body => {
-            resolve(JSON.parse(body))
-          })
+        resolve(res.data)
       })
   })
 }

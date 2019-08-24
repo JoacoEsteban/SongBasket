@@ -9,7 +9,7 @@ let userMethods = {
 
     if (fs.existsSync(userDataPath)) {
       user = fs.readFileSync(userJSONPath, 'utf8')
-      console.log(user)
+      console.log('EXISTS', user)
       return JSON.parse(user)
     } else {
       console.log('Folder missing, Creating')
