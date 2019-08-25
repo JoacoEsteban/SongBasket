@@ -131,6 +131,22 @@ function guestFetch (query) {
     })
 }
 
+function fetchMultiple (ids) {
+  return new Promise((resolve, reject) => {
+    let count = ids.length
+    for (let i = 0; i < count; i++) {
+      let id = ids[i]
+      sbFetch.getTracks(store.getters.RequestParams, id)
+        .then(response => {
+          store.dispatch('playlistStoreTracks', { id, tracks: response.tracks }).then(() => {
+            count--
+            if (count === 0) resolve()
+          })
+        })
+    }
+  })
+}
+
 // :::::::::::::::::::::::::::::::::IPC:::::::::::::::::::::::::::::::::
 
 ipc.on('setHomeFolder', function (event) {
@@ -187,7 +203,10 @@ ipc.on('Youtube Convert', function () {
   if (store.state.CurrentUser.queuedPlaylists.length === 0) return
   let unCached = store.getters.UnCachedPlaylists
   console.log('unCached', unCached)
-  if (unCached === null) youtubeHandler.youtubizeAll()
+  if (unCached !== null) {
+    fetchMultiple(unCached)
+      .then(() => youtubeHandler.youtubizeAll())
+  } else youtubeHandler.youtubizeAll()
 })
 
 ipc.on('Search Track', function (event, track) {
