@@ -17,7 +17,7 @@
       </div>
     </div>
     <div class="pl-track-controls-container">
-      <button class="button" @click="$emit('searchOnYoutube')">Convert</button>
+      <button class="button" @click="$emit('openYtVideo')">Open</button>
     </div>
   </div>
 </template>

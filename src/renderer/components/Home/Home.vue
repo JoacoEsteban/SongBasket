@@ -10,6 +10,7 @@
       @openPlaylist="getTracks($event)"
       @searchTrackOnYoutube="(searchOnYoutube($event))"
       @addPlaylistToSyncQueue="addPlaylistToSyncQueue($event)"
+      @openYtVideo="openYtVideo($event)"
       ></router-view>
 
       <user-data @logOut="logOut"></user-data>
@@ -86,6 +87,10 @@ export default {
     },
     youtubeConvert () {
       ipc.send('Youtube Convert')
+    },
+    openYtVideo (id) {
+      console.log('openYtVideo', id)
+      ipc.send('openYtVideo', id)
     }
 
   },

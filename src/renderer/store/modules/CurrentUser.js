@@ -197,6 +197,18 @@ const getters = {
   CurrentPlaylist: (state, getters) => {
     return getters.PlaylistById(state.currentPlaylist)
   },
+  ConvertedPlaylist: (state) => function (id) {
+    for (let i = 0; i < state.youtubizedPlaylists.length; i++) {
+      let pl = state.youtubizedPlaylists[i]
+
+      if (pl.id === id) {
+        if (pl.tracks === null || pl.tracks === undefined) return null
+
+        return pl
+      }
+    }
+    return null
+  },
   QueuedPlaylists: (state, getters) => {
     let all = []
     for (let i = 0; i < state.queuedPlaylists.length; i++) {

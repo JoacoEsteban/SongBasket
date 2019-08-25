@@ -11,7 +11,7 @@
       </div>
       <div class="plv-rp-tracklist">
         <Track v-for="(track, index) in playlist.tracks.items" :key="index" :track="track"
-        @searchOnYoutube="$emit('searchTrackOnYoutube', track)"
+        @openYtVideo="$emit('openYtVideo', youtubeId(track.id))"
         />
       </div>
     </div>
@@ -37,6 +37,10 @@ export default {
   computed: {
     playlist () {
       return this.$store.getters.CurrentPlaylist
+    },
+    converted () {
+      if (this.playlist) return this.$store.getters.ConvertedPlaylist(this.playlist.id)
+      else return null
     }
   },
   mounted () {
@@ -45,6 +49,13 @@ export default {
   methods: {
     searchOnYoutube (track) {
       ipc.send('Search Track', track)
+    },
+    youtubeId (id) {
+      let c = this.converted.tracks
+      for (let i = 0; i < c.length; i++) {
+        if (c[i].id === id) return c[i].yt.id
+      }
+      return null
     }
   }
 }

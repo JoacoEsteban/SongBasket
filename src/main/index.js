@@ -1,11 +1,12 @@
 import FileSystemUser from './FileSystem/index'
-
 import { logme } from '../UTILS'
 
 import store from '../renderer/store'
 import * as sbFetch from './sbFetch'
 import * as youtubeHandler from './youtubeHandler'
 import electron from 'electron'
+var open = require('open')
+
 const dialog = electron.dialog
 
 let { app, BrowserWindow, session } = electron
@@ -148,6 +149,10 @@ function fetchMultiple (ids) {
 }
 
 // :::::::::::::::::::::::::::::::::IPC:::::::::::::::::::::::::::::::::
+ipc.on('openYtVideo', function (event, id) {
+  // console.log('openYtVideo', id)
+  open('https://www.youtube.com/watch?v=' + id)
+})
 
 ipc.on('setHomeFolder', function (event) {
   // console.log('goty')
