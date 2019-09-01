@@ -1,7 +1,6 @@
 <template>
   <div class="home-router pll-container">
     <playlist v-for="playlist in playlists"
-    :queued="isQueued(playlist.id)"
     :playlist="playlist"
     :key="playlist.id"
     @addPlaylistToSyncQueue="$emit('addPlaylistToSyncQueue', playlist.id)"
@@ -34,9 +33,6 @@ export default {
   computed: {
     allLoaded: function () {
       return this.control.total - this.control.offset <= 0
-    },
-    queuedPlaylists () {
-      return this.$store.state.CurrentUser.queuedPlaylists
     }
   },
   methods: {
@@ -46,17 +42,11 @@ export default {
         ipc.send('loadMore')
       }
     },
-    isQueued (id) {
-      for (let i = 0; i < this.queuedPlaylists.length; i++) {
-        if (this.queuedPlaylists[i] === id) return true
-      }
-      return false
+    mounted () {
+      ipc.on('done loading', () => {
+        this.loading = false
+      })
     }
-  },
-  mounted () {
-    ipc.on('done loading', () => {
-      this.loading = false
-    })
   }
 }
 </script>

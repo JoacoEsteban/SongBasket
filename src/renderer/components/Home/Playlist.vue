@@ -18,22 +18,26 @@
 </template>
 
 <script>
+import 'vuex'
+
 import electron from 'electron'
 import PlaylistIcon from '../../assets/icons/playlist-icon'
 const ipc = electron.ipcRenderer
 
 export default {
   props: {
-    playlist: Object,
-    queued: {
-      type: Boolean,
-      required: true
-    }
+    playlist: Object
   },
   data () {
     return {
       playlistName: this.$props.playlist.name.length > 20 ? this.$props.playlist.name.substring(0, 20) + '...' : this.$props.playlist.name
     }
+  },
+  computed: {
+    queued () {
+      return this.$store.getters.PlaylistIsQueued(this.playlist.id)
+    }
+
   },
   mounted () {
     ipc.on(`hola ${this.playlist.id}`, () => {

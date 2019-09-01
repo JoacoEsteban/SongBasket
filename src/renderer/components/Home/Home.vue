@@ -80,6 +80,7 @@ export default {
       return false
     },
     addPlaylistToSyncQueue (id) {
+      console.log('asdjkfasljkflad tamo redy', id)
       this.$store.dispatch('queuePlaylist', id)
     },
     searchOnYoutube (track) {

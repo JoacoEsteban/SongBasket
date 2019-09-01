@@ -209,6 +209,17 @@ const getters = {
     }
     return null
   },
+  PlaylistIsQueued: (state, getters) => function (id) {
+    let pls = getters.QueuedPlaylists
+    console.log(pls, '::::::::')
+    for (let i = 0; i < pls.length; i++) {
+      let pl = pls[i]
+      if (pl.id === id) {
+        return true
+      }
+    }
+    return false
+  },
   QueuedPlaylists: (state, getters) => {
     let all = []
     for (let i = 0; i < state.queuedPlaylists.length; i++) {

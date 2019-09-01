@@ -2,6 +2,7 @@
   <div class="home-router plv-container">
     <div class="plv-leftpanel">
       <div class="plv-lp-img" :style="'background-image: url('+playlist.images[0].url+')'" />
+      <button class="button" @click="$emit('addPlaylistToSyncQueue', playlist.id)">{{isQueued ? 'Unqueue' : 'Queue'}}</button>
       
     </div>
     <div class="plv-rightpanel">
@@ -41,6 +42,10 @@ export default {
     converted () {
       if (this.playlist) return this.$store.getters.ConvertedPlaylist(this.playlist.id)
       else return null
+    },
+    isQueued () {
+      if (this.playlist) return this.$store.getters.PlaylistIsQueued(this.playlist.id)
+      else return false
     }
   },
   mounted () {
@@ -80,6 +85,7 @@ export default {
   background-size: cover;
   width: 92%;
   padding-bottom: 92%;
+  margin-bottom: 1rem;
 }
 
 .plv-rightpanel {
