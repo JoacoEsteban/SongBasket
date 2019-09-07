@@ -141,33 +141,39 @@ const mutations = {
       return
     }
 
+    // This Immense for loop replaces already fetched results for some reason
     for (let i = 0; i < state.youtubizedPlaylists.length; i++) {
       let pl = state.youtubizedPlaylists[i]
 
       for (let o = 0; o < youtubizedResult.length; o++) {
         let ytpl = youtubizedResult[o]
 
+        // If Fetched playlists already exists in VUEX
         if (pl.id === ytpl.id) {
+          // Cycle through tracks
           for (let u = 0; u < pl.tracks.length; u++) {
             let trackSt = pl.tracks[u]
 
             for (let y = 0; y < ytpl.tracks.length; y++) {
               let trackYt = ytpl.tracks[y]
               if (trackSt.id === trackYt.id) {
-                // Vue.set({object, key, value)
-                trackSt = trackYt
+                // Replace with new Data directly into state
+                state.youtubizedPlaylists[i].tracks.splice(u, 1, trackYt)
+                // Popit from fetched tracks
                 ytpl.tracks.splice(y, 1)
                 break
               }
             }
           }
-          if (ytpl.tracks.length > 0) pl.tracks = [...pl.tracks, ...ytpl.tracks]
+          // Adds remaining new songs directly into state
+          if (ytpl.tracks.length > 0) state.youtubizedPlaylists[i].tracks = [...pl.tracks, ...ytpl.tracks]
 
           youtubizedResult.splice(o, 1)
           break
         }
       }
     }
+    // Adds remaining new playlists directly into state
     if (youtubizedResult.length > 0) state.youtubizedPlaylists = [...state.youtubizedPlaylists, ...youtubizedResult]
   }
 
@@ -249,6 +255,7 @@ const getters = {
     if (ret.length === 0) ret = null
     return ret
   },
+  // Number of Queued playlists and tracks to show in View
   SelectedPlaylistsCompute: (state) => {
     let q = state.queuedPlaylists
     let p = [ ...state.playlists ]

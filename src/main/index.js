@@ -195,11 +195,9 @@ ipc.on('loadMore', function (event) {
 
 ipc.on('get tracks from', function (event, id) {
   console.log('LOADING FROM ', id)
-  sbFetch.getTracks(store.getters.RequestParams, id)
-    .then(response => {
-      store.dispatch('playlistStoreTracks', { id, tracks: response.tracks }).then(() => {
-        mainWindow.webContents.send('open playlist', id)
-      })
+  fetchMultiple([id])
+    .then(() => {
+      mainWindow.webContents.send('open playlist', id)
     })
 })
 

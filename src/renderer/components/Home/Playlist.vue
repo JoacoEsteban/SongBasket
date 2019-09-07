@@ -13,7 +13,9 @@
         <div class="pl-name" ref="plname">
             <!-- TODO handle multi line names -->
             {{playlistName}}
+            
         </div>
+        <div class="queued-indicator" ref="plname" />
     </div>
 </template>
 
@@ -57,21 +59,36 @@ $q-false-color:#272727;
 $q-true-color:rgb(103, 214, 0);
 .pl-container {
   display: inline-block;
+  position: relative;
   width: 8rem;
   background: $q-false-color;
   margin: 0 1rem 1.4rem 1rem;
   transition: transform .2s ease, background-color .2s ease, outline-width .1s ease;
   color: #f0f0f0;
   
+  $bg: darken($q-true-color, 7);
+  $ol: $q-true-color;
+  .queued-indicator {
+    // width: 100%;
+    height: .15em;
+    background: $ol;
+    position: absolute;
+    $bezier: cubic-bezier(.64,.54,.22,1);
+    transition: all .15s $bezier;
+    right: 50%;
+    left: 50%;
+  }
   &.queued {
-    $bg: darken($q-true-color, 7);
-    $ol: $q-true-color;
-    outline: 3px solid $ol;
-    // background: $bg;
-    transform: scale(1.07);
-    .pl-track-count {
-      // background: $bg
+    .queued-indicator {
+      right: 0;
+      left: 0;
     }
+    // outline: 3px solid $ol;
+    // background: $bg;
+    transform: scale(1.08);
+    // .pl-track-count {
+    //   // background: $bg
+    // }
   }
 
   &:hover {

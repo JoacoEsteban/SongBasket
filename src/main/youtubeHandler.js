@@ -18,13 +18,14 @@ export function youtubizeAll () {
       if (duration <= 20 && duration >= 4) duration = 'medium'
       if (duration < 4) duration = 'short'
 
-      pls[i].tracks = [...pls[i].tracks, {query, duration, id: track.id}]
+      pls[i].tracks = [...pls[i].tracks, {query, duration, duration_s: track.duration_ms / 1000, id: track.id}]
     }
   }
 
   sbFetch.youtubizeAll(pls)
     .then(convertion => {
       console.log('REITERAMO::::: ', convertion)
+
       store.dispatch('youtubizeResult', convertion)
     })
 
