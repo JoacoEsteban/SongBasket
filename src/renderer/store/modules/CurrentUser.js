@@ -7,7 +7,7 @@ const getDefaultState = () => {
     },
     user: {}, // Includes name, number of playlists, image url
     playlists: [],
-    cachedPlaylists: [],
+    syncedPlaylists: [],
     control: {},
     currentPlaylist: '',
     queuedPlaylists: [],
@@ -33,8 +33,8 @@ const actions = {
   playlistStoreTracks ({ commit }, {id, tracks}) {
     commit('PLAYLIST_STORE_TRACKS', {id, tracks})
   },
-  playlistUpdateCached ({ commit }, id) {
-    commit('PLAYLIST_UPDATE_CACHED', id)
+  playlistUpdateSynced ({ commit }, id) {
+    commit('PLAYLIST_UPDATE_SYNCED', id)
   },
   setCurrentPlaylist ({ commit }, id) {
     return new Promise((resolve, reject) => {
@@ -102,23 +102,23 @@ const mutations = {
       if (pl.id === id) {
         pl.tracks.items = tracks
         done = true
-        this.dispatch('playlistUpdateCached', id)
+        this.dispatch('playlistUpdateSynced', id)
       }
     }
     if (!done) console.log('PLAYLIST NOT FOUND WHEN SETTING TRACKS INSIDE STATE (VUEX)')
   },
 
-  PLAYLIST_UPDATE_CACHED (state, id) {
-    for (let i = 0; i < state.cachedPlaylists.length; i++) {
-      let p = state.cachedPlaylists[i]
+  PLAYLIST_UPDATE_SYNCED (state, id) {
+    for (let i = 0; i < state.syncedPlaylists.length; i++) {
+      let p = state.syncedPlaylists[i]
       if (p.id === id) {
         p = {id: p.id, time: Date.now()}
-        console.log('UPDATING CACHE LOG FOR PLAYLIST WITH ID ' + id)
+        console.log('UPDATING SYNC LOG FOR PLAYLIST WITH ID ' + id)
         return
       }
     }
-    console.log('UPDATING CACHE LOG')
-    state.cachedPlaylists = [ ...state.cachedPlaylists, { id: id, time: Date.now() } ]
+    console.log('UPDATING SYNC LOG')
+    state.syncedPlaylists = [ ...state.syncedPlaylists, { id: id, time: Date.now() } ]
   },
   SET_CURRENT_PLAYLIST (state, id) {
     console.log('SETTING PLAYLIST WITH ID ' + id + ' AS SELECTED')
@@ -233,9 +233,9 @@ const getters = {
     }
     return all
   },
-  UnCachedPlaylists: (state) => {
+  UnSyncedPlaylists: (state) => {
     let q = [...state.queuedPlaylists]
-    let c = [...state.cachedPlaylists]
+    let c = [...state.syncedPlaylists]
     let ret = []
 
     if (c.length === 0) return q

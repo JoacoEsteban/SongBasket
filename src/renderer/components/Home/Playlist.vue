@@ -15,7 +15,7 @@
             {{playlistName}}
             
         </div>
-        <div class="queued-indicator" ref="plname" />
+        <div class="queued-indicator" />
     </div>
 </template>
 
@@ -65,30 +65,35 @@ $q-true-color:rgb(103, 214, 0);
   margin: 0 1rem 1.4rem 1rem;
   transition: transform .2s ease, background-color .2s ease, outline-width .1s ease;
   color: #f0f0f0;
+  z-index: 0;
   
   $bg: darken($q-true-color, 7);
   $ol: $q-true-color;
   .queued-indicator {
-    // width: 100%;
-    height: .15em;
-    background: $ol;
     position: absolute;
-    $bezier: cubic-bezier(.64,.54,.22,1);
-    transition: all .15s $bezier;
+    top: 100%;
+    bottom: -.15em;
     right: 50%;
     left: 50%;
+
+    z-index: -1;
+    background: $ol;
+    $bezier: cubic-bezier(.64,.54,.22,1);
+    transition: all .15s $bezier;
   }
   &.queued {
     .queued-indicator {
-      right: 0;
-      left: 0;
+      right: 1px;
+      left: 1px;
     }
-    // outline: 3px solid $ol;
-    // background: $bg;
     transform: scale(1.08);
-    // .pl-track-count {
-    //   // background: $bg
-    // }
+  }
+  &.synced {
+    .queued-indicator {
+      right: -.15em;
+      left: -.15em;
+      top: -.15em;
+    }
   }
 
   &:hover {
@@ -129,13 +134,14 @@ $q-true-color:rgb(103, 214, 0);
   justify-content: space-evenly;
 }
 .pl-name {
-    text-align: left;
-    font-size: .6rem;
-    font-family: "Poppins Semibold";
-    padding: 0 .2rem;
-    height: 1.5rem;
-    display: flex;
-    align-items: center;
+  background: $q-false-color;
+  text-align: left;
+  font-size: .6rem;
+  font-family: "Poppins Semibold";
+  padding: 0 .2rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
 
 }
 </style>

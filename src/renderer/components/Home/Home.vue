@@ -47,8 +47,8 @@ export default {
     allLoaded: function () {
       return this.control.total - this.control.offset <= 0
     },
-    cachedPlaylists: function () {
-      return this.$store.state.CurrentUser.cachedPlaylists
+    syncedPlaylists: function () {
+      return this.$store.state.CurrentUser.syncedPlaylists
     }
   },
 
@@ -60,7 +60,7 @@ export default {
       }
     },
     getTracks (id) {
-      if (this.playlistCached(id)) this.setPlaylistNPush(id)
+      if (this.playlistSynced(id)) this.setPlaylistNPush(id)
       else ipc.send('get tracks from', id)
     },
     setPlaylistNPush (id) {
@@ -73,9 +73,9 @@ export default {
       this.$router.push('setup')
       this.$store.dispatch('logout')
     },
-    playlistCached (id) {
-      for (let i = 0; i < this.cachedPlaylists.length; i++) {
-        if (this.cachedPlaylists[i].id === id) return true
+    playlistSynced (id) {
+      for (let i = 0; i < this.syncedPlaylists.length; i++) {
+        if (this.syncedPlaylists[i].id === id) return true
       }
       return false
     },

@@ -11,7 +11,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   modules,
   plugins: [
-    createPersistedState({blacklist: ['playlistUpdateCached', 'youtubizeResult']}),
+    createPersistedState({blacklist: ['playlistUpdateSynced', 'youtubizeResult']}),
     createSharedMutations()
   ],
   strict: process.env.NODE_ENV !== 'production'
