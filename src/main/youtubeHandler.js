@@ -2,12 +2,15 @@ import store from '../renderer/store'
 import * as sbFetch from './sbFetch'
 
 export function youtubizeAll () {
+  let syncedPlaylists = store.getters.SyncedPlaylistsWithNewTracks
   let queuedPlaylists = store.getters.QueuedPlaylists
-  if (queuedPlaylists.length === 0) return
+  if (queuedPlaylists.length === 0 && syncedPlaylists.length === 0) return
+
+  let allPlaylists = [...syncedPlaylists, ...queuedPlaylists]
 
   let pls = []
-  for (let i = 0; i < queuedPlaylists.length; i++) {
-    let pl = queuedPlaylists[i]
+  for (let i = 0; i < allPlaylists.length; i++) {
+    let pl = allPlaylists[i]
     pls = [ ...pls, {id: pl.id, tracks: []} ]
 
     for (let o = 0; o < pl.tracks.items.length; o++) {

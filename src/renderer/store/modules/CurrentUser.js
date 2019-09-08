@@ -210,6 +210,7 @@ const mutations = {
       return
     }
 
+    // TODO Update tracks accordingly to version control
     // This Immense for loop replaces already fetched results for some reason lol
     for (let i = 0; i < state.syncedPlaylists.length; i++) {
       let pl = state.syncedPlaylists[i]
@@ -265,7 +266,7 @@ const getters = {
   CurrentPlaylist: (state, getters) => {
     return getters.PlaylistById(state.currentPlaylist)
   },
-  SyncedPlaylist: (state) => function (id) {
+  SyncedPlaylistById: (state) => function (id) {
     for (let i = 0; i < state.syncedPlaylists.length; i++) {
       let pl = state.syncedPlaylists[i]
 
@@ -290,6 +291,13 @@ const getters = {
     let all = []
     for (let i = 0; i < state.queuedPlaylists.length; i++) {
       all = [...all, getters.PlaylistById(state.queuedPlaylists[i])]
+    }
+    return all
+  },
+  SyncedPlaylists: (state, getters) => {
+    let all = []
+    for (let i = 0; i < state.syncedPlaylists.length; i++) {
+      all = [...all, getters.SyncedPlaylistById(state.syncedPlaylists[i])]
     }
     return all
   },
@@ -343,7 +351,7 @@ const getters = {
     // If there are no changes, then both arrays will be empty
 
     let added = [...getters.PlaylistById(id).tracks.items]
-    let removed = [...getters.SyncedPlaylist(id).tracks]
+    let removed = [...getters.SyncedPlaylistById(id).tracks]
 
     let i = 0
     while (i < added.length) {
@@ -365,6 +373,18 @@ const getters = {
     }
 
     return {added, removed}
+  },
+
+  SyncedPlaylistsWithNewTracks: (state, getters) => {
+    return getters.SyncedPlaylists.map(pl => {
+      pl = getters.PlaylistById(pl.id)
+      return {
+        ...pl,
+        tracks: {
+          items: getters.PlaylistTrackChanges(pl.id).added
+        }
+      }
+    })
   }
 }
 

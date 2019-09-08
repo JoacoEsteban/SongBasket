@@ -41,7 +41,7 @@ export default {
       return this.$store.getters.CurrentPlaylist
     },
     converted () {
-      if (this.playlist) return this.$store.getters.SyncedPlaylist(this.playlist.id)
+      if (this.playlist) return this.$store.getters.SyncedPlaylistById(this.playlist.id)
       else return null
     },
     isQueued () {
