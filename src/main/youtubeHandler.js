@@ -3,6 +3,7 @@ import * as sbFetch from './sbFetch'
 
 export function youtubizeAll () {
   let queuedPlaylists = store.getters.QueuedPlaylists
+  if (queuedPlaylists.length === 0) return
 
   let pls = []
   for (let i = 0; i < queuedPlaylists.length; i++) {

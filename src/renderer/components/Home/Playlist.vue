@@ -38,7 +38,7 @@ export default {
   },
   computed: {
     isQueued () {
-      return this.$store.getters.PlaylistIsQueued(this.playlist.id)
+      return this.$store.getters.PlaylistIsQueued(this.playlist.id) >= 0
     },
     isSynced () {
       if (this.playlist) return this.$store.getters.PlaylistIsSynced(this.playlist.id)

@@ -49,9 +49,15 @@ const actions = {
       resolve()
     })
   },
-  youtubizeResult ({ commit }, result) {
+  findAndUnqueue ({ commit, getters }, id) {
     return new Promise((resolve, reject) => {
-      commit('YOUTUBIZE_RESULT', result)
+      commit('FIND_AND_UNQUEUE', {id, getters})
+      resolve()
+    })
+  },
+  youtubizeResult ({ commit }, youtubizedResult) {
+    return new Promise((resolve, reject) => {
+      commit('YOUTUBIZE_RESULT', youtubizedResult)
       resolve()
     })
   }
@@ -124,20 +130,35 @@ const mutations = {
     let found = false
     for (let i = 0; i < state.queuedPlaylists.length; i++) {
       let pl = state.queuedPlaylists[i]
-      if (pl === id) {
+      if (pl === id) { // Unqueues if found
         found = true
         state.queuedPlaylists.splice(i, 1)
       }
     }
     if (!found) state.queuedPlaylists = [...state.queuedPlaylists, id]
   },
+  FIND_AND_UNQUEUE (state, {id, getters}) {
+    let index = findInPls(id, state.queuedPlaylists.map(pl => {
+      return {id: pl}
+    }))
+    console.log('Unqueueing', id, index)
+    if (index >= 0) {
+      state.queuedPlaylists.splice(index, 1)
+    }
+  },
   YOUTUBIZE_RESULT (state, youtubizedResult) {
+    // Unqueueing synced playlists
+    console.log('RESULT::', youtubizedResult)
+    for (let i = 0; i < youtubizedResult.length; i++) {
+      this.dispatch('findAndUnqueue', youtubizedResult[i].id)
+    }
+
     if (state.syncedPlaylists.length === 0) {
       state.syncedPlaylists = youtubizedResult
       return
     }
 
-    // This Immense for loop replaces already fetched results for some reason
+    // This Immense for loop replaces already fetched results for some reason lol
     for (let i = 0; i < state.syncedPlaylists.length; i++) {
       let pl = state.syncedPlaylists[i]
 
@@ -208,7 +229,7 @@ const getters = {
     return findInPls(id, state.cachedPlaylists) >= 0
   },
   PlaylistIsQueued: (state, getters) => function (id) {
-    return findInPls(id, getters.QueuedPlaylists) >= 0
+    return findInPls(id, getters.QueuedPlaylists)
   },
   PlaylistIsSynced: (state, getters) => function (id) {
     return findInPls(id, state.syncedPlaylists) >= 0

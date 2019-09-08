@@ -45,7 +45,7 @@ export default {
       else return null
     },
     isQueued () {
-      if (this.playlist) return this.$store.getters.PlaylistIsQueued(this.playlist.id)
+      if (this.playlist) return this.$store.getters.PlaylistIsQueued(this.playlist.id) >= 0
       else return false
     },
     isSynced () {
