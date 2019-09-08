@@ -195,7 +195,7 @@ ipc.on('loadMore', function (event) {
 
 ipc.on('get tracks from', function (event, id) {
   console.log('LOADING FROM ', id)
-  if (store.getters.PlaylistIsCached(id) === false) {
+  if (store.getters.PlaylistIsCached(id) === false && store.getters.PlaylistIsSynced(id) === false) {
     fetchMultiple([id])
       .then(() => {
         mainWindow.webContents.send('open playlist', id)
@@ -204,8 +204,8 @@ ipc.on('get tracks from', function (event, id) {
 })
 
 ipc.on('Youtube Convert', function () {
-  console.log('FETCHING YT')
   if (store.state.CurrentUser.queuedPlaylists.length === 0) return
+  console.log('FETCHING YT')
   let unCached = store.getters.UnCachedPlaylists
   console.log('unCached', unCached)
   if (unCached !== null) {

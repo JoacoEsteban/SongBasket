@@ -55,6 +55,12 @@ const actions = {
       resolve()
     })
   },
+  findAndUncache ({ commit, getters }, id) {
+    return new Promise((resolve, reject) => {
+      commit('FIND_AND_UNCACHE', {id, getters})
+      resolve()
+    })
+  },
   youtubizeResult ({ commit }, youtubizedResult) {
     return new Promise((resolve, reject) => {
       commit('YOUTUBIZE_RESULT', youtubizedResult)
@@ -146,11 +152,20 @@ const mutations = {
       state.queuedPlaylists.splice(index, 1)
     }
   },
+  FIND_AND_UNCACHE (state, {id, getters}) {
+    let index = findInPls(id, state.cachedPlaylists)
+    console.log('Uncaching', id, index)
+    if (index >= 0) {
+      state.cachedPlaylists.splice(index, 1)
+    }
+  },
   YOUTUBIZE_RESULT (state, youtubizedResult) {
     // Unqueueing synced playlists
-    console.log('RESULT::', youtubizedResult)
+    console.log('RESULT::', youtubizedResult.length)
     for (let i = 0; i < youtubizedResult.length; i++) {
+      console.log('iiiiiiiiiiiiiiii:', i)
       this.dispatch('findAndUnqueue', youtubizedResult[i].id)
+      this.dispatch('findAndUncache', youtubizedResult[i].id)
     }
 
     if (state.syncedPlaylists.length === 0) {

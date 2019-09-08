@@ -6,6 +6,7 @@ const localBackend = 'http://localhost:5000'
 // const herokuBackend = 'https://songbasket-backend.herokuapp.com'
 const Backend = localBackend
 
+// Brings back user information
 export function guestLogin (userId) {
   return new Promise((resolve, reject) => {
     fetch(`${Backend}/guest_sign_in?user_id=${userId}`)
