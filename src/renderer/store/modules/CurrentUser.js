@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import Vue from 'vue'
 
 const getDefaultState = () => {
@@ -30,8 +31,8 @@ const actions = {
   logout ({ commit }) {
     commit('LOGOUT')
   },
-  playlistStoreTracks ({ commit }, {id, tracks}) {
-    commit('PLAYLIST_STORE_TRACKS', {id, tracks})
+  playlistStoreTracks ({ commit }, playlist) {
+    commit('PLAYLIST_STORE_TRACKS', playlist)
   },
   playlistUpdateCached ({ commit }, id) {
     commit('PLAYLIST_UPDATE_CACHED', id)
@@ -92,20 +93,15 @@ const mutations = {
     console.log(state)
   },
 
-  PLAYLIST_STORE_TRACKS (state, {id, tracks}) {
-    console.log('STORING ' + tracks.length + ' TRACKS FOR PLAYLIST WITH ID ' + id)
+  PLAYLIST_STORE_TRACKS (state, playlist) {
+    console.log('STORING ' + playlist.tracks.items.length + ' TRACKS FOR PLAYLIST WITH ID ' + playlist.id)
 
-    let done = false
-    for (let i = 0; i < state.playlists.length; i++) {
-      let pl = state.playlists[i]
+    let index = findInPls(playlist.id, state.playlists)
 
-      if (pl.id === id) {
-        pl.tracks.items = tracks
-        done = true
-        this.dispatch('playlistUpdateCached', id)
-      }
-    }
-    if (!done) console.log('PLAYLIST NOT FOUND WHEN SETTING TRACKS INSIDE STATE (VUEX)')
+    if (index >= 0) {
+      state.playlists.splice(index, 1, playlist)
+      this.dispatch('playlistUpdateCached', playlist.id)
+    } console.log('PLAYLIST NOT FOUND WHEN SETTING TRACKS INSIDE STATE (VUEX)')
   },
 
   PLAYLIST_UPDATE_CACHED (state, id) {

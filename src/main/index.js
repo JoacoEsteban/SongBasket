@@ -139,7 +139,7 @@ function fetchMultiple (ids) {
       let id = ids[i]
       sbFetch.getTracks(store.getters.RequestParams, id)
         .then(response => {
-          store.dispatch('playlistStoreTracks', { id, tracks: response.tracks }).then(() => {
+          store.dispatch('playlistStoreTracks', response.playlist).then(() => {
             count--
             if (count === 0) resolve()
           })
