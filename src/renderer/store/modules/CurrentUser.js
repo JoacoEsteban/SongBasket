@@ -7,11 +7,11 @@ const getDefaultState = () => {
     },
     user: {}, // Includes name, number of playlists, image url
     playlists: [],
+    cachedPlaylists: [],
     syncedPlaylists: [],
     control: {},
     currentPlaylist: '',
-    queuedPlaylists: [],
-    youtubizedPlaylists: []
+    queuedPlaylists: []
   }
 }
 
@@ -33,8 +33,8 @@ const actions = {
   playlistStoreTracks ({ commit }, {id, tracks}) {
     commit('PLAYLIST_STORE_TRACKS', {id, tracks})
   },
-  playlistUpdateSynced ({ commit }, id) {
-    commit('PLAYLIST_UPDATE_SYNCED', id)
+  playlistUpdateCached ({ commit }, id) {
+    commit('PLAYLIST_UPDATE_CACHED', id)
   },
   setCurrentPlaylist ({ commit }, id) {
     return new Promise((resolve, reject) => {
@@ -102,23 +102,23 @@ const mutations = {
       if (pl.id === id) {
         pl.tracks.items = tracks
         done = true
-        this.dispatch('playlistUpdateSynced', id)
+        this.dispatch('playlistUpdateCached', id)
       }
     }
     if (!done) console.log('PLAYLIST NOT FOUND WHEN SETTING TRACKS INSIDE STATE (VUEX)')
   },
 
-  PLAYLIST_UPDATE_SYNCED (state, id) {
-    for (let i = 0; i < state.syncedPlaylists.length; i++) {
-      let p = state.syncedPlaylists[i]
+  PLAYLIST_UPDATE_CACHED (state, id) {
+    for (let i = 0; i < state.cachedPlaylists.length; i++) {
+      let p = state.cachedPlaylists[i]
       if (p.id === id) {
         p = {id: p.id, time: Date.now()}
-        console.log('UPDATING SYNC LOG FOR PLAYLIST WITH ID ' + id)
+        console.log('UPDATING CACHE LOG FOR PLAYLIST WITH ID ' + id)
         return
       }
     }
-    console.log('UPDATING SYNC LOG')
-    state.syncedPlaylists = [ ...state.syncedPlaylists, { id: id, time: Date.now() } ]
+    console.log('UPDATING CACHE LOG')
+    state.cachedPlaylists = [ ...state.cachedPlaylists, { id: id, time: Date.now() } ]
   },
   SET_CURRENT_PLAYLIST (state, id) {
     console.log('SETTING PLAYLIST WITH ID ' + id + ' AS SELECTED')
@@ -136,14 +136,14 @@ const mutations = {
     if (!found) state.queuedPlaylists = [...state.queuedPlaylists, id]
   },
   YOUTUBIZE_RESULT (state, youtubizedResult) {
-    if (state.youtubizedPlaylists.length === 0) {
-      state.youtubizedPlaylists = youtubizedResult
+    if (state.syncedPlaylists.length === 0) {
+      state.syncedPlaylists = youtubizedResult
       return
     }
 
     // This Immense for loop replaces already fetched results for some reason
-    for (let i = 0; i < state.youtubizedPlaylists.length; i++) {
-      let pl = state.youtubizedPlaylists[i]
+    for (let i = 0; i < state.syncedPlaylists.length; i++) {
+      let pl = state.syncedPlaylists[i]
 
       for (let o = 0; o < youtubizedResult.length; o++) {
         let ytpl = youtubizedResult[o]
@@ -158,7 +158,7 @@ const mutations = {
               let trackYt = ytpl.tracks[y]
               if (trackSt.id === trackYt.id) {
                 // Replace with new Data directly into state
-                state.youtubizedPlaylists[i].tracks.splice(u, 1, trackYt)
+                state.syncedPlaylists[i].tracks.splice(u, 1, trackYt)
                 // Popit from fetched tracks
                 ytpl.tracks.splice(y, 1)
                 break
@@ -166,7 +166,7 @@ const mutations = {
             }
           }
           // Adds remaining new songs directly into state
-          if (ytpl.tracks.length > 0) state.youtubizedPlaylists[i].tracks = [...pl.tracks, ...ytpl.tracks]
+          if (ytpl.tracks.length > 0) state.syncedPlaylists[i].tracks = [...pl.tracks, ...ytpl.tracks]
 
           youtubizedResult.splice(o, 1)
           break
@@ -174,7 +174,7 @@ const mutations = {
       }
     }
     // Adds remaining new playlists directly into state
-    if (youtubizedResult.length > 0) state.youtubizedPlaylists = [...state.youtubizedPlaylists, ...youtubizedResult]
+    if (youtubizedResult.length > 0) state.syncedPlaylists = [...state.syncedPlaylists, ...youtubizedResult]
   }
 
 }
@@ -189,23 +189,16 @@ const getters = {
     }
   },
   PlaylistById: (state) => function (id) {
-    for (let i = 0; i < state.playlists.length; i++) {
-      let pl = state.playlists[i]
-
-      if (pl.id === id) {
-        if (pl.tracks === null || pl.tracks === undefined) return null
-
-        return pl
-      }
-    }
-    return null
+    let pl = state.playlists[findInPls(id, state.playlists)]
+    if (!pl || pl.tracks === null || pl.tracks === undefined) return null
+    return pl
   },
   CurrentPlaylist: (state, getters) => {
     return getters.PlaylistById(state.currentPlaylist)
   },
-  ConvertedPlaylist: (state) => function (id) {
-    for (let i = 0; i < state.youtubizedPlaylists.length; i++) {
-      let pl = state.youtubizedPlaylists[i]
+  SyncedPlaylist: (state) => function (id) {
+    for (let i = 0; i < state.syncedPlaylists.length; i++) {
+      let pl = state.syncedPlaylists[i]
 
       if (pl.id === id) {
         if (pl.tracks === null || pl.tracks === undefined) return null
@@ -215,16 +208,14 @@ const getters = {
     }
     return null
   },
+  PlaylistIsCached: (state, getters) => function (id) {
+    return findInPls(id, state.cachedPlaylists) >= 0
+  },
   PlaylistIsQueued: (state, getters) => function (id) {
-    let pls = getters.QueuedPlaylists
-    console.log(pls, '::::::::')
-    for (let i = 0; i < pls.length; i++) {
-      let pl = pls[i]
-      if (pl.id === id) {
-        return true
-      }
-    }
-    return false
+    return findInPls(id, getters.QueuedPlaylists) >= 0
+  },
+  PlaylistIsSynced: (state, getters) => function (id) {
+    return findInPls(id, state.syncedPlaylists) >= 0
   },
   QueuedPlaylists: (state, getters) => {
     let all = []
@@ -233,9 +224,9 @@ const getters = {
     }
     return all
   },
-  UnSyncedPlaylists: (state) => {
+  UnCachedPlaylists: (state) => {
     let q = [...state.queuedPlaylists]
-    let c = [...state.syncedPlaylists]
+    let c = [...state.cachedPlaylists]
     let ret = []
 
     if (c.length === 0) return q
@@ -283,4 +274,14 @@ export default {
   actions,
   mutations,
   getters
+}
+
+function findInPls (id, pls) {
+  for (let i = 0; i < pls.length; i++) {
+    let pl = pls[i]
+    if (pl.id === id) {
+      return i
+    }
+  }
+  return -1
 }

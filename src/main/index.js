@@ -195,19 +195,21 @@ ipc.on('loadMore', function (event) {
 
 ipc.on('get tracks from', function (event, id) {
   console.log('LOADING FROM ', id)
-  fetchMultiple([id])
-    .then(() => {
-      mainWindow.webContents.send('open playlist', id)
-    })
+  if (store.getters.PlaylistIsCached(id) === false) {
+    fetchMultiple([id])
+      .then(() => {
+        mainWindow.webContents.send('open playlist', id)
+      })
+  } else mainWindow.webContents.send('open playlist', id)
 })
 
 ipc.on('Youtube Convert', function () {
   console.log('FETCHING YT')
   if (store.state.CurrentUser.queuedPlaylists.length === 0) return
-  let unSynced = store.getters.UnSyncedPlaylists
-  console.log('unSynced', unSynced)
-  if (unSynced !== null) {
-    fetchMultiple(unSynced)
+  let unCached = store.getters.UnCachedPlaylists
+  console.log('unCached', unCached)
+  if (unCached !== null) {
+    fetchMultiple(unCached)
       .then(() => youtubeHandler.youtubizeAll())
   } else youtubeHandler.youtubizeAll()
 })

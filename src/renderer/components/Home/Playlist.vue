@@ -69,6 +69,7 @@ $q-true-color:rgb(103, 214, 0);
   
   $bg: darken($q-true-color, 7);
   $ol: $q-true-color;
+  $bezier: cubic-bezier(.31,.68,0,1);
   .queued-indicator {
     position: absolute;
     top: 100%;
@@ -78,18 +79,19 @@ $q-true-color:rgb(103, 214, 0);
 
     z-index: -1;
     background: $ol;
-    $bezier: cubic-bezier(.64,.54,.22,1);
-    transition: all .15s $bezier;
+    transition: all .2s $bezier;
   }
   &.queued {
     .queued-indicator {
-      right: 1px;
-      left: 1px;
+      transition: all .4s $bezier;
+      right: 0;
+      left: 0;
     }
     transform: scale(1.08);
   }
   &.synced {
     .queued-indicator {
+      transition: all .4s $bezier;
       right: -.15em;
       left: -.15em;
       top: -.15em;
@@ -101,16 +103,16 @@ $q-true-color:rgb(103, 214, 0);
   }
 }
 .pl-track-count {
-    position: relative;
-    box-sizing: border-box;
-    text-align: center;
-    font-size: .6rem;
-    width: 8rem;
-    height: 1rem;
-    background-color: $q-false-color;
-    font-family: "Poppins Semibold";
+  position: relative;
+  box-sizing: border-box;
+  text-align: center;
+  font-size: .6rem;
+  width: 8rem;
+  height: 1rem;
+  background-color: $q-false-color;
+  font-family: "Poppins Semibold";
 
-    background-color: $q-false-color;
+  background-color: $q-false-color;
 }
 .pl-img {
     width: 8rem;
