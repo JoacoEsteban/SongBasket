@@ -66,6 +66,7 @@ export default {
       for (let i = 0; i < c.length; i++) {
         if (c[i].id === id) return c[i].bestMatch
       }
+      console.log('TRACK NOT FOUND')
       return null
     }
   }

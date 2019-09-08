@@ -1,6 +1,11 @@
 <template>
   <div class="home-router pll-container">
-    <playlist v-for="playlist in playlists"
+    <playlist v-for="playlist in syncedPlaylists"
+    :playlist="playlist"
+    :key="playlist.id"
+    @addPlaylistToSyncQueue="$emit('addPlaylistToSyncQueue', playlist.id)"
+    @openPlaylist="$emit('openPlaylist', playlist.id)" />
+    <playlist v-for="playlist in unSyncedPlaylists"
     :playlist="playlist"
     :key="playlist.id"
     @addPlaylistToSyncQueue="$emit('addPlaylistToSyncQueue', playlist.id)"
@@ -23,7 +28,6 @@ export default {
     return {
       user: this.$store.state.CurrentUser.user,
       control: this.$store.state.CurrentUser.control,
-      playlists: this.$store.state.CurrentUser.playlists,
       loading: false
     }
   },
@@ -31,8 +35,18 @@ export default {
     Playlist
   },
   computed: {
-    allLoaded: function () {
+    allLoaded () {
       return this.control.total - this.control.offset <= 0
+    },
+    playlists () {
+      return this.$store.state.CurrentUser.playlists
+    },
+    syncedPlaylists () {
+      let sync = this.$store.state.CurrentUser.syncedPlaylists
+      return sync.map(pl => this.$store.getters.PlaylistById(pl.id))
+    },
+    unSyncedPlaylists () {
+      return this.playlists.filter(pl => !this.$store.getters.PlaylistIsSynced(pl.id))
     }
   },
   methods: {
