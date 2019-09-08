@@ -251,7 +251,7 @@ ipc.on('Youtube Convert', function () {
   console.log('unCached', unCached)
   if (unCached !== null) {
     fetchMultiple(unCached.map(pl => {
-      return { id: pl.id }
+      return { id: pl }
     }), false)
       .then(() => youtubeHandler.youtubizeAll())
   } else youtubeHandler.youtubizeAll()

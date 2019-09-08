@@ -335,6 +335,36 @@ const getters = {
     }
 
     return selectedPlaylists
+  },
+  // Returns differences between youtubeized results and local copy of spotify items
+  PlaylistTrackChanges: (state, getters) => function (id) {
+    // Starting with both local spotify copy and local youtube copy
+    // Tracks will be compared between both arrays and if it's a match, then both will be spliced from both arrays
+    // If there are no changes, then both arrays will be empty
+
+    let added = [...getters.PlaylistById(id).tracks.items]
+    let removed = [...getters.SyncedPlaylist(id).tracks]
+
+    let i = 0
+    while (i < added.length) {
+      let a = added[i]
+      let found = false
+
+      for (let o = 0; o < removed.length; o++) {
+        let r = removed[o]
+
+        if (a.id === r.id) {
+          // No changes to track
+          found = true
+          added.splice(i, 1)
+          removed.splice(o, 1)
+          break
+        }
+      }
+      if (!found) i++
+    }
+
+    return {added, removed}
   }
 }
 
