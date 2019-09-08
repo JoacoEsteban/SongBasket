@@ -46,12 +46,12 @@ export function searchTrackOnYT (track) {
       })
   })
 }
-export function youtubizeAll (tracks) {
-  tracks = JSON.stringify(tracks)
-  console.log('Trackies', tracks)
+export function youtubizeAll (playlists) {
+  playlists = JSON.stringify(playlists)
+  console.log('Trackies', playlists)
   return new Promise((resolve, reject) => {
     axios.post(`${Backend}/youtubize`, {
-      tracks
+      playlists
     })
       .then(res => {
         resolve(res.data)

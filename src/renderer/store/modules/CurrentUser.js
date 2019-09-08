@@ -101,7 +101,7 @@ const mutations = {
     if (index >= 0) {
       state.playlists.splice(index, 1, playlist)
       this.dispatch('playlistUpdateCached', playlist.id)
-    } console.log('PLAYLIST NOT FOUND WHEN SETTING TRACKS INSIDE STATE (VUEX)')
+    } else console.log('PLAYLIST NOT FOUND WHEN SETTING TRACKS INSIDE STATE (VUEX)')
   },
 
   PLAYLIST_UPDATE_CACHED (state, id) {

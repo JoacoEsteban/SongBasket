@@ -1,12 +1,13 @@
 <template>
     <div 
-    :class="{'queued': queued}"
+    :class="{'queued': isQueued, 'synced': isSynced}"
     class="pl-container">
         <div class="pl-track-count">{{playlist.tracks.total}} {{playlist.tracks.total === 1 ? 'Track' : 'Tracks'}}</div>
         <div class="pl-img" :style="playlist.images.length > 0 ? {backgroundImage: `url(${playlist.images[0].url})`} : null">
           <div class="pl-button-container">
             <button class="button" @click="$emit('openPlaylist')">Explore</button>
-            <button class="button" @click="$emit('addPlaylistToSyncQueue')">{{queued ? 'Unqueue' : 'Queue'}}</button>
+            <button v-if="!isSynced" class="button" @click="$emit('addPlaylistToSyncQueue')">{{isQueued ? 'Unqueue' : 'Queue'}}</button>
+            <button v-if="isSynced" class="button" @click="">Unsync</button>
           </div>
             <playlist-icon v-if="playlist.images.length === 0" />
         </div>
@@ -36,8 +37,12 @@ export default {
     }
   },
   computed: {
-    queued () {
+    isQueued () {
       return this.$store.getters.PlaylistIsQueued(this.playlist.id)
+    },
+    isSynced () {
+      if (this.playlist) return this.$store.getters.PlaylistIsSynced(this.playlist.id)
+      else return false
     }
 
   },

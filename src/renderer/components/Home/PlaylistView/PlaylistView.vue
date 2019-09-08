@@ -64,7 +64,7 @@ export default {
     youtubeId (id) {
       let c = this.converted.tracks
       for (let i = 0; i < c.length; i++) {
-        if (c[i].id === id) return c[i].yt.id
+        if (c[i].id === id) return c[i].bestMatch
       }
       return null
     }
