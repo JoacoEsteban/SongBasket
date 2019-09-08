@@ -2,6 +2,7 @@
   <div>
     <div class="home-container">
       <top-bar
+      @refreshPlaylists="refreshPlaylists"
       @youtubeConvert="youtubeConvert"
       />
       
@@ -87,6 +88,10 @@ export default {
     },
     youtubeConvert () {
       ipc.send('Youtube Convert')
+    },
+    refreshPlaylists () {
+      console.log('poncho')
+      ipc.send('refreshPlaylists')
     },
     openYtVideo (id) {
       console.log('openYtVideo', id)

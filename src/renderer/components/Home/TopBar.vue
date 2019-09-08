@@ -20,7 +20,7 @@
 
     <div class="tb-button-panel">
       <div class="tb-button-container">
-        <div @click="refreshPlaylists" class="tb-button sync-icon">
+        <div @click="$emit('refreshPlaylists')" class="tb-button sync-icon">
           <sync-icon></sync-icon>
         </div>
 
@@ -83,11 +83,6 @@ export default {
 
       console.log('asdfasdfadsf', thisDate.month)
       return { date, hours }
-    }
-  },
-  methods: {
-    refreshPlaylists () {
-
     }
   }
 }

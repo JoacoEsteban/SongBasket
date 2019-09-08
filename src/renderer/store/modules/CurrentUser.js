@@ -32,10 +32,13 @@ const actions = {
     commit('LOGOUT')
   },
   playlistStoreTracks ({ commit }, playlist) {
-    commit('PLAYLIST_STORE_TRACKS', playlist)
+    return new Promise((resolve, reject) => {
+      commit('PLAYLIST_STORE_TRACKS', playlist)
+      resolve()
+    })
   },
-  playlistUpdateCached ({ commit }, id) {
-    commit('PLAYLIST_UPDATE_CACHED', id)
+  playlistUpdateCached ({ commit }, {id, snapshot_id}) {
+    commit('PLAYLIST_UPDATE_CACHED', {id, snapshot_id})
   },
   setCurrentPlaylist ({ commit }, id) {
     return new Promise((resolve, reject) => {
@@ -75,11 +78,34 @@ const mutations = {
     state.fileSystem.homeFolder = path
   },
   INIT_USER (state, object) {
-    console.log(`INITIALIZING USER::: ${object.user.id}`)
+    function isCachedOrSynced (id) {
+      let c = findInPls(id, state.cachedPlaylists)
+      let s = findInPls(id, state.syncedPlaylists)
+      return {c, s}
+    }
 
     state.user = object.user
     state.user.logged = object.request.logged
     state.user.SBID = object.request.SBID
+
+    if (state.cachedPlaylists.length > 0 || state.syncedPlaylists.length > 0) {
+      for (let i = 0; i < object.playlists.items.length; i++) {
+        let cachedOrSynced = isCachedOrSynced(object.playlists.items[i].id)
+
+        if (cachedOrSynced.c >= 0) {
+          console.log('IS CACHED::')
+          object.playlists.items.splice(i, 1, state.playlists[findInPls(object.playlists.items[i].id, state.playlists)])
+          continue
+        }
+        if (cachedOrSynced.s >= 0) {
+          console.log('IS SYNCED::')
+          object.playlists.items.splice(i, 1, state.playlists[findInPls(object.playlists.items[i].id, state.playlists)])
+          continue
+        }
+      }
+    } else {
+      console.log('NO CACHED OR SYNCED PLS')
+    }
 
     state.playlists = object.playlists.items
 
@@ -106,30 +132,35 @@ const mutations = {
   },
 
   PLAYLIST_STORE_TRACKS (state, playlist) {
+    if (playlist.same_version === true) {
+      // If backend says it's the same version, no overwrite
+      console.log('RETRIEVED SAME VERSION. NOT OVERWRITTING')
+      return
+    }
+
     console.log('STORING ' + playlist.tracks.items.length + ' TRACKS FOR PLAYLIST WITH ID ' + playlist.id)
 
     let index = findInPls(playlist.id, state.playlists)
-
     if (index >= 0) {
+      // If there are changes with local version, overwrite
       state.playlists.splice(index, 1, playlist)
-      this.dispatch('playlistUpdateCached', playlist.id)
+      let {id, snapshot_id} = playlist
+      this.dispatch('playlistUpdateCached', {id, snapshot_id})
     } else console.log('PLAYLIST NOT FOUND WHEN SETTING TRACKS INSIDE STATE (VUEX)')
   },
 
-  PLAYLIST_UPDATE_CACHED (state, id) {
+  PLAYLIST_UPDATE_CACHED (state, {id, snapshot_id}) {
     for (let i = 0; i < state.cachedPlaylists.length; i++) {
       let p = state.cachedPlaylists[i]
       if (p.id === id) {
-        p = {id: p.id, time: Date.now()}
+        p = {id, time: Date.now(), snapshot_id}
         console.log('UPDATING CACHE LOG FOR PLAYLIST WITH ID ' + id)
         return
       }
     }
-    console.log('UPDATING CACHE LOG')
-    state.cachedPlaylists = [ ...state.cachedPlaylists, { id: id, time: Date.now() } ]
+    state.cachedPlaylists = [ ...state.cachedPlaylists, { id, time: Date.now(), snapshot_id } ]
   },
   SET_CURRENT_PLAYLIST (state, id) {
-    console.log('SETTING PLAYLIST WITH ID ' + id + ' AS SELECTED')
     state.currentPlaylist = id
   },
   QUEUE_PLAYLIST (state, id) {
@@ -163,10 +194,16 @@ const mutations = {
     // Unqueueing synced playlists
     console.log('RESULT::', youtubizedResult.length)
     for (let i = 0; i < youtubizedResult.length; i++) {
-      console.log('iiiiiiiiiiiiiiii:', i)
       this.dispatch('findAndUnqueue', youtubizedResult[i].id)
       this.dispatch('findAndUncache', youtubizedResult[i].id)
     }
+
+    youtubizedResult = youtubizedResult.map(pl => {
+      return {
+        ...pl,
+        snapshot_id: state.playlists[findInPls(pl.id, state.playlists)].snapshot_id
+      }
+    })
 
     if (state.syncedPlaylists.length === 0) {
       state.syncedPlaylists = youtubizedResult
