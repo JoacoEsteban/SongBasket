@@ -85,6 +85,7 @@ const mutations = {
     state.fileSystem.homeFolder = path
   },
   INIT_USER (state, object) {
+    // TODO VERSION CONTROL SYNCED PLS FROM HERE AND KEEP REMOVED TRACKS INSIDE THE SYNCED PL OBJECT
     function isCachedOrSynced (id) {
       let c = findInPls(id, state.cachedPlaylists)
       let s = findInPls(id, state.syncedPlaylists)
