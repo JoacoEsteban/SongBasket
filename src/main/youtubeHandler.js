@@ -3,6 +3,7 @@ import * as sbFetch from './sbFetch'
 
 export function youtubizeAll () {
   let syncedPlaylists = store.getters.SyncedPlaylistsWithNewTracks
+  console.log('a verga synced playlists', syncedPlaylists)
   let queuedPlaylists = store.getters.QueuedPlaylists
   if (queuedPlaylists.length === 0 && syncedPlaylists.length === 0) return
 
@@ -32,6 +33,4 @@ export function youtubizeAll () {
 
       store.dispatch('youtubizeResult', convertion)
     })
-
-  // TODO sbfetch and Backend endpoint
 }

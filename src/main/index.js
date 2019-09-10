@@ -234,8 +234,8 @@ ipc.on('loadMore', function (event) {
 })
 
 ipc.on('get tracks from', function (event, id) {
-  console.log('LOADING FROM ', id)
   if (store.getters.PlaylistIsCached(id) === false && store.getters.PlaylistIsSynced(id) === false) {
+    console.log('LOADING FROM ', id)
     fetchMultiple([{id}], false)
       .then(() => {
         mainWindow.webContents.send('open playlist', id)
@@ -244,13 +244,12 @@ ipc.on('get tracks from', function (event, id) {
 })
 
 ipc.on('Youtube Convert', function () {
-  console.log('jkalsdfjlkasdf')
   if (store.state.CurrentUser.queuedPlaylists.length === 0 && store.state.CurrentUser.syncedPlaylists.length === 0) return
 
   console.log('FETCHING YT')
   let unCached = store.getters.UnCachedPlaylists
   console.log('unCached', unCached)
-  if (unCached !== null) {
+  if (unCached.length > 0) {
     fetchMultiple(unCached.map(pl => {
       return { id: pl }
     }), false)

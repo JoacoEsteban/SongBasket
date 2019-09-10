@@ -75,13 +75,12 @@ export default {
     now () {
       let separator = ' / '
       let thisDate = dateFormatter(new Date())
-      console.log('thisDate', thisDate)
+      // console.log('thisDate', thisDate)
       let hours = thisDate.time.hours + ':' + thisDate.time.minutes
       let date = ''
       if (thisDate.date.today) date = 'Today'
       else date = thisDate.date.month + separator + thisDate.date.date + (!thisDate.date.sameYear ? (separator + thisDate.date.year) : '')
 
-      console.log('asdfasdfadsf', thisDate.month)
       return { date, hours }
     }
   }

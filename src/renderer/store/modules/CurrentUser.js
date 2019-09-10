@@ -64,7 +64,14 @@ const actions = {
       resolve()
     })
   },
-  youtubizeResult ({ commit }, youtubizedResult) {
+  youtubizeResult ({ commit, getters }, youtubizedResult) {
+    youtubizedResult = youtubizedResult.map(pl => {
+      console.log('A VER ', getters.PlaylistTrackChanges(pl.id))
+      return {
+        ...pl,
+        removed: getters.PlaylistTrackChanges(pl.id).removed
+      }
+    })
     return new Promise((resolve, reject) => {
       commit('YOUTUBIZE_RESULT', youtubizedResult)
       resolve()
@@ -192,6 +199,7 @@ const mutations = {
   },
   YOUTUBIZE_RESULT (state, youtubizedResult) {
     // Unqueueing synced playlists
+    // TODO Put this at the end of mutation
     console.log('RESULT::', youtubizedResult.length)
     for (let i = 0; i < youtubizedResult.length; i++) {
       this.dispatch('findAndUnqueue', youtubizedResult[i].id)
@@ -206,7 +214,14 @@ const mutations = {
     })
 
     if (state.syncedPlaylists.length === 0) {
-      state.syncedPlaylists = youtubizedResult
+      state.syncedPlaylists = [ ...youtubizedResult.map(pl => {
+        // Declared this way in order not to add 'Removed' tracks array
+        return {
+          id: pl.id,
+          tracks: pl.tracks,
+          snapshot_id: pl.snapshot_id
+        }
+      })]
       return
     }
 
@@ -224,13 +239,13 @@ const mutations = {
           for (let u = 0; u < pl.tracks.length; u++) {
             let trackSt = pl.tracks[u]
 
-            for (let y = 0; y < ytpl.tracks.length; y++) {
-              let trackYt = ytpl.tracks[y]
-              if (trackSt.id === trackYt.id) {
-                // Replace with new Data directly into state
-                state.syncedPlaylists[i].tracks.splice(u, 1, trackYt)
-                // Popit from fetched tracks
-                ytpl.tracks.splice(y, 1)
+            for (let y = 0; y < ytpl.removed.length; y++) {
+              let trackRemoved = ytpl.removed[y]
+              if (trackSt.id === trackRemoved.id) {
+                // Remove already removed track from state
+                state.syncedPlaylists[i].tracks.splice(u, 1)
+                // Popit from removed tracks 'log'
+                ytpl.removed.splice(y, 1)
                 break
               }
             }
@@ -244,7 +259,16 @@ const mutations = {
       }
     }
     // Adds remaining new playlists directly into state
-    if (youtubizedResult.length > 0) state.syncedPlaylists = [...state.syncedPlaylists, ...youtubizedResult]
+    if (youtubizedResult.length > 0) {
+      state.syncedPlaylists = [...state.syncedPlaylists, ...youtubizedResult.map(pl => {
+        // Declared this way in order not to add 'Removed' tracks array
+        return {
+          id: pl.id,
+          tracks: pl.tracks,
+          snapshot_id: pl.snapshot_id
+        }
+      })]
+    }
   }
 
 }
@@ -297,7 +321,7 @@ const getters = {
   SyncedPlaylists: (state, getters) => {
     let all = []
     for (let i = 0; i < state.syncedPlaylists.length; i++) {
-      all = [...all, getters.SyncedPlaylistById(state.syncedPlaylists[i])]
+      all = [...all, getters.SyncedPlaylistById(state.syncedPlaylists[i].id)]
     }
     return all
   },
@@ -320,7 +344,6 @@ const getters = {
 
       if (!found) ret = [...ret, q[i]]
     }
-    if (ret.length === 0) ret = null
     return ret
   },
   // Number of Queued playlists and tracks to show in View
@@ -351,40 +374,54 @@ const getters = {
     // If there are no changes, then both arrays will be empty
 
     let added = [...getters.PlaylistById(id).tracks.items]
-    let removed = [...getters.SyncedPlaylistById(id).tracks]
+    let removed = getters.SyncedPlaylistById(id)
 
-    let i = 0
-    while (i < added.length) {
-      let a = added[i]
-      let found = false
+    if (removed !== null && removed.tracks.length > 0) { // This checks if the synced playlist has not been added to DB yet, if so, then every song will be 'new'
+      removed = [...removed.tracks]
 
-      for (let o = 0; o < removed.length; o++) {
-        let r = removed[o]
+      let i = 0
+      while (i < added.length) {
+        let a = added[i]
+        let found = false
 
-        if (a.id === r.id) {
-          // No changes to track
-          found = true
-          added.splice(i, 1)
-          removed.splice(o, 1)
-          break
+        for (let o = 0; o < removed.length; o++) {
+          let r = removed[o]
+
+          if (a.id === r.id) {
+            // No changes to track
+            found = true
+            added.splice(i, 1)
+            removed.splice(o, 1)
+            break
+          }
         }
+        if (!found) i++
       }
-      if (!found) i++
-    }
+    } else removed = []
 
     return {added, removed}
   },
 
   SyncedPlaylistsWithNewTracks: (state, getters) => {
-    return getters.SyncedPlaylists.map(pl => {
+    let syncedPls = getters.SyncedPlaylists
+    let devolver = []
+    for (let i = 0; i < syncedPls.length; i++) {
+      let pl = syncedPls[i]
+      let added = getters.PlaylistTrackChanges(pl.id).added
+
+      if (added.length === 0) continue
+
       pl = getters.PlaylistById(pl.id)
-      return {
-        ...pl,
-        tracks: {
-          items: getters.PlaylistTrackChanges(pl.id).added
-        }
-      }
-    })
+      devolver = [...devolver,
+        {
+          ...pl,
+          tracks: {
+            items: added
+          }
+        }]
+    }
+
+    return devolver
   }
 }
 

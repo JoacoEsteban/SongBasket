@@ -101,7 +101,7 @@ export default {
   },
 
   mounted () {
-    console.log('USER::::', this.user)
+    // console.log('USER::::', this.user)
 
     if (this.$store.state.CurrentUser.playlists.length === 0) { this.$router.push('/empty') }
 
