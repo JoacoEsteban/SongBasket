@@ -13,7 +13,7 @@
         </div>
         <div class="pl-name" ref="plname">
             <!-- TODO handle multi line names -->
-            {{!isSynced ? playlistName : trackChanges.added.length + ' added, ' + trackChanges.removed.length + ' removed, '}}
+            {{!isSynced ? playlistName : playlist.tracks.added.length + ' added, ' + playlist.tracks.removed.length + ' removed, '}}
             
         </div>
         <div class="queued-indicator" />
@@ -43,15 +43,7 @@ export default {
     isSynced () {
       if (this.playlist) return this.$store.getters.PlaylistIsSynced(this.playlist.id)
       else return false
-    },
-    trackChanges () {
-      if (this.isSynced) {
-        return this.$store.getters.PlaylistTrackChanges(this.playlist.id)
-      } else {
-        return null
-      }
     }
-
   },
   mounted () {
     ipc.on(`hola ${this.playlist.id}`, () => {

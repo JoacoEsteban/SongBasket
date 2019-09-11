@@ -64,16 +64,15 @@ const actions = {
       resolve()
     })
   },
-  youtubizeResult ({ commit, getters }, youtubizedResult) {
-    youtubizedResult = youtubizedResult.map(pl => {
-      console.log('A VER ', getters.PlaylistTrackChanges(pl.id))
-      return {
-        ...pl,
-        removed: getters.PlaylistTrackChanges(pl.id).removed
-      }
-    })
+  youtubizeResult ({ commit }, youtubizedResult) {
     return new Promise((resolve, reject) => {
       commit('YOUTUBIZE_RESULT', youtubizedResult)
+      resolve()
+    })
+  },
+  commitTrackChanges ({ commit }, id) {
+    return new Promise((resolve, reject) => {
+      commit('COMMIT_TRACK_CHANGES', id)
       resolve()
     })
   }
@@ -140,6 +139,41 @@ const mutations = {
   },
 
   PLAYLIST_STORE_TRACKS (state, playlist) {
+    // TODO FIx this shit getting in twice for no reason
+    function playlistComputeChanges (oldPl, newPl) {
+      // Starting with both local spotify copy and local youtube copy
+      // Tracks will be compared between both arrays and if it's a match, then both will be spliced from both arrays
+      // If there are no changes, then both arrays will be empty
+
+      let added = [ ...newPl ]
+      let removed = [ ...oldPl ]
+      let items = [] // Tracks that are preserved between versions
+
+      if (removed.length > 0) { // This checks if the synced playlist has not been added to DB yet, if so, then every song will be 'new'
+        let i = 0
+        while (i < added.length) {
+          let a = added[i]
+          let found = false
+
+          for (let o = 0; o < removed.length; o++) {
+            let r = removed[o]
+
+            if (a.id === r.id) {
+              // No changes to track
+              found = true
+              removed.splice(o, 1)
+              // Preserved track is stored
+              items = [...items, ...added.splice(i, 1)]
+              break
+            }
+          }
+          if (!found) i++
+        }
+      } else removed = []
+
+      return {added, items, removed}
+    }
+
     if (playlist.same_version === true) {
       // If backend says it's the same version, no overwrite
       console.log('RETRIEVED SAME VERSION. NOT OVERWRITTING')
@@ -149,8 +183,32 @@ const mutations = {
     console.log('STORING ' + playlist.tracks.items.length + ' TRACKS FOR PLAYLIST WITH ID ' + playlist.id)
 
     let index = findInPls(playlist.id, state.playlists)
+    // If there are changes with local version, overwrite
     if (index >= 0) {
-      // If there are changes with local version, overwrite
+      // If playlist is synced, then I will compute differences with previous local version
+      if (findInPls(playlist.id, state.syncedPlaylists) >= 0) {
+        let oldPl = {
+          ...state.playlists[index].tracks.items,
+          ...state.playlists[index].tracks.added,
+          ...state.playlists[index].tracks.removed
+        }
+        // Compute track changes
+        // Using all tracks from old playlist (removed and added. Im comparing with latest version of pl so no problemo)
+        let {items, removed, added} = playlistComputeChanges(oldPl, playlist.tracks.items)
+        playlist.tracks = {
+          ...playlist.tracks,
+          items,
+          added,
+          removed
+        }
+      } else {
+        // Playlist is not synced so I dont care about computing changes
+        playlist.tracks = {
+          ...playlist.tracks,
+          added: [],
+          removed: []
+        }
+      }
       state.playlists.splice(index, 1, playlist)
       let {id, snapshot_id} = playlist
       this.dispatch('playlistUpdateCached', {id, snapshot_id})
@@ -207,6 +265,7 @@ const mutations = {
       this.dispatch('findAndUncache', youtubizedResult[i].id)
     }
 
+    // TODO Find snapshot inside cached array. Uncache then
     youtubizedResult = youtubizedResult.map(pl => {
       return {
         ...pl,
@@ -236,23 +295,26 @@ const mutations = {
 
         // If Fetched playlists already exists in VUEX
         if (pl.id === ytpl.id) {
-          // Cycle through tracks
+          // Cycle through tracks and clear removed ones
+          let localPl = [...state.playlists[findInPls(pl.id, state.playlists)]]
           for (let u = 0; u < pl.tracks.length; u++) {
             let trackSt = pl.tracks[u]
 
-            for (let y = 0; y < ytpl.removed.length; y++) {
-              let trackRemoved = ytpl.removed[y]
+            for (let y = 0; y < localPl.tracks.removed.length; y++) {
+              let trackRemoved = localPl.tracks.removed[y]
               if (trackSt.id === trackRemoved.id) {
-                // Remove already removed track from state
+                // Remove already removed (IN SPOTI DATA) track from YT SYNC state
                 state.syncedPlaylists[i].tracks.splice(u, 1)
                 // Popit from removed tracks 'log'
-                ytpl.removed.splice(y, 1)
+                localPl.tracks.removed.splice(y, 1)
                 break
               }
             }
           }
           // Adds remaining new songs directly into state
-          if (ytpl.tracks.length > 0) state.syncedPlaylists[i].tracks = [...pl.tracks, ...ytpl.tracks]
+          state.syncedPlaylists[i].tracks = [...pl.tracks, ...ytpl.tracks]
+          // TODO Songs were removed from youtube state. Now to remove old ones and add new ones to spotify state
+          this.dispatch('commitTrackChanges', pl.id)
 
           youtubizedResult.splice(o, 1)
           break
@@ -260,15 +322,26 @@ const mutations = {
       }
     }
     // Adds remaining new playlists directly into state
+    // No need to 'commitTrackChanges' to this ones. Every song is New
     if (youtubizedResult.length > 0) {
-      state.syncedPlaylists = [...state.syncedPlaylists, ...youtubizedResult.map(pl => {
-        // Declared this way in order not to add 'Removed' tracks array
-        return {
-          id: pl.id,
-          tracks: pl.tracks,
-          snapshot_id: pl.snapshot_id
-        }
-      })]
+      state.syncedPlaylists = [...state.syncedPlaylists, ...youtubizedResult]
+    }
+  },
+  COMMIT_TRACK_CHANGES (state, id) {
+    let index = findInPls(id, state.playlists)
+    if (index === -1) {
+      console.log('PLAYLIST NOT FOUND WHEN COMMITING CHANGES')
+      return
+    }
+    let tracks = state.playlists[index].tracks
+    state.playlists[index] = {
+      ...state.playlists[index],
+      tracks: {
+        ...tracks,
+        items: [...tracks.items, ...tracks.added],
+        added: [],
+        removed: []
+      }
     }
   }
 
@@ -323,6 +396,14 @@ const getters = {
     let all = []
     for (let i = 0; i < state.syncedPlaylists.length; i++) {
       all = [...all, getters.SyncedPlaylistById(state.syncedPlaylists[i].id)]
+    }
+    return all
+  },
+  // Gives spotify object
+  SyncedPlaylistsSp: (state, getters) => {
+    let all = []
+    for (let i = 0; i < state.syncedPlaylists.length; i++) {
+      all = [...all, getters.PlaylistById(state.syncedPlaylists[i].id)]
     }
     return all
   },
