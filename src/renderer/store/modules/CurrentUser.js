@@ -94,8 +94,8 @@ const mutations = {
     state.user = object.user
     state.user.logged = object.request.logged
     state.user.SBID = object.request.SBID
-    console.log('SYNNNasfasdf')
-    let damajuana
+    // console.log('SYNNNasfasdf')
+    // let damajuana
 
     if (state.cachedPlaylists.length > 0 || state.syncedPlaylists.length > 0) {
       console.log('entramo')
@@ -110,7 +110,7 @@ const mutations = {
         }
         if (cachedOrSynced.s >= 0) {
           console.log('IS SYNCED::')
-          damajuana = i
+          // damajuana = i
           object.playlists.items.splice(i, 1, state.playlists[findInPls(object.playlists.items[i].id, state.playlists)])
           continue
         }
@@ -121,7 +121,7 @@ const mutations = {
 
     state.playlists = object.playlists.items
     // TODO Finish finding wtf is going on with added tracks
-    console.log('SYNNN', state.playlists[damajuana].tracks.added)
+    // console.log('SYNNN', state.playlists[damajuana].tracks.added)
 
     state.control = {
       total: object.playlists.total,
