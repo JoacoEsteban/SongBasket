@@ -94,27 +94,34 @@ const mutations = {
     state.user = object.user
     state.user.logged = object.request.logged
     state.user.SBID = object.request.SBID
+    console.log('SYNNNasfasdf')
+    let damajuana
 
     if (state.cachedPlaylists.length > 0 || state.syncedPlaylists.length > 0) {
+      console.log('entramo')
       for (let i = 0; i < object.playlists.items.length; i++) {
         let cachedOrSynced = isCachedOrSynced(object.playlists.items[i].id)
+        console.log('entramo 2', cachedOrSynced)
 
         if (cachedOrSynced.c >= 0) {
-          console.log('IS CACHED::')
+          // console.log('IS CACHED::')
           object.playlists.items.splice(i, 1, state.playlists[findInPls(object.playlists.items[i].id, state.playlists)])
           continue
         }
         if (cachedOrSynced.s >= 0) {
           console.log('IS SYNCED::')
+          damajuana = i
           object.playlists.items.splice(i, 1, state.playlists[findInPls(object.playlists.items[i].id, state.playlists)])
           continue
         }
       }
     } else {
-      console.log('NO CACHED OR SYNCED PLS')
+      // console.log('NO CACHED OR SYNCED PLS')
     }
 
     state.playlists = object.playlists.items
+    // TODO Finish finding wtf is going on with added tracks
+    console.log('SYNNN', state.playlists[damajuana].tracks.added)
 
     state.control = {
       total: object.playlists.total,
@@ -149,6 +156,8 @@ const mutations = {
       let removed = [ ...oldPl ]
       let items = [] // Tracks that are preserved between versions
 
+      console.log('CHECK ME OUT:::', added, removed)
+
       if (removed.length > 0) { // This checks if the synced playlist has not been added to DB yet, if so, then every song will be 'new'
         let i = 0
         while (i < added.length) {
@@ -170,7 +179,6 @@ const mutations = {
           if (!found) i++
         }
       } else removed = []
-
       return {added, items, removed}
     }
 
@@ -186,12 +194,13 @@ const mutations = {
     // If there are changes with local version, overwrite
     if (index >= 0) {
       // If playlist is synced, then I will compute differences with previous local version
-      if (findInPls(playlist.id, state.syncedPlaylists) >= 0) {
-        let oldPl = {
+      let isSynced = findInPls(playlist.id, state.syncedPlaylists) >= 0
+      if (isSynced) {
+        let oldPl = [
           ...state.playlists[index].tracks.items,
           ...state.playlists[index].tracks.added,
           ...state.playlists[index].tracks.removed
-        }
+        ]
         // Compute track changes
         // Using all tracks from old playlist (removed and added. Im comparing with latest version of pl so no problemo)
         let {items, removed, added} = playlistComputeChanges(oldPl, playlist.tracks.items)
@@ -201,6 +210,7 @@ const mutations = {
           added,
           removed
         }
+        console.log('SON, ITS TIME NOW', playlist.tracks.added.map(p => p.name))
       } else {
         // Playlist is not synced so I dont care about computing changes
         playlist.tracks = {
@@ -208,10 +218,10 @@ const mutations = {
           added: [],
           removed: []
         }
+        let {id, snapshot_id} = playlist
+        this.dispatch('playlistUpdateCached', {id, snapshot_id})
       }
       state.playlists.splice(index, 1, playlist)
-      let {id, snapshot_id} = playlist
-      this.dispatch('playlistUpdateCached', {id, snapshot_id})
     } else console.log('PLAYLIST NOT FOUND WHEN SETTING TRACKS INSIDE STATE (VUEX)')
   },
 
@@ -220,7 +230,7 @@ const mutations = {
       let p = state.cachedPlaylists[i]
       if (p.id === id) {
         p = {id, time: Date.now(), snapshot_id}
-        console.log('UPDATING CACHE LOG FOR PLAYLIST WITH ID ' + id)
+        // console.log('UPDATING CACHE LOG FOR PLAYLIST WITH ID ' + id)
         return
       }
     }
@@ -244,14 +254,14 @@ const mutations = {
     let index = findInPls(id, state.queuedPlaylists.map(pl => {
       return {id: pl}
     }))
-    console.log('Unqueueing', id, index)
+    // console.log('Unqueueing', id, index)
     if (index >= 0) {
       state.queuedPlaylists.splice(index, 1)
     }
   },
   FIND_AND_UNCACHE (state, {id, getters}) {
     let index = findInPls(id, state.cachedPlaylists)
-    console.log('Uncaching', id, index)
+    // console.log('Uncaching', id, index)
     if (index >= 0) {
       state.cachedPlaylists.splice(index, 1)
     }
@@ -259,7 +269,7 @@ const mutations = {
   YOUTUBIZE_RESULT (state, youtubizedResult) {
     // Unqueueing synced playlists
     // TODO Put this at the end of mutation
-    console.log('RESULT::', youtubizedResult.length)
+    // console.log('RESULT::', youtubizedResult.length)
     for (let i = 0; i < youtubizedResult.length; i++) {
       this.dispatch('findAndUnqueue', youtubizedResult[i].id)
       this.dispatch('findAndUncache', youtubizedResult[i].id)
