@@ -98,10 +98,8 @@ const mutations = {
     // let damajuana
 
     if (state.cachedPlaylists.length > 0 || state.syncedPlaylists.length > 0) {
-      console.log('entramo')
       for (let i = 0; i < object.playlists.items.length; i++) {
         let cachedOrSynced = isCachedOrSynced(object.playlists.items[i].id)
-        console.log('entramo 2', cachedOrSynced)
 
         if (cachedOrSynced.c >= 0) {
           // console.log('IS CACHED::')
@@ -121,7 +119,7 @@ const mutations = {
 
     state.playlists = object.playlists.items
     // TODO Finish finding wtf is going on with added tracks
-    // console.log('SYNNN', state.playlists[damajuana].tracks.added)
+    // console.log('SYNNN', state.playlists[damajuana].tracks.added, state.playlists[damajuana].tracks.items.length, state.playlists[damajuana].tracks.removed.length)
 
     state.control = {
       total: object.playlists.total,
@@ -146,6 +144,7 @@ const mutations = {
   },
 
   PLAYLIST_STORE_TRACKS (state, playlist) {
+    playlist = {...playlist}
     // TODO FIx this shit getting in twice for no reason
     function playlistComputeChanges (oldPl, newPl) {
       // Starting with both local spotify copy and local youtube copy
@@ -194,8 +193,8 @@ const mutations = {
     // If there are changes with local version, overwrite
     if (index >= 0) {
       // If playlist is synced, then I will compute differences with previous local version
-      let isSynced = findInPls(playlist.id, state.syncedPlaylists) >= 0
-      if (isSynced) {
+      let syncIndex = findInPls(playlist.id, state.syncedPlaylists)
+      if (syncIndex >= 0) {
         let oldPl = [
           ...state.playlists[index].tracks.items,
           ...state.playlists[index].tracks.added,
@@ -211,6 +210,7 @@ const mutations = {
           removed
         }
         console.log('SON, ITS TIME NOW', playlist.tracks.added.map(p => p.name))
+        state.syncedPlaylists[syncIndex].snapshot_id = playlist.snapshot_id
       } else {
         // Playlist is not synced so I dont care about computing changes
         playlist.tracks = {
@@ -222,6 +222,7 @@ const mutations = {
         this.dispatch('playlistUpdateCached', {id, snapshot_id})
       }
       state.playlists.splice(index, 1, playlist)
+      console.log('SON, ITS TIME NOW', state.playlists[index].tracks.added.map(p => p.name))
     } else console.log('PLAYLIST NOT FOUND WHEN SETTING TRACKS INSIDE STATE (VUEX)')
   },
 

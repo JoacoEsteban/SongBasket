@@ -1,6 +1,5 @@
 /* eslint-disable camelcase */
 import fetch from 'electron-fetch'
-import {logme} from '../UTILS'
 const axios = require('axios')
 
 const localBackend = 'http://localhost:5000'
@@ -31,8 +30,7 @@ export async function fetchPlaylists ({userId, logged, SBID, control}) {
 
 export async function getTracks ({userId, logged, SBID, control}, {id, snapshot_id}, checkVersion) {
   let playlistId = id
-  logme(SBID)
-  let res = await fetch(`${Backend}/retrieve?user_id=${userId}&logged=${logged.toString()}&SBID=${SBID}&limit=100&offset=${control.offset}&retrieve=playlist_tracks&playlist_id=${playlistId}&retrieve_user_data=false${checkVersion ? '&snapshot_id=' + snapshot_id : ''}`)
+  let res = await fetch(`${Backend}/retrieve?user_id=${userId}&logged=${logged.toString()}&SBID=${SBID}&offset=${control.offset}&retrieve=playlist_tracks&playlist_id=${playlistId}&retrieve_user_data=false${checkVersion ? '&snapshot_id=' + snapshot_id : ''}`)
   let body = await res.text()
   return Promise.resolve(JSON.parse(body))
 }

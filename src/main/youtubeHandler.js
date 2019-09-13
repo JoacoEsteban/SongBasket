@@ -22,12 +22,17 @@ export function youtubizeAll () {
   for (let i = 0; i < allPlaylists.length; i++) {
     let pl = allPlaylists[i]
     let tracks = pl.synced ? pl.tracks.added : pl.tracks.items
-    if (tracks.length === 0) continue
+    if (tracks.length === 0) {
+      allPlaylists.splice(i, 1)
+      i--
+      continue
+    }
     pls = [ ...pls, {id: pl.id, tracks: []} ]
-    console.log('a verga Trcks', tracks)
+    // console.log('a verga Trcks', tracks)
 
     for (let o = 0; o < tracks.length; o++) {
       let track = tracks[o]
+      console.log('asdfasdf', pl.name, track.name, pls, i)
 
       let query = `${track.name} ${track.artists[0].name}`
       let duration = track.duration_ms / 1000 / 60

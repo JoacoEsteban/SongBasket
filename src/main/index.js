@@ -127,8 +127,8 @@ function guestLogin (userId) {
 function guestFetch (query, updateOrFirstTime) {
   let allData = []
 
-  let list = false
-  let synced = false
+  let list = false // List of playlists Retrieved (just metadata)
+  let synced = false // List of synced and cached Retrieved (all tracks)
 
   // Are there Synced playlist to check new version
   let areThere = {
@@ -150,6 +150,7 @@ function guestFetch (query, updateOrFirstTime) {
         snapshot_id: pl.snapshot_id
       }
     })]
+
     fetchMultiple(ids, true)
       .then(() => {
         synced = true
