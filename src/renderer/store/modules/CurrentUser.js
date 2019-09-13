@@ -307,7 +307,7 @@ const mutations = {
         // If Fetched playlists already exists in VUEX
         if (pl.id === ytpl.id) {
           // Cycle through tracks and clear removed ones
-          let localPl = [...state.playlists[findInPls(pl.id, state.playlists)]]
+          let localPl = {...state.playlists[findInPls(pl.id, state.playlists)]}
           for (let u = 0; u < pl.tracks.length; u++) {
             let trackSt = pl.tracks[u]
 
