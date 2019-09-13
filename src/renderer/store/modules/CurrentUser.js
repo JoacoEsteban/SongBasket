@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 import Vue from 'vue'
+import FileSystem from '../../../main/FileSystem/index'
 
 const getDefaultState = () => {
   return {
@@ -21,6 +22,13 @@ const state = getDefaultState()
 const actions = {
   setHomeFolder ({ commit }, path) {
     commit('SET_HOME_FOLDER', path)
+    FileSystem.setHomeFolder({state, path})
+      .then(() => {
+        console.log('Changes saved successfully')
+      })
+      .catch(err => {
+        console.log('Error when setting home folder::', err)
+      })
   },
   initUser ({ commit }, object) {
     commit('INIT_USER', object)
@@ -80,7 +88,7 @@ const actions = {
 
 const mutations = {
   SET_HOME_FOLDER (state, path) {
-    console.log(`SETTING HOME FOLDER::: ${path}`)
+    console.log('SETTING HOME FOLDER::: ', path, Date.now())
     state.fileSystem.homeFolder = path
   },
   INIT_USER (state, object) {

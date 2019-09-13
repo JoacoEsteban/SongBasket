@@ -1,4 +1,4 @@
-import FileSystemUser from './FileSystem/index'
+// import FileSystemUser from './FileSystem/index'
 import { logme } from '../UTILS'
 
 import store from '../renderer/store'
@@ -12,7 +12,7 @@ const dialog = electron.dialog
 
 let { app, BrowserWindow, session } = electron
 
-let USER = FileSystemUser.checkForUser()
+// let USER = FileSystemUser.checkForUser()
 const ipc = electron.ipcMain
 
 const localBackend = 'http://localhost:5000'
@@ -32,7 +32,7 @@ let loginWindow
 const winURL = process.env.NODE_ENV === 'development' ? `http://localhost:9080` : `file://${__dirname}/index.html`
 
 function createWindow () {
-  if (USER) guestFetch(USER.user, true)
+  // if (USER) guestFetch(USER.user, true)
   mainWindow = new BrowserWindow({
     width: 800,
     height: 500,
