@@ -8,7 +8,7 @@
                 <span @click="changeMode(0)">Username</span>
               </div>
               <div 
-              @click="changeMode()"
+              @click="changeMode(null)"
               class="radio-container">
                 <div 
                 :class="{'left': mode === 0, 'right': mode === 1}"
@@ -57,10 +57,10 @@ export default {
   methods: {
     guestSearch () {
       this.lastmode = this.mode
-      this.$emit('guestSearch', this.userQuery)
+      this.$emit('guestSearch', {query: this.userQuery, mode: this.mode ? 'playlist' : 'user'})
     },
     changeMode (mode) {
-      if (!mode) this.mode = this.mode === 0 ? 1 : 0
+      if (mode === null) this.mode = this.mode === 0 ? 1 : 0
       else this.mode = mode
 
       this.focusInput()

@@ -168,12 +168,12 @@ function guestFetch (query, updateOrFirstTime) {
     })
 }
 
-function fetchMultiple (tracks, checkVersion) {
+function fetchMultiple (playlists, checkVersion) {
   return new Promise((resolve, reject) => {
-    let count = tracks.length
+    let count = playlists.length
     for (let i = 0; i < count; i++) {
-      let track = tracks[i]
-      sbFetch.getTracks(store.getters.RequestParams, track, checkVersion)
+      let playlist = playlists[i]
+      sbFetch.getTracks(store.getters.RequestParams, playlist, checkVersion)
         .then(response => {
           console.log('senora deje de joder', response.playlist.tracks)
           store.dispatch('playlistStoreTracks', response.playlist).then(() => {
@@ -217,10 +217,28 @@ ipc.on('refreshPlaylists', function (event) {
   guestFetch(store.getters.RequestParams.userId, false)
 })
 
-ipc.on('guestSignIn', function (event, { userQuery }) {
-  logme(`Logging Guest user ${userQuery}`)
+ipc.on('guestSignIn', function (event, {mode, query}) {
+  console.log('Guest:: Type:', mode, query)
 
-  guestLogin(userQuery)
+  if (mode === 'user') guestLogin(query)
+  if (mode === 'playlist') {
+    sbFetch.getTracks(store.getters.RequestParams, {id: query}, false)
+      .then(response => {
+        console.log('responseta', response)
+        if (response.error) {
+          console.log('ERROR DUD', response)
+        } else {
+          console.log('DOUU', response)
+        }
+        // store.dispatch('playlistStoreTracks', response.playlist).then(() => {
+        //   count--
+        //   if (count === 0) resolve()
+        // })
+      })
+      .catch(error => {
+        console.log('a ver si lo aachea', error)
+      })
+  }
 })
 
 ipc.on('loadMore', function (event) {
@@ -257,19 +275,6 @@ ipc.on('Youtube Convert', function () {
     }), false)
       .then(() => youtubeHandler.youtubizeAll())
   } else youtubeHandler.youtubizeAll()
-})
-
-ipc.on('Search Track', function (event, track) {
-  console.log('LOADING FROM ', track.id)
-
-  sbFetch.searchTrackOnYT(track)
-    .then(ytRes => console.log(ytRes))
-  // .then(response => {
-  // // STORE THEM
-  //   store.dispatch('playlistStoreTracks', { id, tracks: response.tracks }).then(() => {
-  //     mainWindow.webContents.send('open playlist', id)
-  //   })
-  // })
 })
 
 /**

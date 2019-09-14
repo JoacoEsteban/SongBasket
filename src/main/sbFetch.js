@@ -21,32 +21,40 @@ export function guestLogin (userId) {
   })
 }
 
-export async function fetchPlaylists ({userId, logged, SBID, control}) {
-  var limit = 20
-  let res = await fetch(`${Backend}/retrieve?user_id=${userId}&logged=${logged.toString()}&SBID=${SBID}&limit=${limit}&offset=${control.offset}&retrieve=playlists&retrieve_user_data=true`)
-  let body = await res.text()
-  return Promise.resolve(JSON.parse(body))
-}
-
-export async function getTracks ({userId, logged, SBID, control}, {id, snapshot_id}, checkVersion) {
-  let playlistId = id
-  let res = await fetch(`${Backend}/retrieve?user_id=${userId}&logged=${logged.toString()}&SBID=${SBID}&offset=${control.offset}&retrieve=playlist_tracks&playlist_id=${playlistId}&retrieve_user_data=false${checkVersion ? '&snapshot_id=' + snapshot_id : ''}`)
-  let body = await res.text()
-  return Promise.resolve(JSON.parse(body))
-}
-
-export function searchTrackOnYT (track) {
-  track = JSON.stringify(track)
+// Retrieves user's playlists
+export function fetchPlaylists ({userId, logged, SBID, control}) {
   return new Promise((resolve, reject) => {
-    fetch(`${Backend}/retrieve?retrieve=youtube_convert&track=${track}`)
+    fetch(`${Backend}/retrieve?user_id=${userId}&logged=${logged.toString()}&SBID=${SBID}&offset=${control.offset}&retrieve=playlists&retrieve_user_data=true`)
       .then(res => {
         res.text()
           .then(body => {
             resolve(JSON.parse(body))
           })
+          .catch(err => reject(err))
+      })
+      .catch(err => reject(err))
+  })
+}
+
+export function getTracks ({userId, logged, SBID, control}, {id, snapshot_id}, checkVersion) {
+  let playlistId = id
+  return new Promise((resolve, reject) => {
+    fetch(`${Backend}/retrieve?user_id=${userId}&logged=${logged}&SBID=${SBID}&offset=${control.offset}&retrieve=playlist_tracks&playlist_id=${playlistId}&retrieve_user_data=false${checkVersion ? '&snapshot_id=' + snapshot_id : ''}`)
+      .then(res => {
+        res.text()
+          .then(body => {
+            resolve(JSON.parse(body))
+          })
+          .catch(error => {
+            console.log(error)
+          })
+      })
+      .catch(error => {
+        reject(error)
       })
   })
 }
+
 export function youtubizeAll (playlists) {
   playlists = JSON.stringify(playlists)
   console.log('Trackies', playlists)

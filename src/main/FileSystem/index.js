@@ -23,7 +23,7 @@ let userMethods = {
   setHomeFolder: function ({state, path}) {
     return new Promise((resolve, reject) => {
       let jsonState = JSON.stringify(state)
-      console.log('PATHH', Date.now())
+      console.log('PATHH', jsonState)
       fs.writeFile(path + '/.songbasket', jsonState, 'utf8', (err) => {
         if (err) reject(err)
         else resolve()

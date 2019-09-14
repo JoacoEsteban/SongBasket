@@ -41,10 +41,10 @@ export default {
     login () {
       ipc.send('login')
     },
-    guestSearch (userQuery) {
-      if (this.loadingState !== 'Loading' && userQuery !== '' && userQuery !== undefined && userQuery !== null) {
+    guestSearch (request) {
+      if (this.loadingState !== 'Loading' && request.query !== '' && request.query !== undefined && request.query !== null) {
         this.$store.dispatch('SET_LOADING_STATE', 'loading')
-        ipc.send('guestSignIn', { userQuery: userQuery })
+        ipc.send('guestSignIn', request)
       }
     },
     redirect (path, payload) {

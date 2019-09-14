@@ -22,13 +22,6 @@ const state = getDefaultState()
 const actions = {
   setHomeFolder ({ commit }, path) {
     commit('SET_HOME_FOLDER', path)
-    FileSystem.setHomeFolder({state, path})
-      .then(() => {
-        console.log('Changes saved successfully')
-      })
-      .catch(err => {
-        console.log('Error when setting home folder::', err)
-      })
   },
   initUser ({ commit }, object) {
     commit('INIT_USER', object)
@@ -89,7 +82,8 @@ const actions = {
 const mutations = {
   SET_HOME_FOLDER (state, path) {
     console.log('SETTING HOME FOLDER::: ', path, Date.now())
-    state.fileSystem.homeFolder = path
+    state.fileSystem.homeFolder = path[0]
+    FileSystem.setHomeFolder({state, path})
   },
   INIT_USER (state, object) {
     // TODO VERSION CONTROL SYNCED PLS FROM HERE AND KEEP REMOVED TRACKS INSIDE THE SYNCED PL OBJECT

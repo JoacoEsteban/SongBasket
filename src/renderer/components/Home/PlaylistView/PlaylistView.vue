@@ -24,8 +24,6 @@
 <script>
 import 'vuex'
 import Track from './Track'
-const electron = require('electron')
-const ipc = electron.ipcRenderer
 
 export default {
   data () {
@@ -58,9 +56,6 @@ export default {
     console.log('PLAYLISTTTTT:::::', this.playlist)
   },
   methods: {
-    searchOnYoutube (track) {
-      ipc.send('Search Track', track)
-    },
     youtubeId (id) {
       let c = this.converted.tracks
       for (let i = 0; i < c.length; i++) {
