@@ -75,7 +75,7 @@ export default {
     },
     now () {
       let separator = ' / '
-      let thisDate = dateFormatter(new Date())
+      let thisDate = dateFormatter(this.$store.state.CurrentUser.lastSync)
       // console.log('thisDate', thisDate)
       let hours = thisDate.time.hours + ':' + thisDate.time.minutes
       let date = ''

@@ -25,7 +25,8 @@ const getDefaultState = () => {
     syncedPlaylists: [],
     control: {},
     currentPlaylist: '',
-    queuedPlaylists: []
+    queuedPlaylists: [],
+    lastSync: null
   }
 }
 
@@ -161,6 +162,8 @@ const mutations = {
       total: object.playlists.total,
       offset: state.playlists.length
     }
+
+    state.lastSync = new Date()
     console.log('ISISISISI', SharedStates.state.fileSystem.homeFolders)
     SAVE_TO_DISK()
   },
