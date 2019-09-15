@@ -20,6 +20,7 @@
 
     <div class="tb-button-panel">
       <div class="tb-button-container">
+        <!-- TODO Disable this button in PlaylistView -->
         <div @click="$emit('refreshPlaylists')" class="tb-button sync-icon">
           <sync-icon></sync-icon>
         </div>

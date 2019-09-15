@@ -112,30 +112,40 @@ const mutations = {
   UPDATE_USER_ENTITIES (state, object) {
     // TODO VERSION CONTROL SYNCED PLS FROM HERE AND KEEP REMOVED TRACKS INSIDE THE SYNCED PL OBJECT
     function isCachedOrSynced (id) {
+      // If it's cached I want to compare the version with the currently stored one.
+      // If they match I will keep the tracks (currently stored version)
+      // If they don't I will keep the new version without tracks and the playlist will be uncached
       let c = findInPls(id, state.cachedPlaylists)
-      let s = findInPls(id, state.syncedPlaylists)
+      if (c >= 0) c = state.cachedPlaylists[c].snapshot_id
+      else c = false
+
+      // I dont care about the version controlling synced ones in here because version control has been handled elsewhere
+      let s = findInPls(id, state.syncedPlaylists) >= 0
+
       return {c, s}
     }
 
     state.user = object.user
     state.user.logged = object.request.logged
     state.user.SBID = object.request.SBID
-    // console.log('SYNNNasfasdf')
-    // let damajuana
 
     if (state.cachedPlaylists.length > 0 || state.syncedPlaylists.length > 0) {
       for (let i = 0; i < object.playlists.items.length; i++) {
-        let cachedOrSynced = isCachedOrSynced(object.playlists.items[i].id)
+        let currentPlaylist = object.playlists.items[i]
+        let cachedOrSynced = isCachedOrSynced(currentPlaylist.id)
 
-        if (cachedOrSynced.c >= 0) {
+        if (cachedOrSynced.c !== false) {
           // console.log('IS CACHED::')
-          object.playlists.items.splice(i, 1, state.playlists[findInPls(object.playlists.items[i].id, state.playlists)])
+          if (cachedOrSynced.c === currentPlaylist.snapshot_id) {
+            object.playlists.items.splice(i, 1, state.playlists[findInPls(currentPlaylist.id, state.playlists)])
+          } else {
+            this.dispatch('findAndUncache', currentPlaylist.id)
+          }
           continue
         }
-        if (cachedOrSynced.s >= 0) {
-          console.log('IS SYNCED::')
-          // damajuana = i
-          object.playlists.items.splice(i, 1, state.playlists[findInPls(object.playlists.items[i].id, state.playlists)])
+        if (cachedOrSynced.s) {
+          // console.log('IS SYNCED::')
+          object.playlists.items.splice(i, 1, state.playlists[findInPls(currentPlaylist.id, state.playlists)])
           continue
         }
       }
@@ -299,6 +309,7 @@ const mutations = {
     if (index >= 0) {
       state.cachedPlaylists.splice(index, 1)
     }
+    SAVE_TO_DISK()
   },
   YOUTUBIZE_RESULT (state, youtubizedResult) {
     // Unqueueing synced playlists

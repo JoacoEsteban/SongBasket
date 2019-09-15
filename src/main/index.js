@@ -166,25 +166,18 @@ function guestFetch (query, updateOrFirstTime) {
   let synced = false // List of synced and cached Retrieved (all tracks)
 
   // Are there Synced playlist to check new version
-  let areThere = {
-    Synced: store.state.CurrentUser.syncedPlaylists.length > 0,
-    Cached: store.state.CurrentUser.cachedPlaylists.length > 0
-  }
+  let areThereSynced = store.state.CurrentUser.syncedPlaylists.length > 0
 
   // No synced playlists
-  if (!areThere.Synced && !areThere.Cached) synced = true
+  if (!areThereSynced) synced = true
   else {
     let ids = [...store.state.CurrentUser.syncedPlaylists.map(pl => {
       return {
         id: pl.id,
         snapshot_id: pl.snapshot_id
       }
-    }), ...store.state.CurrentUser.cachedPlaylists.map(pl => {
-      return {
-        id: pl.id,
-        snapshot_id: pl.snapshot_id
-      }
-    })]
+    })
+    ]
 
     fetchMultiple(ids, true)
       .then(() => {
