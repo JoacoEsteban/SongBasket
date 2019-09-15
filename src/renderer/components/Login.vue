@@ -4,7 +4,7 @@
       <div class="">
         <button class="button" @click="login">Login to Spotify</button>
         <div>or</div>
-        <router-link to="/guest" tag="button" class="button">Continue without Logging in</router-link>
+        <router-link to="/setup/guest" tag="button" class="button">Continue without Logging in</router-link>
       </div>
     </div>
 </template>

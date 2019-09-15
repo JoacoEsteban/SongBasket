@@ -29,23 +29,14 @@ export default {
   methods: {
     redirect (path, payload) {
       switch (path) {
-        case 'login': {
-          this.header.text = 'Let\'s find your music'
-          this.$router.push('login')
-          break
-        }
-        case 'guest-verify': {
-          this.$router.push({name: 'guest-verify', params: { user: payload }})
-          this.header.text = 'Is this You?'
+        case 'setup': {
+          // this.header.text = 'Let\'s find your music'
+          this.$router.push('/setup')
           break
         }
         case 'home': {
-          this.$router.push({path: '/home'})
-          break
-        }
-        case 'guest': {
-          this.header.text = 'Let\'s find your music'
-          this.$router.push({path: '/guest'})
+          // this.header.text = 'Let\'s find your music'
+          this.$router.push('/home')
           break
         }
       }
@@ -78,6 +69,10 @@ export default {
     //   this.redirect('home')
     // })
 
+    ipc.on('initializeSetup', () => {
+      // this.$store.dispatch('SET_LOADING_STATE', 'found')
+      this.redirect('setup')
+    })
     ipc.on('dataStored', () => {
       console.log('tamos listo')
       this.$store.dispatch('SET_LOADING_STATE', 'found')

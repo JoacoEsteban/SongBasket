@@ -7,7 +7,6 @@ const stateFileName = '/.songbasket'
 let userMethods = {
   checkForUser: function () {
     let folders = fs.existsSync(foldersJsonPath)
-    console.log('EXISTS??', folders, foldersJsonPath)
 
     if (folders) {
       folders = fs.readFileSync(foldersJsonPath, 'utf8')
@@ -25,7 +24,7 @@ let userMethods = {
     path = path.path
 
     for (let i = 0; i < paths.folders.length; i++) {
-      paths[i].current = false
+      paths.folders[i].current = false
       if (paths.folders[i] === path) return 'already added'
     }
 
@@ -51,9 +50,15 @@ let userMethods = {
   retrieveState: function (path) {
     console.log('retrieving from ', path)
     return new Promise((resolve, reject) => {
-      fs.readFile(path + stateFileName, (err, data) => {
+      fs.access(path + stateFileName, (err) => {
+        console.log('KXKXKXKXKX', err)
         if (err) reject(err)
-        resolve(JSON.parse(data))
+        else {
+          fs.readFile(path + stateFileName, (err, data) => {
+            if (err) reject(err)
+            resolve(JSON.parse(data))
+          })
+        }
       })
     })
   }

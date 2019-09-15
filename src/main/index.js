@@ -112,22 +112,27 @@ function verifyFileSystem () {
     if (FOLDERS.folders.length > 0) {
       console.log('FOLDER PATH Exists', FOLDERS)
 
-      store.dispatch('folderPaths', FOLDERS)
+      store.dispatch('folderPaths', FOLDERS.folders)
         .then(() => {
-          if (FOLDERS.folders.length === 1) {
+          let comodin = true
+          if (FOLDERS.folders.length === 1 || comodin) {
             retrieveAndStoreState(FOLDERS.folders[0].path)
               .then(() => {
-                console.log('QOQOQOQ')
                 mainWindow.webContents.send('dataStored')
               })
-              .catch(() => {
+              .catch((err) => {
                 // TODO Handle errors when retrieving and setting data
+                console.log('NOT FOOUND', err)
+                mainWindow.webContents.send('initializeSetup')
               })
+          } else {
+            // TODO redirect to folders view
           }
         })
       // guestFetch(FOLDERS.user, true)
     } else {
       console.log('no user', 1)
+      mainWindow.webContents.send('initializeSetup')
     }
   })
 }

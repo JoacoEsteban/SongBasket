@@ -3,6 +3,20 @@ import Vue from 'vue'
 import FileSystem from '../../../main/FileSystem/index'
 import SharedStates from './SharedStates'
 
+// Last time changes were saved to disk
+let lastSaved = null
+
+function SAVE_TO_DISK () {
+  console.log('SAVIN', SharedStates.state)
+  let now = Date.now()
+
+  // Prevents calling this function more than once in half a second
+  if (now - lastSaved > 10) {
+    lastSaved = now
+    FileSystem.saveState({state, path: SharedStates.state.fileSystem.homeFolders.find(path => path.current === true).path})
+  }
+}
+
 const getDefaultState = () => {
   return {
     user: {}, // Includes name, number of playlists, image url
@@ -82,9 +96,18 @@ const actions = {
 
 const mutations = {
   STORE_DATA_FROM_DISK (state, data) {
-    console.log('LO HICIMOS??', state.user)
-    state = data
-    console.log('LO HICIMOS??', state.user)
+    let {cachedPlaylists, control, playlists, queuedPlaylists, syncedPlaylists, user} = data
+    state.playlists = playlists
+    state.user = user
+
+    state.cachedPlaylists = cachedPlaylists
+    state.control = control
+    state.playlists = playlists
+    state.queuedPlaylists = queuedPlaylists
+    state.syncedPlaylists = syncedPlaylists
+    state.user = user
+
+    console.log('DATA STORED')
   },
   UPDATE_USER_ENTITIES (state, object) {
     // TODO VERSION CONTROL SYNCED PLS FROM HERE AND KEEP REMOVED TRACKS INSIDE THE SYNCED PL OBJECT
@@ -129,7 +152,7 @@ const mutations = {
       offset: state.playlists.length
     }
     console.log('ISISISISI', SharedStates.state.fileSystem.homeFolders)
-    FileSystem.saveState({state, path: SharedStates.state.fileSystem.homeFolders.find(path => path.current === true).path})
+    SAVE_TO_DISK()
   },
 
   UPDATE_PLAYLISTS (state, playlists) {
@@ -140,6 +163,7 @@ const mutations = {
     Vue.set(state.control, 'offset', state.playlists.length)
 
     console.log('PLAYLISTS UPDATE::::::')
+    SAVE_TO_DISK()
   },
 
   LOGOUT (state) {
@@ -228,19 +252,23 @@ const mutations = {
       }
       state.playlists.splice(index, 1, playlist)
       console.log('SON, ITS TIME NOW', state.playlists[index].tracks.added.map(p => p.name))
+
+      SAVE_TO_DISK()
     } else console.log('PLAYLIST NOT FOUND WHEN SETTING TRACKS INSIDE STATE (VUEX)')
   },
 
   PLAYLIST_UPDATE_CACHED (state, {id, snapshot_id}) {
+    let found = false
     for (let i = 0; i < state.cachedPlaylists.length; i++) {
       let p = state.cachedPlaylists[i]
       if (p.id === id) {
         p = {id, time: Date.now(), snapshot_id}
         // console.log('UPDATING CACHE LOG FOR PLAYLIST WITH ID ' + id)
-        return
+        found = true
       }
     }
-    state.cachedPlaylists = [ ...state.cachedPlaylists, { id, time: Date.now(), snapshot_id } ]
+    if (!found) state.cachedPlaylists = [ ...state.cachedPlaylists, { id, time: Date.now(), snapshot_id } ]
+    SAVE_TO_DISK()
   },
   SET_CURRENT_PLAYLIST (state, id) {
     state.currentPlaylist = id
@@ -298,6 +326,7 @@ const mutations = {
           snapshot_id: pl.snapshot_id
         }
       })]
+      SAVE_TO_DISK()
       return
     }
 
@@ -342,6 +371,8 @@ const mutations = {
     if (youtubizedResult.length > 0) {
       state.syncedPlaylists = [...state.syncedPlaylists, ...youtubizedResult]
     }
+
+    SAVE_TO_DISK()
   },
   COMMIT_TRACK_CHANGES (state, id) {
     let index = findInPls(id, state.playlists)
@@ -359,6 +390,7 @@ const mutations = {
         removed: []
       }
     }
+    SAVE_TO_DISK()
   }
 
 }

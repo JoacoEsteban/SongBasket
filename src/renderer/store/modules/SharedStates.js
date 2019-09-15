@@ -19,13 +19,12 @@ const actions = {
     commit('SET_LOADING_STATE', loadingState)
   },
   folderPaths ({commit}, paths) {
-    commit('FOLDER_PATHS')
+    commit('FOLDER_PATHS', paths)
   }
 }
 
 const mutations = {
   SET_HOME_FOLDER (state, path) {
-    console.log('JEJEJEJO', state.fileSystem.homeFolders)
     if (!state.fileSystem.homeFolders) state.fileSystem.homeFolders = [{path, current: true}]
 
     for (let i = 0; i < state.fileSystem.homeFolders.length; i++) {
