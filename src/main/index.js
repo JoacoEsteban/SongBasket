@@ -1,4 +1,4 @@
-// import FileSystemUser from './FileSystem/index'
+import FileSystemUser from './FileSystem/index'
 import { logme } from '../UTILS'
 
 import store from '../renderer/store'
@@ -12,7 +12,7 @@ const dialog = electron.dialog
 
 let { app, BrowserWindow, session } = electron
 
-// let USER = FileSystemUser.checkForUser()
+let FOLDERS = FileSystemUser.checkForUser()
 const ipc = electron.ipcMain
 
 const localBackend = 'http://localhost:5000'
@@ -32,7 +32,6 @@ let loginWindow
 const winURL = process.env.NODE_ENV === 'development' ? `http://localhost:9080` : `file://${__dirname}/index.html`
 
 function createWindow () {
-  // if (USER) guestFetch(USER.user, true)
   mainWindow = new BrowserWindow({
     width: 800,
     height: 500,
@@ -83,7 +82,7 @@ function createLoginWindow () {
 };
 
 function storePlaylists (resolve, redirect) {
-  store.dispatch('initUser', resolve)
+  store.dispatch('updateUserEntities', resolve)
     .then(() => {
       if (redirect) {
         mainWindow.webContents.send('playlists done')
@@ -92,7 +91,56 @@ function storePlaylists (resolve, redirect) {
     })
 }
 
-app.on('ready', createWindow)
+function retrieveAndStoreState (path) {
+  return new Promise((resolve, reject) => {
+    FileSystemUser.retrieveState(path)
+      .then(data => {
+        // console.log('LO HICIMOS?', data)
+        store.dispatch('storeDataFromDisk', data)
+          .then(() => {
+            resolve()
+          })
+      })
+      .catch(err => {
+        reject(err)
+      })
+  })
+}
+
+function verifyFileSystem () {
+  return new Promise((resolve, reject) => {
+    if (FOLDERS.folders.length > 0) {
+      console.log('FOLDER PATH Exists', FOLDERS)
+
+      store.dispatch('folderPaths', FOLDERS)
+        .then(() => {
+          if (FOLDERS.folders.length === 1) {
+            retrieveAndStoreState(FOLDERS.folders[0].path)
+              .then(() => {
+                console.log('QOQOQOQ')
+                mainWindow.webContents.send('dataStored')
+              })
+              .catch(() => {
+                // TODO Handle errors when retrieving and setting data
+              })
+          }
+        })
+      // guestFetch(FOLDERS.user, true)
+    } else {
+      console.log('no user', 1)
+    }
+  })
+}
+
+app.on('ready', () => {
+  createWindow()
+  mainWindow.webContents.on('did-finish-load', () => {
+    verifyFileSystem()
+      .then(() => {
+        console.log(2)
+      })
+  })
+})
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -105,24 +153,6 @@ app.on('activate', () => {
     createWindow()
   }
 })
-
-function guestLogin (userId) {
-  if (userId !== null && userId !== undefined) {
-    sbFetch.guestLogin(userId)
-      .then(resolve => {
-        if (resolve.code === 404) {
-          mainWindow.webContents.send('not-found')
-        }
-        if (resolve.code === 400) {
-          mainWindow.webContents.send('invalid')
-        }
-        if (resolve.code === 200) {
-          mainWindow.webContents.send('user-found', resolve)
-        }
-      })
-      .catch(err => logme(err))
-  }
-}
 
 function guestFetch (query, updateOrFirstTime) {
   let allData = []
@@ -197,7 +227,7 @@ ipc.on('setHomeFolder', function (event) {
     properties: ['openDirectory']
   }, path => {
     if (path === undefined) return
-    store.dispatch('setHomeFolder', path)
+    store.dispatch('setHomeFolder', path[0])
       .then(() => mainWindow.webContents.send('continueToLogin'))
   })
 })
@@ -206,21 +236,26 @@ ipc.on('login', function (event) {
   createLoginWindow()
 })
 
-ipc.on('guestConfirm', function (event, userID) {
-  logme(`Fetching Playlists from Guest user ${userID}`)
-
-  guestFetch(userID, true)
-})
-
-ipc.on('refreshPlaylists', function (event) {
-  console.log('Refreshing Playlists')
-  guestFetch(store.getters.RequestParams.userId, false)
-})
-
 ipc.on('guestSignIn', function (event, {mode, query}) {
   console.log('Guest:: Type:', mode, query)
 
-  if (mode === 'user') guestLogin(query)
+  if (mode === 'user') {
+    if (query !== null && query !== undefined) {
+      sbFetch.guestLogin(query)
+        .then(resolve => {
+          if (resolve.code === 404) {
+            mainWindow.webContents.send('not-found')
+          }
+          if (resolve.code === 400) {
+            mainWindow.webContents.send('invalid')
+          }
+          if (resolve.code === 200) {
+            mainWindow.webContents.send('user-found', resolve)
+          }
+        })
+        .catch(err => logme(err))
+    }
+  }
   if (mode === 'playlist') {
     sbFetch.getTracks(store.getters.RequestParams, {id: query}, false)
       .then(response => {
@@ -239,6 +274,21 @@ ipc.on('guestSignIn', function (event, {mode, query}) {
         console.log('a ver si lo aachea', error)
       })
   }
+})
+
+ipc.on('guestConfirm', function (event, userID) {
+  logme(`Fetching Playlists from Guest user ${userID}`)
+  // Saving Home folder to .songbasket-userdata
+  let addNewFolder = FileSystemUser.addHomeFolder(store.state.SharedStates.fileSystem.homeFolders[0])
+  if (addNewFolder === 'already added') {
+    // handle already added folder (Tell user)
+  }
+  guestFetch(userID, true)
+})
+
+ipc.on('refreshPlaylists', function (event) {
+  console.log('Refreshing Playlists')
+  guestFetch(store.getters.RequestParams.userId, false)
 })
 
 ipc.on('loadMore', function (event) {

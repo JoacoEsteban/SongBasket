@@ -1,14 +1,6 @@
 <template>
     <div  class="login-flex">
-      <div v-if="$route.name !== 'set-home-folder'" class="login-header">{{header.text}}</div>
-      <router-view
-      path="/set-home-folder"
-      @setHomeFolder="setHomeFolder" 
-      @login="login"
-      @guestSearch="guestSearch($event)" 
-      @not-user="redirect('guest')"
-      @confirm-user="confirmUser"
-      > </router-view>
+      Loading
   </div>
 </template>
 
@@ -35,18 +27,6 @@ export default {
     }
   },
   methods: {
-    setHomeFolder () {
-      ipc.send('setHomeFolder')
-    },
-    login () {
-      ipc.send('login')
-    },
-    guestSearch (request) {
-      if (this.loadingState !== 'Loading' && request.query !== '' && request.query !== undefined && request.query !== null) {
-        this.$store.dispatch('SET_LOADING_STATE', 'loading')
-        ipc.send('guestSignIn', request)
-      }
-    },
     redirect (path, payload) {
       switch (path) {
         case 'login': {
@@ -76,24 +56,30 @@ export default {
 
   },
   mounted () {
-    ipc.on('continueToLogin', () => {
-      this.redirect('login')
-    })
+    // ipc.on('continueToLogin', () => {
+    //   this.redirect('login')
+    // })
 
-    ipc.on('not-found', () => {
-      this.$store.dispatch('SET_LOADING_STATE', 'not found')
-    })
-    ipc.on('invalid', () => {
-      this.$store.dispatch('SET_LOADING_STATE', 'invalid id')
-    })
+    // ipc.on('not-found', () => {
+    //   this.$store.dispatch('SET_LOADING_STATE', 'not found')
+    // })
+    // ipc.on('invalid', () => {
+    //   this.$store.dispatch('SET_LOADING_STATE', 'invalid id')
+    // })
 
-    ipc.on('user-found', (event, user) => {
-      this.$store.dispatch('SET_LOADING_STATE', 'found')
-      this.userOnHold = user
-      this.redirect('guest-verify', user)
-    })
+    // ipc.on('user-found', (event, user) => {
+    //   this.$store.dispatch('SET_LOADING_STATE', 'found')
+    //   this.userOnHold = user
+    //   this.redirect('guest-verify', user)
+    // })
 
-    ipc.on('playlists done', () => {
+    // ipc.on('playlists done', () => {
+    //   this.$store.dispatch('SET_LOADING_STATE', 'found')
+    //   this.redirect('home')
+    // })
+
+    ipc.on('dataStored', () => {
+      console.log('tamos listo')
       this.$store.dispatch('SET_LOADING_STATE', 'found')
       this.redirect('home')
     })

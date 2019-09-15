@@ -1,12 +1,10 @@
 /* eslint-disable camelcase */
 import Vue from 'vue'
 import FileSystem from '../../../main/FileSystem/index'
+import SharedStates from './SharedStates'
 
 const getDefaultState = () => {
   return {
-    fileSystem: {
-      homeFolder: null
-    },
     user: {}, // Includes name, number of playlists, image url
     playlists: [],
     cachedPlaylists: [],
@@ -20,11 +18,14 @@ const getDefaultState = () => {
 const state = getDefaultState()
 
 const actions = {
-  setHomeFolder ({ commit }, path) {
-    commit('SET_HOME_FOLDER', path)
+  storeDataFromDisk ({commit}, data) {
+    return new Promise((resolve, reject) => {
+      commit('STORE_DATA_FROM_DISK', data)
+      resolve()
+    })
   },
-  initUser ({ commit }, object) {
-    commit('INIT_USER', object)
+  updateUserEntities ({ commit }, object) {
+    commit('UPDATE_USER_ENTITIES', object)
   },
   updatePlaylists ({ commit }, playlists) {
     commit('UPDATE_PLAYLISTS', playlists)
@@ -80,12 +81,12 @@ const actions = {
 }
 
 const mutations = {
-  SET_HOME_FOLDER (state, path) {
-    console.log('SETTING HOME FOLDER::: ', path, Date.now())
-    state.fileSystem.homeFolder = path[0]
-    FileSystem.setHomeFolder({state, path})
+  STORE_DATA_FROM_DISK (state, data) {
+    console.log('LO HICIMOS??', state.user)
+    state = data
+    console.log('LO HICIMOS??', state.user)
   },
-  INIT_USER (state, object) {
+  UPDATE_USER_ENTITIES (state, object) {
     // TODO VERSION CONTROL SYNCED PLS FROM HERE AND KEEP REMOVED TRACKS INSIDE THE SYNCED PL OBJECT
     function isCachedOrSynced (id) {
       let c = findInPls(id, state.cachedPlaylists)
@@ -127,6 +128,8 @@ const mutations = {
       total: object.playlists.total,
       offset: state.playlists.length
     }
+    console.log('ISISISISI', SharedStates.state.fileSystem.homeFolders)
+    FileSystem.saveState({state, path: SharedStates.state.fileSystem.homeFolders.find(path => path.current === true).path})
   },
 
   UPDATE_PLAYLISTS (state, playlists) {
