@@ -97,7 +97,7 @@ const actions = {
 
 const mutations = {
   STORE_DATA_FROM_DISK (state, data) {
-    let {cachedPlaylists, control, playlists, queuedPlaylists, syncedPlaylists, user} = data
+    let {cachedPlaylists, control, playlists, queuedPlaylists, syncedPlaylists, user, lastSync} = data
     state.playlists = playlists
     state.user = user
 
@@ -107,6 +107,7 @@ const mutations = {
     state.queuedPlaylists = queuedPlaylists
     state.syncedPlaylists = syncedPlaylists
     state.user = user
+    state.lastSync = lastSync
 
     console.log('DATA STORED')
   },

@@ -2,6 +2,7 @@ exports.logme = (logger) => logger === undefined ? console.log('Logging...') : c
 
 exports.dateFormatter = (dateParam) => {
   let now = new Date()
+  dateParam = new Date(dateParam)
   let months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
   let date = {
