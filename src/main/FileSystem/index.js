@@ -11,10 +11,9 @@ let userMethods = {
 
     if (folders) {
       folders = fs.readFileSync(foldersJsonPath, 'utf8')
-      console.log('EXISTS', folders)
       return JSON.parse(folders)
     } else {
-      console.log('Folder missing, Creating')
+      console.log('Folder paths file missing, Creating')
       let emptyFolders = {folders: []}
       fs.writeFileSync(foldersJsonPath, JSON.stringify(emptyFolders), 'utf8')
       return (emptyFolders)
