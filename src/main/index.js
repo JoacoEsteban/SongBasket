@@ -203,7 +203,6 @@ function fetchMultiple (playlists, checkVersion) {
       let playlist = playlists[i]
       sbFetch.getTracks(store.getters.RequestParams, playlist, checkVersion)
         .then(response => {
-          console.log('senora deje de joder', response.playlist.tracks)
           store.dispatch('playlistStoreTracks', response.playlist).then(() => {
             count--
             if (count === 0) resolve()

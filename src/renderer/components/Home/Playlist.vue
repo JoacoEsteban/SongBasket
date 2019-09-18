@@ -2,7 +2,27 @@
     <div 
     :class="{'queued': isQueued, 'synced': isSynced}"
     class="pl-container">
-        <div class="pl-track-count">{{playlist.tracks.total}} {{playlist.tracks.total === 1 ? 'Track' : 'Tracks'}}</div>
+        <div class="pl-track-count">
+          {{playlist.tracks.total}} {{playlist.tracks.total === 1 ? 'Track' : 'Tracks'}}
+          <div v-if="isSynced" class="star-icons-container">
+            <div v-if="playlist.tracks.added && playlist.tracks.added.length > 0" class="star-icon">
+              <div class="rotate">
+                <star-icon color="#3f2" />
+              </div>
+              <div class="num">
+                +{{playlist.tracks.added.length}}
+              </div>
+            </div>
+            <div v-if="playlist.tracks.removed && playlist.tracks.removed.length > 0" class="star-icon">
+              <div class="rotate">
+                <star-icon color="#e33" />
+              </div>
+              <div class="num">
+                -{{playlist.tracks.removed.length}}
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="pl-img" :style="playlist.images.length > 0 ? {backgroundImage: `url(${playlist.images[0].url})`} : null">
           <div class="pl-button-container">
             <button class="button" @click="$emit('openPlaylist')">Explore</button>
@@ -13,7 +33,7 @@
         </div>
         <div class="pl-name" ref="plname">
             <!-- TODO handle multi line names -->
-            {{!isSynced ? playlistName : playlist.tracks.added.length + ' added, ' + playlist.tracks.removed.length + ' removed, '}}
+            {{playlistName}}
             
         </div>
         <div class="queued-indicator" />
@@ -25,6 +45,7 @@ import 'vuex'
 
 import electron from 'electron'
 import PlaylistIcon from '../../assets/icons/playlist-icon'
+import StarIcon from '../Icons/star-icon'
 const ipc = electron.ipcRenderer
 
 export default {
@@ -51,7 +72,8 @@ export default {
     })
   },
   components: {
-    PlaylistIcon
+    PlaylistIcon,
+    StarIcon
   },
   methods: {
   }
@@ -149,5 +171,38 @@ $q-true-color:rgb(103, 214, 0);
   display: flex;
   align-items: center;
 
+}
+.star-icons-container {
+  position: absolute;
+  display: flex;
+  top: -1.1em;
+  right: -1.2em;
+  .star-icon {
+    .rotate {
+      @keyframes rotation {
+        0% {transform: rotate(0deg)}
+        100% {transform: rotate(180deg)}
+      }
+      height: 100%;
+      // width: 100%;
+      animation: rotation 4s cubic-bezier(0.62, 0, 0, 0.98) infinite;
+    }
+    position: relative;
+    $size: 2em;
+    width: $size;
+    height: $size;
+
+    .num {
+      font-size: .8em;
+      position: absolute;
+      top: 0;
+      right: 0;
+      left: 0;
+      bottom: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
 }
 </style>

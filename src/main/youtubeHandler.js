@@ -32,7 +32,6 @@ export function youtubizeAll () {
 
     for (let o = 0; o < tracks.length; o++) {
       let track = tracks[o]
-      console.log('asdfasdf', pl.name, track.name, pls, i)
 
       let query = `${track.name} ${track.artists[0].name}`
       let duration = track.duration_ms / 1000 / 60
