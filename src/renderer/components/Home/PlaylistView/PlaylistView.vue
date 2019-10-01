@@ -74,20 +74,20 @@ export default {
   flex-direction: row;
   /* border: 1px solid white; */
   padding: 0;
-  padding-top: 0.4rem;
+  padding-top: 0.4em;
 }
 .plv-leftpanel {
   display: flex;
   flex-direction: column;
   align-items: center;
   /* border: 1px solid white; */
-  min-width: 7rem;
+  min-width: 7em;
 }
 .plv-lp-img {
   background-size: cover;
   width: 92%;
   padding-bottom: 92%;
-  margin-bottom: 1rem;
+  margin-bottom: 1em;
 }
 
 .plv-rightpanel {
@@ -101,18 +101,18 @@ export default {
   /* display: flex;
   flex-direction: column; */
   /* justify-content: space-evenly; */
-  min-height: 3rem;
+  min-height: 3em;
 }
 .plv-rp-data-plname {
   font-family: "Poppins Black";
   text-align: left;
-  font-size: 1.5rem;
+  font-size: 1.5em;
   line-height: 1;
 }
 .plv-rp-data-byuser {
   font-family: "poppins regular";
   text-align: left;
-  font-size: 0.9rem;
+  font-size: 0.9em;
   line-height: 1.3;
 }
 .plv-rp-tracklist {

@@ -64,6 +64,12 @@ body:hover{
     background: var(--button-purple);
     color: var(--text-white);
 }
+.button:active{
+    font-family: 'Poppins medium';
+    transform: scale(.98);
+    background: var(--button-purple);
+    color: var(--text-white);
+}
 .button.accept {
     background-color: #1dcc00;
     color: var(--text-white);
