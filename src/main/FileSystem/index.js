@@ -33,7 +33,7 @@ let userMethods = {
     return 'success'
   },
   saveState: function ({state, path}) {
-    console.log('Saving state to', path)
+    // console.log('Saving state to', path)
     return new Promise((resolve, reject) => {
       let exists = fs.existsSync(path)
       if (!exists) {

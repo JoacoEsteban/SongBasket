@@ -28,7 +28,8 @@ export default {
     return {
       user: this.$store.state.CurrentUser.user,
       control: this.$store.state.CurrentUser.control,
-      loading: false
+      loading: false,
+      syncedPlaylists: []
     }
   },
   components: {
@@ -41,12 +42,17 @@ export default {
     playlists () {
       return this.$store.state.CurrentUser.playlists
     },
-    syncedPlaylists () {
-      let sync = this.$store.state.CurrentUser.syncedPlaylists
-      return sync.map(pl => this.$store.getters.PlaylistById(pl.id))
-    },
     unSyncedPlaylists () {
       return this.playlists.filter(pl => !this.$store.getters.PlaylistIsSynced(pl.id))
+    },
+    syncedPlaylistsRefreshed () {
+      return this.$store.state.Events.SYNCED_PLAYLISTS_REFRESHED
+    }
+  },
+  watch: {
+    syncedPlaylistsRefreshed () {
+      console.log('duuuuud jejejejje')
+      this.refreshSynced()
     }
   },
   methods: {
@@ -56,11 +62,18 @@ export default {
         ipc.send('loadMore')
       }
     },
-    mounted () {
-      ipc.on('done loading', () => {
-        this.loading = false
-      })
+    refreshSynced () {
+      this.syncedPlaylists = []
+      setTimeout(() => {
+        this.syncedPlaylists = this.$store.getters.SyncedPlaylistsSp
+      }, 100)
     }
+  },
+  mounted () {
+    ipc.on('done loading', () => {
+      this.loading = false
+    })
+    this.refreshSynced()
   }
 }
 </script>

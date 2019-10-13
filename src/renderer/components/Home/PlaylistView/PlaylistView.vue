@@ -40,7 +40,7 @@
       </div>
       <div class="plv-rp-tracklist">
         <Track
-          v-for="(track, index) in playlist.tracks.items"
+          v-for="(track, index) in items"
           :key="index"
           :track="track"
           :conversion="giveMeConversion(track.id)"
@@ -63,7 +63,9 @@ export default {
     return {
       // TODO make it work
       showingConversion: [],
-      showingAll: false
+      showingAll: false,
+      showingAdded: false,
+      showingRemoved: false
     }
   },
   components: {
@@ -76,12 +78,8 @@ export default {
     conversion () {
       if (this.playlist) { return this.$store.getters.SyncedPlaylistById(this.playlist.id) } else return null
     },
-    allTracks () {
-      let tracks = this.playlist.tracks
-      let items = tracks.items
-      let removed = tracks.removed
-      if (!removed) removed = []
-      return [...items, ...removed]
+    ammountOfTracksBeingShown () {
+      return this.items.length + (this.showingAdded ? this.added.length : 0) + (this.showingRemoved ? this.removed.length : 0)
     },
     isQueued () {
       if (this.playlist) { return this.$store.getters.PlaylistIsQueued(this.playlist.id) >= 0 } else return false
@@ -91,6 +89,10 @@ export default {
     },
     trackQty () {
       return ' Track' + (this.playlist.tracks.total === 1 ? '' : 's')
+    },
+    items () {
+      console.log('UPDATE DOU')
+      return this.playlist.tracks.items
     },
     added () {
       return this.playlist.tracks.added ? this.playlist.tracks.added : []
@@ -124,14 +126,14 @@ export default {
         if (this.showingConversion[i] === id) {
           this.showingConversion.splice(i, 1)
           console.log('dou! tt')
-          if (this.showingConversion.length === 0 && this.showingALl) {
+          if (this.showingConversion.length === 0 && this.showingAll) {
             this.toggleShowingAll()
           }
           return
         }
       }
       this.showingConversion.push(id)
-      if (this.showingConversion.length === this.conversion.tracks.length) {
+      if (this.showingConversion.length === this.ammountOfTracksBeingShown) {
         console.log('dou! ff')
         this.toggleShowingAll()
       }
@@ -148,6 +150,7 @@ export default {
       return this.showingAll
     },
     selectTrack (trackId, newId) {
+      console.log('dou')
       this.$store.dispatch('changeYtTrackSelection', {playlist: this.playlist.id, trackId, newId})
     }
   }

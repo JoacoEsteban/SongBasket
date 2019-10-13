@@ -14,7 +14,7 @@ export function youtubizeAll () {
       synced: false
     }
   })
-  if (queuedPlaylists.length === 0 && syncedPlaylists.length === 0) return
+  if (queuedPlaylists.length + syncedPlaylists.length === 0) return
 
   let allPlaylists = [...syncedPlaylists, ...queuedPlaylists]
 
@@ -28,7 +28,6 @@ export function youtubizeAll () {
       continue
     }
     pls = [ ...pls, {id: pl.id, tracks: []} ]
-    // console.log('a verga Trcks', tracks)
 
     for (let o = 0; o < tracks.length; o++) {
       let track = tracks[o]
@@ -44,6 +43,9 @@ export function youtubizeAll () {
   }
   if (pls.length === 0) {
     console.log('no new tracks')
+    // Just filter out removed tracks from all playlists
+    // If there are tracks to convert, this step will be performed at the end of the 'YOUTUBIZE_RESULT' Mutation
+    store.dispatch('clearRemovedTracks')
     return
   }
   sbFetch.youtubizeAll(pls)

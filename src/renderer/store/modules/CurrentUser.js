@@ -7,7 +7,7 @@ import SharedStates from './SharedStates'
 let lastSaved = null
 
 function SAVE_TO_DISK () {
-  console.log('SAVIN', SharedStates.state)
+  // console.log('SAVIN', SharedStates.state)
   let now = Date.now()
 
   // Prevents calling this function more than once in half a second
@@ -21,11 +21,11 @@ const getDefaultState = () => {
   return {
     user: {}, // Includes name, number of playlists, image url
     playlists: [],
-    cachedPlaylists: [],
     syncedPlaylists: [],
-    control: {},
-    currentPlaylist: '',
     queuedPlaylists: [],
+    cachedPlaylists: [],
+    currentPlaylist: '',
+    control: {},
     lastSync: null
   }
 }
@@ -78,6 +78,12 @@ const actions = {
   findAndUncache ({ commit, getters }, id) {
     return new Promise((resolve, reject) => {
       commit('FIND_AND_UNCACHE', {id, getters})
+      resolve()
+    })
+  },
+  clearRemovedTracks ({commit}) {
+    return new Promise((resolve, reject) => {
+      commit('CLEAR_REMOVED_TRACKS')
       resolve()
     })
   },
@@ -141,6 +147,11 @@ const mutations = {
       for (let i = 0; i < object.playlists.items.length; i++) {
         let currentPlaylist = object.playlists.items[i]
         let cachedOrSynced = isCachedOrSynced(currentPlaylist.id)
+        if (!cachedOrSynced.c && !cachedOrSynced.s) {
+          object.playlists.items[i].items = []
+          object.playlists.items[i].added = []
+          object.playlists.items[i].removed = []
+        }
 
         if (cachedOrSynced.c !== false) {
           // console.log('IS CACHED::')
@@ -159,6 +170,14 @@ const mutations = {
       }
     } else {
       // console.log('NO CACHED OR SYNCED PLS')
+      for (let i = 0; i < object.playlists.items.length; i++) {
+        object.playlists.items[i].tracks = {
+          ...object.playlists.items[i].tracks,
+          items: [],
+          added: [],
+          removed: []
+        }
+      }
     }
 
     state.playlists = object.playlists.items
@@ -171,7 +190,7 @@ const mutations = {
     }
 
     state.lastSync = new Date()
-    console.log('ISISISISI', SharedStates.state.fileSystem.homeFolders)
+    // console.log('ISISISISI', SharedStates.state.fileSystem.homeFolders)
     SAVE_TO_DISK()
   },
 
@@ -304,7 +323,7 @@ const mutations = {
     }
     if (!found) state.queuedPlaylists = [...state.queuedPlaylists, id]
   },
-  FIND_AND_UNQUEUE (state, {id, getters}) {
+  FIND_AND_UNQUEUE (state, {id}) {
     let index = findById(id, state.queuedPlaylists.map(pl => {
       return {id: pl}
     }))
@@ -313,12 +332,46 @@ const mutations = {
       state.queuedPlaylists.splice(index, 1)
     }
   },
-  FIND_AND_UNCACHE (state, {id, getters}) {
+  FIND_AND_UNCACHE (state, {id}) {
     let index = findById(id, state.cachedPlaylists)
     // console.log('Uncaching', id, index)
     if (index >= 0) {
       state.cachedPlaylists.splice(index, 1)
     }
+    SAVE_TO_DISK()
+  },
+  CLEAR_REMOVED_TRACKS (state) {
+    let syncedPls = [...state.syncedPlaylists]
+    let pls = state.playlists
+
+    for (let i = 0; i < pls.length; i++) {
+      let pl = pls[i]
+      for (let o = 0; o < syncedPls.length; o++) {
+        let spl = syncedPls[o]
+        if (spl.id === pl.id) {
+          // found syncedPlaylist
+          let removed = pl.tracks.removed
+          for (let u = 0; u < removed.length; u++) {
+            let rmTrack = removed[u]
+
+            for (let y = 0; y < spl.tracks.length; y++) {
+              let syncdTrack = spl.tracks[y]
+
+              if (rmTrack.id === syncdTrack.id) {
+                // found removed track
+                spl.tracks.splice(y, 1)
+                break
+              }
+            }
+          }
+          break
+        }
+      }
+      pl.tracks.removed = []
+    }
+
+    state.syncedPlaylists = syncedPls
+
     SAVE_TO_DISK()
   },
   YOUTUBIZE_RESULT (state, youtubizedResult) {
@@ -392,10 +445,11 @@ const mutations = {
     if (youtubizedResult.length > 0) {
       state.syncedPlaylists = [...state.syncedPlaylists, ...youtubizedResult]
     }
-
+    this.dispatch('syncedPlaylistsRefreshed', {}, {root: true})
     SAVE_TO_DISK()
   },
   COMMIT_TRACK_CHANGES (state, id) {
+    console.log('dousinho a ver commiting')
     let index = findById(id, state.playlists)
     if (index === -1) {
       console.log('PLAYLIST NOT FOUND WHEN COMMITING CHANGES')
@@ -479,6 +533,7 @@ const getters = {
     }
     return all
   },
+  // TODO this sounds fking redundant, deprecate it pls
   SyncedPlaylists: (state, getters) => {
     let all = []
     for (let i = 0; i < state.syncedPlaylists.length; i++) {
