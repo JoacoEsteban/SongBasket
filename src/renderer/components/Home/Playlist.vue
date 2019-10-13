@@ -94,7 +94,7 @@ $q-true-color:rgb(103, 214, 0);
   z-index: 0;
   
   $bg: darken($q-true-color, 7);
-  $ol: $q-true-color;
+  $ol: var(--green-accept);
   $bezier: cubic-bezier(.31,.68,0,1);
   .queued-indicator {
     position: absolute;
@@ -102,7 +102,7 @@ $q-true-color:rgb(103, 214, 0);
     bottom: -.15em;
     right: 50%;
     left: 50%;
-
+    pointer-events: none;
     z-index: -1;
     background: $ol;
     transition: all .2s $bezier;

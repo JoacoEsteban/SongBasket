@@ -92,6 +92,12 @@ const actions = {
       commit('COMMIT_TRACK_CHANGES', id)
       resolve()
     })
+  },
+  changeYtTrackSelection ({ commit }, {playlist, trackId, newId}) {
+    return new Promise((resolve, reject) => {
+      commit('CHANGE_YT_TRACK_SELECTION', {playlist, trackId, newId})
+      resolve()
+    })
   }
 }
 
@@ -117,12 +123,12 @@ const mutations = {
       // If it's cached I want to compare the version with the currently stored one.
       // If they match I will keep the tracks (currently stored version)
       // If they don't I will keep the new version without tracks and the playlist will be uncached
-      let c = findInPls(id, state.cachedPlaylists)
+      let c = findById(id, state.cachedPlaylists)
       if (c >= 0) c = state.cachedPlaylists[c].snapshot_id
       else c = false
 
       // I dont care about the version controlling synced ones in here because version control has been handled elsewhere
-      let s = findInPls(id, state.syncedPlaylists) >= 0
+      let s = findById(id, state.syncedPlaylists) >= 0
 
       return {c, s}
     }
@@ -139,7 +145,7 @@ const mutations = {
         if (cachedOrSynced.c !== false) {
           // console.log('IS CACHED::')
           if (cachedOrSynced.c === currentPlaylist.snapshot_id) {
-            object.playlists.items.splice(i, 1, state.playlists[findInPls(currentPlaylist.id, state.playlists)])
+            object.playlists.items.splice(i, 1, state.playlists[findById(currentPlaylist.id, state.playlists)])
           } else {
             this.dispatch('findAndUncache', currentPlaylist.id)
           }
@@ -147,7 +153,7 @@ const mutations = {
         }
         if (cachedOrSynced.s) {
           // console.log('IS SYNCED::')
-          object.playlists.items.splice(i, 1, state.playlists[findInPls(currentPlaylist.id, state.playlists)])
+          object.playlists.items.splice(i, 1, state.playlists[findById(currentPlaylist.id, state.playlists)])
           continue
         }
       }
@@ -232,11 +238,11 @@ const mutations = {
 
     console.log('STORING ' + playlist.tracks.items.length + ' TRACKS FOR PLAYLIST WITH ID ' + playlist.id)
 
-    let index = findInPls(playlist.id, state.playlists)
+    let index = findById(playlist.id, state.playlists)
     // If there are changes with local version, overwrite
     if (index >= 0) {
       // If playlist is synced, then I will compute differences with previous local version
-      let syncIndex = findInPls(playlist.id, state.syncedPlaylists)
+      let syncIndex = findById(playlist.id, state.syncedPlaylists)
       if (syncIndex >= 0) {
         let oldPl = [
           ...state.playlists[index].tracks.items,
@@ -299,7 +305,7 @@ const mutations = {
     if (!found) state.queuedPlaylists = [...state.queuedPlaylists, id]
   },
   FIND_AND_UNQUEUE (state, {id, getters}) {
-    let index = findInPls(id, state.queuedPlaylists.map(pl => {
+    let index = findById(id, state.queuedPlaylists.map(pl => {
       return {id: pl}
     }))
     // console.log('Unqueueing', id, index)
@@ -308,7 +314,7 @@ const mutations = {
     }
   },
   FIND_AND_UNCACHE (state, {id, getters}) {
-    let index = findInPls(id, state.cachedPlaylists)
+    let index = findById(id, state.cachedPlaylists)
     // console.log('Uncaching', id, index)
     if (index >= 0) {
       state.cachedPlaylists.splice(index, 1)
@@ -328,7 +334,7 @@ const mutations = {
     youtubizedResult = youtubizedResult.map(pl => {
       return {
         ...pl,
-        snapshot_id: state.playlists[findInPls(pl.id, state.playlists)].snapshot_id
+        snapshot_id: state.playlists[findById(pl.id, state.playlists)].snapshot_id
       }
     })
 
@@ -356,7 +362,7 @@ const mutations = {
         // If Fetched playlists already exists in VUEX
         if (pl.id === ytpl.id) {
           // Cycle through tracks and clear removed ones
-          let localPl = {...state.playlists[findInPls(pl.id, state.playlists)]}
+          let localPl = {...state.playlists[findById(pl.id, state.playlists)]}
           for (let u = 0; u < pl.tracks.length; u++) {
             let trackSt = pl.tracks[u]
 
@@ -390,7 +396,7 @@ const mutations = {
     SAVE_TO_DISK()
   },
   COMMIT_TRACK_CHANGES (state, id) {
-    let index = findInPls(id, state.playlists)
+    let index = findById(id, state.playlists)
     if (index === -1) {
       console.log('PLAYLIST NOT FOUND WHEN COMMITING CHANGES')
       return
@@ -406,6 +412,24 @@ const mutations = {
       }
     }
     SAVE_TO_DISK()
+  },
+  CHANGE_YT_TRACK_SELECTION (state, {playlist, trackId, newId}) {
+    let index = findById(playlist, state.syncedPlaylists)
+    if (index === -1) {
+      console.error('Synced playlist not found:: CurrentUser.js :: CHANGE_YT_TRACK_SELECTION')
+      return
+    }
+
+    let playlistObj = state.syncedPlaylists[index]
+    index = findById(trackId, playlistObj.tracks)
+    if (index === -1) {
+      console.error('Converted Track not found:: CurrentUser.js :: CHANGE_YT_TRACK_SELECTION')
+      return
+    }
+
+    let track = playlistObj.tracks[index]
+    track.selected = newId
+    SAVE_TO_DISK()
   }
 
 }
@@ -420,7 +444,7 @@ const getters = {
     }
   },
   PlaylistById: (state) => function (id) {
-    let pl = state.playlists[findInPls(id, state.playlists)]
+    let pl = state.playlists[findById(id, state.playlists)]
     if (!pl || pl.tracks === null || pl.tracks === undefined) return null
     return pl
   },
@@ -440,13 +464,13 @@ const getters = {
     return null
   },
   PlaylistIsCached: (state, getters) => function (id) {
-    return findInPls(id, state.cachedPlaylists) >= 0
+    return findById(id, state.cachedPlaylists) >= 0
   },
   PlaylistIsQueued: (state, getters) => function (id) {
-    return findInPls(id, getters.QueuedPlaylists)
+    return findById(id, getters.QueuedPlaylists)
   },
   PlaylistIsSynced: (state, getters) => function (id) {
-    return findInPls(id, state.syncedPlaylists) >= 0
+    return findById(id, state.syncedPlaylists) >= 0
   },
   QueuedPlaylists: (state, getters) => {
     let all = []
@@ -577,7 +601,7 @@ export default {
   getters
 }
 
-function findInPls (id, pls) {
+function findById (id, pls) {
   for (let i = 0; i < pls.length; i++) {
     let pl = pls[i]
     if (pl.id === id) {

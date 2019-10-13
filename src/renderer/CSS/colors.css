@@ -1,7 +1,10 @@
 :root {
-    --body-dark: #151515;
-    --global-grey: #333;
-    --text-white: #f5f5f5;
-    --text-black: #111;
-    --button-purple: #9900cc;
+  --body-dark: #151515;
+  --global-grey: #333;
+  --global-grey-secondary: #222;
+  --text-white: #f5f5f5;
+  --text-black: #111;
+  --button-purple: #9900cc;
+  --green-accept: #1dcc00;
+  --red-cancel: #c00;
 }

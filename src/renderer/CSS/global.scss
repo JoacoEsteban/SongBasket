@@ -15,15 +15,15 @@ width: 7px;
 /* Track */
 ::-webkit-scrollbar-track {
 background: var(--global-grey);
-padding-top: 2rem;
-/* border-radius: 1rem; */
+padding-top: 2em;
+/* border-radius: 1em; */
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
 background: #c4c4c4;
 transition: background-color
-/* border-radius: 1rem; */
+/* border-radius: 1em; */
 }
 
 /* Handle on hover */
@@ -35,7 +35,7 @@ body{
     background: var(--body-dark);
     color: var(--text-white);
     font-family: 'Poppins regular';
-    font-size: 1rem;
+    font-size: 1em;
     margin: 0;
     user-select: none;
     overflow: hidden;
@@ -46,12 +46,12 @@ body:hover{
 .button{
     outline: none;
     font-family: 'Poppins semibold';
-    font-size: 0.7rem;
-    padding: .6rem 1rem;
-    // height: 2rem;
-    /* width: 10rem; */
+    font-size: 0.7em;
+    padding: 1em 1.5em;
+    // height: 2em;
+    /* width: 10em; */
     border: none;
-    border-radius: 2rem;
+    border-radius: 2em;
     color: var(--text-black);
     background: var(--text-white);
     transition: transform .15s ease, background .2s ease;
@@ -71,14 +71,22 @@ body:hover{
     color: var(--text-white);
 }
 .button.accept {
-    background-color: #1dcc00;
+    background-color: var(--green-accept);
     color: var(--text-white);
     font-family: 'Poppins medium';
 }
 .button.cancel {
-    background-color: #c00;
+    background-color: var(--red-cancel);
     color: var(--text-white);
     font-family: 'Poppins medium';
+}
+.button.thin {
+    padding: .2em 2em;
+}
+.button.disabled {
+    background-color: #111;
+    color: var(--text-white);
+    pointer-events: none;
 }
 .dev-border-w{
     border: 1px solid white;
@@ -89,11 +97,36 @@ body:hover{
 
 
 .icon {
-    width: 1rem;
-    height: 1rem;
+    width: 1em;
+    height: 1em;
     transition: transform .1s ease;
 }
 .icon:hover {
     transform: scale(1.25);
     cursor: pointer;
+}
+
+.df {
+    display: flex;
+}
+.fldc {
+    flex-direction: column;
+}
+.global-center {
+    align-items: center;
+    justify-content: center;
+}
+.jucc {
+    justify-content: center;
+}
+
+.alic {
+    align-items: center;
+}
+
+.bold {
+    font-family: "Poppins Bold";
+}
+.semibold {
+    font-family: "Poppins SemiBold";
 }

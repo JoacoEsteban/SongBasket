@@ -13,7 +13,7 @@
 
     <div class="tb-mid-section">
       Last Sync: {{now.date + ' @ ' + now.hours}}
-      <router-link to="/home" tag="span">
+      <router-link style="font-size: 1.5em;" to="/home" tag="span">
         <home-icon />
       </router-link>
     </div>
