@@ -324,7 +324,7 @@ $conversion-time: .5s;
   }
   &.transitioning {
     z-index: -1;
-    pointer-events: none
+    pointer-events: none;
   }
 }
 .conversion-container {

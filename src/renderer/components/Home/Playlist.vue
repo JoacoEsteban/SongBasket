@@ -185,7 +185,7 @@ $q-true-color:rgb(103, 214, 0);
       }
       height: 100%;
       // width: 100%;
-      animation: rotation 4s cubic-bezier(0.62, 0, 0, 0.98) infinite;
+      animation: rotation 4s linear infinite;
     }
     position: relative;
     $size: 2em;

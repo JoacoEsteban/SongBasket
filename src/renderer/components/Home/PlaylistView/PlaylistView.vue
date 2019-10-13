@@ -124,7 +124,7 @@ export default {
         if (this.showingConversion[i] === id) {
           this.showingConversion.splice(i, 1)
           console.log('dou! tt')
-          if (this.showingConversion.length) {
+          if (this.showingConversion.length === 0 && this.showingALl) {
             this.toggleShowingAll()
           }
           return
@@ -167,7 +167,7 @@ export default {
   align-items: center;
   /* border: 1px solid white; */
   padding-top: .5em;
-  min-width: 7em;
+  min-width: 8em;
   .controls {
     display: flex;
     flex-direction: column;
