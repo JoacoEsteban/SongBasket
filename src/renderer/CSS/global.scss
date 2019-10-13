@@ -95,6 +95,12 @@ body:hover{
     border: 1px solid black;
 }
 
+.link-button {
+    color: var(--text-white);
+    cursor: pointer;
+    text-decoration: underline;
+    margin: 0 .3em;
+}
 
 .icon {
     width: 1em;
@@ -104,29 +110,4 @@ body:hover{
 .icon:hover {
     transform: scale(1.25);
     cursor: pointer;
-}
-
-.df {
-    display: flex;
-}
-.fldc {
-    flex-direction: column;
-}
-.global-center {
-    align-items: center;
-    justify-content: center;
-}
-.jucc {
-    justify-content: center;
-}
-
-.alic {
-    align-items: center;
-}
-
-.bold {
-    font-family: "Poppins Bold";
-}
-.semibold {
-    font-family: "Poppins SemiBold";
 }

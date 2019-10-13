@@ -2,22 +2,27 @@
   <div class="home-router plv-container">
     <div class="plv-leftpanel">
       <div class="plv-lp-img" :style="'background-image: url('+playlist.images[0].url+')'" />
-
-        <div class="df fldc alic">
-          <span class="track-qty">
-            <span>
-              {{playlist.tracks.total}}
+        <div class="controls">
+          <div class="df fldc alic">
+            <span class="track-qty">
+              <span>
+                {{playlist.tracks.total}}
+              </span>
+                {{trackQty}}
             </span>
-              {{trackQty}}
-          </span>
-          <button
-            v-if="!isSynced"
-            class="button"
-            @click="$emit('addPlaylistToSyncQueue', playlist.id)"
-          >{{isQueued ? 'Unqueue' : 'Queue'}}</button>
+            <button
+              v-if="!isSynced"
+              class="button"
+              @click="$emit('addPlaylistToSyncQueue', playlist.id)"
+            >{{isQueued ? 'Unqueue' : 'Queue'}}</button>
+            <button v-if="isSynced" class="button" @click="">Unsync</button>
+          </div>
+
+          <div v-if="isSynced" @click="toggleShowingAll" class="button thin">
+            {{showingAll ? 'Collapse' : 'Show'}} all
+          </div>
         </div>
 
-      <button v-if="isSynced" class="button" @click>Unsync</button>
     </div>
     <div class="plv-rightpanel">
       <div class="plv-rp-data">
@@ -39,8 +44,10 @@
           :key="index"
           :track="track"
           :conversion="giveMeConversion(track.id)"
+          :convertionIsOpened="convertionIsOpened(track.id)"
+          @toggleConversion="toggleConversion(track.id)"
           @selectTrack="selectTrack(track.id, $event)"
-          @openYtVideo="$emit('openYtVideo', youtubeId(track.id))"
+          @openYtVideo="$emit('openYtVideo', $event)"
         />
       </div>
     </div>
@@ -55,6 +62,8 @@ export default {
   data () {
     return {
       // TODO make it work
+      showingConversion: [],
+      showingAll: false
     }
   },
   components: {
@@ -110,6 +119,34 @@ export default {
         if (track.id === id) return track
       }
     },
+    toggleConversion (id) {
+      for (let i = 0; i < this.showingConversion.length; i++) {
+        if (this.showingConversion[i] === id) {
+          this.showingConversion.splice(i, 1)
+          console.log('dou! tt')
+          if (this.showingConversion.length) {
+            this.toggleShowingAll()
+          }
+          return
+        }
+      }
+      this.showingConversion.push(id)
+      if (this.showingConversion.length === this.conversion.tracks.length) {
+        console.log('dou! ff')
+        this.toggleShowingAll()
+      }
+    },
+    toggleShowingAll () {
+      this.showingAll = !this.showingAll
+      this.showingConversion = []
+    },
+    convertionIsOpened (id) {
+      if (this.showingConversion.length === 0) return this.showingAll
+      for (let i = 0; i < this.showingConversion.length; i++) {
+        if (this.showingConversion[i] === id) return !this.showingAll
+      }
+      return this.showingAll
+    },
     selectTrack (trackId, newId) {
       this.$store.dispatch('changeYtTrackSelection', {playlist: this.playlist.id, trackId, newId})
     }
@@ -131,6 +168,14 @@ export default {
   /* border: 1px solid white; */
   padding-top: .5em;
   min-width: 7em;
+  .controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    padding-bottom: .5em;
+  }
 }
 .plv-lp-img {
   background-size: cover;

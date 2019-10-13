@@ -23,56 +23,65 @@
               Override
             </span>
           </button>
-        <button v-if="conversion" class="button thin" @click="">
+        <button v-if="conversion" class="button thin" @click="$emit('toggleConversion')">
           <span>
-            Show Conversion
+            {{convertionIsOpenedLocal ? 'Collapse' : 'Show'}} Conversion
           </span>
         </button>
       </div>
     </div>
-    <div v-if="conversion" class="conversion-container">
-      <div
-      v-for="(track, index) in conversion.yt"
-      :key="index"
-      :class="{'selected': isSelected(track.id)}"
-       class="pl-track-container yt bestMatch">
-        <div class="pl-track-img-container">
-          <div class="pl-track-img" :style="'background-image: url('+track.snippet.thumbnails.high.url+')'" />
-        </div>
-        <div class="aligner" />
-        <div class="pl-track-data-up">
-          <!-- TODO pull out ellipsis without fucking up the entire page -->
-          <div class="pl-track-data-name  center">
-            {{track.snippet.title}}
-          </div>
-          <div class="pl-track-data-byartist ">
-            uploader <span class="bold">{{track.snippet.channelTitle}}</span>
-          </div>
-          <div class="pl-track-data-duration">Duration: <span>{{durationFormatted}}</span></div>
 
-        </div>
-
-        <div class="aligner" />
-        <div class="controls">
-          <div
-          :class="{'disabled': isSelected(track.id)}"
-          @click="select(track.id)" class="button thin">
-            <span>
-              {{isSelected(track.id) ? 'Selected' : 'Select'}}
-            </span>
+    <div
+    v-if="conversion"
+    :class="{'show': convertionIsOpenedLocal, 'transitioning': transitioning, 'd-none': !convertionIsOpened && !transitioning}"
+    class="animation-container">
+      <div class="conversion-container df fldc jucb alic">
+        <div
+        v-for="(track, index) in conversion.yt"
+        :key="index"
+        :class="{'selected': isSelected(track.id)}"
+        class="pl-track-container yt bestMatch">
+          <div class="pl-track-img-container">
+            <div class="pl-track-img" :style="'background-image: url('+track.snippet.thumbnails.high.url+')'" />
           </div>
-          <div class="button thin">
-            <span>
-              Override
-            </span>
+          <div class="aligner" />
+          <div class="pl-track-data-up">
+            <!-- TODO pull out ellipsis without fucking up the entire page -->
+            <div class="pl-track-data-name  center">
+              {{track.snippet.title}}
+            </div>
+            <div class="pl-track-data-byartist ">
+              uploader <span class="bold">{{track.snippet.channelTitle}}</span>
+            </div>
+            <div class="pl-track-data-duration">Duration: <span>{{convertNFormat(track.duration)}}</span></div>
+
+          </div>
+
+          <div class="aligner" />
+          <div class="controls">
+            <div
+            :class="{'disabled': isSelected(track.id)}"
+            @click="select(track.id)" class="button thin">
+              <span>
+                {{isSelected(track.id) ? 'Selected' : 'Select'}}
+              </span>
+            </div>
+            <div @click="$emit('openYtVideo', track.id)" class="button thin">
+              <span>
+                Open
+              </span>
+            </div>
+          </div>
+        </div>
+        <div style="font-size: .5em;" class="df">
+          <div @click="select(null)" class="link-button">
+            Reset Selection
+          </div>
+          <div class="link-button">
+            Use Custom URL
           </div>
         </div>
       </div>
-      <!-- <div v-for="(track, index) in youtubeTracks.items"
-      :key="index"
-      class="pl-track-container yt bestMatch">
-        {{track.snippet.title}}
-      </div> -->
     </div>
   </div>
 </template>
@@ -81,6 +90,13 @@
 import * as utils from '../../../utils'
 
 export default {
+  data () {
+    return {
+      transitioning: false,
+      convertionIsOpenedLocal: false,
+      transitionCount: 0
+    }
+  },
   props: {
     track: {
       type: Object,
@@ -90,6 +106,24 @@ export default {
       type: Object,
       required: false,
       default: null
+    },
+    convertionIsOpened: {
+      type: Boolean,
+      required: false,
+      default: false
+    }
+  },
+  watch: {
+    convertionIsOpened (val) {
+      this.transitionCount++
+      this.transitioning = true
+      setTimeout(() => {
+        this.convertionIsOpenedLocal = val
+      }, 50)
+      setTimeout(() => {
+        this.transitionCount--
+        if (this.transitionCount === 0) this.transitioning = false
+      }, 550)
     }
   },
   computed: {
@@ -106,23 +140,16 @@ export default {
     },
 
     songDuration () {
-      let { minutes, seconds } = utils.convertMS(this.track.duration_ms)
-      return { minutes, seconds }
+      return this.timeFilter(this.track.duration_ms)
     },
     durationFormatted () {
-      let min =
-        this.songDuration.minutes < 10
-          ? '0' + this.songDuration.minutes
-          : this.songDuration.minutes.toString()
-      let sec =
-        this.songDuration.seconds < 10
-          ? '0' + this.songDuration.seconds
-          : this.songDuration.seconds.toString()
-
-      return min + ':' + sec
+      let {minutes, seconds} = this.songDuration
+      return this.formatDuration({minutes, seconds})
     }
   },
-  mounted () {},
+  mounted () {
+    this.convertionIsOpenedLocal = this.convertionIsOpened
+  },
   methods: {
     shorten (text) {
       let length = 50
@@ -130,12 +157,32 @@ export default {
       return text.substring(0, length).trim() + '...'
     },
     isSelected (id) {
-      // TODO backend return bestMatch aswell as 'Selected' equal to bestmatch
       return id === this.conversion.selected
     },
     select (id) {
+      if (!id) id = this.conversion.bestMatch
       if (this.isSelected(id)) return
       this.$emit('selectTrack', id)
+    },
+    timeFilter (ms) {
+      let { minutes, seconds } = utils.convertMS(ms)
+      return { minutes, seconds }
+    },
+    formatDuration ({minutes, seconds}) {
+      let min =
+        minutes < 10
+          ? '0' + minutes
+          : minutes.toString()
+      let sec =
+        seconds < 10
+          ? '0' + seconds
+          : seconds.toString()
+
+      return min + ':' + sec
+    },
+    convertNFormat (ms) {
+      if (ms < 1000) ms = ms * 1000 // Assuming time is expressed in seconds instead of ms
+      return this.formatDuration(this.timeFilter(ms))
     }
   }
 }
@@ -145,10 +192,12 @@ export default {
 /* TODO Media Query for List View */
 .whole-container {
   margin: 0.4em 0;
+  z-index: 0;
 
 }
 $track-height: 3.5em;
 .pl-track-container {
+  z-index: 1;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -202,7 +251,7 @@ $track-height: 3.5em;
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
-  height: 100%;
+  // height: 100%;
   width: 100%;
 }
 .ellipsis {
@@ -239,7 +288,7 @@ $track-height: 3.5em;
 .pl-track-data-duration {
   font-family: "Poppins regular";
   line-height: 1;
-  font-size: 0.3em;
+  font-size: 0.5em;
   span{
     font-family: 'Poppins Bold';
   }
@@ -247,19 +296,52 @@ $track-height: 3.5em;
 .pl-track-controls-container{
   display: flex;
   align-items: center;
-  min-width: 13em;
+  justify-content: flex-end;
+  // min-width: 15em;
   > .button {
     font-size: .65em;
-    margin: 0 .2em;
+    margin: 0 .3em;
+    min-width: 13em;
   }
 }
-
+$conversion-height: 25em;
+$conversion-time: .5s;
+.animation-container {
+  z-index: 0;
+  height: 0;
+  transition: height $conversion-time ease;
+  position: relative;
+  pointer-events: none;
+  &.show {
+    height: $conversion-height;
+    z-index: 0;
+    pointer-events: all;
+    .conversion-container {
+      top: 0;
+      opacity: 1;
+      transform: scale(1)
+    }
+  }
+  &.transitioning {
+    z-index: -1;
+    pointer-events: none
+  }
+}
 .conversion-container {
   padding: 1em;
   font-size: .9em;
   background-color: #252525;
   border-radius: 0 0 1em 1em;
-  margin: 0 .3em;
+  position: absolute;
+  left: .3em;
+  right: .3em;
+  top: -3em;
+  height: $conversion-height;
+  $transition-props: $conversion-time ease;
+  transition: transform $transition-props, opacity $transition-props, top $transition-props;
+  transform-origin: top;
+  opacity: 0;
+  transform: scale(.9);
   .aligner {
     min-width: 6em
   }
@@ -296,9 +378,13 @@ $track-height: 3.5em;
       min-width: $size;
       left: 0;
     }
+    .pl-track-data-duration {
+      font-size: .5em;
+    }
     .pl-track-data-up {
       font-size: 1.1em;
       align-items: center;
+      padding: .3em 0;
     }
     .controls {
       position: absolute;
