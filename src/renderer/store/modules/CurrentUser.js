@@ -190,6 +190,7 @@ const mutations = {
     }
 
     state.lastSync = new Date()
+    this.dispatch('syncedPlaylistsRefreshed', {}, {root: true})
     // console.log('ISISISISI', SharedStates.state.fileSystem.homeFolders)
     SAVE_TO_DISK()
   },
@@ -265,11 +266,10 @@ const mutations = {
       if (syncIndex >= 0) {
         let oldPl = [
           ...state.playlists[index].tracks.items,
-          ...state.playlists[index].tracks.added,
           ...state.playlists[index].tracks.removed
         ]
         // Compute track changes
-        // Using all tracks from old playlist (removed and added. Im comparing with latest version of pl so no problemo)
+        // Using just removed and items. Im not using added because they will pop up in the new data.
         let {items, removed, added} = playlistComputeChanges(oldPl, playlist.tracks.items)
         playlist.tracks = {
           ...playlist.tracks,
@@ -277,7 +277,7 @@ const mutations = {
           added,
           removed
         }
-        console.log('SON, ITS TIME NOW', playlist.tracks.added.map(p => p.name))
+        // console.log('SON, ITS TIME NOW', playlist.tracks.added.map(p => p.name))
         state.syncedPlaylists[syncIndex].snapshot_id = playlist.snapshot_id
       } else {
         // Playlist is not synced so I dont care about computing changes
@@ -290,7 +290,7 @@ const mutations = {
         this.dispatch('playlistUpdateCached', {id, snapshot_id})
       }
       state.playlists.splice(index, 1, playlist)
-      console.log('SON, ITS TIME NOW', state.playlists[index].tracks.added.map(p => p.name))
+      // console.log('SON, ITS TIME NOW', state.playlists[index].tracks.added.map(p => p.name))
 
       SAVE_TO_DISK()
     } else console.log('PLAYLIST NOT FOUND WHEN SETTING TRACKS INSIDE STATE (VUEX)')
@@ -543,9 +543,19 @@ const getters = {
   },
   // Gives spotify object
   SyncedPlaylistsSp: (state, getters) => {
+    console.log('LOGINLOGINLOGIN1111111111111111111111111')
     let all = []
+    let pls = [...state.playlists]
     for (let i = 0; i < state.syncedPlaylists.length; i++) {
-      all = [...all, getters.PlaylistById(state.syncedPlaylists[i].id)]
+      let syncPl = state.syncedPlaylists[i]
+      for (let o = 0; o < pls.length; o++) {
+        let pl = pls[o]
+        if (pl.id === syncPl.id) {
+          all = [...all, pl]
+          pls.splice(o, 1)
+          break
+        }
+      }
     }
     return all
   },

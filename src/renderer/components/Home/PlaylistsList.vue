@@ -63,10 +63,20 @@ export default {
       }
     },
     refreshSynced () {
-      this.syncedPlaylists = []
-      setTimeout(() => {
-        this.syncedPlaylists = this.$store.getters.SyncedPlaylistsSp
-      }, 100)
+      let all = []
+      let pls = [...this.$store.state.CurrentUser.playlists]
+      for (let i = 0; i < this.$store.state.CurrentUser.syncedPlaylists.length; i++) {
+        let syncPl = this.$store.state.CurrentUser.syncedPlaylists[i]
+        for (let o = 0; o < pls.length; o++) {
+          let pl = pls[o]
+          if (pl.id === syncPl.id) {
+            all = [...all, pl]
+            pls.splice(o, 1)
+            break
+          }
+        }
+      }
+      this.syncedPlaylists = all
     }
   },
   mounted () {

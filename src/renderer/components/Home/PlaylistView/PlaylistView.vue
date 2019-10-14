@@ -95,7 +95,7 @@ export default {
       return this.playlist.tracks.items
     },
     added () {
-      return this.playlist.tracks.added ? this.playlist.tracks.added : []
+      return this.playlist.tracks.added
     },
     removed () {
       return this.playlist.tracks.removed

@@ -86,7 +86,6 @@ export default {
       ipc.send('Youtube Convert')
     },
     refreshPlaylists () {
-      console.log('poncho')
       ipc.send('refreshPlaylists')
     },
     openYtVideo (id) {
