@@ -189,6 +189,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '../../../CSS/helpers.scss';
 /* TODO Media Query for List View */
 .whole-container {
   margin: 0.4em 0;
@@ -197,7 +198,9 @@ export default {
 }
 $track-height: 3.5em;
 .pl-track-container {
+  @extend .box-shadow;
   z-index: 1;
+  position: relative;
   display: flex;
   flex-direction: row;
   justify-content: space-between;

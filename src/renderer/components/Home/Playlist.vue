@@ -89,8 +89,10 @@ $q-true-color:rgb(103, 214, 0);
   width: 8rem;
   background: $q-false-color;
   margin: 0 1rem 1.4rem 1rem;
-  transition: transform .2s ease, background-color .2s ease, outline-width .1s ease;
+  $transition: .2s ease;
+  transition: transform $transition, background-color $transition, box-shadow $transition, outline-width .1s ease;
   color: #f0f0f0;
+  box-shadow: .1em .1em .3em 0 rgba(0, 0, 0, 0.4);
   z-index: 0;
   
   $bg: darken($q-true-color, 7);

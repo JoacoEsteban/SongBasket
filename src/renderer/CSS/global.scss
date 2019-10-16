@@ -39,6 +39,7 @@ body{
     margin: 0;
     user-select: none;
     overflow: hidden;
+    height: 100%;
 }
 body:hover{
     cursor: default;
@@ -51,6 +52,7 @@ body:hover{
     // height: 2em;
     /* width: 10em; */
     border: none;
+    box-shadow: .1em .1em .3em 0 rgba(0, 0, 0, 0.4);
     border-radius: 2em;
     color: var(--text-black);
     background: var(--text-white);
