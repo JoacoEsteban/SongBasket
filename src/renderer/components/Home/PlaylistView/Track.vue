@@ -23,7 +23,7 @@
               Override
             </span>
           </button>
-        <button v-if="conversion" class="button thin" @click="$emit('toggleConversion')">
+        <button v-if="conversion" class="button thin" @click="$emit('toggleConversion', !convertionIsOpened)">
           <span>
             {{convertionIsOpenedLocal ? 'Collapse' : 'Show'}} Conversion
           </span>

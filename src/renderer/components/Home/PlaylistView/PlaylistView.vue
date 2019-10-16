@@ -45,7 +45,7 @@
           :track="track"
           :conversion="giveMeConversion(track.id)"
           :convertionIsOpened="convertionIsOpened(track.id)"
-          @toggleConversion="toggleConversion(track.id)"
+          @toggleConversion="toggleConversion(track.id, $event)"
           @selectTrack="selectTrack(track.id, $event)"
           @openYtVideo="$emit('openYtVideo', $event)"
         />
@@ -121,19 +121,21 @@ export default {
         if (track.id === id) return track
       }
     },
-    toggleConversion (id) {
+    toggleConversion (id, intention) {
+      // Intention is what the toggle wants to do
+      // Prevents funky things from happening when the showingConversion array gets empty
       for (let i = 0; i < this.showingConversion.length; i++) {
         if (this.showingConversion[i] === id) {
           this.showingConversion.splice(i, 1)
           console.log('dou! tt')
-          if (this.showingConversion.length === 0 && this.showingAll) {
+          if (this.showingConversion.length === 0 && intention !== this.showingAll) {
             this.toggleShowingAll()
           }
           return
         }
       }
       this.showingConversion.push(id)
-      if (this.showingConversion.length === this.ammountOfTracksBeingShown) {
+      if (this.showingConversion.length === this.ammountOfTracksBeingShown && intention !== this.showingAll) {
         console.log('dou! ff')
         this.toggleShowingAll()
       }
