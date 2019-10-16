@@ -12,7 +12,7 @@
     </div>
 
     <div class="tb-mid-section">
-      Last Sync: {{now.date + ' @ ' + now.hours}}
+      {{status}}
       <router-link style="font-size: 1.5em;" to="/home" tag="span">
         <home-icon />
       </router-link>
@@ -82,6 +82,13 @@ export default {
       else date = thisDate.date.month + separator + thisDate.date.date + (!thisDate.date.sameYear ? (separator + thisDate.date.year) : '')
 
       return { date, hours }
+    },
+    loadingState () {
+      return this.$store.state.Events.GLOBAL_LOADING_STATE
+    },
+    status () {
+      if (!this.loadingState.value) return `Last Sync: ${this.now.date} @ ${this.now.hours}`
+      return this.loadingState.target
     }
   }
 }

@@ -254,6 +254,7 @@ ipc.on('guestSignIn', function (event, {mode, query}) {
     }
   }
   if (mode === 'playlist') {
+    // TODO make dis
     sbFetch.getTracks(store.getters.RequestParams, {id: query}, false)
       .then(response => {
         console.log('responseta', response)
