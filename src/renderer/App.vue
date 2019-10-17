@@ -5,7 +5,10 @@
 <script>
   
 export default {
-    name: 'songbasket'
+    name: 'SongBasket',
+    mounted () {
+      window.sbDebug = this
+    }
   }
 </script>
 

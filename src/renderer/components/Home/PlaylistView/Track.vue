@@ -17,13 +17,16 @@
           </div>
         </div>
       </div>
+      <div 
+      @dblclick="toggleConversion"
+      class="dbclick-hitbox" />
       <div class="pl-track-controls-container">
         <button class="button thin" @click="">
             <span>
               Override
             </span>
           </button>
-        <button v-if="conversion" class="button thin" @click="$emit('toggleConversion', !convertionIsOpened)">
+        <button v-if="conversion" class="button thin" @click="toggleConversion">
           <span>
             {{convertionIsOpenedLocal ? 'Collapse' : 'Show'}} Conversion
           </span>
@@ -151,10 +154,9 @@ export default {
     this.convertionIsOpenedLocal = this.convertionIsOpened
   },
   methods: {
-    shorten (text) {
-      let length = 50
-      if (text.length < length - 3) return text
-      return text.substring(0, length).trim() + '...'
+    toggleConversion () {
+      if (!this.conversion) return
+      this.$emit('toggleConversion', !this.convertionIsOpened)
     },
     isSelected (id) {
       return id === this.conversion.selected
@@ -218,9 +220,19 @@ $track-height: 3.5em;
 .pl-track-info-container {
   display: flex;
   flex-direction: row;
+  position: relative;
   align-items: center;
   width: 100%;
+  z-index: 0;
   
+}
+.dbclick-hitbox {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 1;
 }
 .pl-track-img-container {
   min-height: $track-height;
@@ -300,6 +312,8 @@ $track-height: 3.5em;
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  position: relative;
+  z-index: 2;
   // min-width: 15em;
   > .button {
     font-size: .65em;

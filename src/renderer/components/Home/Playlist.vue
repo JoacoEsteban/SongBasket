@@ -54,7 +54,7 @@ export default {
   },
   data () {
     return {
-      playlistName: this.$props.playlist.name.length > 20 ? this.$props.playlist.name.substring(0, 20) + '...' : this.$props.playlist.name
+      playlistName: this.$props.playlist.name
     }
   },
   computed: {
@@ -170,8 +170,12 @@ $q-true-color:rgb(103, 214, 0);
   font-family: "Poppins Semibold";
   padding: 0 .2rem;
   height: 1.5rem;
-  display: flex;
-  align-items: center;
+  display: block;
+  line-height: 1.5rem;
+  max-width: 100%;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 
 }
 .star-icons-container {

@@ -206,6 +206,7 @@ export default {
   position: relative;
   padding: .5em;
   min-height: 3em;
+  z-index: 1;
 }
 
 .changes-container {
@@ -244,6 +245,7 @@ export default {
 }
 .plv-rp-tracklist {
   /* height: 150%; */
+  z-index: 0;
   padding: 0 .5em;
   overflow-y: scroll;
 }
