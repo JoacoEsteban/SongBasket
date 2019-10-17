@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="whole-container">
     <div class="home-container">
       <top-bar
       @refreshPlaylists="refreshPlaylists"
@@ -15,12 +15,14 @@
 
       <user-data @logOut="logOut"></user-data>
     </div>
+    <modal />
   </div>
 </template>
 
 <script>
 import 'vuex'
 
+import Modal from '../Modal/Modal'
 import TopBar from './TopBar.vue'
 import PlaylistsList from './PlaylistsList.vue'
 import Playlist from './Playlist.vue'
@@ -31,6 +33,7 @@ const ipc = electron.ipcRenderer
 
 export default {
   components: {
+    Modal,
     TopBar,
     PlaylistsList,
     Playlist,
@@ -112,7 +115,12 @@ export default {
 </script>
 
 <style>
+.whole-container {
+  z-index: 0;
+}
 .home-container {
+  z-index: 0;
+  position: relative;
   display: flex;
   text-align: center;
   height: 100vh;
@@ -122,7 +130,7 @@ export default {
 }
 .home-router{
   height: 100%;
-  padding: 1rem 0;
+  padding: 1.5rem 0;
   box-sizing: border-box;
 }
 
