@@ -3,10 +3,10 @@
     :class="{'d-none': !transitioning && !showLocal}"
     class="modal-container">
         <div
-        :class="{'transitioning': transitioning, 'show': showLocal}"
+        :class="{'show': showLocal}"
         class="actual-modal">
             <div class="content box-shadow">
-                <unsync />
+                <loader @close="close" />
             </div>
         </div>
         <div
@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import Unsync from './Unsync'
+import Loader from './Loader'
 export default {
   data () {
     return {
@@ -27,7 +27,7 @@ export default {
     }
   },
   components: {
-    Unsync
+    Loader
   },
   methods: {
     close () {

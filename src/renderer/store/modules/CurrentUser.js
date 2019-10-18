@@ -104,6 +104,12 @@ const actions = {
       commit('CHANGE_YT_TRACK_SELECTION', {playlist, trackId, newId})
       resolve()
     })
+  },
+  unsyncPlaylist ({commit}, id) {
+    return new Promise((resolve, reject) => {
+      commit('UNSYNC_PLAYLIST', id)
+      resolve()
+    })
   }
 }
 
@@ -484,6 +490,28 @@ const mutations = {
     let track = playlistObj.tracks[index]
     track.selected = newId
     SAVE_TO_DISK()
+  },
+  UNSYNC_PLAYLIST (state, id) {
+    console.log('UNSYNCING ', id)
+    let index = findById(id, state.syncedPlaylists)
+    let success = true
+    if (index !== -1) {
+      state.syncedPlaylists.splice(index, 1)
+      index = findById(id, state.playlists)
+      if (index !== -1) {
+        let pl = state.playlists[index]
+        pl.tracks.items = []
+        pl.tracks.added = []
+        pl.tracks.removed = []
+        this.dispatch('syncedPlaylistsRefreshed', {}, {root: true})
+      } else {
+        success = false
+      }
+    } else {
+      success = false
+    }
+    if (!success) console.error('Playlist not found when unsyncing :: UNSYNC_PLAYLIST')
+    else SAVE_TO_DISK()
   }
 
 }

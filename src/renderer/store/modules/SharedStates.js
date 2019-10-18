@@ -14,7 +14,7 @@ function defaultModal () {
     show: false,
     options: {
       wich: null,
-      payload: null
+      payload: {}
     }
   }
 }
@@ -54,14 +54,13 @@ const mutations = {
   FOLDER_PATHS (state, paths) {
     state.fileSystem.homeFolders = paths
   },
-  OPEN_MODAL (state, options) {
-    state.modal = {
-      show: true,
-      options
-    }
+  OPEN_MODAL (state, {wich, payload}) {
+    state.modal.show = true
+    state.modal.options.wich = wich
+    state.modal.options.payload = payload
   },
   CLOSE_MODAL (state, options) {
-    state.modal = defaultModal()
+    state.modal.show = false
   }
 }
 

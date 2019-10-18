@@ -49,6 +49,7 @@ body:hover{
     font-family: 'Poppins semibold';
     font-size: 0.7em;
     padding: 1em 1.5em;
+    text-align: center;
     // height: 2em;
     /* width: 10em; */
     border: none;
@@ -82,7 +83,7 @@ body:hover{
     color: var(--text-white);
     font-family: 'Poppins medium';
 }
-.button.thin {
+.button.slim {
     padding: .2em 2em;
 }
 .button.disabled {

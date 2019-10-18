@@ -21,12 +21,12 @@
       @dblclick="toggleConversion"
       class="dbclick-hitbox" />
       <div class="pl-track-controls-container">
-        <button class="button thin" @click="">
+        <button class="button slim" @click="">
             <span>
               Override
             </span>
           </button>
-        <button v-if="conversion" class="button thin" @click="toggleConversion">
+        <button v-if="conversion" class="button slim" @click="toggleConversion">
           <span>
             {{convertionIsOpenedLocal ? 'Collapse' : 'Show'}} Conversion
           </span>
@@ -64,12 +64,12 @@
           <div class="controls">
             <div
             :class="{'disabled': isSelected(track.id)}"
-            @click="select(track.id)" class="button thin">
+            @click="select(track.id)" class="button slim">
               <span>
                 {{isSelected(track.id) ? 'Selected' : 'Select'}}
               </span>
             </div>
-            <div @click="$emit('openYtVideo', track.id)" class="button thin">
+            <div @click="$emit('openYtVideo', track.id)" class="button slim">
               <span>
                 Open
               </span>
@@ -417,7 +417,7 @@ $conversion-time: .5s;
   }
 }
 
-.thin {
+.slim {
   > span {
     font-size: .8em;
   }

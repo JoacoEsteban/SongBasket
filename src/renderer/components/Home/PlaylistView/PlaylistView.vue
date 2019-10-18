@@ -15,10 +15,10 @@
               class="button"
               @click="$emit('addPlaylistToSyncQueue', playlist.id)"
             >{{isQueued ? 'Unqueue' : 'Queue'}}</button>
-            <button v-if="isSynced" class="button" @click="">Unsync</button>
+            <button v-if="isSynced" class="button" @click="unsync">Unsync</button>
           </div>
 
-          <div v-if="isSynced" @click="toggleShowingAll" class="button thin">
+          <div v-if="isSynced" @click="toggleShowingAll" class="button slim">
             {{showingAll ? 'Collapse' : 'Show'}} all
           </div>
         </div>
@@ -154,6 +154,9 @@ export default {
     selectTrack (trackId, newId) {
       console.log('dou')
       this.$store.dispatch('changeYtTrackSelection', {playlist: this.playlist.id, trackId, newId})
+    },
+    unsync () {
+      this.$store.dispatch('openModal', {wich: 'unsync', payload: {id: this.playlist.id}})
     }
   }
 }
