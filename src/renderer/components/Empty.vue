@@ -1,7 +1,7 @@
 <template>
     <div class="empty-container">
-        <h1>It's quiet . . .</h1>
-        <h6>We couldn't find any Playlists associated with this User.</h6>
+        <div class="header">It's quiet . . .</div>
+        <div class="info">We couldn't find any Playlists associated with this User.</div>
         <router-link to="/" tag="button" class="button">Go Back</router-link>
     </div>
 </template>
@@ -12,8 +12,23 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
     .empty-container{
         text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        width: 100%;
+    }
+    .header {
+        font-size: 2em;
+        padding: .67em 0;
+        font-weight: bold;
+    }
+    .info {
+        font-size: .67em;
+        margin-bottom: 2em;
     }
 </style>

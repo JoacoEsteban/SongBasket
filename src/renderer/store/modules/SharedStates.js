@@ -5,7 +5,11 @@ const getDefaultState = () => {
     fileSystem: {
       homeFolders: []
     },
-    loadingState: null
+    loadingState: null,
+    modal: {
+      show: false,
+      wich: null
+    }
   }
 }
 

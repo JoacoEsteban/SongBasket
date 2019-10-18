@@ -15,14 +15,12 @@
 
       <user-data @logOut="logOut"></user-data>
     </div>
-    <modal />
   </div>
 </template>
 
 <script>
 import 'vuex'
 
-import Modal from '../Modal/Modal'
 import TopBar from './TopBar.vue'
 import PlaylistsList from './PlaylistsList.vue'
 import Playlist from './Playlist.vue'
@@ -33,7 +31,7 @@ const ipc = electron.ipcRenderer
 
 export default {
   components: {
-    Modal,
+
     TopBar,
     PlaylistsList,
     Playlist,

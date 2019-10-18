@@ -1,5 +1,5 @@
 <template>
-    <div class="modal-container">
+    <div v-if="false" class="modal-container">
         <div class="actual-modal">
             <div class="content">
                 Holi
