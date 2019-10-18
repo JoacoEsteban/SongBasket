@@ -26,8 +26,8 @@
         <div class="pl-img" :style="playlist.images.length > 0 ? {backgroundImage: `url(${playlist.images[0].url})`} : null">
           <div class="pl-button-container">
             <button class="button" @click="$emit('openPlaylist')">Explore</button>
-            <button v-if="!isSynced" class="button" @click="$emit('addPlaylistToSyncQueue')">{{isQueued ? 'Unqueue' : 'Queue'}}</button>
-            <button v-if="isSynced" class="button" @click="">Unsync</button>
+            <button v-if="!isSynced" class="button" @click="addPlaylistToSyncQueue">{{isQueued ? 'Unqueue' : 'Queue'}}</button>
+            <button v-if="isSynced" class="button" @click="unsync">Unsync</button>
           </div>
             <playlist-icon v-if="playlist.images.length === 0" />
         </div>
@@ -66,6 +66,14 @@ export default {
       else return false
     }
   },
+  methods: {
+    addPlaylistToSyncQueue () {
+      this.$store.dispatch('queuePlaylist', this.playlist.id)
+    },
+    unsync () {
+      this.$store.dispatch('openModal', {wich: 'unsync', payload: this.playlist.id})
+    }
+  },
   mounted () {
     ipc.on(`hola ${this.playlist.id}`, () => {
       console.log('Recibido Compa: ', this.playlist.name, this.playlist.id)
@@ -74,8 +82,6 @@ export default {
   components: {
     PlaylistIcon,
     StarIcon
-  },
-  methods: {
   }
 }
 </script>

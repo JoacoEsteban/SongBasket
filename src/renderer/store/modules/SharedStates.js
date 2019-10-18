@@ -6,13 +6,18 @@ const getDefaultState = () => {
       homeFolders: []
     },
     loadingState: null,
-    modal: {
-      show: false,
-      wich: null
+    modal: defaultModal()
+  }
+}
+function defaultModal () {
+  return {
+    show: false,
+    options: {
+      wich: null,
+      payload: null
     }
   }
 }
-
 const state = getDefaultState()
 
 const actions = {
@@ -24,6 +29,12 @@ const actions = {
   },
   folderPaths ({commit}, paths) {
     commit('FOLDER_PATHS', paths)
+  },
+  openModal ({commit}, options) {
+    commit('OPEN_MODAL', options)
+  },
+  closeModal ({commit}) {
+    commit('CLOSE_MODAL')
   }
 }
 
@@ -42,6 +53,15 @@ const mutations = {
   },
   FOLDER_PATHS (state, paths) {
     state.fileSystem.homeFolders = paths
+  },
+  OPEN_MODAL (state, options) {
+    state.modal = {
+      show: true,
+      options
+    }
+  },
+  CLOSE_MODAL (state, options) {
+    state.modal = defaultModal()
   }
 }
 
