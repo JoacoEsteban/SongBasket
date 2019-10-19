@@ -43,10 +43,8 @@
 <script>
 import 'vuex'
 
-import electron from 'electron'
 import PlaylistIcon from '../../assets/icons/playlist-icon'
 import StarIcon from '../Icons/star-icon'
-const ipc = electron.ipcRenderer
 
 export default {
   props: {
@@ -74,11 +72,6 @@ export default {
       console.log('dou')
       this.$store._actions.openModal[0]({wich: 'unsync', payload: {id: this.playlist.id}})
     }
-  },
-  mounted () {
-    ipc.on(`hola ${this.playlist.id}`, () => {
-      console.log('Recibido Compa: ', this.playlist.name, this.playlist.id)
-    })
   },
   components: {
     PlaylistIcon,

@@ -65,15 +65,16 @@ export default {
       showingConversion: [],
       showingAll: false,
       showingAdded: false,
-      showingRemoved: false
+      showingRemoved: false,
+      playlist: {}
     }
   },
   components: {
     Track
   },
   computed: {
-    playlist () {
-      return this.$store.getters.CurrentPlaylist
+    currentPlaylist () {
+      return this.$store.state.CurrentUser.currentPlaylist
     },
     conversion () {
       if (this.playlist) { return this.$store.getters.SyncedPlaylistById(this.playlist.id) } else return null
@@ -100,19 +101,35 @@ export default {
     removed () {
       return this.playlist.tracks.removed
     },
+    syncedPlaylistsRefreshed () {
+      return this.$store.state.Events.SYNCED_PLAYLISTS_REFRESHED
+    },
     playlistUnsynced () {
       return this.$store.state.Events.PLAYLIST_UNSYNCED
     }
   },
   watch: {
+    currentPlaylist () {
+      this.refreshPlaylist()
+    },
+    syncedPlaylistsRefreshed () {
+      this.refreshPlaylist()
+    },
     playlistUnsynced () {
       this.$router.push('/home')
     }
   },
   mounted () {
     console.log('PLAYLISTTTTT:::::', this.playlist)
+    this.refreshPlaylist()
+  },
+  destroyed () {
+    console.log('exitexit')
   },
   methods: {
+    refreshPlaylist () {
+      this.playlist = this.$store.getters.PlaylistById(this.currentPlaylist)
+    },
     youtubeId (id) {
       let c = this.conversion.tracks
       for (let i = 0; i < c.length; i++) {

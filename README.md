@@ -1,4 +1,4 @@
-# songbasket
+# SongBasket
 
 > Download your Spotify Playlists as MP3
 

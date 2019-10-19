@@ -17,6 +17,11 @@ function SAVE_TO_DISK () {
   }
 }
 
+function LOADING (store, value, target) {
+  if (!value) value = false
+  store.dispatch('globalLoadingState', {value, target}, {root: true})
+}
+
 const getDefaultState = () => {
   return {
     user: {}, // Includes name, number of playlists, image url
@@ -131,6 +136,8 @@ const mutations = {
     console.log('DATA STORED')
   },
   UPDATE_USER_ENTITIES (state, object) {
+    LOADING(this, true, 'Computing Changes')
+
     // TODO VERSION CONTROL SYNCED PLS FROM HERE AND KEEP REMOVED TRACKS INSIDE THE SYNCED PL OBJECT
     function isCachedOrSynced (id) {
       // If it's cached I want to compare the version with the currently stored one.
@@ -197,8 +204,8 @@ const mutations = {
     }
 
     state.lastSync = new Date()
+    LOADING(this)
     this.dispatch('syncedPlaylistsRefreshed', {}, {root: true})
-    // console.log('ISISISISI', SharedStates.state.fileSystem.homeFolders)
     SAVE_TO_DISK()
   },
 
@@ -263,8 +270,6 @@ const mutations = {
       return
     }
 
-    console.log('STORING ' + playlist.tracks.items.length + ' TRACKS FOR PLAYLIST WITH ID ' + playlist.id)
-
     let index = findById(playlist.id, state.playlists)
     // If there are changes with local version, overwrite
     if (index >= 0) {
@@ -296,6 +301,7 @@ const mutations = {
         let {id, snapshot_id} = playlist
         this.dispatch('playlistUpdateCached', {id, snapshot_id})
       }
+      console.log(playlist.tracks.added.length + ' TRACKS ARE NOT SYNCED FROM PLAYLIST ' + playlist.name)
       state.playlists.splice(index, 1, playlist)
       // console.log('SON, ITS TIME NOW', state.playlists[index].tracks.added.map(p => p.name))
 
@@ -569,24 +575,6 @@ const getters = {
     let all = []
     for (let i = 0; i < state.syncedPlaylists.length; i++) {
       all = [...all, getters.SyncedPlaylistById(state.syncedPlaylists[i].id)]
-    }
-    return all
-  },
-  // Gives spotify object
-  SyncedPlaylistsSp: (state, getters) => {
-    console.log('LOGINLOGINLOGIN1111111111111111111111111')
-    let all = []
-    let pls = [...state.playlists]
-    for (let i = 0; i < state.syncedPlaylists.length; i++) {
-      let syncPl = state.syncedPlaylists[i]
-      for (let o = 0; o < pls.length; o++) {
-        let pl = pls[o]
-        if (pl.id === syncPl.id) {
-          all = [...all, pl]
-          pls.splice(o, 1)
-          break
-        }
-      }
     }
     return all
   },

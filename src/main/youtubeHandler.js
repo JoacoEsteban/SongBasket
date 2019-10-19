@@ -1,8 +1,27 @@
 import store from '../renderer/store'
 import * as sbFetch from './sbFetch'
 
+// Gives spotify object
+let SyncedPlaylistsSp = () => {
+  let state = store.state.CurrentUser
+  let all = []
+  let pls = [...state.playlists]
+  for (let i = 0; i < state.syncedPlaylists.length; i++) {
+    let syncPl = state.syncedPlaylists[i]
+    for (let o = 0; o < pls.length; o++) {
+      let pl = pls[o]
+      if (pl.id === syncPl.id) {
+        all = [...all, pl]
+        pls.splice(o, 1)
+        break
+      }
+    }
+  }
+  return all
+}
+
 export function youtubizeAll () {
-  let syncedPlaylists = store.getters.SyncedPlaylistsSp.map(pl => {
+  let syncedPlaylists = SyncedPlaylistsSp().map(pl => {
     return {
       ...pl,
       synced: true

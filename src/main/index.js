@@ -29,7 +29,6 @@ if (process.env.NODE_ENV !== 'development') {
 let mainWindow
 let loginWindow
 const winURL = process.env.NODE_ENV === 'development' ? `http://localhost:9080` : `file://${__dirname}/index.html`
-console.log('A VER LOCO QUE ONDA', store)
 
 function createWindow () {
   mainWindow = new BrowserWindow({

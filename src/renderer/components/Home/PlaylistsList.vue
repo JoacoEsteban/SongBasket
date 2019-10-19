@@ -51,7 +51,6 @@ export default {
   },
   watch: {
     syncedPlaylistsRefreshed () {
-      console.log('duuuuud jejejejje')
       this.refreshSynced()
     }
   },
