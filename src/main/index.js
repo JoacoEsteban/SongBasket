@@ -1,6 +1,5 @@
 import FileSystemUser from './FileSystem/index'
 import { logme } from '../UTILS'
-
 import store from '../renderer/store'
 import * as sbFetch from './sbFetch'
 import * as youtubeHandler from './youtubeHandler'
@@ -30,6 +29,7 @@ if (process.env.NODE_ENV !== 'development') {
 let mainWindow
 let loginWindow
 const winURL = process.env.NODE_ENV === 'development' ? `http://localhost:9080` : `file://${__dirname}/index.html`
+console.log('A VER LOCO QUE ONDA', store)
 
 function createWindow () {
   mainWindow = new BrowserWindow({
@@ -110,7 +110,7 @@ function retrieveAndStoreState (path) {
 function verifyFileSystem () {
   return new Promise((resolve, reject) => {
     if (FOLDERS.folders.length > 0) {
-      console.log('FOLDER PATH Exists', FOLDERS)
+      console.log('FOLDER PATH Exddddists', FOLDERS)
 
       store.dispatch('folderPaths', FOLDERS.folders)
         .then(() => {

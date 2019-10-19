@@ -1,6 +1,17 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
+import LoadingScreen from '../components/LoadingScreen/LoadingScreen'
+import Setup from '../components/Setup/Setup'
+import SetHomeFolder from '../components/Setup/SetHomeFolder'
+import Login from '../components/Login'
+import Guest from '../components/Setup/Guest'
+import GuestVerify from '../components/Setup/GuestVerify'
+import Empty from '../components/Empty'
+import Home from '../components/Home/Home'
+import PlaylistsList from '../components/Home/PlaylistsList'
+import PlaylistView from '../components/Home/PlaylistView/PlaylistView'
+
 Vue.use(Router)
 
 export default new Router({
@@ -11,55 +22,54 @@ export default new Router({
     },
     {
       path: '/',
-      component: require('@/components/LoadingScreen/LoadingScreen').default
+      component: LoadingScreen
       // children: [{
       //   path: '',
       //   name: 'set-home-folder',
-      //   component: require('@/components/Setup/SetHomeFolder').default
     },
     {
       path: '/setup',
-      component: require('@/components/Setup/Setup').default,
+      component: Setup,
       children: [{
         path: '',
         name: 'set-home-folder',
-        component: require('@/components/Setup/SetHomeFolder').default
+        component: SetHomeFolder
       },
       {
         path: 'login',
         name: 'login',
-        component: require('@/components/Login').default
+        component: Login
       },
       {
         path: 'guest',
         name: 'guest',
-        component: require('@/components/Setup/Guest').default
+        component: Guest
       },
       {
         path: 'guest-verify',
         name: 'guest-verify',
-        component: require('@/components/Setup/GuestVerify').default
+        component: GuestVerify
       }
       ]
     },
     {
       path: '/empty',
       name: 'empty',
-      component: require('@/components/Empty').default
+      component: Empty
     },
     {
       path: '/home',
-      component: require('@/components/Home/Home').default,
+      component: Home,
       children: [
         {
           path: '',
           name: 'playlists-list',
-          component: require('@/components/Home/PlaylistsList').default
+          component: PlaylistsList
         },
         {
           path: 'playlist-view',
           name: 'playlist-view',
-          component: require('@/components/Home/PlaylistView/PlaylistView').default
+          component: PlaylistView
         }
       ]
     }

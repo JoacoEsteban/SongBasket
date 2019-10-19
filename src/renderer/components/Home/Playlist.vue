@@ -71,7 +71,8 @@ export default {
       this.$store.dispatch('queuePlaylist', this.playlist.id)
     },
     unsync () {
-      this.$store.dispatch('openModal', {wich: 'unsync', payload: {id: this.playlist.id}})
+      console.log('dou')
+      this.$store._actions.openModal[0]({wich: 'unsync', payload: {id: this.playlist.id}})
     }
   },
   mounted () {

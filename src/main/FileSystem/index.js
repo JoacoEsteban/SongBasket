@@ -51,7 +51,6 @@ let userMethods = {
     console.log('retrieving from ', path)
     return new Promise((resolve, reject) => {
       fs.access(path + stateFileName, (err) => {
-        console.log('KXKXKXKXKX', err)
         if (err) reject(err)
         else {
           fs.readFile(path + stateFileName, (err, data) => {

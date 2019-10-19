@@ -32,7 +32,7 @@ export default {
   methods: {
     close () {
       if (this.transitioning) return
-      this.$store.dispatch('closeModal')
+      this.$store._actions.closeModal[0]()
     }
   },
   computed: {

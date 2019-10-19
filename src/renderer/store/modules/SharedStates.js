@@ -31,6 +31,7 @@ const actions = {
     commit('FOLDER_PATHS', paths)
   },
   openModal ({commit}, options) {
+    console.log('didid')
     commit('OPEN_MODAL', options)
   },
   closeModal ({commit}) {
@@ -55,6 +56,7 @@ const mutations = {
     state.fileSystem.homeFolders = paths
   },
   OPEN_MODAL (state, {wich, payload}) {
+    console.log('didid')
     state.modal.show = true
     state.modal.options.wich = wich
     state.modal.options.payload = payload
