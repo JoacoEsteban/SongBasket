@@ -99,6 +99,14 @@ export default {
     },
     removed () {
       return this.playlist.tracks.removed
+    },
+    playlistUnsynced () {
+      return this.$store.state.Events.PLAYLIST_UNSYNCED
+    }
+  },
+  watch: {
+    playlistUnsynced () {
+      this.$router.push('/home')
     }
   },
   mounted () {

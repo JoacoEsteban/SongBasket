@@ -1,6 +1,5 @@
 /* eslint-disable camelcase */
 import Vue from 'vue'
-import router from '../../router'
 import FileSystem from '../../../main/FileSystem/index'
 import SharedStates from './SharedStates'
 
@@ -513,9 +512,7 @@ const mutations = {
     }
     if (success) {
       SAVE_TO_DISK()
-      if (router.app._route === 'playlist-view') {
-        router.push('/home')
-      }
+      this.dispatch('playlistUnsynced', {}, {root: true})
     } else console.error('Playlist not found when unsyncing :: UNSYNC_PLAYLIST')
   }
 
