@@ -107,6 +107,7 @@ const actions = {
     })
   },
   unsyncPlaylist ({commit}, id) {
+    console.log('dodifajdfjklasdjf')
     return new Promise((resolve, reject) => {
       commit('UNSYNC_PLAYLIST', id)
       resolve()
