@@ -84,7 +84,7 @@ export default {
             .inputFormat('mp4')
             .on('end', () => {
               // TODO Emit convertion starting
-              // TODO Delete MP4
+              fs.unlink(pathmp4)
               console.log('Finished processing')
               applyTags(pathmp3, track, ytSelection)
             })
