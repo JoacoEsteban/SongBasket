@@ -5743,7 +5743,7 @@ iconv-lite@0.4.15:
   resolved "https://registry.yarnpkg.com/iconv-lite/-/iconv-lite-0.4.15.tgz#fe265a218ac6a57cfe854927e9d04c19825eddeb"
   integrity sha1-/iZaIYrGpXz+hUkn6dBMGYJe3es=
 
-iconv-lite@0.4.24, iconv-lite@^0.4.17, iconv-lite@^0.4.24, iconv-lite@^0.4.4, iconv-lite@~0.4.13:
+iconv-lite@0.4.24, iconv-lite@^0.4.15, iconv-lite@^0.4.17, iconv-lite@^0.4.24, iconv-lite@^0.4.4, iconv-lite@~0.4.13:
   version "0.4.24"
   resolved "https://registry.yarnpkg.com/iconv-lite/-/iconv-lite-0.4.24.tgz#2022b4b25fbddc21d2f524974a474aafe733908b"
   integrity sha512-v3MXnZAcvnywkTUEZomIActle7RXXeedOR31wwl7VlyoXO4Qi9arvSenNQWne1TcRwhCL1HwLI21bEqdpj8/rA==
@@ -7662,6 +7662,13 @@ node-gyp@^3.8.0:
     semver "~5.3.0"
     tar "^2.0.0"
     which "1"
+
+node-id3@^0.1.11:
+  version "0.1.11"
+  resolved "https://registry.yarnpkg.com/node-id3/-/node-id3-0.1.11.tgz#ca9b97f0c54e40fb2346e529b4ac4c15a0cf162a"
+  integrity sha512-lNBa5k0oxLyWaRBsMABJcctDHoK7T2qGg44c3KbAZiH/7IHx7a2Uo4f2RFBqeC0XvD1dIQrJjjtb49iE0MQ8dA==
+  dependencies:
+    iconv-lite "^0.4.15"
 
 node-libs-browser@^2.2.1:
   version "2.2.1"

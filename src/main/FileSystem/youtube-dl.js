@@ -1,7 +1,10 @@
 import store from '../../renderer/store'
 import customGetters from '../../renderer/store/customGetters'
 
+let NodeID3 = require('node-id3')
+let axios = require('axios')
 let fs = require('fs')
+
 let youtubedl = require('youtube-dl')
 let ffbinaries = require('ffbinaries')
 let ffmpeg = require('fluent-ffmpeg')
@@ -13,8 +16,6 @@ ffbinaries.downloadBinaries(['ffmpeg', 'ffprobe'], {destination: binPath}, funct
   ffmpeg.setFfmpegPath(binPath + '/ffmpeg')
   ffmpeg.setFfprobePath(binPath + '/ffprobe')
 })
-
-// ffmpeg.setFfmpegPath("./bin/ffmpeg/bin")
 
 export default {
   downloadSyncedPlaylists (playlists) {
@@ -70,22 +71,85 @@ export default {
             console.log('track completed')
             store.dispatch('downloadChunk', {id, finished: true})
             downloadLoop(playlistIndex, trackIndex + 1)
-            convertMp3(fullPathmp3, fullPathmp4)
+            convertMp3(fullPathmp3, fullPathmp4, spTrack, ytTrack.selected)
           })
         }
       }
     }
 
-    function convertMp3 (pathmp3, pathmp4) {
+    function convertMp3 (pathmp3, pathmp4, track, ytSelection) {
       return new Promise(() => {
         let command =
           ffmpeg(pathmp4)
             .inputFormat('mp4')
             .on('end', () => {
+              // TODO Emit convertion starting
+              // TODO Delete MP4
               console.log('Finished processing')
+              applyTags(pathmp3, track, ytSelection)
             })
 
         command.save(pathmp3)
+      })
+    }
+
+    function applyTags (pathmp3, track, ytSelection) {
+      // TODO Emit applying tags
+      console.log('applying tags')
+      getPhoto(track.album.images[0].url)
+        .then(buffer => {
+          let tags = {
+            title: track.name,
+            artist: track.artists[0].name,
+            album: track.album.name,
+            userDefinedText: [{
+              description: 'songbasket_spotify_id',
+              value: track.id
+            }, {
+              description: 'songbasket_youtube_id',
+              value: ytSelection
+            }],
+            image: {
+              mime: 'png/jpeg' / undefined,
+              type: {
+                id: 3,
+                name: 'front cover'
+              },
+              imageBuffer: buffer
+            }
+          }
+
+          // TODO Emit Track Finished
+          let tagSuccess = NodeID3.write(tags, pathmp3)
+          if (!tagSuccess) {
+            // TODO Handle error
+          } else {
+
+          }
+        })
+    }
+
+    function getPhoto (url) {
+      console.log('getting picture')
+      return new Promise((resolve, reject) => {
+        axios({
+          url,
+          method: 'GET',
+          responseType: 'stream'
+        }).then(resp => {
+          // console.log('rep', resp)
+          let buffer = Buffer.alloc(0)
+          resp.data
+            .on('data', (chunk) => {
+              buffer = Buffer.concat([buffer, chunk])
+            // console.log('bu00000', buffer)
+            })
+            .on('end', () => {
+              console.log('photo retrieved')
+              resolve(buffer)
+            })
+        })
+          .catch((err) => reject(err))
       })
     }
   }
