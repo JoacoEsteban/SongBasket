@@ -1,10 +1,13 @@
 import FileSystemUser from './FileSystem/index'
+import youtubeDl from './FileSystem/youtube-dl'
 import { logme } from '../UTILS'
 import store from '../renderer/store'
 import * as sbFetch from './sbFetch'
 import * as youtubeHandler from './youtubeHandler'
 import electron from 'electron'
+import dotenv from 'dotenv'
 // import { sync } from 'C:/Users/joaco/AppData/Local/Microsoft/TypeScript/3.6/node_modules/@types/glob'
+dotenv.config()
 var open = require('open')
 
 const dialog = electron.dialog
@@ -59,7 +62,6 @@ function createLoginWindow () {
     loginWindow.loadURL(`${Backend}/init`, { 'extraHeaders': 'pragma: no-cache\n' })
 
     loginWindow.on('closed', function () { loginWindow = null })
-
     // Then, Backend retrieves user data and sends it back with a unique SBID
     session.defaultSession.webRequest.onHeadersReceived(filter, (details, callbackFunc) => {
       if (details.responseHeaders.SBID !== undefined) {
@@ -109,12 +111,11 @@ function retrieveAndStoreState (path) {
 function verifyFileSystem () {
   return new Promise((resolve, reject) => {
     if (FOLDERS.folders.length > 0) {
-      console.log('FOLDER PATH Exddddists', FOLDERS)
-
       store.dispatch('folderPaths', FOLDERS.folders)
         .then(() => {
           let comodin = true
           if (FOLDERS.folders.length === 1 || comodin) {
+            store.dispatch('setHomeFolder', FOLDERS.folders[0].path)
             retrieveAndStoreState(FOLDERS.folders[0].path)
               .then(() => {
                 mainWindow.webContents.send('dataStored')
@@ -210,8 +211,17 @@ function fetchMultiple (playlists, checkVersion) {
     }
   })
 }
-
+console.log('Home folder: ', process.env.HOME_FOLDER)
 // :::::::::::::::::::::::::::::::::IPC:::::::::::::::::::::::::::::::::
+ipc.on('download', function (event, id) {
+  // console.log('openYtVideo', id)
+  FileSystemUser.checkDownloadPaths()
+    .then(playlists => {
+      console.log('tryin')
+      youtubeDl.downloadSyncedPlaylists(playlists)
+    })
+})
+
 ipc.on('openYtVideo', function (event, id) {
   // console.log('openYtVideo', id)
   open('https://www.youtube.com/watch?v=' + id)

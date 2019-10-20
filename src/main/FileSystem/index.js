@@ -1,3 +1,4 @@
+import customGetters from '../../renderer/store/customGetters'
 const electron = require('electron')
 var fs = require('fs')
 const userDataPath = (electron.app || electron.remote.app).getPath('userData') + '/'
@@ -60,7 +61,42 @@ let userMethods = {
         }
       })
     })
+  },
+  checkDownloadPaths () {
+    return new Promise((resolve, reject) => {
+      let syncedPlaylists = customGetters.SyncedPlaylistsSp()
+      let playlists = []
+      for (let i = 0; i < syncedPlaylists.length; i++) {
+        let pl = syncedPlaylists[i]
+        playlists = [...playlists, { id: pl.id, path: process.env.HOME_FOLDER + '/' + pl.name, tracks: [] }]
+      }
+      console.log('playlists', playlists)
+
+      for (let i = 0; i < playlists.length; i++) {
+        let pl = playlists[i]
+        let path = pl.path
+        checkPathThenCreate(path)
+        fs.readdir(path, function (err, filenames) {
+          if (err) {
+            console.error('error reading path', path)
+            reject(err)
+            return
+          }
+          filenames = filenames.filter(n => n.substr(n.length - 3) === 'mp3')
+          // filenames = filenames.map(n => n.substr(0, n.length - 4))
+          console.log('path: ', path, filenames)
+
+          // TODO Implement Spotify ID Tag into MP3 file and verify existing songs
+          pl.tracks = []
+        })
+      }
+      resolve(playlists)
+    })
   }
+}
+
+function checkPathThenCreate (path) {
+  if (!fs.existsSync(path)) fs.mkdirSync(path)
 }
 
 export default userMethods

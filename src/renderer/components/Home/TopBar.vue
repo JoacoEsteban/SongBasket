@@ -31,7 +31,9 @@
           <cloud-search-icon></cloud-search-icon>
         </div>
 
-        <div class="tb-button download-icon">
+        <div
+        @click="$emit('download')"
+        class="tb-button download-icon">
           <download-icon></download-icon>
         </div>
       </div>

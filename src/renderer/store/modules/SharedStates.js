@@ -6,7 +6,8 @@ const getDefaultState = () => {
       homeFolders: []
     },
     loadingState: null,
-    modal: defaultModal()
+    modal: defaultModal(),
+    downloadPool: []
   }
 }
 function defaultModal () {
@@ -36,6 +37,11 @@ const actions = {
   },
   closeModal ({commit}) {
     commit('CLOSE_MODAL')
+  },
+  initializeDownloadPool ({commit}) {
+  },
+  downloadChunk ({commit}, {id, current, size}) {
+    commit('DOWNLOAD_CHUNK', {id, current, size})
   }
 }
 
@@ -47,6 +53,8 @@ const mutations = {
       let path = state.fileSystem.homeFolders[i]
       path.current = false
     }
+    process.env.HOME_FOLDER = path
+    console.log('HOME FOLDER SET', process.env.HOME_FOLDER)
     state.fileSystem.homeFolders = [...state.fileSystem.homeFolders, {path, current: true}]
   },
   SET_LOADING_STATE (state, loadingState) {
@@ -63,6 +71,9 @@ const mutations = {
   },
   CLOSE_MODAL (state, options) {
     state.modal.show = false
+  },
+  DOWNLOAD_CHUNK (state, {id, current, size}) {
+
   }
 }
 

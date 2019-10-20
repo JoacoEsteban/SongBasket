@@ -4,6 +4,7 @@
       <top-bar
       @refreshPlaylists="refreshPlaylists"
       @youtubeConvert="youtubeConvert"
+      @download="download"
       />
       
       <router-view
@@ -92,8 +93,10 @@ export default {
     openYtVideo (id) {
       console.log('openYtVideo', id)
       ipc.send('openYtVideo', id)
+    },
+    download () {
+      ipc.send('download')
     }
-
   },
 
   mounted () {
