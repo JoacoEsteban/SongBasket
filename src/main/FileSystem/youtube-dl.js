@@ -6,11 +6,12 @@ let youtubedl = require('youtube-dl')
 let ffbinaries = require('ffbinaries')
 let ffmpeg = require('fluent-ffmpeg')
 
-ffbinaries.downloadBinaries(['ffmpeg', 'ffprobe'], {destination: process.cwd() + '/bin/ffmpeg'}, function () {
+let binPath = process.cwd() + '/bin/ffmpeg'
+ffbinaries.downloadBinaries(['ffmpeg', 'ffprobe'], {destination: binPath}, function () {
   console.log('Downloaded all binaries for current platform.')
 
-  ffmpeg.setFfmpegPath('/Users/joaco/Repos/ELECTRON/SongBasket/bin/ffmpeg/ffmpeg')
-  ffmpeg.setFfprobePath('/Users/joaco/Repos/ELECTRON/SongBasket/bin/ffmpeg/ffprobe')
+  ffmpeg.setFfmpegPath(binPath + '/ffmpeg')
+  ffmpeg.setFfprobePath(binPath + '/ffprobe')
 })
 
 // ffmpeg.setFfmpegPath("./bin/ffmpeg/bin")
@@ -77,21 +78,14 @@ export default {
 
     function convertMp3 (pathmp3, pathmp4) {
       return new Promise(() => {
-        try {
-          console.log('converting to mp3')
-          ffmpeg(pathmp4, function (err, video) {
-            if (!err) {
-              console.log('The video is ready to be processed')
+        let command =
+          ffmpeg(pathmp4)
+            .inputFormat('mp4')
+            .on('end', () => {
+              console.log('Finished processing')
+            })
 
-              video.fnExtractSoundToMP3(pathmp3, (err, files) => console.log(err, files))
-            } else {
-              console.log('Error: ' + err)
-            }
-          })
-        } catch (e) {
-          console.log(e.code)
-          console.log(e.msg)
-        }
+        command.save(pathmp3)
       })
     }
   }
