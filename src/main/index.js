@@ -217,7 +217,6 @@ ipc.on('download', function (event, id) {
   // console.log('openYtVideo', id)
   FileSystemUser.checkDownloadPaths()
     .then(playlists => {
-      console.log('tryin')
       youtubeDl.downloadSyncedPlaylists(playlists)
     })
 })

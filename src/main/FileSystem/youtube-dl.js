@@ -19,7 +19,7 @@ ffbinaries.downloadBinaries(['ffmpeg', 'ffprobe'], {destination: binPath}, funct
 
 export default {
   downloadSyncedPlaylists (playlists) {
-    console.log('STARTING DOWNLOAD')
+    console.log('STARTING DOWNLOAD', playlists)
     let ytPlaylists = store.state.CurrentUser.syncedPlaylists
     let spPlaylists = customGetters.SyncedPlaylistsSp()
     // TODO Filter already downloaded tracks

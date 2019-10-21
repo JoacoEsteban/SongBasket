@@ -1,6 +1,7 @@
 import customGetters from '../../renderer/store/customGetters'
 const electron = require('electron')
 var fs = require('fs')
+let NodeID3 = require('node-id3')
 const userDataPath = (electron.app || electron.remote.app).getPath('userData') + '/'
 const foldersJsonPath = userDataPath + '.songbasket-folders'
 const stateFileName = '/.songbasket'
@@ -68,35 +69,68 @@ let userMethods = {
       let playlists = []
       for (let i = 0; i < syncedPlaylists.length; i++) {
         let pl = syncedPlaylists[i]
-        playlists = [...playlists, { id: pl.id, path: process.env.HOME_FOLDER + '/' + pl.name, tracks: [] }]
+        playlists = [...playlists, { id: pl.id, path: process.env.HOME_FOLDER + '/' + pl.name, tracks: [], name: pl.name }]
       }
       console.log('playlists', playlists)
 
+      let processedPls = 0
       for (let i = 0; i < playlists.length; i++) {
         let pl = playlists[i]
         let path = pl.path
-        checkPathThenCreate(path)
-        fs.readdir(path, function (err, filenames) {
-          if (err) {
-            console.error('error reading path', path)
-            reject(err)
-            return
-          }
-          filenames = filenames.filter(n => n.substr(n.length - 3) === 'mp3')
-          // filenames = filenames.map(n => n.substr(0, n.length - 4))
-          console.log('path: ', path, filenames)
+        if (checkPathThenCreate(path)) {
+          // Get all files from playlist dir
+          fs.readdir(path, function (err, filenames) {
+            if (err) {
+              console.error('error reading path', path)
+              reject(err)
+              return
+            }
+            // filter to just MP3 files
+            // TODO Support FLAC, etc
+            filenames = filenames.filter(n => n.substr(n.length - 3) === 'mp3')
+            let processedTracks = 0
+            // cycle throug tracks and store SB ones
+            for (let o = 0; o < filenames.length; o++) {
+              let file = pl.path + '/' + filenames[o]
+              NodeID3.read(file, function (err, tags) {
+                if (err) console.error(err) // TODO Handle error
+                tags = tags.userDefinedText
+                if (tags) {
+                  let track = {}
+                  let found = false
+                  for (let u = 0; u < tags.length; u++) {
+                    let tag = tags[u]
+                    let expression = /(songbasket|SONGBASKET)_(youtube|spotify)_(id|ID)/
+                    if (expression.test(tag.description)) {
+                      found = true
+                      track[tag.description] = tag.value
+                    }
+                  }
 
-          // TODO Implement Spotify ID Tag into MP3 file and verify existing songs
-          pl.tracks = []
-        })
+                  if (found) pl.tracks.push(track)
+                }
+
+                processedTracks++
+                if (processedTracks === filenames.length) {
+                  processedPls++
+                  if (processedPls === playlists.length) resolve(playlists)
+                }
+              })
+            }
+          })
+        } else {
+          processedPls++
+          if (processedPls === playlists.length) resolve(playlists)
+        }
       }
-      resolve(playlists)
     })
   }
 }
 
 function checkPathThenCreate (path) {
-  if (!fs.existsSync(path)) fs.mkdirSync(path)
+  let pathExists = fs.existsSync(path)
+  if (!pathExists) fs.mkdirSync(path)
+  return pathExists
 }
 
 export default userMethods
