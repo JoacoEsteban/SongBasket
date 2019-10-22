@@ -103,7 +103,8 @@ let userMethods = {
                     let expression = /(songbasket|SONGBASKET)_(youtube|spotify)_(id|ID)/
                     if (expression.test(tag.description)) {
                       found = true
-                      track[tag.description] = tag.value
+                      track[tag.description.toLowerCase()] = tag.value
+                      track.path = file
                     }
                   }
 

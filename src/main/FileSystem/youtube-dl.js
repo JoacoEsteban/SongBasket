@@ -18,27 +18,67 @@ ffbinaries.downloadBinaries(['ffmpeg', 'ffprobe'], {destination: binPath}, funct
 })
 
 export default {
-  downloadSyncedPlaylists (playlists) {
-    console.log('STARTING DOWNLOAD', playlists)
+  downloadSyncedPlaylists (dlPlaylists) {
+    function skipTrack (selection, downloadedTrack) {
+      if (selection !== downloadedTrack.songbasket_youtube_id) {
+        fs.unlinkSync(downloadedTrack.path)
+        return false
+      }
+      return true
+    }
+
+    console.log('STARTING DOWNLOAD', dlPlaylists)
     let ytPlaylists = store.state.CurrentUser.syncedPlaylists
     let spPlaylists = customGetters.SyncedPlaylistsSp()
     // TODO Filter already downloaded tracks
 
-    downloadLoop(0, 0)
+    downloadLoop({playlistIndex: 0, ytPlaylistIndex: null, dlPlaylistIndex: null, trackIndex: 0})
 
-    function downloadLoop (playlistIndex, trackIndex) {
+    function downloadLoop ({playlistIndex, ytPlaylistIndex, dlPlaylistIndex, trackIndex}) {
       if (playlistIndex < spPlaylists.length) {
-        let sp = spPlaylists[playlistIndex]
-        if (trackIndex >= sp.tracks.items.length) downloadLoop(playlistIndex + 1, 0)
-        else {
-          // TODO turn find into for => splice
-          let yt = ytPlaylists.find(yt => yt.id === sp.id)
+        let spPlaylist = spPlaylists[playlistIndex]
+        if (trackIndex >= spPlaylist.tracks.items.length) {
+          // Playlist finished
+          downloadLoop({playlistIndex: playlistIndex + 1, ytPlaylistIndex: null, dlPlaylistIndex: null, trackIndex: 0})
+          // TODO splice ytPlaylists & dlPlaylists obj
+        } else {
+          // These runs the first time per playlist
+          // They define where playlists objects are located, defined by
+          if (ytPlaylistIndex === null) {
+            for (let i = 0; i < ytPlaylists.length; i++) {
+              if (ytPlaylists[i].id === spPlaylist.id) {
+                ytPlaylistIndex = i
+                break
+              }
+            }
+          }
+          let ytPlaylist = ytPlaylists[ytPlaylistIndex]
 
-          let spTrack = sp.tracks.items[trackIndex]
-          let ytTrack = yt.tracks.find(track => track.id === spTrack.id)
+          if (dlPlaylistIndex === null) {
+            for (let i = 0; i < dlPlaylists.length; i++) {
+              if (dlPlaylists[i].id === spPlaylist.id) {
+                dlPlaylistIndex = i
+                break
+              }
+            }
+          }
+          let dlPlaylist = dlPlaylists[dlPlaylistIndex]
+
+          let spTrack = spPlaylist.tracks.items[trackIndex]
+          let ytTrack = ytPlaylist.tracks.find(track => track.id === spTrack.id)
+          let dlTrack = dlPlaylist.tracks.find(track => track.songbasket_spotify_id === spTrack.id)
+
+          // Condition to skip a download
+          // To be skippable Downloaded track must be in disk and YT Selection must be the same
+          // If YT Selection differs, skipTrack removes file from disk
+          if (dlTrack !== undefined && skipTrack(ytTrack.selected, dlTrack)) {
+            console.log('SKIPPING', spTrack.name)
+            return downloadLoop({playlistIndex, ytPlaylistIndex, dlPlaylistIndex, trackIndex: trackIndex + 1})
+          }
 
           let {name, id} = spTrack
-          let fullPath = process.env.HOME_FOLDER + '/' + sp.name
+          // declaring write paths
+          let fullPath = process.env.HOME_FOLDER + '/' + spPlaylist.name
           let fullPathmp4 = fullPath + '/' + name + '.mp4'
           let fullPathmp3 = fullPath + '/' + name + '.mp3'
 
@@ -70,7 +110,7 @@ export default {
           video.on('end', () => {
             console.log('track completed')
             store.dispatch('downloadChunk', {id, finished: true})
-            downloadLoop(playlistIndex, trackIndex + 1)
+            downloadLoop({playlistIndex, ytPlaylistIndex, dlPlaylistIndex, trackIndex: trackIndex + 1})
             convertMp3(fullPathmp3, fullPathmp4, spTrack, ytTrack.selected)
           })
         }
