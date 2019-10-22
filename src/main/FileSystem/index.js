@@ -135,6 +135,12 @@ let userMethods = {
       console.log('Playlist ' + playlistName + ' Deleted')
       callback()
     })
+  },
+  renameFolder ({oldName, newName}) {
+    console.log('RENAMING FOLDER: ' + oldName + ' => ' + newName)
+    let base = homeFolderPath() + '/'
+    if (!fs.existsSync(base + oldName)) return
+    fs.rename(base + oldName, base + newName)
   }
 }
 

@@ -176,8 +176,9 @@ const mutations = {
           continue
         }
         if (cachedOrSynced.s) {
-          // console.log('IS SYNCED::')
-          object.playlists.items.splice(i, 1, state.playlists[findById(currentPlaylist.id, state.playlists)])
+          // If playlist is synced, it will have already been processed, so im just replacing it
+          let index = findById(currentPlaylist.id, state.playlists)
+          object.playlists.items.splice(i, 1, state.playlists[index])
           continue
         }
       }
@@ -237,8 +238,6 @@ const mutations = {
       let removed = [ ...oldPl ]
       let items = [] // Tracks that are preserved between versions
 
-      console.log('CHECK ME OUT:::', added, removed)
-
       if (removed.length > 0) { // This checks if the synced playlist has not been added to DB yet, if so, then every song will be 'new'
         let i = 0
         while (i < added.length) {
@@ -272,6 +271,14 @@ const mutations = {
     let index = findById(playlist.id, state.playlists)
     // If there are changes with local version, overwrite
     if (index >= 0) {
+      let oldName = state.playlists[index].name
+      let newName = playlist.name
+      console.log('NAMES', oldName, newName)
+      if (newName !== oldName) {
+        console.log('DIFFERENT')
+        FileSystem.renameFolder({oldName, newName}) // Rename Folder
+      }
+
       // If playlist is synced, then I will compute differences with previous local version
       let syncIndex = findById(playlist.id, state.syncedPlaylists)
       if (syncIndex >= 0) {
@@ -303,6 +310,7 @@ const mutations = {
       console.log(playlist.tracks.added.length + ' TRACKS ARE NOT SYNCED FROM PLAYLIST ' + playlist.name)
       state.playlists.splice(index, 1, playlist)
       // console.log('SON, ITS TIME NOW', state.playlists[index].tracks.added.map(p => p.name))
+      this.dispatch('syncedPlaylistsRefreshed', {}, {root: true})
 
       SAVE_TO_DISK()
     } else console.log('PLAYLIST NOT FOUND WHEN SETTING TRACKS INSIDE STATE (VUEX)')
