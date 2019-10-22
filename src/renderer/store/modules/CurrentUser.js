@@ -111,7 +111,6 @@ const actions = {
     })
   },
   unsyncPlaylist ({commit}, id) {
-    console.log('dodifajdfjklasdjf')
     return new Promise((resolve, reject) => {
       commit('UNSYNC_PLAYLIST', id)
       resolve()
@@ -501,25 +500,26 @@ const mutations = {
   UNSYNC_PLAYLIST (state, id) {
     console.log('UNSYNCING ', id)
     let index = findById(id, state.syncedPlaylists)
-    let success = true
+    let success = false
     if (index !== -1) {
       state.syncedPlaylists.splice(index, 1)
       index = findById(id, state.playlists)
       if (index !== -1) {
-        let pl = state.playlists[index]
-        pl.tracks.items = []
-        pl.tracks.added = []
-        pl.tracks.removed = []
-        this.dispatch('syncedPlaylistsRefreshed', {}, {root: true})
-      } else {
-        success = false
+        success = true
+        state.playlists[index].tracks = {
+          ...state.playlists[index].tracks,
+          items: [],
+          added: [],
+          removed: []
+        }
       }
-    } else {
-      success = false
     }
     if (success) {
-      SAVE_TO_DISK()
-      this.dispatch('playlistUnsynced', {}, {root: true})
+      FileSystem.deletePlaylist(state.playlists[index].name, () => {
+        this.dispatch('syncedPlaylistsRefreshed', {}, {root: true})
+        this.dispatch('playlistUnsynced', {}, {root: true})
+        SAVE_TO_DISK()
+      })
     } else console.error('Playlist not found when unsyncing :: UNSYNC_PLAYLIST')
   }
 

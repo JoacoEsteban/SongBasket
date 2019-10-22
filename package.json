@@ -64,6 +64,7 @@
     "fluent-ffmpeg": "^2.1.2",
     "node-id3": "^0.1.11",
     "open": "^6.4.0",
+    "rimraf": "^3.0.0",
     "vue": "^2.5.16",
     "vue-electron": "^1.0.6",
     "vue-router": "^3.0.1",

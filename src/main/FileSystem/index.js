@@ -1,10 +1,14 @@
 import customGetters from '../../renderer/store/customGetters'
 const electron = require('electron')
 var fs = require('fs')
+var rimraf = require('rimraf')
 let NodeID3 = require('node-id3')
+
 const userDataPath = (electron.app || electron.remote.app).getPath('userData') + '/'
 const foldersJsonPath = userDataPath + '.songbasket-folders'
 const stateFileName = '/.songbasket'
+
+let homeFolderPath = () => process.env.HOME_FOLDER
 
 let userMethods = {
   checkForUser: function () {
@@ -69,7 +73,7 @@ let userMethods = {
       let playlists = []
       for (let i = 0; i < syncedPlaylists.length; i++) {
         let pl = syncedPlaylists[i]
-        playlists = [...playlists, { id: pl.id, path: process.env.HOME_FOLDER + '/' + pl.name, tracks: [], name: pl.name }]
+        playlists = [...playlists, { id: pl.id, path: homeFolderPath() + '/' + pl.name, tracks: [], name: pl.name }]
       }
       console.log('playlists', playlists)
 
@@ -124,6 +128,12 @@ let userMethods = {
           if (processedPls === playlists.length) resolve(playlists)
         }
       }
+    })
+  },
+  deletePlaylist (playlistName, callback) {
+    rimraf(homeFolderPath() + '/' + playlistName, function () {
+      console.log('Playlist ' + playlistName + ' Deleted')
+      callback()
     })
   }
 }
