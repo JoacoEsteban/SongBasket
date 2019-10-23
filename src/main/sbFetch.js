@@ -63,21 +63,35 @@ export function getTracks ({userId, logged, SBID, control}, {id, snapshot_id}, c
   })
 }
 
-export function youtubizeAll (playlists) {
-  playlists = JSON.stringify(playlists)
-  console.log('Trackies', playlists)
+export function youtubizeAll (tracks) {
   return new Promise((resolve, reject) => {
+    let succeded = []
+    let failed = []
     LOADING(true, 'Converting')
-    axios.post(`${Backend}/youtubize`, {
-      playlists
-    })
-      .then(res => {
-        LOADING()
-        resolve(res.data)
+    for (let i = 0; i < tracks.length; i++) {
+      let track = JSON.stringify(tracks[i])
+      console.log('getting trackie::', track)
+      axios.post(`${Backend}/youtubize`, {
+        track
       })
-      .catch(err => {
-        LOADING()
-        reject(err)
-      })
+        .then(res => {
+          succeded.push(res.data)
+          // TODO Emit success event
+          areAllFinished(succeded, failed, resolve)
+        })
+        .catch(err => {
+          console.log('Error', err)
+          failed.push(track)
+          // TODO Emit fail event
+          areAllFinished(succeded, failed, resolve)
+        })
+    }
   })
+
+  function areAllFinished (succeded, failed, resolve) {
+    if (succeded.length + failed.length === tracks.length) {
+      LOADING()
+      resolve(succeded, failed)
+    }
+  }
 }
