@@ -2,6 +2,7 @@ import FileSystemUser from './FileSystem/index'
 import youtubeDl from './FileSystem/youtube-dl'
 import { logme } from '../UTILS'
 import store from '../renderer/store'
+import customGetters from '../renderer/store/customGetters'
 import * as sbFetch from './sbFetch'
 import * as youtubeHandler from './youtubeHandler'
 import electron from 'electron'
@@ -166,12 +167,13 @@ function guestFetch (query, updateOrFirstTime) {
   let synced = false // List of synced and cached Retrieved (all tracks)
 
   // Are there Synced playlist to check new version
-  let areThereSynced = store.state.CurrentUser.syncedPlaylists.length > 0
+  let syncedPls = customGetters.SyncedPlaylistsSp()
+  let areThereSynced = syncedPls.length > 0
 
   // No synced playlists
   if (!areThereSynced) synced = true
   else {
-    let ids = [...store.state.CurrentUser.syncedPlaylists.map(pl => {
+    let ids = [...syncedPls.map(pl => {
       return {
         id: pl.id,
         snapshot_id: pl.snapshot_id
@@ -320,6 +322,7 @@ ipc.on('get tracks from', function (event, id) {
 })
 
 ipc.on('Youtube Convert', function () {
+  console.log(store.state.CurrentUser.queuedPlaylists, store.state.CurrentUser.syncedPlaylists)
   if (store.state.CurrentUser.queuedPlaylists.length === 0 && store.state.CurrentUser.syncedPlaylists.length === 0) return
 
   console.log('FETCHING YT')

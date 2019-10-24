@@ -29,6 +29,7 @@ const getDefaultState = () => {
     syncedPlaylists: [],
     queuedPlaylists: [],
     cachedPlaylists: [],
+    convertedTracks: [],
     currentPlaylist: '',
     control: {},
     lastSync: null
@@ -92,9 +93,9 @@ const actions = {
       resolve()
     })
   },
-  youtubizeResult ({ commit }, youtubizedResult) {
+  youtubizeResult ({ commit }, convertedTracks) {
     return new Promise((resolve, reject) => {
-      commit('YOUTUBIZE_RESULT', youtubizedResult)
+      commit('YOUTUBIZE_RESULT', convertedTracks)
       resolve()
     })
   },
@@ -394,77 +395,23 @@ const mutations = {
 
     SAVE_TO_DISK()
   },
-  YOUTUBIZE_RESULT (state, youtubizedResult) {
-    // Unqueueing synced playlists
-    // TODO Put this at the end of mutation
-    // console.log('RESULT::', youtubizedResult.length)
-    for (let i = 0; i < youtubizedResult.length; i++) {
-      this.dispatch('findAndUnqueue', youtubizedResult[i].id)
-      this.dispatch('findAndUncache', youtubizedResult[i].id)
-    }
+  YOUTUBIZE_RESULT (state, convertedTracks) {
+    state.convertedTracks = convertedTracks
 
-    // TODO Find snapshot inside cached array. Uncache then
-    youtubizedResult = youtubizedResult.map(pl => {
-      return {
-        ...pl,
-        snapshot_id: state.playlists[findById(pl.id, state.playlists)].snapshot_id
-      }
-    })
-
-    if (state.syncedPlaylists.length === 0) {
-      state.syncedPlaylists = [ ...youtubizedResult.map(pl => {
-        // Declared this way in order not to add 'Removed' tracks array
-        return {
-          id: pl.id,
-          tracks: pl.tracks,
-          snapshot_id: pl.snapshot_id
-        }
-      })]
-      SAVE_TO_DISK()
-      return
-    }
-
-    // TODO Update tracks accordingly to version control
-    // This Immense for loop replaces already fetched results for some reason lol
+    // TODO turn this into a separate mutation. awaiting for all to finish at once
     for (let i = 0; i < state.syncedPlaylists.length; i++) {
-      let pl = state.syncedPlaylists[i]
-
-      for (let o = 0; o < youtubizedResult.length; o++) {
-        let ytpl = youtubizedResult[o]
-
-        // If Fetched playlists already exists in VUEX
-        if (pl.id === ytpl.id) {
-          // Cycle through tracks and clear removed ones
-          let localPl = {...state.playlists[findById(pl.id, state.playlists)]}
-          for (let u = 0; u < pl.tracks.length; u++) {
-            let trackSt = pl.tracks[u]
-
-            for (let y = 0; y < localPl.tracks.removed.length; y++) {
-              let trackRemoved = localPl.tracks.removed[y]
-              if (trackSt.id === trackRemoved.id) {
-                // Remove already removed (IN SPOTI DATA) track from YT SYNC state
-                state.syncedPlaylists[i].tracks.splice(u, 1)
-                // Popit from removed tracks 'log'
-                localPl.tracks.removed.splice(y, 1)
-                break
-              }
-            }
-          }
-          // Adds remaining new songs directly into state
-          state.syncedPlaylists[i].tracks = [...pl.tracks, ...ytpl.tracks]
-          // TODO Songs were removed from youtube state. Now to remove old ones and add new ones to spotify state
-          this.dispatch('commitTrackChanges', pl.id)
-
-          youtubizedResult.splice(o, 1)
-          break
-        }
-      }
+      this.dispatch('commitTrackChanges', state.syncedPlaylists[i])
     }
-    // Adds remaining new playlists directly into state
-    // No need to 'commitTrackChanges' to this ones. Every song is New
-    if (youtubizedResult.length > 0) {
-      state.syncedPlaylists = [...state.syncedPlaylists, ...youtubizedResult]
+    let queued = [...state.queuedPlaylists]
+    for (let i = 0; i < queued.length; i++) {
+      // TODO Turn queued into synced
+      this.dispatch('findAndUnqueue', queued[i])
+      this.dispatch('findAndUncache', queued[i])
+      this.dispatch('commitTrackChanges', queued[i])
+      console.log(queued[i])
+      state.syncedPlaylists = [...state.syncedPlaylists, queued[i]]
     }
+
     this.dispatch('syncedPlaylistsRefreshed', {}, {root: true})
     SAVE_TO_DISK()
   },
@@ -476,6 +423,20 @@ const mutations = {
       return
     }
     let tracks = state.playlists[index].tracks
+
+    // Remove playlist from converted tracks registries
+    if (tracks.removed.length !== 0) {
+      for (let i = 0; i < tracks.removed.length; i++) {
+        let rem = tracks.removed[i]
+        for (let o = 0; o < state.convertedTracks.length; o++) {
+          if (rem.id === state.convertedTracks[o].id) {
+            state.convertedTracks[o].playlists = state.convertedTracks[o].playlists.filter(pl => pl !== id)
+            if (state.convertedTracks[o].playlists.length === 0) state.convertedTracks.splice(o, 1)
+          }
+        }
+      }
+    }
+
     state.playlists[index] = {
       ...state.playlists[index],
       tracks: {
@@ -506,6 +467,9 @@ const mutations = {
     SAVE_TO_DISK()
   },
   UNSYNC_PLAYLIST (state, id) {
+    // Removes tracks from conversion
+    this.dispatch('commitTrackChanges', id)
+    // .then(() => {
     console.log('UNSYNCING ', id)
     let index = findById(id, state.syncedPlaylists)
     let success = false
@@ -529,8 +493,8 @@ const mutations = {
         SAVE_TO_DISK()
       })
     } else console.error('Playlist not found when unsyncing :: UNSYNC_PLAYLIST')
+    // })
   }
-
 }
 
 const getters = {
@@ -695,8 +659,9 @@ export default {
 
 function findById (id, pls) {
   for (let i = 0; i < pls.length; i++) {
-    let pl = pls[i]
-    if (pl.id === id) {
+    let pl = pls[i].id
+    if (pl === undefined) pl = pls[i]
+    if (pl === id) {
       return i
     }
   }

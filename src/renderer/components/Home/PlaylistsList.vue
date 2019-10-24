@@ -68,7 +68,7 @@ export default {
         let syncPl = this.$store.state.CurrentUser.syncedPlaylists[i]
         for (let o = 0; o < pls.length; o++) {
           let pl = pls[o]
-          if (pl.id === syncPl.id) {
+          if (pl.id === syncPl) {
             all = [...all, pl]
             pls.splice(o, 1)
             break

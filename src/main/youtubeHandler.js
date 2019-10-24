@@ -2,11 +2,12 @@ import store from '../renderer/store'
 import * as sbFetch from './sbFetch'
 import customGetters from '../renderer/store/customGetters'
 
-let SYNCED_PLAYLISTS = []
 let ALL_PLAYLISTS = []
-let SORTED_TRACKS = []
+let NEW_TRACKS = []
+let ALL_TRACKS = []
 
 export function youtubizeAll () {
+  console.log(' av er', ALL_TRACKS)
   let syncedPlaylists = customGetters.SyncedPlaylistsSp().map(pl => {
     return {
       ...pl,
@@ -21,23 +22,19 @@ export function youtubizeAll () {
   })
   if (queuedPlaylists.length + syncedPlaylists.length === 0) return
 
-  SYNCED_PLAYLISTS = syncedPlaylists
   ALL_PLAYLISTS = [...syncedPlaylists, ...queuedPlaylists]
-  if (findDuplicatedTracks() === false) {
-    console.log('no new tracks')
-    // If no new tracks, just filtering out removed tracks from all playlists
-    // If there are tracks to convert, this step will be performed at the end of the 'YOUTUBIZE_RESULT' Mutation
-    store.dispatch('clearRemovedTracks')
-    return
-  }
 
-  findLocalConversions()
+  findDuplicatedTracks()
 
-  sbFetch.youtubizeAll(makeQueries())
-    .then(convertion => {
-      console.log('REITERAMO::::: ', convertion)
+  ALL_TRACKS = store.state.CurrentUser.convertedTracks
+  if (ALL_TRACKS.length !== 0) findLocalConversions()
+  makeQueries()
+
+  sbFetch.youtubizeAll(NEW_TRACKS)
+    .then(CONVERTED_TRACKS => {
+      // console.log('REITERAMO::::: ', CONVERTED_TRACKS)
       // TODO adapt this mutation to new implementation
-      // store.dispatch('youtubizeResult', { convertion, sortedTracks: SORTED_TRACKS })
+      store.dispatch('youtubizeResult', [...ALL_TRACKS, ...CONVERTED_TRACKS])
     })
 }
 
@@ -61,9 +58,8 @@ function findDuplicatedTracks () {
   let sortedTracks = []
   for (let i = 0; i < pls.length; i++) {
     let playlist = pls[i]
-    console.log('loopin', playlist)
-    // Prevents iterating over same-playlist tracks
-    let breakLoopAt = sortedTracks.length
+    // console.log('loopin', playlist)
+    let breakLoopAt = sortedTracks.length // Prevents iterating over same-playlist tracks
     for (let o = 0; o < playlist.tracks.length; o++) {
       let dirtyTrack = playlist.tracks[o]
       let found = false
@@ -83,42 +79,38 @@ function findDuplicatedTracks () {
           id: dirtyTrack.id,
           data: dirtyTrack,
           playlists: [playlist.id],
-          conversion: null
+          conversion: null,
+          query: null
         })
       }
     }
   }
   // Finished sorting all tracks
   console.log('Finished', sortedTracks)
-  SORTED_TRACKS = sortedTracks
+  NEW_TRACKS = sortedTracks
 }
 
 function findLocalConversions () {
   // Find already converted tracks
-  for (let i = 0; i < SORTED_TRACKS.length; i++) {
-    let sortedTrack = SORTED_TRACKS[i]
-    for (let o = 0; o < SYNCED_PLAYLISTS.length; o++) {
-      // Skipping playlist check if new track belongs to it
-      if (sortedTrack.playlists.some(pl => pl.id === SYNCED_PLAYLISTS[o].id)) continue
-
-      let tracks = [...SYNCED_PLAYLISTS[o].tracks]
-      for (let u = 0; u < tracks.length; u++) {
-        let track = tracks[u]
-        if (sortedTrack.id === track.id) { // Found duplicate
-          SORTED_TRACKS[i].conversion = track
-          tracks.splice(u, 1)
+  for (let i = 0; i < NEW_TRACKS.length; i++) {
+    for (let o = 0; o < ALL_TRACKS.length; o++) {
+      if (NEW_TRACKS[i].id === ALL_TRACKS[o].id) { // Found ALready converted track
+        if (ALL_TRACKS[o].conversion !== null) {
+          ALL_TRACKS[o].playlists = [...ALL_TRACKS[o].playlists, ...NEW_TRACKS[i].playlists] // Adding new added playlists to local conversion of track
+          NEW_TRACKS.splice(i, 1) // Removed from new tracks
+        } else {
+          NEW_TRACKS[i].playlists = [...ALL_TRACKS[o].playlists, ...NEW_TRACKS[i].playlists] // This track failed to be fetched in the past, so adding it to the fetch
+          ALL_TRACKS.splice(i, 1) // Removed from local tracks, will be saved when retrieved
         }
+        break
       }
     }
   }
 }
 
 function makeQueries () {
-  let queries = []
-  for (let o = 0; o < SORTED_TRACKS.length; o++) {
-    // Local version is present, so skip track
-    if (SORTED_TRACKS[o].conversion !== null) continue
-    let track = SORTED_TRACKS[o].data
+  for (let o = 0; o < NEW_TRACKS.length; o++) {
+    let track = NEW_TRACKS[o].data
 
     let query = `${track.name} ${track.artists[0].name}`
     let duration = track.duration_ms / 1000 / 60
@@ -126,7 +118,6 @@ function makeQueries () {
     if (duration <= 20 && duration >= 4) duration = 'medium'
     if (duration < 4) duration = 'short'
 
-    queries = [...queries, {query, duration, duration_s: track.duration_ms / 1000, id: track.id}]
+    NEW_TRACKS[o].query = {query, duration, duration_s: track.duration_ms / 1000, id: track.id}
   }
-  return queries
 }
