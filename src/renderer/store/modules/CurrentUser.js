@@ -87,12 +87,6 @@ const actions = {
       resolve()
     })
   },
-  clearRemovedTracks ({commit}) {
-    return new Promise((resolve, reject) => {
-      commit('CLEAR_REMOVED_TRACKS')
-      resolve()
-    })
-  },
   youtubizeResult ({ commit }, convertedTracks) {
     return new Promise((resolve, reject) => {
       commit('YOUTUBIZE_RESULT', convertedTracks)
@@ -121,7 +115,7 @@ const actions = {
 
 const mutations = {
   STORE_DATA_FROM_DISK (state, data) {
-    let {cachedPlaylists, control, playlists, queuedPlaylists, syncedPlaylists, user, lastSync} = data
+    let {cachedPlaylists, control, playlists, queuedPlaylists, syncedPlaylists, user, convertedTracks, lastSync} = data
     state.playlists = playlists
     state.user = user
 
@@ -131,6 +125,7 @@ const mutations = {
     state.queuedPlaylists = queuedPlaylists
     state.syncedPlaylists = syncedPlaylists
     state.user = user
+    state.convertedTracks = convertedTracks
     state.lastSync = lastSync
 
     console.log('DATA STORED')
@@ -361,40 +356,6 @@ const mutations = {
     }
     SAVE_TO_DISK()
   },
-  CLEAR_REMOVED_TRACKS (state) {
-    let syncedPls = [...state.syncedPlaylists]
-    let pls = state.playlists
-
-    for (let i = 0; i < pls.length; i++) {
-      let pl = pls[i]
-      for (let o = 0; o < syncedPls.length; o++) {
-        let spl = syncedPls[o]
-        if (spl.id === pl.id) {
-          // found syncedPlaylist
-          let removed = pl.tracks.removed
-          for (let u = 0; u < removed.length; u++) {
-            let rmTrack = removed[u]
-
-            for (let y = 0; y < spl.tracks.length; y++) {
-              let syncdTrack = spl.tracks[y]
-
-              if (rmTrack.id === syncdTrack.id) {
-                // found removed track
-                spl.tracks.splice(y, 1)
-                break
-              }
-            }
-          }
-          break
-        }
-      }
-      pl.tracks.removed = []
-    }
-
-    state.syncedPlaylists = syncedPls
-
-    SAVE_TO_DISK()
-  },
   YOUTUBIZE_RESULT (state, convertedTracks) {
     state.convertedTracks = convertedTracks
 
@@ -408,11 +369,12 @@ const mutations = {
       this.dispatch('findAndUnqueue', queued[i])
       this.dispatch('findAndUncache', queued[i])
       this.dispatch('commitTrackChanges', queued[i])
-      console.log(queued[i])
       state.syncedPlaylists = [...state.syncedPlaylists, queued[i]]
+      console.log(queued[i], state.syncedPlaylists)
     }
 
     this.dispatch('syncedPlaylistsRefreshed', {}, {root: true})
+    console.log('afuera', state.syncedPlaylists)
     SAVE_TO_DISK()
   },
   COMMIT_TRACK_CHANGES (state, id) {

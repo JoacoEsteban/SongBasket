@@ -1,13 +1,13 @@
 import store from '../renderer/store'
 import * as sbFetch from './sbFetch'
 import customGetters from '../renderer/store/customGetters'
+import * as utils from '../MAIN_PROCESS_UTILS'
 
 let ALL_PLAYLISTS = []
-let NEW_TRACKS = []
 let ALL_TRACKS = []
 
 export function youtubizeAll () {
-  console.log(' av er', ALL_TRACKS)
+  console.log('GETTIN IN DOU')
   let syncedPlaylists = customGetters.SyncedPlaylistsSp().map(pl => {
     return {
       ...pl,
@@ -23,22 +23,22 @@ export function youtubizeAll () {
   if (queuedPlaylists.length + syncedPlaylists.length === 0) return
 
   ALL_PLAYLISTS = [...syncedPlaylists, ...queuedPlaylists]
-
+  ALL_TRACKS = utils.cloneObject(store.state.CurrentUser.convertedTracks)
   findDuplicatedTracks()
 
-  ALL_TRACKS = store.state.CurrentUser.convertedTracks
-  if (ALL_TRACKS.length !== 0) findLocalConversions()
   makeQueries()
 
-  sbFetch.youtubizeAll(NEW_TRACKS)
+  sbFetch.youtubizeAll(ALL_TRACKS)
     .then(CONVERTED_TRACKS => {
       // console.log('REITERAMO::::: ', CONVERTED_TRACKS)
       // TODO adapt this mutation to new implementation
-      store.dispatch('youtubizeResult', [...ALL_TRACKS, ...CONVERTED_TRACKS])
+      store.dispatch('youtubizeResult', [...CONVERTED_TRACKS])
     })
 }
 
 function findDuplicatedTracks () {
+  console.log('DUPLICCC')
+
   // Accumulating tracks to fetch
   let pls = []
   for (let i = 0; i < ALL_PLAYLISTS.length; i++) {
@@ -55,16 +55,14 @@ function findDuplicatedTracks () {
   if (pls.length === 0) return false
 
   // Computing duplicated tracks
-  let sortedTracks = []
   for (let i = 0; i < pls.length; i++) {
     let playlist = pls[i]
     // console.log('loopin', playlist)
-    let breakLoopAt = sortedTracks.length // Prevents iterating over same-playlist tracks
     for (let o = 0; o < playlist.tracks.length; o++) {
       let dirtyTrack = playlist.tracks[o]
       let found = false
-      for (let u = 0; u < breakLoopAt; u++) {
-        let cleanTrack = sortedTracks[u]
+      for (let u = 0; u < ALL_TRACKS.length; u++) {
+        let cleanTrack = ALL_TRACKS[u]
         if (dirtyTrack.id === cleanTrack.id) {
           // Foud duplicated
           found = u
@@ -72,10 +70,16 @@ function findDuplicatedTracks () {
         }
       }
       // Pushing to playlist register if found
-      if (found !== false) sortedTracks[found].playlists.push(playlist.id)
-      else {
-        // Create new track entry if not
-        sortedTracks.push({
+      if (found !== false) {
+        // console.log('FOUND!', ALL_TRACKS[found])
+        ALL_TRACKS[found] = {
+          ...ALL_TRACKS[found],
+          playlists: utils.removeDuplication([...ALL_TRACKS[found].playlists, playlist.id]) // Adding new added playlists to local conversion of track
+        }
+      } else {
+        console.log('new track', dirtyTrack.name, dirtyTrack.id)
+        // Create new track entry if not found
+        ALL_TRACKS.push({
           id: dirtyTrack.id,
           data: dirtyTrack,
           playlists: [playlist.id],
@@ -86,31 +90,15 @@ function findDuplicatedTracks () {
     }
   }
   // Finished sorting all tracks
-  console.log('Finished', sortedTracks)
-  NEW_TRACKS = sortedTracks
-}
-
-function findLocalConversions () {
-  // Find already converted tracks
-  for (let i = 0; i < NEW_TRACKS.length; i++) {
-    for (let o = 0; o < ALL_TRACKS.length; o++) {
-      if (NEW_TRACKS[i].id === ALL_TRACKS[o].id) { // Found ALready converted track
-        if (ALL_TRACKS[o].conversion !== null) {
-          ALL_TRACKS[o].playlists = [...ALL_TRACKS[o].playlists, ...NEW_TRACKS[i].playlists] // Adding new added playlists to local conversion of track
-          NEW_TRACKS.splice(i, 1) // Removed from new tracks
-        } else {
-          NEW_TRACKS[i].playlists = [...ALL_TRACKS[o].playlists, ...NEW_TRACKS[i].playlists] // This track failed to be fetched in the past, so adding it to the fetch
-          ALL_TRACKS.splice(i, 1) // Removed from local tracks, will be saved when retrieved
-        }
-        break
-      }
-    }
-  }
+  // console.log('Finished', newTracks)
 }
 
 function makeQueries () {
-  for (let o = 0; o < NEW_TRACKS.length; o++) {
-    let track = NEW_TRACKS[o].data
+  console.log('queries', ALL_TRACKS.length)
+  for (let o = 0; o < ALL_TRACKS.length; o++) {
+    if (ALL_TRACKS[o].query !== null) continue
+    console.log('queries', o)
+    let track = ALL_TRACKS[o].data
 
     let query = `${track.name} ${track.artists[0].name}`
     let duration = track.duration_ms / 1000 / 60
@@ -118,6 +106,9 @@ function makeQueries () {
     if (duration <= 20 && duration >= 4) duration = 'medium'
     if (duration < 4) duration = 'short'
 
-    NEW_TRACKS[o].query = {query, duration, duration_s: track.duration_ms / 1000, id: track.id}
+    ALL_TRACKS[o] = {
+      ...ALL_TRACKS[o],
+      query: {query, duration, duration_s: track.duration_ms / 1000, id: track.id}
+    }
   }
 }

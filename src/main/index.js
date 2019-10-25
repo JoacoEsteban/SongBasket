@@ -323,7 +323,7 @@ ipc.on('get tracks from', function (event, id) {
 
 ipc.on('Youtube Convert', function () {
   console.log(store.state.CurrentUser.queuedPlaylists, store.state.CurrentUser.syncedPlaylists)
-  if (store.state.CurrentUser.queuedPlaylists.length === 0 && store.state.CurrentUser.syncedPlaylists.length === 0) return
+  if (store.state.CurrentUser.queuedPlaylists.length + store.state.CurrentUser.syncedPlaylists.length === 0) return
 
   console.log('FETCHING YT')
   let unCached = store.getters.UnCachedPlaylists

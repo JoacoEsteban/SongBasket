@@ -69,7 +69,8 @@ export function youtubizeAll (tracks) {
   let failed = 0
   return new Promise((resolve, reject) => {
     LOADING(true, 'Converting')
-    for (let i = 0; i < tracks.length * 0 + 1; i++) {
+    for (let i = 0; i < tracks.length && totalTracks === 0; i++) {
+      if (tracks[i].conversion !== null) continue
       let track = tracks[i].query
       totalTracks++
       track = JSON.stringify(track)
