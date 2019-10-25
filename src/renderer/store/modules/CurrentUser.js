@@ -359,22 +359,21 @@ const mutations = {
   YOUTUBIZE_RESULT (state, convertedTracks) {
     state.convertedTracks = convertedTracks
 
-    // TODO turn this into a separate mutation. awaiting for all to finish at once
     for (let i = 0; i < state.syncedPlaylists.length; i++) {
       this.dispatch('commitTrackChanges', state.syncedPlaylists[i])
     }
     let queued = [...state.queuedPlaylists]
     for (let i = 0; i < queued.length; i++) {
-      // TODO Turn queued into synced
-      this.dispatch('findAndUnqueue', queued[i])
-      this.dispatch('findAndUncache', queued[i])
-      this.dispatch('commitTrackChanges', queued[i])
-      state.syncedPlaylists = [...state.syncedPlaylists, queued[i]]
-      console.log(queued[i], state.syncedPlaylists)
+      let id = queued[i]
+      state.syncedPlaylists = [...state.syncedPlaylists, id]
+      let index = findById(id, state.queuedPlaylists)
+      if (index >= 0) state.queuedPlaylists.splice(index, 1)
+
+      this.dispatch('findAndUncache', id)
+      this.dispatch('commitTrackChanges', id)
     }
 
     this.dispatch('syncedPlaylistsRefreshed', {}, {root: true})
-    console.log('afuera', state.syncedPlaylists)
     SAVE_TO_DISK()
   },
   COMMIT_TRACK_CHANGES (state, id) {
