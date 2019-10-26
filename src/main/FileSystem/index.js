@@ -101,18 +101,15 @@ let userMethods = {
                 tags = tags.userDefinedText
                 if (tags) {
                   let track = {}
-                  let found = false
                   for (let u = 0; u < tags.length; u++) {
                     let tag = tags[u]
-                    let expression = /(songbasket|SONGBASKET)_(youtube|spotify)_(id|ID)/
+                    let expression = /(songbasket|SONGBASKET)_(youtube|YOUTUBE|spotify|SPOTIFY)_(id|ID)/
                     if (expression.test(tag.description)) {
-                      found = true
                       track[tag.description.toLowerCase()] = tag.value
                       track.path = file
+                      pl.tracks.push(track)
                     }
                   }
-
-                  if (found) pl.tracks.push(track)
                 }
 
                 processedTracks++
