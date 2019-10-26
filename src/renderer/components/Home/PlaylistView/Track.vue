@@ -40,7 +40,7 @@
     class="animation-container">
       <div class="conversion-container df fldc jucb alic">
         <div
-        v-for="(track, index) in conversion.yt"
+        v-for="(track, index) in conversion.conversion.yt"
         :key="index"
         :class="{'selected': isSelected(track.id)}"
         class="pl-track-container yt bestMatch">
@@ -51,10 +51,10 @@
           <div class="pl-track-data-up">
             <!-- TODO pull out ellipsis without fucking up the entire page -->
             <div class="pl-track-data-name  center">
-              {{track.snippet.title}}
+              {{track.snippet.title | decodeUri}}
             </div>
             <div class="pl-track-data-byartist ">
-              uploader <span class="bold">{{track.snippet.channelTitle}}</span>
+              uploader <span class="bold">{{track.snippet.channelTitle | decodeUri}}</span>
             </div>
             <div class="pl-track-data-duration">Duration: <span>{{convertNFormat(track.duration)}}</span></div>
 
@@ -91,6 +91,7 @@
 
 <script>
 import * as utils from '../../../utils'
+const he = require('he')
 
 export default {
   data () {
@@ -99,6 +100,9 @@ export default {
       convertionIsOpenedLocal: false,
       transitionCount: 0
     }
+  },
+  filters: {
+    decodeUri: (text) => he.decode(text)
   },
   props: {
     track: {
@@ -141,13 +145,19 @@ export default {
         return this.track.artists[0].name
       }
     },
-
+    playlist () {
+      return this.$store.state.CurrentUser.currentPlaylist
+    },
     songDuration () {
       return this.timeFilter(this.track.duration_ms)
     },
     durationFormatted () {
       let {minutes, seconds} = this.songDuration
       return this.formatDuration({minutes, seconds})
+    },
+    selected () {
+      if (!this.conversion) return null
+      return this.conversion.playlists.find(p => p.id === this.playlist).selected
     }
   },
   mounted () {
@@ -159,7 +169,7 @@ export default {
       this.$emit('toggleConversion', !this.convertionIsOpened)
     },
     isSelected (id) {
-      return id === this.conversion.selected
+      return id === (this.selected !== null ? this.selected : this.conversion.conversion.bestMatch)
     },
     select (id) {
       if (!id) id = this.conversion.bestMatch

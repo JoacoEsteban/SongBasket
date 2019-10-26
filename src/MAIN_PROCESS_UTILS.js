@@ -23,3 +23,11 @@ export function removeDuplication (array) {
   }
   return array
 }
+
+export function removeDuplicationId (array) {
+  if (!Array.isArray(array)) return
+  for (let i = 0; i < array.length; i++) {
+    array = [array[i], ...array.filter(item => item.id !== array[i].id)]
+  }
+  return array
+}

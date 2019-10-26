@@ -92,6 +92,7 @@ export function youtubizeAll (tracks) {
           areAllFinished(resolve)
         })
     }
+    if (totalTracks === 0) areAllFinished(resolve)
   })
 
   function areAllFinished (resolve) {

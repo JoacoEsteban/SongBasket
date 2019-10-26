@@ -62,6 +62,7 @@
     "ffbinaries": "^1.1.4",
     "ffmpeg": "^0.0.4",
     "fluent-ffmpeg": "^2.1.2",
+    "he": "^1.2.0",
     "node-id3": "^0.1.11",
     "open": "^6.4.0",
     "rimraf": "^3.0.0",

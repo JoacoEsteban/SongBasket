@@ -64,10 +64,8 @@ const actions = {
     commit('PLAYLIST_UPDATE_CACHED', {id, snapshot_id})
   },
   setCurrentPlaylist ({ commit }, id) {
-    return new Promise((resolve, reject) => {
-      commit('SET_CURRENT_PLAYLIST', id)
-      resolve()
-    })
+    commit('SET_CURRENT_PLAYLIST', id)
+    this.dispatch('currentPlaylistSet', {}, {root: true})
   },
   queuePlaylist ({ commit }, id) {
     return new Promise((resolve, reject) => {
@@ -363,13 +361,15 @@ const mutations = {
       this.dispatch('commitTrackChanges', state.syncedPlaylists[i])
     }
     let queued = [...state.queuedPlaylists]
+    console.log('dou', queued)
     for (let i = 0; i < queued.length; i++) {
       let id = queued[i]
       state.syncedPlaylists = [...state.syncedPlaylists, id]
       let index = findById(id, state.queuedPlaylists)
       if (index >= 0) state.queuedPlaylists.splice(index, 1)
+      index = findById(id, state.cachedPlaylists)
+      if (index >= 0) state.cachedPlaylists.splice(index, 1)
 
-      this.dispatch('findAndUncache', id)
       this.dispatch('commitTrackChanges', id)
     }
 
@@ -391,8 +391,8 @@ const mutations = {
         let rem = tracks.removed[i]
         for (let o = 0; o < state.convertedTracks.length; o++) {
           if (rem.id === state.convertedTracks[o].id) {
-            state.convertedTracks[o].playlists = state.convertedTracks[o].playlists.filter(pl => pl !== id)
-            if (state.convertedTracks[o].playlists.length === 0) state.convertedTracks.splice(o, 1)
+            state.convertedTracks[o].playlists = state.convertedTracks[o].playlists.filter(pl => pl.id !== id)
+            if (state.convertedTracks[o].playlists.length === 0) state.convertedTracks.splice(o, 1) // Track not being used by any playlist. Removing track
           }
         }
       }
@@ -429,8 +429,6 @@ const mutations = {
   },
   UNSYNC_PLAYLIST (state, id) {
     // Removes tracks from conversion
-    this.dispatch('commitTrackChanges', id)
-    // .then(() => {
     console.log('UNSYNCING ', id)
     let index = findById(id, state.syncedPlaylists)
     let success = false
@@ -441,10 +439,12 @@ const mutations = {
         success = true
         state.playlists[index].tracks = {
           ...state.playlists[index].tracks,
+          removed: state.playlists[index].tracks.items,
           items: [],
-          added: [],
-          removed: []
+          added: []
         }
+
+        this.dispatch('commitTrackChanges', id)
       }
     }
     if (success) {

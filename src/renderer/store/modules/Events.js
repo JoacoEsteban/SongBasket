@@ -1,6 +1,7 @@
 // import Vue from 'vue'
 
 const state = {
+  CURRENT_PLAYLIST_SET: false,
   SYNCED_PLAYLISTS_REFRESHED: false,
   PLAYLIST_UNSYNCED: false,
   GLOBAL_LOADING_STATE: {
@@ -10,11 +11,14 @@ const state = {
 }
 
 const actions = {
+  currentPlaylistSet ({commit}) {
+    commit('TRIGGER', 'CURRENT_PLAYLIST_SET')
+  },
   syncedPlaylistsRefreshed ({commit}) {
-    commit('SYNCED_PLAYLISTS_REFRESHED')
+    commit('TRIGGER', 'SYNCED_PLAYLISTS_REFRESHED')
   },
   playlistUnsynced ({commit}) {
-    commit('PLAYLIST_UNSYNCED')
+    commit('TRIGGER', 'PLAYLIST_UNSYNCED')
   },
   globalLoadingState ({commit}, value) {
     commit('GLOBAL_LOADING_STATE', value)
@@ -22,11 +26,9 @@ const actions = {
 }
 
 const mutations = {
-  SYNCED_PLAYLISTS_REFRESHED (state) {
-    state.SYNCED_PLAYLISTS_REFRESHED = !state.SYNCED_PLAYLISTS_REFRESHED
-  },
-  PLAYLIST_UNSYNCED (state) {
-    state.PLAYLIST_UNSYNCED = !state.PLAYLIST_UNSYNCED
+  TRIGGER (state, key) {
+    console.log('ckeckme out')
+    state[key] = !state[key]
   },
   GLOBAL_LOADING_STATE (state, {value, target}) {
     if (!target) target = ''

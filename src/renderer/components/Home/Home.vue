@@ -46,14 +46,21 @@ export default {
     }
   },
   computed: {
-    allLoaded: function () {
+    allLoaded () {
       return this.control.total - this.control.offset <= 0
     },
-    syncedPlaylists: function () {
+    syncedPlaylists () {
       return this.$store.state.CurrentUser.syncedPlaylists
+    },
+    currentPlaylistSet () {
+      return this.$store.state.Events.CURRENT_PLAYLIST_SET
     }
   },
-
+  watch: {
+    currentPlaylistSet () {
+      this.$router.push('/home/playlist-view')
+    }
+  },
   methods: {
     loadMore () {
       if (!this.loading) {
@@ -67,8 +74,6 @@ export default {
     },
     setPlaylistNPush (id) {
       this.$store.dispatch('setCurrentPlaylist', id)
-      // .then( () => )
-      this.$router.push('/home/playlist-view')
     },
     logOut () {
       console.log('Logging Out:::::')

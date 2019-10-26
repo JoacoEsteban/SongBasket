@@ -36,7 +36,7 @@
           </div>
         </div>
         <div class="plv-rp-data-plname">{{playlist.name}}</div>
-        <div class="plv-rp-data-byuser">by {{$store.state.CurrentUser.user.display_name}}</div>
+        <div class="plv-rp-data-byuser">by {{playlist.owner.display_name}}</div>
       </div>
       <div class="plv-rp-tracklist">
         <Track
@@ -61,7 +61,7 @@ import Track from './Track'
 export default {
   data () {
     return {
-      // TODO make it work
+      conversion: [],
       showingConversion: [],
       showingAll: false,
       showingAdded: false,
@@ -76,9 +76,6 @@ export default {
     currentPlaylist () {
       return this.$store.state.CurrentUser.currentPlaylist
     },
-    conversion () {
-      if (this.playlist) { return this.$store.getters.SyncedPlaylistById(this.playlist.id) } else return null
-    },
     ammountOfTracksBeingShown () {
       return this.items.length + (this.showingAdded ? this.added.length : 0) + (this.showingRemoved ? this.removed.length : 0)
     },
@@ -86,13 +83,16 @@ export default {
       if (this.playlist) { return this.$store.getters.PlaylistIsQueued(this.playlist.id) >= 0 } else return false
     },
     isSynced () {
-      if (this.playlist) { return this.$store.getters.PlaylistIsSynced(this.playlist.id) } else return false
+      if (this.playlist) {
+        return this.$store.getters.PlaylistIsSynced(this.currentPlaylist)
+      } else {
+        return false
+      }
     },
     trackQty () {
       return ' Track' + (this.playlist.tracks.total === 1 ? '' : 's')
     },
     items () {
-      console.log('UPDATE DOU')
       return this.playlist.tracks.items
     },
     added () {
@@ -114,6 +114,7 @@ export default {
     },
     syncedPlaylistsRefreshed () {
       this.refreshPlaylist()
+      this.computeTracks()
     },
     playlistUnsynced () {
       this.$router.push('/home')
@@ -121,6 +122,7 @@ export default {
   },
   mounted () {
     console.log('PLAYLISTTTTT:::::', this.playlist)
+    this.computeTracks()
     this.refreshPlaylist()
   },
   destroyed () {
@@ -129,6 +131,22 @@ export default {
   methods: {
     refreshPlaylist () {
       this.playlist = this.$store.getters.PlaylistById(this.currentPlaylist)
+    },
+    computeTracks () {
+      console.log('computing', this.isSynced)
+      if (!this.isSynced) return
+      let allTracks = this.$store.state.CurrentUser.convertedTracks
+      console.log('alltracks', allTracks)
+      let plTracks = []
+
+      for (let i = 0; i < allTracks.length; i++) {
+        let track = allTracks[i]
+        if (track.playlists.some(pl => pl.id === this.currentPlaylist)) {
+          plTracks.push(track)
+        }
+      }
+
+      this.conversion = allTracks
     },
     youtubeId (id) {
       let c = this.conversion.tracks
@@ -140,10 +158,12 @@ export default {
     },
     giveMeConversion (id) {
       if (!this.isSynced) return null
-      let tracks = this.conversion.tracks
+      let tracks = this.conversion
       for (let i = 0; i < tracks.length; i++) {
         let track = tracks[i]
-        if (track.id === id) return track
+        if (track.id === id) {
+          return track
+        }
       }
     },
     toggleConversion (id, intention) {
@@ -152,7 +172,6 @@ export default {
       for (let i = 0; i < this.showingConversion.length; i++) {
         if (this.showingConversion[i] === id) {
           this.showingConversion.splice(i, 1)
-          console.log('dou! tt')
           if (this.showingConversion.length === 0 && intention !== this.showingAll) {
             this.toggleShowingAll()
           }
@@ -161,7 +180,6 @@ export default {
       }
       this.showingConversion.push(id)
       if (this.showingConversion.length === this.ammountOfTracksBeingShown && intention !== this.showingAll) {
-        console.log('dou! ff')
         this.toggleShowingAll()
       }
     },
@@ -177,7 +195,6 @@ export default {
       return this.showingAll
     },
     selectTrack (trackId, newId) {
-      console.log('dou')
       this.$store.dispatch('changeYtTrackSelection', {playlist: this.playlist.id, trackId, newId})
     },
     unsync () {
