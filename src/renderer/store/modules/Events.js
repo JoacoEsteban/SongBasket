@@ -27,7 +27,6 @@ const actions = {
 
 const mutations = {
   TRIGGER (state, key) {
-    console.log('ckeckme out')
     state[key] = !state[key]
   },
   GLOBAL_LOADING_STATE (state, {value, target}) {
