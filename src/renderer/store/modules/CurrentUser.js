@@ -289,8 +289,6 @@ const mutations = {
           added,
           removed
         }
-        // console.log('SON, ITS TIME NOW', playlist.tracks.added.map(p => p.name))
-        state.syncedPlaylists[syncIndex].snapshot_id = playlist.snapshot_id
       } else {
         // Playlist is not synced so I dont care about computing changes
         playlist.tracks = {
@@ -410,21 +408,20 @@ const mutations = {
     SAVE_TO_DISK()
   },
   CHANGE_YT_TRACK_SELECTION (state, {playlist, trackId, newId}) {
-    let index = findById(playlist, state.syncedPlaylists)
-    if (index === -1) {
-      console.error('Synced playlist not found:: CurrentUser.js :: CHANGE_YT_TRACK_SELECTION')
-      return
-    }
-
-    let playlistObj = state.syncedPlaylists[index]
-    index = findById(trackId, playlistObj.tracks)
+    let index = findById(trackId, state.convertedTracks)
     if (index === -1) {
       console.error('Converted Track not found:: CurrentUser.js :: CHANGE_YT_TRACK_SELECTION')
       return
     }
 
-    let track = playlistObj.tracks[index]
-    track.selected = newId
+    let trackObj = state.convertedTracks[index]
+    index = findById(playlist, trackObj.playlists)
+    if (index === -1) {
+      console.error('Playlist that the track was synced into was not found:: CurrentUser.js :: CHANGE_YT_TRACK_SELECTION')
+      return
+    }
+
+    trackObj.playlists[index].selected = newId
     SAVE_TO_DISK()
   },
   UNSYNC_PLAYLIST (state, id) {
@@ -618,10 +615,10 @@ export default {
   getters
 }
 
-function findById (id, pls) {
-  for (let i = 0; i < pls.length; i++) {
-    let pl = pls[i].id
-    if (pl === undefined) pl = pls[i]
+function findById (id, obj) {
+  for (let i = 0; i < obj.length; i++) {
+    let pl = obj[i].id
+    if (pl === undefined) pl = obj[i]
     if (pl === id) {
       return i
     }

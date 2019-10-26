@@ -54,6 +54,7 @@ function findDuplicatedTracks () {
   if (pls.length === 0) return false
 
   // Computing duplicated tracks
+  console.log('checkin', pls)
   for (let i = 0; i < pls.length; i++) {
     let playlist = pls[i]
     // console.log('loopin', playlist)

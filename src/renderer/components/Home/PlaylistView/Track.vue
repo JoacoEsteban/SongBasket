@@ -172,7 +172,6 @@ export default {
       return id === (this.selected !== null ? this.selected : this.conversion.conversion.bestMatch)
     },
     select (id) {
-      if (!id) id = this.conversion.bestMatch
       if (this.isSelected(id)) return
       this.$emit('selectTrack', id)
     },
