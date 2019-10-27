@@ -70,22 +70,17 @@ let userMethods = {
   checkDownloadPaths () {
     return new Promise((resolve, reject) => {
       let syncedPlaylists = customGetters.SyncedPlaylistsSp()
-      let playlists = []
+      let processedPls = 0
+      let allTracks = []
       for (let i = 0; i < syncedPlaylists.length; i++) {
         let pl = syncedPlaylists[i]
-        playlists = [...playlists, { id: pl.id, path: homeFolderPath() + '/' + pl.name, tracks: [], name: pl.name }]
-      }
-      console.log('playlists', playlists)
+        pl = { id: pl.id, path: homeFolderPath() + '/' + pl.name }
 
-      let processedPls = 0
-      for (let i = 0; i < playlists.length; i++) {
-        let pl = playlists[i]
-        let path = pl.path
-        if (checkPathThenCreate(path)) {
+        if (checkPathThenCreate(pl.path)) {
           // Get all files from playlist dir
-          fs.readdir(path, function (err, filenames) {
+          fs.readdir(pl.path, function (err, filenames) {
             if (err) {
-              console.error('error reading path', path)
+              console.error('error reading path', pl.path)
               reject(err)
               return
             }
@@ -101,28 +96,31 @@ let userMethods = {
                 tags = tags.userDefinedText
                 if (tags) {
                   let track = {}
+                  let found = 2 // 2 tags to find
                   for (let u = 0; u < tags.length; u++) {
                     let tag = tags[u]
                     let expression = /(songbasket|SONGBASKET)_(youtube|YOUTUBE|spotify|SPOTIFY)_(id|ID)/
                     if (expression.test(tag.description)) {
                       track[tag.description.toLowerCase()] = tag.value
-                      track.path = file
-                      pl.tracks.push(track)
+                      if (--found === 0) { // all tags found
+                        track.playlist = pl.id
+                        track.path = file
+                        allTracks.push(track)
+                        break
+                      }
                     }
                   }
                 }
 
                 processedTracks++
                 if (processedTracks === filenames.length) {
-                  processedPls++
-                  if (processedPls === playlists.length) resolve(playlists)
+                  if (++processedPls === syncedPlaylists.length) resolve(allTracks)
                 }
               })
             }
           })
         } else {
-          processedPls++
-          if (processedPls === playlists.length) resolve(playlists)
+          if (++processedPls === syncedPlaylists.length) resolve(allTracks)
         }
       }
     })

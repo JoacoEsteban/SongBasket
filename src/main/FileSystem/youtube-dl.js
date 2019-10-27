@@ -1,5 +1,6 @@
 import store from '../../renderer/store'
 import customGetters from '../../renderer/store/customGetters'
+import utils from '../../MAIN_PROCESS_UTILS'
 
 let NodeID3 = require('node-id3')
 let axios = require('axios')
@@ -18,7 +19,7 @@ ffbinaries.downloadBinaries(['ffmpeg', 'ffprobe'], {destination: binPath}, funct
 })
 
 export default {
-  downloadSyncedPlaylists (dlPlaylists) {
+  downloadSyncedPlaylists (localTracks) {
     function skipTrack (selection, downloadedTrack) {
       if (selection !== downloadedTrack.songbasket_youtube_id) {
         fs.unlinkSync(downloadedTrack.path)
@@ -27,7 +28,7 @@ export default {
       return true
     }
 
-    console.log('STARTING DOWNLOAD', dlPlaylists)
+    console.log('STARTING DOWNLOAD', localTracks)
     let ytPlaylists = store.state.CurrentUser.syncedPlaylists
     let spPlaylists = customGetters.SyncedPlaylistsSp()
     // TODO Filter already downloaded tracks
@@ -35,6 +36,8 @@ export default {
     downloadLoop({playlistIndex: 0, ytPlaylistIndex: null, dlPlaylistIndex: null, trackIndex: 0})
 
     function downloadLoop ({playlistIndex, ytPlaylistIndex, dlPlaylistIndex, trackIndex}) {
+      // let a = true
+      // if (a) return
       if (playlistIndex < spPlaylists.length) {
         let spPlaylist = spPlaylists[playlistIndex]
         if (trackIndex >= spPlaylist.tracks.items.length) {
@@ -191,6 +194,42 @@ export default {
         })
           .catch((err) => reject(err))
       })
+    }
+
+    function downloadLinkRemove (localTracks, queryTracks) {
+      let download = []
+      let link = []
+      let remove = []
+
+      for (let i = 0; i < queryTracks.length; i++) {
+        qt = queryTracks[i]
+        for (let o = 0; o < localTracks.length; o++) {
+          lt = localTracks[o]
+          if (qt.id === lc.songbasket_spotify_id) { // same SP Track
+            let sameVer = false
+            let found = false
+            for (let u = 0; u > qt.conversion.playlists.length; u++) {
+              let pl = qt.conversion.playlists[u]
+              samePl = pl.id === lt.playlist
+              sameVer = pl.conversion === lt.songbasket_youtube_id
+
+              if (sameVer && samePl) {
+                found = true
+                qt.conversion.playlists.splice(u, 1)
+              } else {
+                if (samePl) {
+                  
+                }
+                if (sameVer) {
+                  link.push()
+                }
+              }
+            }
+          }
+          
+        }
+      }
+      return {download, link, remove}
     }
   }
 }
