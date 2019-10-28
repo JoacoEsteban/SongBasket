@@ -207,8 +207,6 @@ export default {
                   }
                   if (!samePl) { // Same version, diff pl. Hardlink into this playlist
                     console.log('LINKING EXISTING TRACK')
-                    // Track found, skipping
-                    // hardLink will return false if the link exists or, so only splice if link has been created. Else splice will happen when triple match ocurrs later as it goes iterating over more tracks
                     linkQueue.push({paths: [lt.path, process.env.HOME_FOLDER + '/' + customGetters.giveMePlName(pl.id) + '/' + lt.file], indexes: [i, u]})
                   }
                 }
@@ -227,13 +225,17 @@ export default {
       }
 
       linkQueue.forEach(track => {
-        link(track.paths[0], track.paths[1])
+        link(track.paths[0], track.paths[1] + '.temp')
         queryTracks[track.indexes[0]].playlists.splice(track.indexes[1], 1)
       })
 
       unlinkQueue = [...unlinkQueue, ...localTracks]
       unlinkQueue.forEach(track => {
         unlink(track.path)
+      })
+
+      linkQueue.forEach(track => {
+        fs.renameSync(track.paths[1] + '.temp', track.paths[1])
       })
 
       return queryTracks
