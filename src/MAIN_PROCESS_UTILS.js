@@ -31,3 +31,7 @@ export function removeDuplicationId (array) {
   }
   return array
 }
+
+export function encodeIntoFilename (text) {
+  return text.replace('/', ':')
+}

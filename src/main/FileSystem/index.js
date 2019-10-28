@@ -1,4 +1,5 @@
 import customGetters from '../../renderer/store/customGetters'
+import * as utils from '../../MAIN_PROCESS_UTILS'
 const electron = require('electron')
 var fs = require('fs')
 var rimraf = require('rimraf')
@@ -78,7 +79,7 @@ let userMethods = {
       }
       for (let i = 0; i < syncedPlaylists.length; i++) {
         let pl = syncedPlaylists[i]
-        pl = { id: pl.id, path: homeFolderPath() + '/' + pl.name }
+        pl = { id: pl.id, path: homeFolderPath() + '/' + utils.encodeIntoFilename(pl.name) }
         console.log('checked', pl)
 
         if (checkPathThenCreate(pl.path)) {
@@ -136,12 +137,15 @@ let userMethods = {
     })
   },
   deletePlaylist (playlistName, callback) {
+    playlistName = utils.encodeIntoFilename(playlistName)
     rimraf(homeFolderPath() + '/' + playlistName, function () {
       console.log('Playlist ' + playlistName + ' Deleted')
       callback()
     })
   },
   renameFolder ({oldName, newName}) {
+    newName = utils.encodeIntoFilename(newName)
+    oldName = utils.encodeIntoFilename(oldName)
     console.log('RENAMING FOLDER: ' + oldName + ' => ' + newName)
     let base = homeFolderPath() + '/'
     if (!fs.existsSync(base + oldName)) return
