@@ -235,6 +235,7 @@ export default {
       })
 
       linkQueue.forEach(track => {
+        if (fs.existsSync(track.paths[1])) fs.unlinkSync(track.paths[1])
         fs.renameSync(track.paths[1] + '.temp', track.paths[1])
       })
 
