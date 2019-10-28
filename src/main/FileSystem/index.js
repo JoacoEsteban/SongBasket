@@ -72,9 +72,14 @@ let userMethods = {
       let syncedPlaylists = customGetters.SyncedPlaylistsSp()
       let processedPls = 0
       let allTracks = []
+
+      function checkNResolve () {
+        if (++processedPls === syncedPlaylists.length) resolve(allTracks)
+      }
       for (let i = 0; i < syncedPlaylists.length; i++) {
         let pl = syncedPlaylists[i]
         pl = { id: pl.id, path: homeFolderPath() + '/' + pl.name }
+        console.log('checked', pl)
 
         if (checkPathThenCreate(pl.path)) {
           // Get all files from playlist dir
@@ -84,43 +89,48 @@ let userMethods = {
               reject(err)
               return
             }
-            // filter to just MP3 files
-            // TODO Support FLAC, etc
             filenames = filenames.filter(n => n.substr(n.length - 3) === 'mp3')
-            let processedTracks = 0
-            // cycle throug tracks and store SB ones
-            for (let o = 0; o < filenames.length; o++) {
-              let file = pl.path + '/' + filenames[o]
-              NodeID3.read(file, function (err, tags) {
-                if (err) console.error(err) // TODO Handle error
-                tags = tags.userDefinedText
-                if (tags) {
-                  let track = {}
-                  let found = 2 // 2 tags to find
-                  for (let u = 0; u < tags.length; u++) {
-                    let tag = tags[u]
-                    let expression = /(songbasket|SONGBASKET)_(youtube|YOUTUBE|spotify|SPOTIFY)_(id|ID)/
-                    if (expression.test(tag.description)) {
-                      track[tag.description.toLowerCase()] = tag.value
-                      if (--found === 0) { // all tags found
-                        track.playlist = pl.id
-                        track.path = file
-                        allTracks.push(track)
-                        break
+            if (filenames.length === 0) {
+              checkNResolve()
+            } else {
+              // filter to just MP3 files
+              // TODO Support FLAC, etc
+              let processedTracks = 0
+              // cycle throug tracks and store SB ones
+              for (let o = 0; o < filenames.length; o++) {
+                let file = pl.path + '/' + filenames[o]
+                NodeID3.read(file, function (err, tags) {
+                  if (err) console.error(err) // TODO Handle error
+                  tags = tags.userDefinedText
+                  if (tags) {
+                    let track = {}
+                    let found = 2 // 2 tags to find
+                    for (let u = 0; u < tags.length; u++) {
+                      let tag = tags[u]
+                      let expression = /(songbasket|SONGBASKET)_(youtube|YOUTUBE|spotify|SPOTIFY)_(id|ID)/
+                      if (expression.test(tag.description)) {
+                        track[tag.description.toLowerCase()] = tag.value
+                        if (--found === 0) { // all tags found
+                          track.playlist = pl.id
+                          track.path = file
+                          track.file = filenames[o]
+                          allTracks.push(track)
+                          break
+                        }
                       }
                     }
                   }
-                }
 
-                processedTracks++
-                if (processedTracks === filenames.length) {
-                  if (++processedPls === syncedPlaylists.length) resolve(allTracks)
-                }
-              })
+                  processedTracks++
+                  if (processedTracks === filenames.length) {
+                    checkNResolve()
+                  }
+                })
+              }
             }
           })
         } else {
-          if (++processedPls === syncedPlaylists.length) resolve(allTracks)
+          checkNResolve()
         }
       }
     })

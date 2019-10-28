@@ -1,6 +1,6 @@
 import store from '../../renderer/store'
 import customGetters from '../../renderer/store/customGetters'
-import utils from '../../MAIN_PROCESS_UTILS'
+import * as utils from '../../MAIN_PROCESS_UTILS'
 
 let NodeID3 = require('node-id3')
 let axios = require('axios')
@@ -20,85 +20,45 @@ ffbinaries.downloadBinaries(['ffmpeg', 'ffprobe'], {destination: binPath}, funct
 
 export default {
   downloadSyncedPlaylists (localTracks) {
-    function skipTrack (selection, downloadedTrack) {
-      if (selection !== downloadedTrack.songbasket_youtube_id) {
-        fs.unlinkSync(downloadedTrack.path)
-        return false
-      }
-      return true
-    }
-
-    console.log('STARTING DOWNLOAD', localTracks)
-    let ytPlaylists = store.state.CurrentUser.syncedPlaylists
-    let spPlaylists = customGetters.SyncedPlaylistsSp()
+    console.log('Stored tracks: ', localTracks.length)
     // TODO Filter already downloaded tracks
+    let allTracks = downloadLinkRemove(localTracks, utils.cloneObject(store.state.CurrentUser.convertedTracks))
+    console.log('Filtered tracks: ', allTracks.length)
+    downloadLoop(0)
 
-    downloadLoop({playlistIndex: 0, ytPlaylistIndex: null, dlPlaylistIndex: null, trackIndex: 0})
+    function downloadLoop (trackIndex) {
+      if (trackIndex < allTracks.length) {
+        let track = allTracks[trackIndex]
+        let trackMap = {}
 
-    function downloadLoop ({playlistIndex, ytPlaylistIndex, dlPlaylistIndex, trackIndex}) {
-      // let a = true
-      // if (a) return
-      if (playlistIndex < spPlaylists.length) {
-        let spPlaylist = spPlaylists[playlistIndex]
-        if (trackIndex >= spPlaylist.tracks.items.length) {
-          // Playlist finished
-          downloadLoop({playlistIndex: playlistIndex + 1, ytPlaylistIndex: null, dlPlaylistIndex: null, trackIndex: 0})
-          // TODO splice ytPlaylists & dlPlaylists obj
-        } else {
-          // These runs the first time per playlist
-          // They define where playlists objects are located, defined by
-          if (ytPlaylistIndex === null) {
-            for (let i = 0; i < ytPlaylists.length; i++) {
-              if (ytPlaylists[i].id === spPlaylist.id) {
-                ytPlaylistIndex = i
-                break
-              }
-            }
-          }
-          let ytPlaylist = ytPlaylists[ytPlaylistIndex]
+        track.playlists.forEach(pl => {
+          let yt = pl.selected === null ? track.conversion.bestMatch : pl.selected
+          trackMap[yt] = trackMap[yt] === undefined ? [pl.id] : [...trackMap[yt], pl.id]
+        })
 
-          if (dlPlaylistIndex === null) {
-            for (let i = 0; i < dlPlaylists.length; i++) {
-              if (dlPlaylists[i].id === spPlaylist.id) {
-                dlPlaylistIndex = i
-                break
-              }
-            }
-          }
-          let dlPlaylist = dlPlaylists[dlPlaylistIndex]
+        let name = track.data.name
+        let id = track.id
+        if (Object.keys(trackMap).length === 0) return downloadLoop(trackIndex + 1)
 
-          let spTrack = spPlaylist.tracks.items[trackIndex]
-          let ytTrack = ytPlaylist.tracks.find(track => track.id === spTrack.id)
-          let dlTrack = dlPlaylist.tracks.find(track => track.songbasket_spotify_id === spTrack.id)
-
-          // Condition to skip a download
-          // To be skippable Downloaded track must be in disk and YT Selection must be the same
-          // If YT Selection differs, skipTrack removes file from disk
-          if (dlTrack !== undefined && skipTrack(ytTrack.selected, dlTrack)) {
-            console.log('SKIPPING', spTrack.name)
-            return downloadLoop({playlistIndex, ytPlaylistIndex, dlPlaylistIndex, trackIndex: trackIndex + 1})
-          }
-
-          let {name, id} = spTrack
-          // declaring write paths
-          let fullPath = process.env.HOME_FOLDER + '/' + spPlaylist.name
+        for (let ytId in trackMap) {
+          let fullPath = process.env.HOME_FOLDER + '/' + customGetters.giveMePlName(trackMap[ytId][0])
           let fullPathmp4 = fullPath + '/' + name + '.mp4'
           let fullPathmp3 = fullPath + '/' + name + '.mp3'
+          console.log('trackie: ', trackMap[ytId])
 
           console.log('downloading ', fullPathmp4)
-          let video = youtubedl(ytTrack.selected,
+          let video = youtubedl(ytId,
             // Optional arguments passed to youtube-dl.
             ['--format=18'],
             // Additional options can be given for calling `child_process.execFile()`.
             { cwd: fullPath })
 
           // Will be called when the download starts.
-          let size = 0
           video.on('info', function (info) {
             console.log('Download started')
             console.log('filename: ' + info._filename)
             console.log('size: ' + info.size)
-            size = info.size
+            store.dispatch('downloadChunk', {started: true, id, ytId, info})
           })
 
           video.pipe(fs.createWriteStream(fullPathmp4))
@@ -107,21 +67,30 @@ export default {
           video.on('data', (chunk) => {
             current += chunk.length
             // console.log(Math.round(current / size * 100) + '%')
-            store.dispatch('downloadChunk', {id, current, size})
+            store.dispatch('downloadChunk', {id, ytId, current})
           })
 
           video.on('end', () => {
             console.log('track completed')
-            store.dispatch('downloadChunk', {id, finished: true})
-            downloadLoop({playlistIndex, ytPlaylistIndex, dlPlaylistIndex, trackIndex: trackIndex + 1})
-            convertMp3(fullPathmp3, fullPathmp4, spTrack, ytTrack.selected)
+            store.dispatch('downloadChunk', {id, ytId, finished: true})
+            downloadLoop(trackIndex + 1)
+            convertMp3(fullPathmp3, fullPathmp4, track, ytId)
+              .then(() => {
+                for (let i = 1; i < trackMap[ytId].length; i++) {
+                  link(fullPathmp3, process.env.HOME_FOLDER + '/' + customGetters.giveMePlName(trackMap[ytId][i]) + '/' + name)
+                }
+                console.log('finished track')
+              })
+              .catch(() => {
+                // TODO handle error
+              })
           })
         }
       }
     }
 
-    function convertMp3 (pathmp3, pathmp4, track, ytSelection) {
-      return new Promise(() => {
+    function convertMp3 (pathmp3, pathmp4, track, ytId) {
+      return new Promise((resolve, reject) => {
         let command =
           ffmpeg(pathmp4)
             .inputFormat('mp4')
@@ -129,47 +98,57 @@ export default {
               // TODO Emit convertion starting
               fs.unlink(pathmp4)
               console.log('Finished processing')
-              applyTags(pathmp3, track, ytSelection)
+              applyTags(pathmp3, track, ytId)
+                .then(() => {
+                  // TODO Emit Track Finished
+                  resolve()
+                })
+                .catch((err) => {
+                  // TODO handle error
+                  reject(err)
+                })
             })
-
         command.save(pathmp3)
       })
     }
 
     function applyTags (pathmp3, track, ytSelection) {
-      // TODO Emit applying tags
-      console.log('applying tags')
-      getPhoto(track.album.images[0].url)
-        .then(buffer => {
-          let tags = {
-            title: track.name,
-            artist: track.artists[0].name,
-            album: track.album.name,
-            userDefinedText: [{
-              description: 'songbasket_spotify_id',
-              value: track.id
-            }, {
-              description: 'songbasket_youtube_id',
-              value: ytSelection
-            }],
-            image: {
-              mime: 'png/jpeg' / undefined,
-              type: {
-                id: 3,
-                name: 'front cover'
-              },
-              imageBuffer: buffer
+      let data = track.data
+      return new Promise((resolve, reject) => {
+        // TODO Emit applying tags
+        console.log('applying tags')
+        getPhoto(data.album.images[0].url)
+          .then(buffer => {
+            let tags = {
+              title: data.name,
+              artist: data.artists[0].name,
+              album: data.album.name,
+              userDefinedText: [{
+                description: 'songbasket_spotify_id',
+                value: data.id
+              }, {
+                description: 'songbasket_youtube_id',
+                value: ytSelection
+              }],
+              image: {
+                mime: 'png/jpeg' / undefined,
+                type: {
+                  id: 3,
+                  name: 'front cover'
+                },
+                imageBuffer: buffer
+              }
             }
-          }
 
-          // TODO Emit Track Finished
-          let tagSuccess = NodeID3.write(tags, pathmp3)
-          if (!tagSuccess) {
-            // TODO Handle error
-          } else {
-
-          }
-        })
+            let tagSuccess = NodeID3.write(tags, pathmp3)
+            if (!tagSuccess) {
+              // TODO Handle error
+              reject(new Error('error while writing tags'))
+            } else {
+              resolve()
+            }
+          })
+      })
     }
 
     function getPhoto (url) {
@@ -197,39 +176,79 @@ export default {
     }
 
     function downloadLinkRemove (localTracks, queryTracks) {
-      let download = []
-      let link = []
-      let remove = []
-
+      let linkQueue = []
+      let unlinkQueue = []
       for (let i = 0; i < queryTracks.length; i++) {
-        qt = queryTracks[i]
+        let qt = queryTracks[i]
         for (let o = 0; o < localTracks.length; o++) {
-          lt = localTracks[o]
-          if (qt.id === lc.songbasket_spotify_id) { // same SP Track
-            let sameVer = false
+          let lt = localTracks[o]
+          if (qt.id === lt.songbasket_spotify_id) {
+            console.log('FOUND') // same SP Track
             let found = false
-            for (let u = 0; u > qt.conversion.playlists.length; u++) {
-              let pl = qt.conversion.playlists[u]
-              samePl = pl.id === lt.playlist
-              sameVer = pl.conversion === lt.songbasket_youtube_id
+            let unlinkTrack = false
+            console.log('playlists', qt.playlists.length, lt.playlist)
+            for (let u = 0; u < qt.playlists.length; u++) {
+              let pl = qt.playlists[u]
+              pl.selected = pl.selected === null ? qt.conversion.bestMatch : pl.selected
 
-              if (sameVer && samePl) {
+              let samePl = pl.id === lt.playlist
+              let sameVer = pl.selected === lt.songbasket_youtube_id
+              console.log('a ver', samePl, sameVer)
+              if (samePl || sameVer) {
                 found = true
-                qt.conversion.playlists.splice(u, 1)
-              } else {
-                if (samePl) {
-                  
-                }
-                if (sameVer) {
-                  link.push()
+
+                if (sameVer && samePl) {
+                  qt.playlists.splice(u, 1) // Track found, skipping
+                  u--
+                  found = true
+                } else {
+                  if (!sameVer) { // Same playlist but version changed, so unlink it when everything has been verified
+                    unlinkTrack = true
+                  }
+                  if (!samePl) { // Same version, diff pl. Hardlink into this playlist
+                    console.log('LINKING EXISTING TRACK')
+                    // Track found, skipping
+                    // hardLink will return false if the link exists or, so only splice if link has been created. Else splice will happen when triple match ocurrs later as it goes iterating over more tracks
+                    linkQueue.push({paths: [lt.path, process.env.HOME_FOLDER + '/' + customGetters.giveMePlName(pl.id) + '/' + lt.file], indexes: [i, u]})
+                  }
                 }
               }
             }
+            if (found) {
+              if (unlinkTrack) {
+                console.log('UNLINKING TRACK')
+                unlinkQueue.push(lt)
+              }
+              localTracks.splice(o, 1)
+              o--
+            }
           }
-          
         }
       }
-      return {download, link, remove}
+
+      linkQueue.forEach(track => {
+        link(track.paths[0], track.paths[1])
+        queryTracks[track.indexes[0]].playlists.splice(track.indexes[1], 1)
+      })
+
+      unlinkQueue = [...unlinkQueue, ...localTracks]
+      unlinkQueue.forEach(track => {
+        unlink(track.path)
+      })
+
+      return queryTracks
     }
   }
+}
+
+// TODO consider both of this as async
+function unlink (path) {
+  if (fs.existsSync(path))fs.unlinkSync(path)
+}
+function link (path, newPath) {
+  console.log('linking ', path, newPath)
+  let exists = fs.existsSync(path) && !fs.existsSync(newPath)
+  console.log(fs.existsSync(path), fs.existsSync(path))
+  if (exists) fs.linkSync(path, newPath)
+  return exists
 }

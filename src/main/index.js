@@ -215,10 +215,11 @@ function fetchMultiple (playlists, checkVersion) {
 }
 console.log('Home folder: ', process.env.HOME_FOLDER)
 // :::::::::::::::::::::::::::::::::IPC:::::::::::::::::::::::::::::::::
-ipc.on('download', function (event, id) {
-  // console.log('openYtVideo', id)
+ipc.on('download', function (event) {
+  console.log('About to download')
   FileSystemUser.checkDownloadPaths()
     .then(playlists => {
+      console.log('passed')
       youtubeDl.downloadSyncedPlaylists(playlists)
     })
 })

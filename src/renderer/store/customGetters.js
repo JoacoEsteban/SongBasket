@@ -18,5 +18,11 @@ export default {
       }
     }
     return all
+  },
+  giveMePlName (id) {
+    let state = store.state.CurrentUser
+    for (let i = 0; i < state.playlists.length; i++) {
+      if (id === state.playlists[i].id) return state.playlists[i].name
+    }
   }
 }
