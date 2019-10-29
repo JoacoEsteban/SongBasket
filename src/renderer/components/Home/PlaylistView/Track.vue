@@ -38,30 +38,15 @@
     v-if="conversion"
     :class="{'show': convertionIsOpenedLocal, 'transitioning': transitioning, 'd-none': !convertionIsOpened && !transitioning}"
     class="animation-container">
-      <div class="conversion-container df fldc jucb alic">
+      <div class="conversion-container df juce alic flww">
         <div
         v-for="(track, index) in conversion.conversion.yt"
         :key="index"
         :class="{'selected': isSelected(track.id)}"
-        class="pl-track-container yt bestMatch">
+        class="pl-track-container">
           <div class="pl-track-img-container">
             <div class="pl-track-img" :style="'background-image: url('+track.snippet.thumbnails.high.url+')'" />
-          </div>
-          <div class="aligner" />
-          <div class="pl-track-data-up">
-            <!-- TODO pull out ellipsis without fucking up the entire page -->
-            <div class="pl-track-data-name  center">
-              {{track.snippet.title | decodeUri}}
-            </div>
-            <div class="pl-track-data-byartist ">
-              uploader <span class="bold">{{track.snippet.channelTitle | decodeUri}}</span>
-            </div>
-            <div class="pl-track-data-duration">Duration: <span>{{convertNFormat(track.duration)}}</span></div>
-
-          </div>
-
-          <div class="aligner" />
-          <div class="controls">
+            <div class="controls">
             <div
             :class="{'disabled': isSelected(track.id)}"
             @click="select(track.id)" class="button slim">
@@ -75,8 +60,24 @@
               </span>
             </div>
           </div>
+          </div>
+          <!-- <div class="aligner" /> -->
+          <div class="pl-track-data-up">
+            <!-- TODO pull out ellipsis without fucking up the entire page -->
+            <div class="pl-track-data-name  center">
+              {{track.snippet.title | decodeUri}}
+            </div>
+            <div class="pl-track-data-byartist ">
+              uploader <span class="bold">{{track.snippet.channelTitle | decodeUri}}</span>
+            </div>
+            <div class="pl-track-data-duration">Duration: <span>{{convertNFormat(track.duration)}}</span></div>
+
+          </div>
+
+          <!-- <div class="aligner" /> -->
+          
         </div>
-        <div style="font-size: .5em;" class="df">
+        <div style="font-size: .5em; position: absolute; bottom: 1em; left: 0; right: 0" class="df jucc">
           <div @click="select(null)" class="link-button">
             Reset Selection
           </div>
@@ -332,7 +333,7 @@ $track-height: 3.5em;
     min-width: 13em;
   }
 }
-$conversion-height: 25em;
+$conversion-height: 20em;
 $conversion-time: .5s;
 .animation-container {
   z-index: 0;
@@ -377,16 +378,17 @@ $conversion-time: .5s;
   .pl-track-container {
     position: relative;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin-bottom: .5em;
+    margin-right: .5em;
     transition: transform .3s ease, border-color .3s ease;
     transform: scale(.95);
     $track-height: 4em;
+    border-radius: .4em;
     height: $track-height;
     border: 3px solid transparent;
-    border-left: none;
-
+    width: 13em;
 
     &:nth-last-child(1) {
       margin-bottom: 0;
@@ -398,7 +400,7 @@ $conversion-time: .5s;
 
 
     .pl-track-img-container {
-      position: absolute;
+      position: relative;
       $size: $track-height * 1.1;
       height: $size;
       min-height: $size;
@@ -410,20 +412,19 @@ $conversion-time: .5s;
       font-size: .5em;
     }
     .pl-track-data-up {
-      font-size: 1.1em;
+      font-size: .85em;
       align-items: center;
       padding: .3em 0;
     }
     .controls {
       position: absolute;
-      right: 0;
-      $padding: .25em;
+      left: 4.5em;
+      $padding: .5em;
       top: $padding;
       bottom: $padding;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding-right: 1em;
     }
   }
 }
