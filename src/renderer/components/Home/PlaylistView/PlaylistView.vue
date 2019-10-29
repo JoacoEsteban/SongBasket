@@ -18,8 +18,13 @@
             <button v-if="isSynced" class="button" @click="unsync">Unsync</button>
           </div>
 
-          <div v-if="isSynced" @click="toggleShowingAll" class="button slim">
-            {{showingAll ? 'Collapse' : 'Show'}} all
+          <div>
+            <div v-if="isSynced" @click="toggleShowingAll" class="button slim mb-1">
+              {{showingAll ? 'Collapse' : 'Show'}} all
+            </div>
+            <div v-if="isSynced" @click="resetAll" class="button slim">
+              Reset all
+            </div>
           </div>
         </div>
 
@@ -193,6 +198,14 @@ export default {
         if (this.showingConversion[i] === id) return !this.showingAll
       }
       return this.showingAll
+    },
+    resetAll () {
+      this.conversion.forEach(track => {
+        this.$store.dispatch('changeYtTrackSelection', {playlist: this.playlist.id, trackId: track.id, newId: null})
+      })
+      setTimeout(() => {
+        this.$forceUpdate()
+      }, 0)
     },
     selectTrack (trackId, newId) {
       this.$store.dispatch('changeYtTrackSelection', {playlist: this.playlist.id, trackId, newId})
