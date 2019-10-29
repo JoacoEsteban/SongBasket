@@ -232,6 +232,7 @@ $track-height: 3.5em;
   position: relative;
   align-items: center;
   width: 100%;
+  min-width: 0;
   z-index: 0;
   
 }
@@ -267,6 +268,7 @@ $track-height: 3.5em;
   padding: .2em 0;
   padding-left: 0.2em;
   width: 100%;
+  min-width: 0;
   height: 100%;
   font-size: .85em;
 }
@@ -281,7 +283,7 @@ $track-height: 3.5em;
 .ellipsis {
   white-space: nowrap;
   overflow: hidden;
-  width: calc(98%);
+  width: calc(100%);
   text-overflow: ellipsis;
 
   &.left {

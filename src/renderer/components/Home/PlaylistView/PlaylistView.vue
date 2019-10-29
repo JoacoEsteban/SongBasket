@@ -243,6 +243,7 @@ export default {
   width: 100%;
   display: flex;
   flex-direction: column;
+  min-width: 0;
 
   /* border: 1px solid white; */
 }
