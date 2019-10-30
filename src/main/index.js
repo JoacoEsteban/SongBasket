@@ -1,3 +1,4 @@
+import dotenvConfig from './dotenvConfig'
 import FileSystemUser from './FileSystem/index'
 import youtubeDl from './FileSystem/youtube-dl'
 import { logme } from '../UTILS'
@@ -6,9 +7,7 @@ import customGetters from '../renderer/store/customGetters'
 import * as sbFetch from './sbFetch'
 import * as youtubeHandler from './youtubeHandler'
 import electron from 'electron'
-import dotenv from 'dotenv'
-// import { sync } from 'C:/Users/joaco/AppData/Local/Microsoft/TypeScript/3.6/node_modules/@types/glob'
-dotenv.config()
+console.log(dotenvConfig)
 var open = require('open')
 
 const dialog = electron.dialog
@@ -18,12 +17,10 @@ let { app, BrowserWindow, session } = electron
 let FOLDERS = FileSystemUser.checkForUser()
 const ipc = electron.ipcMain
 
-const localBackend = 'http://localhost:5000'
-// const herokuBackend = 'https://songbasket-backend.herokuapp.com'
-const Backend = localBackend
+const Backend = process.env.BACKEND
 
 const filter = { // when logging in
-  urls: ['http://*.localhost:5000/*']
+  urls: [Backend + '/*']
 }
 
 if (process.env.NODE_ENV !== 'development') {

@@ -3,9 +3,8 @@ import fetch from 'electron-fetch'
 import store from '../renderer/store'
 const axios = require('axios')
 
-const localBackend = 'http://localhost:5000'
-// const herokuBackend = 'https://songbasket-backend.herokuapp.com'
-const Backend = localBackend
+const Backend = process.env.BACKEND
+console.log('douu', Backend)
 
 function LOADING (value, target) {
   if (!value) value = false
