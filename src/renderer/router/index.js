@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import store from '../store'
 
 import LoadingScreen from '../components/LoadingScreen/LoadingScreen'
 import Setup from '../components/Setup/Setup'
@@ -14,7 +15,7 @@ import PlaylistView from '../components/Home/PlaylistView/PlaylistView'
 
 Vue.use(Router)
 
-export default new Router({
+let router = new Router({
   routes: [
     {
       path: '*',
@@ -75,3 +76,15 @@ export default new Router({
     }
   ]
 })
+router.beforeEach((to, from, next) => {
+  console.log('to, ', to, 'from.', from, 'next', next)
+  store.dispatch('routerAnimation', 'out')
+  setTimeout(() => {
+    next()
+    setTimeout(() => {
+      store.dispatch('routerAnimation', 'in')
+    }, 100)
+  }, 300)
+})
+
+export default router
