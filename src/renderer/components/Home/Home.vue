@@ -15,7 +15,7 @@
       @openYtVideo="openYtVideo($event)"
       ></router-view>
 
-      <user-data @logOut="logOut"></user-data>
+      <user-data style="z-index: 1" @logOut="logOut"></user-data>
     </div>
   </div>
 </template>
@@ -159,7 +159,7 @@ export default {
 
   &.out {
     transform-origin: bottom;
-    transform: scale(.5);
+    transform: scale(1.5);
     opacity: 0;
   }
   &.in {

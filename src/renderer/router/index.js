@@ -77,13 +77,12 @@ let router = new Router({
   ]
 })
 router.beforeEach((to, from, next) => {
-  console.log('to, ', to, 'from.', from, 'next', next)
   store.dispatch('routerAnimation', 'out')
   setTimeout(() => {
     next()
     setTimeout(() => {
       store.dispatch('routerAnimation', 'in')
-    }, 100)
+    }, 10)
   }, 300)
 })
 
