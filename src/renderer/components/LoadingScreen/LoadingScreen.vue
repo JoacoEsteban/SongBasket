@@ -46,7 +46,7 @@ export default {
     }
 
   },
-  mounted () {
+  created () {
     // ipc.on('continueToLogin', () => {
     //   this.redirect('login')
     // })
@@ -70,6 +70,7 @@ export default {
     // })
 
     ipc.on('initializeSetup', () => {
+      console.log('a vere man')
       // this.$store.dispatch('SET_LOADING_STATE', 'found')
       this.redirect('setup')
     })
@@ -93,7 +94,9 @@ export default {
 .login-flex {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
+  text-align: center;
+  align-self: center;
   height: 100vh;
 }
 .login-header {
