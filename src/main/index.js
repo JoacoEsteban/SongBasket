@@ -129,8 +129,10 @@ function verifyFileSystem () {
         })
       // guestFetch(FOLDERS.user, true)
     } else {
-      console.log('no user', 1)
-      mainWindow.webContents.send('initializeSetup')
+      console.log('no user')
+      setTimeout(() => {
+        mainWindow.webContents.send('initializeSetup')
+      }, 1000)
     }
   })
 }
