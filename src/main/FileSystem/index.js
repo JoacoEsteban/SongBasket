@@ -13,10 +13,8 @@ let homeFolderPath = () => process.env.HOME_FOLDER
 
 let userMethods = {
   checkForUser: function () {
-    let folders = fs.existsSync(foldersJsonPath)
-
-    if (folders) {
-      folders = fs.readFileSync(foldersJsonPath, 'utf8')
+    if (fs.existsSync(foldersJsonPath)) {
+      let folders = fs.readFileSync(foldersJsonPath, 'utf8')
       return JSON.parse(folders)
     } else {
       console.log('Folder paths file missing, Creating')

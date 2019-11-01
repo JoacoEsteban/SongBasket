@@ -11,6 +11,8 @@ let ffbinaries = require('ffbinaries')
 let ffmpeg = require('fluent-ffmpeg')
 
 let binPath = process.cwd() + '/bin/ffmpeg'
+if (!fs.existsSync(process.cwd() + '/bin')) fs.mkdirSync(process.cwd() + '/bin')
+if (!fs.existsSync(process.cwd() + '/bin/ffmpeg')) fs.mkdirSync(process.cwd() + '/bin/ffmpeg')
 ffbinaries.downloadBinaries(['ffmpeg', 'ffprobe'], {destination: binPath}, function () {
   console.log('Downloaded all binaries for current platform.')
 
