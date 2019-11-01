@@ -7,7 +7,8 @@ let ALL_PLAYLISTS = []
 let ALL_TRACKS = []
 
 export function youtubizeAll () {
-  console.log('GETTIN IN DOU')
+  if (store.state.Events.GLOBAL_LOADING_STATE.value) return console.log('STILL LOADING')
+  store.dispatch('globalLoadingState', {value: true, target: 'converting'})
   let syncedPlaylists = customGetters.SyncedPlaylistsSp().map(pl => {
     return {
       ...pl,
@@ -32,6 +33,12 @@ export function youtubizeAll () {
     .then(CONVERTED_TRACKS => {
       // console.log('REITERAMO::::: ', CONVERTED_TRACKS)
       store.dispatch('youtubizeResult', [...CONVERTED_TRACKS])
+    })
+    .catch(err => {
+      console.error(err) // TODO handle error
+    })
+    .finally(() => {
+      store.dispatch('globalLoadingState', {value: false, target: ''})
     })
 }
 

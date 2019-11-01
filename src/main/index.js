@@ -80,8 +80,8 @@ function createLoginWindow () {
   }
 };
 
-function storePlaylists (resolve, redirect) {
-  store.dispatch('updateUserEntities', resolve)
+function storePlaylists (response, redirect) {
+  store.dispatch('updateUserEntities', response)
     .then(() => {
       if (redirect) {
         mainWindow.webContents.send('playlists done')
@@ -135,6 +135,15 @@ function verifyFileSystem () {
   })
 }
 
+function globalLoadingState () {
+  return store.state.Events.GLOBAL_LOADING_STATE
+}
+
+function LOADING (value, target) {
+  if (!value) value = false
+  store.dispatch('globalLoadingState', {value, target})
+}
+
 app.on('ready', () => {
   createWindow()
   mainWindow.webContents.on('did-finish-load', () => {
@@ -158,6 +167,10 @@ app.on('activate', () => {
 })
 
 function guestFetch (query, updateOrFirstTime) {
+  console.log(globalLoadingState().value)
+  if (globalLoadingState().value) return
+  console.log('fetchin')
+  store.dispatch('globalLoadingState', {value: true, target: 'PLAYLIST_REFRESH'})
   let allData = []
 
   let list = false // List of playlists Retrieved (just metadata)
@@ -182,6 +195,10 @@ function guestFetch (query, updateOrFirstTime) {
       .then(() => {
         synced = true
         if (list && synced) storePlaylists(allData, updateOrFirstTime)
+      })
+      .catch(err => {
+        // TODO Properly handle error
+        console.error(err)
       })
   }
 
@@ -293,13 +310,13 @@ ipc.on('guestConfirm', function (event, userID) {
 })
 
 ipc.on('refreshPlaylists', function (event) {
-  console.log('Refreshing Playlists')
   guestFetch(store.getters.RequestParams.userId, false)
 })
 
 ipc.on('loadMore', function (event) {
+  if (globalLoadingState().value) return
   logme('LOADING MORE PLAYLISTS:::::::::')
-
+  LOADING(true, 'morePlaylists')
   // gets user_id, SBID and Control object
   sbFetch.fetchPlaylists(store.getters.RequestParams)
     .then(resolve => {
@@ -307,30 +324,44 @@ ipc.on('loadMore', function (event) {
         mainWindow.webContents.send('done loading')
       })
     })
+    .catch(err => {
+      console.error(err) // TODO Handle error
+    })
+    .finally(LOADING)
 })
 
 ipc.on('get tracks from', function (event, id) {
+  if (globalLoadingState().value) return
   if (store.getters.PlaylistIsCached(id) === false && store.getters.PlaylistIsSynced(id) === false) {
+    LOADING(true, 'playlistTracks')
     console.log('LOADING FROM ', id)
     fetchMultiple([{id}], false)
       .then(() => {
         mainWindow.webContents.send('open playlist', id)
       })
+      .catch(err => {
+        console.error(err) // TODO Handle error
+      })
+      .finally(LOADING)
   } else mainWindow.webContents.send('open playlist', id)
 })
 
 ipc.on('Youtube Convert', function () {
-  console.log(store.state.CurrentUser.queuedPlaylists, store.state.CurrentUser.syncedPlaylists)
+  if (globalLoadingState().value) return
   if (store.state.CurrentUser.queuedPlaylists.length + store.state.CurrentUser.syncedPlaylists.length === 0) return
 
   console.log('FETCHING YT')
   let unCached = store.getters.UnCachedPlaylists
   console.log('unCached', unCached)
   if (unCached.length > 0) {
+    LOADING(true, 'fetchPlaylists')
     fetchMultiple(unCached.map(pl => {
       return { id: pl }
     }), false)
-      .then(() => youtubeHandler.youtubizeAll())
+      .then(() => {
+        LOADING()
+        youtubeHandler.youtubizeAll()
+      })
   } else youtubeHandler.youtubizeAll()
 })
 

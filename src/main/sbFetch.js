@@ -8,7 +8,7 @@ console.log('douu', Backend)
 
 function LOADING (value, target) {
   if (!value) value = false
-  store.dispatch('globalLoadingState', {value, target})
+  store.dispatch('fetchLoadingState', {value, target})
 }
 
 // Brings back user information

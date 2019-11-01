@@ -1,4 +1,4 @@
-// import Vue from 'vue'
+import Vue from 'vue'
 
 const state = {
   CURRENT_PLAYLIST_SET: false,
@@ -6,6 +6,10 @@ const state = {
   PLAYLIST_UNSYNCED: false,
   ROUTER_ANIMATION: '',
   GLOBAL_LOADING_STATE: {
+    value: false,
+    target: ''
+  },
+  FETCH_LOADING_STATE: {
     value: false,
     target: ''
   }
@@ -25,7 +29,10 @@ const actions = {
     commit('ROUTER_ANIMATION', animation)
   },
   globalLoadingState ({commit}, value) {
-    commit('GLOBAL_LOADING_STATE', value)
+    commit('SET', { key: 'GLOBAL_LOADING_STATE', value })
+  },
+  fetchLoadingState ({commit}, value) {
+    commit('SET', { key: 'FETCH_LOADING_STATE', value })
   }
 }
 
@@ -36,9 +43,8 @@ const mutations = {
   ROUTER_ANIMATION (state, animation) {
     state.ROUTER_ANIMATION = animation
   },
-  GLOBAL_LOADING_STATE (state, {value, target}) {
-    if (!target) target = ''
-    state.GLOBAL_LOADING_STATE = {value, target}
+  SET (state, {key, value}) {
+    Vue.set(state, key, value)
   }
 }
 

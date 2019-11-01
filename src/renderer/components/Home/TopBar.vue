@@ -86,7 +86,7 @@ export default {
       return { date, hours }
     },
     loadingState () {
-      return this.$store.state.Events.GLOBAL_LOADING_STATE
+      return this.$store.state.Events.FETCH_LOADING_STATE
     },
     status () {
       if (!this.loadingState.value) return `Last Sync: ${this.now.date} @ ${this.now.hours}`

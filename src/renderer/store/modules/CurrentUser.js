@@ -375,7 +375,6 @@ const mutations = {
     SAVE_TO_DISK()
   },
   COMMIT_TRACK_CHANGES (state, id) {
-    console.log('dousinho a ver commiting')
     let index = findById(id, state.playlists)
     if (index === -1) {
       console.log('PLAYLIST NOT FOUND WHEN COMMITING CHANGES')

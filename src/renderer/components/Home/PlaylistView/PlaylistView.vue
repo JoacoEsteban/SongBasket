@@ -33,11 +33,11 @@
       <div class="plv-rp-data">
         <div class="changes-container">
           <div v-if="added.length > 0" class="button accept thin">
-            {{added.length}} tracks added
+            {{added.length + ' ' + (added.length === 1 ? 'track' : 'tracks')}} added
           </div>
 
           <div v-if="removed.length > 0" class="button cancel thin">
-            {{removed.length}} tracks removed
+            {{removed.length + ' ' + (removed.length === 1 ? 'track' : 'tracks')}} removed
           </div>
         </div>
         <div class="plv-rp-data-plname">{{playlist.name}}</div>
