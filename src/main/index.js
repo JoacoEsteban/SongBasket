@@ -116,7 +116,9 @@ function verifyFileSystem () {
             store.dispatch('setHomeFolder', FOLDERS.folders[0].path)
             retrieveAndStoreState(FOLDERS.folders[0].path)
               .then(() => {
-                mainWindow.webContents.send('dataStored')
+                setTimeout(() => {
+                  mainWindow.webContents.send('dataStored')
+                }, 2000)
               })
               .catch((err) => {
                 // TODO Handle errors when retrieving and setting data

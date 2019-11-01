@@ -31,6 +31,7 @@ export default {
     function downloadLoop (trackIndex) {
       if (trackIndex < allTracks.length) {
         let track = allTracks[trackIndex]
+        if (track.conversion === null) return downloadLoop(trackIndex + 1)
         let trackMap = {}
 
         track.playlists.forEach(pl => {
