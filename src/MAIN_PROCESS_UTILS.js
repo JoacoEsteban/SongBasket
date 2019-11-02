@@ -33,5 +33,6 @@ export function removeDuplicationId (array) {
 }
 
 export function encodeIntoFilename (text) {
-  return text.replace('/', ':')
+  let reg = /\\|\/|\*|\?|:|\*|\||"|<|>/g
+  return text.replace(reg, '-')
 }
