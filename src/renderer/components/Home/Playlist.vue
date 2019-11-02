@@ -90,7 +90,7 @@ $q-true-color:rgb(103, 214, 0);
   background: $q-false-color;
   margin: 1.5rem 1.25rem;
   margin-top: 0;
-  $transition: .2s ease;
+  $transition: .2s cubic-bezier(.12,.82,0,.99);
   transition: transform $transition, background-color $transition, box-shadow $transition, outline-width .1s ease;
   color: #f0f0f0;
   box-shadow: .1em .1em .3em 0 rgba(0, 0, 0, 0.4);

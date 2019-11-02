@@ -8,7 +8,7 @@
       />
       
       <router-view
-      :class="'router-view ' + animation"
+      :class="'router-view ' + routerAnimation"
       path="playlists-list"
       @openPlaylist="getTracks($event)"
       @addPlaylistToSyncQueue="addPlaylistToSyncQueue($event)"
@@ -64,9 +64,6 @@ export default {
   watch: {
     currentPlaylistSet () {
       this.$router.push('/home/playlist-view')
-    },
-    routerAnimation (val) {
-      this.animation = val
     }
   },
   methods: {
@@ -152,20 +149,26 @@ export default {
 
 <style lang="scss" scoped>
 .router-view {
-  $transition: .3s ease;
+  $transition: .3s cubic-bezier(.12,.82,0,.99);
   transition: transform $transition, opacity $transition;
   opacity: 1;
   transform: scale(1);
+  transform-origin: bottom;
 
-  &.out {
-    transform-origin: bottom;
+  &.fast {
+    transition: transform 0s
+  }
+  &.push {
+    transform: scale(.75);
+    opacity: 0;
+  }
+  &.pull {
     transform: scale(1.5);
     opacity: 0;
   }
-  &.in {
-    transform-origin: bottom;
-    transform: scale(1);
+  &.realease {
     opacity: 1;
+    transform: scale(1)
   }
 }
 </style>

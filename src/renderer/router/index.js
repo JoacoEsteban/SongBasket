@@ -77,12 +77,28 @@ let router = new Router({
   ]
 })
 router.beforeEach((to, from, next) => {
-  store.dispatch('routerAnimation', 'out')
+  let anim1
+  let anim2 = 'fast '
+  let pull = 'pull'
+  let push = 'push'
+
+  if (to.fullPath === '/home') {
+    anim1 = pull
+    anim2 += push
+  } else {
+    anim1 = push
+    anim2 += pull
+  }
+
+  store.dispatch('routerAnimation', anim1)
   setTimeout(() => {
     next()
+    // setTimeout(() => {
+    store.dispatch('routerAnimation', anim2)
     setTimeout(() => {
-      store.dispatch('routerAnimation', 'in')
-    }, 10)
+      store.dispatch('routerAnimation', 'realease')
+    }, 100)
+    // }, 1000)
   }, 300)
 })
 

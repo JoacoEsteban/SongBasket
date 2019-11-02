@@ -59,7 +59,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-$tst: .3s cubic-bezier(0.54, 0.67, 0, 1);
+$tst: .2s cubic-bezier(.12,.82,0,.99);
 .modal-container {
     position: absolute;
     top: 0;
