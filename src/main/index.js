@@ -32,12 +32,14 @@ let loginWindow
 const winURL = process.env.NODE_ENV === 'development' ? `http://localhost:9080` : `file://${__dirname}/index.html`
 
 function createWindow () {
+  let width = 1366
+  let height = 768
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 500,
+    width,
+    height,
 
-    minWidth: 800,
-    minHeight: 500,
+    minWidth: width,
+    minHeight: height,
     useContentSize: true
   })
 
@@ -233,6 +235,22 @@ function fetchMultiple (playlists, checkVersion) {
 }
 console.log('Home folder: ', process.env.HOME_FOLDER)
 // :::::::::::::::::::::::::::::::::IPC:::::::::::::::::::::::::::::::::
+ipc.on('ytTrackDetails', function (event, ytId) {
+  if (globalLoadingState().value) return
+  LOADING(true, 'ytDetails')
+  sbFetch.ytDetails(ytId)
+    .then(resp => {
+      console.log('YT Details retrieved', resp)
+      event.sender.send('done', resp)
+    })
+    .catch(err => {
+      console.error('EROR AT YTTRACKDETAILS:: ipc"ytTrackDetails"', err)
+    })
+    .finally(() => {
+      LOADING()
+    })
+})
+
 ipc.on('download', function (event) {
   console.log('About to download')
   FileSystemUser.checkDownloadPaths()

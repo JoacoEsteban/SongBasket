@@ -108,6 +108,12 @@ const actions = {
       commit('UNSYNC_PLAYLIST', id)
       resolve()
     })
+  },
+  customTrackUrl ({commit}, {details, trackId, playlistId}) {
+    return new Promise((resolve, reject) => {
+      commit('CUSTOM_TRACK_URL', {details, trackId, playlistId})
+      resolve()
+    })
   }
 }
 
@@ -450,7 +456,16 @@ const mutations = {
         SAVE_TO_DISK()
       })
     } else console.error('Playlist not found when unsyncing :: UNSYNC_PLAYLIST')
-    // })
+  },
+  CUSTOM_TRACK_URL (state, {details, trackId, playlistId}) {
+    let track = state.convertedTracks[findById(trackId, state.convertedTracks)]
+    if (track === undefined) return console.error('TRACK NOT FOUND IN CONVERTED TRACKS :: CUSTOM_TRACK_URL')
+    track.custom = details
+
+    let playlist = track.playlists[findById(playlistId, track.playlists)]
+    if (playlist === undefined) return console.error('PLAYLIST NOT FOUND IN CONVERTED TRACK :: CUSTOM_TRACK_URL')
+
+    playlist.selected = false
   }
 }
 

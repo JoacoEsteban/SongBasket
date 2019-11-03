@@ -76,11 +76,16 @@ function findDuplicatedTracks () {
           break
         }
       }
+
+      let plTrackModel = {
+        id: playlist.id,
+        selected: null
+      }
       // Pushing to playlist register if found
       if (found !== false) {
         ALL_TRACKS[found] = {
           ...ALL_TRACKS[found],
-          playlists: utils.removeDuplicationId([...ALL_TRACKS[found].playlists, {id: playlist.id, selected: null}]) // Adding new added playlists to local conversion of track
+          playlists: utils.removeDuplicationId([...ALL_TRACKS[found].playlists, plTrackModel]) // Adding new added playlists to local conversion of track
         }
       } else {
         console.log('new track', dirtyTrack.name, dirtyTrack.id)
@@ -88,11 +93,9 @@ function findDuplicatedTracks () {
         ALL_TRACKS.push({
           id: dirtyTrack.id,
           data: dirtyTrack,
-          playlists: [{
-            id: playlist.id,
-            selected: null
-          }],
+          playlists: [plTrackModel],
           conversion: null,
+          custom: null,
           query: null
         })
       }

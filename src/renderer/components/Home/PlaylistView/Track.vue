@@ -86,7 +86,7 @@
           <div @click="select(null)" class="link-button">
             Reset Selection
           </div>
-          <div class="link-button">
+          <div @click="selectCustomUrl" class="link-button">
             Use Custom URL
           </div>
         </div>
@@ -164,15 +164,23 @@ export default {
     selected () {
       if (!this.conversion) return null
       return this.conversion.playlists.find(p => p.id === this.playlist).selected
+    },
+    customTrack () {
+      if (!this.conversion) return null
+      return this.conversion.playlists.find(p => p.id === this.playlist).custom
     }
   },
   mounted () {
+    window.trackDebug = this
     this.convertionIsOpenedLocal = this.convertionIsOpened
   },
   methods: {
     toggleConversion () {
       if (!this.conversion) return
       this.$emit('toggleConversion', !this.convertionIsOpened)
+    },
+    selectCustomUrl () {
+      this.$emit('customTrackUrl')
     },
     isSelected (id) {
       return id === (this.selected !== null ? this.selected : this.conversion.conversion.bestMatch)

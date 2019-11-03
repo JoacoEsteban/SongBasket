@@ -4,7 +4,7 @@ import store from '../renderer/store'
 const axios = require('axios')
 
 const Backend = process.env.BACKEND
-console.log('douu', Backend)
+console.log('BACKEND::::::', Backend)
 
 function LOADING (value, target) {
   if (!value) value = false
@@ -100,4 +100,18 @@ export function youtubizeAll (tracks) {
       resolve(tracks)
     }
   }
+}
+
+export function ytDetails (id) {
+  return new Promise((resolve, reject) => {
+    LOADING(true, 'Getting Video Details')
+    axios.get(`${Backend}/yt_details`, {params: {ytId: id}})
+      .then(resp => {
+        resolve(resp.data)
+      })
+      .catch(err => reject(err))
+      .finally(() => {
+        LOADING()
+      })
+  })
 }

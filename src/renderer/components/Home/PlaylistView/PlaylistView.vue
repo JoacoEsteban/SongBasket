@@ -35,7 +35,6 @@
           <div v-if="added.length > 0" class="button accept thin">
             {{added.length + ' ' + (added.length === 1 ? 'track' : 'tracks')}} added
           </div>
-
           <div v-if="removed.length > 0" class="button cancel thin">
             {{removed.length + ' ' + (removed.length === 1 ? 'track' : 'tracks')}} removed
           </div>
@@ -52,6 +51,7 @@
           :convertionIsOpened="convertionIsOpened(track.id)"
           @toggleConversion="toggleConversion(track.id, $event)"
           @selectTrack="selectTrack(track.id, $event)"
+          @customTrackUrl="customTrackUrl(track.id)"
           @openYtVideo="$emit('openYtVideo', $event)"
         />
       </div>
@@ -209,6 +209,9 @@ export default {
     },
     selectTrack (trackId, newId) {
       this.$store.dispatch('changeYtTrackSelection', {playlist: this.playlist.id, trackId, newId})
+    },
+    customTrackUrl (trackId) {
+      this.$store._actions.openModal[0]({wich: 'custom-track-url', payload: {trackId, playlistId: this.playlist.id}})
     },
     unsync () {
       this.$store.dispatch('openModal', {wich: 'unsync', payload: {id: this.playlist.id}})
