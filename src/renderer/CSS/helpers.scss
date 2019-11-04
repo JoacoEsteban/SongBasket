@@ -40,6 +40,14 @@
     font-family: "Poppins SemiBold";
 }
 
+.point5-em {
+    font-size: .5em;
+}
+
+.point75-em {
+    font-size: .75em;
+}
+
 .d-none {
     display: none;
 }
@@ -184,4 +192,12 @@
 }
 .ml-4 {
     margin-left: 2em;
+}
+
+.abs {
+    position: absolute;
+}
+.abs-top {
+    position: absolute;
+    top: 0;
 }

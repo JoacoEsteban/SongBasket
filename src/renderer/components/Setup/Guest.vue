@@ -20,7 +20,7 @@
             </div>
 
             <div class="mid">
-              <input ref="guestSearchInput" class="guest-search-box" type="text" v-model.trim="userQuery" @keyup.enter.prevent="guestSearch" />
+              <input ref="guestSearchInput" class="std-input guest-search-box" type="text" v-model.trim="userQuery" @keyup.enter.prevent="guestSearch" />
             </div>
 
             <div class="bot">
@@ -155,18 +155,8 @@ export default {
   }
 }
 .guest-search-box{
-  display: block;
-  margin: 0;
   padding-bottom: 1rem;
-  outline: none;
-  width: 100%;
   font-size: 3rem;
-  font-family: 'Poppins black';
-  text-align: center;
-  border: none;
-  color: white;
-  background: none;
-  transition: transform .15s ease, background .2s ease;
 }
 .bot {
   position: relative;

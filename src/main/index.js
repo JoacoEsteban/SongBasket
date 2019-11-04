@@ -245,6 +245,7 @@ ipc.on('ytTrackDetails', function (event, ytId) {
     })
     .catch(err => {
       console.error('EROR AT YTTRACKDETAILS:: ipc"ytTrackDetails"', err)
+      event.sender.send('error')
     })
     .finally(() => {
       LOADING()

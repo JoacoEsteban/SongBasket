@@ -129,6 +129,7 @@ export default {
     console.log('PLAYLISTTTTT:::::', this.playlist)
     this.computeTracks()
     this.refreshPlaylist()
+    window.plViewDebug = this
   },
   destroyed () {
     console.log('exitexit')
@@ -151,7 +152,7 @@ export default {
         }
       }
 
-      this.conversion = allTracks
+      this.conversion = plTracks
     },
     youtubeId (id) {
       let c = this.conversion.tracks
@@ -200,6 +201,7 @@ export default {
       return this.showingAll
     },
     resetAll () {
+      // TODO Request confirmation
       this.conversion.forEach(track => {
         this.$store.dispatch('changeYtTrackSelection', {playlist: this.playlist.id, trackId: track.id, newId: null})
       })

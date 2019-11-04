@@ -466,6 +466,7 @@ const mutations = {
     if (playlist === undefined) return console.error('PLAYLIST NOT FOUND IN CONVERTED TRACK :: CUSTOM_TRACK_URL')
 
     playlist.selected = false
+    SAVE_TO_DISK()
   }
 }
 

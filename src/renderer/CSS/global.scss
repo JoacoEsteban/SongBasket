@@ -114,3 +114,16 @@ body:hover{
     transform: scale(1.25);
     cursor: pointer;
 }
+.std-input {
+    display: block;
+    margin: 0;
+    font-size: 1em;
+    outline: none;
+    width: 100%;
+    font-family: 'Poppins black';
+    text-align: center;
+    border: none;
+    color: white;
+    background: none;
+    transition: transform .15s ease, background .2s ease;      
+}

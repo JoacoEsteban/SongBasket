@@ -42,10 +42,13 @@
         <div class="df juce alic flww h100">
           <div
           class="df fldc aliic boundaries"
-          v-for="(track, index) in conversion.conversion.yt"
+          v-for="(track, index) in convertedTracks"
           :key="index">
+            <span class="point5-em custom-label">
+              {{track.custom ? 'Custom' : ''}}
+            </span>
             <div
-            :class="{'selected': isSelected(track.id)}"
+            :class="{'selected': isSelected(track.id), 'custom': track.custom}"
             class="pl-track-container">
             <div class="df aliic">
 
@@ -166,8 +169,11 @@ export default {
       return this.conversion.playlists.find(p => p.id === this.playlist).selected
     },
     customTrack () {
-      if (!this.conversion) return null
-      return this.conversion.playlists.find(p => p.id === this.playlist).custom
+      return this.conversion && this.conversion.custom ? { ...this.conversion.custom, custom: true } : null
+    },
+    convertedTracks () {
+      let tracks = this.conversion.conversion.yt
+      return this.customTrack ? [...tracks, this.customTrack] : tracks
     }
   },
   mounted () {
@@ -183,7 +189,7 @@ export default {
       this.$emit('customTrackUrl')
     },
     isSelected (id) {
-      return id === (this.selected !== null ? this.selected : this.conversion.conversion.bestMatch)
+      return id === (this.selected === null ? this.conversion.conversion.bestMatch : this.selected === false ? this.conversion.custom.id : this.selected)
     },
     select (id) {
       if (this.isSelected(id)) return
@@ -372,8 +378,15 @@ $transition-props: $conversion-time cubic-bezier(.12,.82,0,.99);
 }
 .conversion-container {
   .boundaries {
+    position: relative;
     max-width: 13em;
     min-width: 11em;
+    .custom-label {
+      position: absolute;
+      top: -1.5em;
+      right: 0;
+      left: 0;
+    }
   }
   padding: 1em;
   font-size: .9em;
@@ -417,9 +430,11 @@ $transition-props: $conversion-time cubic-bezier(.12,.82,0,.99);
     }
     &.selected {
       transform: scale(1);
-      border-color: var(--green-accept)
+      border-color: var(--green-accept);
+      &.custom {
+        border-color: var(--orange-custom)
+      }
     }
-
 
     .pl-track-img-container {
       position: relative;
