@@ -21,7 +21,7 @@
       @dblclick="toggleConversion"
       class="dbclick-hitbox" />
       <div class="pl-track-controls-container">
-        <button class="button slim" @click="">
+        <button v-if="!isRemoved" class="button slim" @click="">
             <span>
               Override
             </span>
@@ -57,6 +57,7 @@
               </div>
               <div class="controls">
                 <div
+                v-if="!isRemoved"
                 :class="{'disabled': isSelected(track.id)}"
                 @click="select(track.id)" class="button slim">
                   <span>
@@ -85,7 +86,9 @@
             </div>
           </div>
         </div>
-        <div style="font-size: .5em;" class="df jucc mt-2">
+        <div
+        v-if="!isRemoved"
+        style="font-size: .5em;" class="df jucc mt-2">
           <div @click="select(null)" class="link-button">
             Reset Selection
           </div>
@@ -124,6 +127,11 @@ export default {
       default: null
     },
     convertionIsOpened: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    isRemoved: {
       type: Boolean,
       required: false,
       default: false
@@ -193,7 +201,7 @@ export default {
     },
     select (id) {
       if (this.isSelected(id)) return
-      id = id === this.conversion.conversion.bestMatch ? null : id === this.conversion.custom.id ? false : id
+      id = id === this.conversion.conversion.bestMatch ? null : this.customTrack && id === this.conversion.custom.id ? false : id
       this.$emit('selectTrack', id)
     },
     timeFilter (ms) {
@@ -225,6 +233,7 @@ export default {
 /* TODO Media Query for List View */
 .whole-container {
   margin: 0.4em 0;
+  position: relative;
   z-index: 0;
 
 }

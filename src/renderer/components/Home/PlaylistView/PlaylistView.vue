@@ -32,10 +32,14 @@
     <div class="plv-rightpanel">
       <div class="plv-rp-data">
         <div class="changes-container">
-          <div v-if="added.length > 0" class="button accept thin">
+          <div
+          @click="toggle('added')"
+          v-if="added.length > 0" class="button accept thin">
             {{added.length + ' ' + (added.length === 1 ? 'track' : 'tracks')}} added
           </div>
-          <div v-if="removed.length > 0" class="button cancel thin">
+          <div
+          @click="toggle('removed')"
+          v-if="removed.length > 0" class="button cancel thin">
             {{removed.length + ' ' + (removed.length === 1 ? 'track' : 'tracks')}} removed
           </div>
         </div>
@@ -43,6 +47,31 @@
         <div class="plv-rp-data-byuser">by {{playlist.owner.display_name}}</div>
       </div>
       <div class="plv-rp-tracklist">
+        <div
+        :class="{'hide': !showing.added || added.length === 0}"
+        ref="added"
+        class="added changes-tracks-container">
+          <Track
+            v-for="(track, index) in added"
+            :key="index"
+            :track="track"
+          />
+        </div>
+        <div
+        :class="{'hide': !showing.removed || removed.length === 0}"
+        ref="removed"
+        class="removed changes-tracks-container">
+          <Track
+            :isRemoved="true"
+            v-for="(track, index) in removed"
+            :key="index"
+            :track="track"
+            :conversion="giveMeConversion(track.id)"
+            :convertionIsOpened="convertionIsOpened(track.id)"
+            @toggleConversion="toggleConversion(track.id, $event)"
+            @openYtVideo="$emit('openYtVideo', $event)"
+          />
+        </div>
         <Track
           v-for="(track, index) in items"
           :key="index"
@@ -69,8 +98,10 @@ export default {
       conversion: [],
       showingConversion: [],
       showingAll: false,
-      showingAdded: false,
-      showingRemoved: false,
+      showing: {
+        added: false,
+        removed: false
+      },
       playlist: {}
     }
   },
@@ -82,7 +113,7 @@ export default {
       return this.$store.state.CurrentUser.currentPlaylist
     },
     ammountOfTracksBeingShown () {
-      return this.items.length + (this.showingAdded ? this.added.length : 0) + (this.showingRemoved ? this.removed.length : 0)
+      return this.items.length + (this.showing.added ? this.added.length : 0) + (this.showing.removed ? this.removed.length : 0)
     },
     isQueued () {
       if (this.playlist) { return this.$store.getters.PlaylistIsQueued(this.playlist.id) >= 0 } else return false
@@ -137,6 +168,23 @@ export default {
   methods: {
     refreshPlaylist () {
       this.playlist = this.$store.getters.PlaylistById(this.currentPlaylist)
+    },
+    toggle (wich) {
+      this.showing[wich] = !this.showing[wich]
+      switch (this.showing[wich]) {
+        case true:
+          this.$refs[wich].style.height = this.$refs[wich].scrollHeight + 'px'
+          setTimeout(() => {
+            if (this.showing[wich]) this.$refs[wich].style.height = 'initial'
+          }, 500)
+          break
+        case false:
+          this.$refs[wich].style.height = this.$refs[wich].scrollHeight + 'px'
+          setTimeout(() => {
+            this.$refs[wich].style.height = 0 + 'px'
+          }, 100)
+          break
+      }
     },
     computeTracks () {
       console.log('computing', this.isSynced)
@@ -312,5 +360,25 @@ export default {
   z-index: 0;
   padding: 0 .5em;
   overflow-y: scroll;
+
+  .changes-tracks-container {
+    padding: 1px .5em;
+    height: 0px;
+    border-radius: .2em;
+    margin: .3em 0;
+    $transition: .5s cubic-bezier(.12,.82,0,.99);
+    transition: height $transition, margin $transition, opacity $transition;
+    &.added {
+      background-color: var(--green-accept);
+    }
+    &.removed {
+      background-color: var(--red-cancel);
+    }
+
+    &.hide {
+      opacity: 0;
+      margin: 0;
+    }
+  }
 }
 </style>
