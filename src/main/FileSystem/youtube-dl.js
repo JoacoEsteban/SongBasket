@@ -35,14 +35,14 @@ export default {
         let trackMap = {}
 
         track.playlists.forEach(pl => {
-          let yt = pl.selected === null ? track.conversion.bestMatch : pl.selected
+          let yt = pl.selected === null ? track.conversion.bestMatch : pl.selected === false ? track.custom.id : pl.selected
           trackMap[yt] = trackMap[yt] === undefined ? [pl.id] : [...trackMap[yt], pl.id]
         })
+        if (Object.keys(trackMap).length === 0) return downloadLoop(trackIndex + 1)
 
         // TODO Check this with Windows / Linux
         let name = utils.encodeIntoFilename(track.data.name) // colons turn into slashes at the filename
         let id = track.id
-        if (Object.keys(trackMap).length === 0) return downloadLoop(trackIndex + 1)
 
         for (let ytId in trackMap) {
           let fullPath = process.env.HOME_FOLDER + '/' + utils.encodeIntoFilename(customGetters.giveMePlName(trackMap[ytId][0]))
@@ -193,7 +193,7 @@ export default {
             console.log('playlists', qt.playlists.length, lt.playlist)
             for (let u = 0; u < qt.playlists.length; u++) {
               let pl = qt.playlists[u]
-              pl.selected = pl.selected === null ? qt.conversion.bestMatch : pl.selected
+              pl.selected = pl.selected === null ? qt.conversion.bestMatch : pl.selected === false ? qt.custom.id : pl.selected
 
               let samePl = pl.id === lt.playlist
               let sameVer = pl.selected === lt.songbasket_youtube_id

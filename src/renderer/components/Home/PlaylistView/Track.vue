@@ -193,6 +193,7 @@ export default {
     },
     select (id) {
       if (this.isSelected(id)) return
+      id = id === this.conversion.conversion.bestMatch ? null : id === this.conversion.custom.id ? false : id
       this.$emit('selectTrack', id)
     },
     timeFilter (ms) {
