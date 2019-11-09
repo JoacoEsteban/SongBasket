@@ -18,6 +18,7 @@ let FOLDERS = FileSystemUser.checkForUser()
 const ipc = electron.ipcMain
 
 const Backend = process.env.BACKEND
+console.log('BACKEND::::::', Backend)
 
 const filter = { // when logging in
   urls: [Backend + '/*']
@@ -172,7 +173,7 @@ app.on('activate', () => {
   }
 })
 
-function guestFetch (query, updateOrFirstTime) {
+function guestFetch (query, isFirstTime) {
   console.log(globalLoadingState().value)
   if (globalLoadingState().value) return
   console.log('fetchin')
@@ -200,7 +201,7 @@ function guestFetch (query, updateOrFirstTime) {
     fetchMultiple(ids, true)
       .then(() => {
         synced = true
-        if (list && synced) storePlaylists(allData, updateOrFirstTime)
+        if (list && synced) storePlaylists(allData, isFirstTime)
       })
       .catch(err => {
         // TODO Properly handle error
@@ -213,7 +214,7 @@ function guestFetch (query, updateOrFirstTime) {
       if (resolve.code === 200) {
         allData = resolve
         list = true
-        if (list && synced) storePlaylists(allData, updateOrFirstTime)
+        if (list && synced) storePlaylists(allData, isFirstTime)
       }
     })
 }

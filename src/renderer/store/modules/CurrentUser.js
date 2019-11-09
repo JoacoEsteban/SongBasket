@@ -4,17 +4,19 @@ import FileSystem from '../../../main/FileSystem/index'
 import SharedStates from './SharedStates'
 
 // Last time changes were saved to disk
-let lastSaved = null
+let saveQueue = 0
 
-function SAVE_TO_DISK () {
+function SAVE_TO_DISK (check) {
   // console.log('SAVIN', SharedStates.state)
-  let now = Date.now()
-
-  // Prevents calling this function more than once in half a second
-  if (now - lastSaved > 10) {
-    lastSaved = now
-    FileSystem.saveState({state, path: SharedStates.state.fileSystem.homeFolders.find(path => path.current === true).path})
+  console.log('::::::::::::::::::::::::::::TRYING TO SAVE::::::::::::::::::::::::::::::::')
+  if (!check) {
+    saveQueue++
+    return setTimeout(() => SAVE_TO_DISK(true), 1000)
   }
+
+  if (--saveQueue > 0) return
+  console.log('::::::::::::::::::::::::::::SAVING::::::::::::::::::::::::::::::::')
+  FileSystem.saveState({state, path: SharedStates.state.fileSystem.homeFolders.find(path => path.current === true).path})
 }
 
 function LOADING (store, value, target) {
