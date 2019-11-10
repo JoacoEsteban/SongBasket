@@ -8,6 +8,8 @@
 
 <script>
 import Modal from './components/Modal/Modal'
+import electron from 'electron'
+const ipc = electron.ipcRenderer
 
 export default {
   name: 'SongBasket',
@@ -16,6 +18,19 @@ export default {
   },
   mounted () {
     window.sbDebug = this
+    setInterval(() => {
+      console.log(this.ffmpegBinsDownloaded)
+    }, 500)
+  },
+  computed: {
+    ffmpegBinsDownloaded () {
+      return this.$store.state.Events.FFMPEG_BINS_DOWNLOADED
+    }
+  },
+  watch: {
+    ffmpegBinsDownloaded () {
+      ipc.send('ffmpegBinsDownloaded')
+    }
   }
 }
 </script>

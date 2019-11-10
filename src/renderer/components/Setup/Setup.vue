@@ -51,7 +51,7 @@ export default {
       switch (path) {
         case 'login': {
           this.header.text = 'Let\'s find your music'
-          this.$router.push('setup/login')
+          this.$router.push('/setup/login')
           break
         }
         case 'guest-verify': {
@@ -65,7 +65,7 @@ export default {
         }
         case 'guest': {
           this.header.text = 'Let\'s find your music'
-          this.$router.push('setup/guest')
+          this.$router.push('/setup/guest')
           break
         }
       }

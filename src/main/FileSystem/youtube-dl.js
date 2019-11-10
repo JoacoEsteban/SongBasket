@@ -2,6 +2,9 @@ import store from '../../renderer/store'
 import customGetters from '../../renderer/store/customGetters'
 import * as utils from '../../MAIN_PROCESS_UTILS'
 
+const app = require('electron').app
+let basePath = (process.env.NODE_ENV === 'production' ? app.getPath('userData') : process.cwd())
+
 let NodeID3 = require('node-id3')
 let axios = require('axios')
 let fs = require('fs')
@@ -10,12 +13,12 @@ let youtubedl = require('youtube-dl')
 let ffbinaries = require('ffbinaries')
 let ffmpeg = require('fluent-ffmpeg')
 
-let binPath = process.cwd() + '/bin/ffmpeg'
-if (!fs.existsSync(process.cwd() + '/bin')) fs.mkdirSync(process.cwd() + '/bin')
-if (!fs.existsSync(process.cwd() + '/bin/ffmpeg')) fs.mkdirSync(process.cwd() + '/bin/ffmpeg')
+let binPath = basePath + '/bin/ffmpeg'
+if (!fs.existsSync(basePath + '/bin')) fs.mkdirSync(basePath + '/bin')
+if (!fs.existsSync(basePath + '/bin/ffmpeg')) fs.mkdirSync(basePath + '/bin/ffmpeg')
 ffbinaries.downloadBinaries(['ffmpeg', 'ffprobe'], {destination: binPath}, function () {
   console.log('Downloaded all binaries for current platform.')
-
+  store.dispatch('ffmpegBinsDownloaded')
   ffmpeg.setFfmpegPath(binPath + '/ffmpeg')
   ffmpeg.setFfprobePath(binPath + '/ffprobe')
 })

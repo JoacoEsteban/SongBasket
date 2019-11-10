@@ -31,6 +31,13 @@ let mainWindow
 let loginWindow
 const winURL = process.env.NODE_ENV === 'development' ? `http://localhost:9080` : `file://${__dirname}/index.html`
 
+let ffmpegBinsDownloaded = false
+let windowFinishedLoading = false
+
+function isEverythingReady () {
+  if (ffmpegBinsDownloaded && windowFinishedLoading) verifyFileSystem()
+}
+
 function createWindow () {
   let width = 1366
   let height = 768
@@ -153,10 +160,8 @@ function LOADING (value, target) {
 app.on('ready', () => {
   createWindow()
   mainWindow.webContents.on('did-finish-load', () => {
-    verifyFileSystem()
-      .then(() => {
-        console.log(2)
-      })
+    windowFinishedLoading = true
+    isEverythingReady()
   })
 })
 
@@ -235,6 +240,11 @@ function fetchMultiple (playlists, checkVersion) {
 }
 console.log('Home folder: ', process.env.HOME_FOLDER)
 // :::::::::::::::::::::::::::::::::IPC:::::::::::::::::::::::::::::::::
+ipc.on('ffmpegBinsDownloaded', function () {
+  ffmpegBinsDownloaded = true
+  isEverythingReady()
+})
+
 ipc.on('ytTrackDetails', function (event, ytId) {
   if (globalLoadingState().value) return
   LOADING(true, 'ytDetails')
