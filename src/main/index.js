@@ -7,7 +7,7 @@ import customGetters from '../renderer/store/customGetters'
 import * as sbFetch from './sbFetch'
 import * as youtubeHandler from './youtubeHandler'
 import electron from 'electron'
-console.log(dotenvConfig)
+console.log(dotenvConfig) // logging for linter not to complain
 var open = require('open')
 
 const dialog = electron.dialog
@@ -18,7 +18,6 @@ let FOLDERS = FileSystemUser.checkForUser()
 const ipc = electron.ipcMain
 
 const Backend = process.env.BACKEND
-console.log('BACKEND::::::', Backend)
 
 const filter = { // when logging in
   urls: [Backend + '/*']

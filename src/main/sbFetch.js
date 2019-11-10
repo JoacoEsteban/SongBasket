@@ -81,13 +81,14 @@ export function youtubizeAll (tracks) {
           tracks[i].conversion = res.data
           succeded++
           // TODO Emit success event
-          areAllFinished(resolve)
         })
         .catch(err => {
           // Failed tracks will remain with 'conversion' object NULL
           console.log('Error', err)
           failed++
           // TODO Emit fail event
+        })
+        .finally(() => {
           areAllFinished(resolve)
         })
     }
