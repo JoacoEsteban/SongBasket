@@ -50,31 +50,29 @@
             <div
             :class="{'selected': isSelected(track.id), 'custom': track.custom}"
             class="pl-track-container">
-            <div class="df aliic">
+              <div class="df aliic">
 
-              <div class="pl-track-img-container">
-                <div class="pl-track-img" :style="'background-image: url('+track.snippet.thumbnails.high.url+')'" />
+                <div class="pl-track-img-container">
+                  <div class="pl-track-img" :style="'background-image: url('+track.snippet.thumbnails.high.url+')'" />
+                </div>
+                <div class="controls">
+                  <div
+                  v-if="!isRemoved"
+                  :class="{'disabled': isSelected(track.id)}"
+                  @click="select(track.id)" class="button slim">
+                    <span>
+                      {{isSelected(track.id) ? 'Selected' : 'Select'}}
+                    </span>
+                  </div>
+                  <div @click="$emit('openYtVideo', track.id)" class="button slim">
+                    <span>
+                      Open
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div class="controls">
-                <div
-                v-if="!isRemoved"
-                :class="{'disabled': isSelected(track.id)}"
-                @click="select(track.id)" class="button slim">
-                  <span>
-                    {{isSelected(track.id) ? 'Selected' : 'Select'}}
-                  </span>
-                </div>
-                <div @click="$emit('openYtVideo', track.id)" class="button slim">
-                  <span>
-                    Open
-                  </span>
-                </div>
-            </div>
-            </div>
-              <!-- <div class="aligner" /> -->
             </div>
             <div class="pl-track-data-up">
-              <!-- TODO pull out ellipsis without fucking up the entire page -->
               <div class="pl-track-data-name ellipsis center">
                 {{track.snippet.title | decodeUri}}
               </div>

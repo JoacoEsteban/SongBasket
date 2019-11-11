@@ -1,9 +1,23 @@
-TODO PL Synced Track flag
-
-TODO Guest Fetch Playlist by id
-
-TODO YT Track View
-
-TODO Refresh playlist from PlaylistView
-
 TODO Handle removed playlists
+TODO Download GUI
+TODO new buttons
+TODO folder view
+TODO handle existing .songbasket file
+TODO handle duplicated folder entries in .songbasket-folders file
+TODO handle quota exceeded request rejection
+TODO fix custom url not working after wrong non-existing video id is inserted
+TODO remove login button
+TODO Update guest user UI and loading animation
+TODO remove search by playlist switch
+TODO search bars
+TODO Better Loading indicators
+TODO Implement paused playlists
+TODO Implement Override with custom track
+TODO proper window size
+TODO Disable linking tracks in FAT32 & Alert user
+TODO Settings Panel
+
+Non urgent
+TODO custom scroll
+TODO set .songbasket file hidden property
+TODO evaluate using aac

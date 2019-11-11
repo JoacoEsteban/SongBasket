@@ -26,7 +26,6 @@ ffbinaries.downloadBinaries(['ffmpeg', 'ffprobe'], {destination: binPath}, funct
 export default {
   downloadSyncedPlaylists (localTracks) {
     console.log('Stored tracks: ', localTracks.length)
-    // TODO Filter already downloaded tracks
     let allTracks = downloadLinkRemove(localTracks, utils.cloneObject(store.state.CurrentUser.convertedTracks))
     console.log('Filtered tracks: ', allTracks.length)
     downloadLoop(0)

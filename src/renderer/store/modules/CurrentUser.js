@@ -139,7 +139,6 @@ const mutations = {
   UPDATE_USER_ENTITIES (state, object) {
     LOADING(this, true, 'Computing Changes')
 
-    // TODO VERSION CONTROL SYNCED PLS FROM HERE AND KEEP REMOVED TRACKS INSIDE THE SYNCED PL OBJECT
     function isCachedOrSynced (id) {
       // If it's cached I want to compare the version with the currently stored one.
       // If they match I will keep the tracks (currently stored version)
@@ -197,8 +196,6 @@ const mutations = {
     }
 
     state.playlists = object.playlists.items
-    // TODO Finish finding wtf is going on with added tracks
-    // console.log('SYNNN', state.playlists[damajuana].tracks.added, state.playlists[damajuana].tracks.items.length, state.playlists[damajuana].tracks.removed.length)
 
     state.control = {
       total: object.playlists.total,
@@ -230,7 +227,6 @@ const mutations = {
 
   PLAYLIST_STORE_TRACKS (state, playlist) {
     playlist = {...playlist}
-    // TODO FIx this shit getting in twice for no reason
     function playlistComputeChanges (oldPl, newPl) {
       // Starting with both local spotify copy and local youtube copy
       // Tracks will be compared between both arrays and if it's a match, then both will be spliced from both arrays
@@ -514,14 +510,6 @@ const getters = {
     let all = []
     for (let i = 0; i < state.queuedPlaylists.length; i++) {
       all = [...all, getters.PlaylistById(state.queuedPlaylists[i])]
-    }
-    return all
-  },
-  // TODO this sounds fking redundant, deprecate it pls
-  SyncedPlaylists: (state, getters) => {
-    let all = []
-    for (let i = 0; i < state.syncedPlaylists.length; i++) {
-      all = [...all, getters.SyncedPlaylistById(state.syncedPlaylists[i].id)]
     }
     return all
   },
