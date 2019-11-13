@@ -18,9 +18,6 @@ export default {
   },
   mounted () {
     window.sbDebug = this
-    setInterval(() => {
-      console.log(this.ffmpegBinsDownloaded)
-    }, 500)
   },
   computed: {
     ffmpegBinsDownloaded () {
