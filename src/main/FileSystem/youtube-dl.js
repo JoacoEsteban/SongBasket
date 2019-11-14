@@ -47,7 +47,7 @@ export default {
         let id = track.id
 
         for (let ytId in trackMap) {
-          let fullPath = process.env.HOME_FOLDER + '/' + utils.encodeIntoFilename(customGetters.giveMePlName(trackMap[ytId][0]))
+          let fullPath = global.HOME_FOLDER + '/' + utils.encodeIntoFilename(customGetters.giveMePlName(trackMap[ytId][0]))
           let fullPathmp4 = fullPath + '/' + name + '.mp4'
           let fullPathmp3 = fullPath + '/' + name + '.mp3'
           console.log('trackie: ', trackMap[ytId])
@@ -83,7 +83,7 @@ export default {
             convertMp3(fullPathmp3, fullPathmp4, track, ytId)
               .then(() => {
                 for (let i = 1; i < trackMap[ytId].length; i++) {
-                  link(fullPathmp3, process.env.HOME_FOLDER + '/' + utils.encodeIntoFilename(customGetters.giveMePlName(trackMap[ytId][i])) + '/' + name)
+                  link(fullPathmp3, global.HOME_FOLDER + '/' + utils.encodeIntoFilename(customGetters.giveMePlName(trackMap[ytId][i])) + '/' + name)
                 }
                 console.log('finished track')
               })
@@ -213,7 +213,7 @@ export default {
                   }
                   if (!samePl) { // Same version, diff pl. Hardlink into this playlist
                     console.log('LINKING EXISTING TRACK')
-                    linkQueue.push({paths: [lt.path, process.env.HOME_FOLDER + '/' + utils.encodeIntoFilename(customGetters.giveMePlName(pl.id)) + '/' + lt.file], indexes: [i, u]})
+                    linkQueue.push({paths: [lt.path, global.HOME_FOLDER + '/' + utils.encodeIntoFilename(customGetters.giveMePlName(pl.id)) + '/' + lt.file], indexes: [i, u]})
                   }
                 }
               }

@@ -10,33 +10,24 @@ const foldersJsonPath = userDataPath + '.songbasket-folders'
 const stateFileName = '/.songbasket'
 console.log(foldersJsonPath)
 
-let homeFolderPath = () => process.env.HOME_FOLDER
+let homeFolderPath = () => global.HOME_FOLDER
 
 let userMethods = {
   checkForUser: function () {
-    if (fs.existsSync(foldersJsonPath)) {
-      let folders = fs.readFileSync(foldersJsonPath, 'utf8')
-      return JSON.parse(folders)
-    } else {
-      console.log('Folder paths file missing, Creating')
-      let emptyFolders = {folders: []}
-      fs.writeFileSync(foldersJsonPath, JSON.stringify(emptyFolders), 'utf8')
-      return (emptyFolders)
-    }
+    if (fs.existsSync(foldersJsonPath)) return JSON.parse(fs.readFileSync(foldersJsonPath, 'utf8'))
+
+    console.log('Folder paths file missing, Creating')
+    let emptyFolders = {paths: [], selected: null}
+    fs.writeFileSync(foldersJsonPath, JSON.stringify(emptyFolders), 'utf8')
+    return (emptyFolders)
   },
-  addHomeFolder: function (path) {
-    let paths = JSON.parse(fs.readFileSync(foldersJsonPath))
-    console.log('paths', paths)
-    path = path.path
-
-    for (let i = 0; i < paths.folders.length; i++) {
-      paths.folders[i].current = false
-      if (paths.folders[i] === path) return 'already added'
+  writeHomeFolders: async function (folders) {
+    try {
+      await fs.writeFile(foldersJsonPath, JSON.stringify(folders))
+      return 'success'
+    } catch (err) {
+      throw err
     }
-
-    paths.folders = [...paths.folders, {path, current: true}]
-    fs.writeFileSync(foldersJsonPath, JSON.stringify(paths))
-    return 'success'
   },
   saveState: function ({state, path}) {
     // console.log('Saving state to', path)
@@ -54,12 +45,13 @@ let userMethods = {
     })
   },
   retrieveState: function (path) {
+    let filePath = path + stateFileName
     console.log('retrieving from ', path)
     return new Promise((resolve, reject) => {
-      fs.access(path + stateFileName, (err) => {
+      fs.access(filePath, (err) => {
         if (err) reject(err)
         else {
-          fs.readFile(path + stateFileName, (err, data) => {
+          fs.readFile(filePath, (err, data) => {
             if (err) reject(err)
             resolve(JSON.parse(data))
           })

@@ -1,9 +1,13 @@
+import FileSystemUser from '../../../main/FileSystem/index'
 // import Vue from 'vue'
 
 const getDefaultState = () => {
   return {
     fileSystem: {
-      homeFolders: []
+      homeFolders: {
+        paths: [],
+        selected: null
+      }
     },
     loadingState: null,
     modal: defaultModal(),
@@ -22,49 +26,68 @@ function defaultModal () {
 const state = getDefaultState()
 
 const actions = {
-  setHomeFolder ({ commit }, path) {
-    commit('SET_HOME_FOLDER', path)
+  addHomeFolder ({ commit }, path) {
+    return new Promise((resolve, reject) => {
+      commit('ADD_HOME_FOLDER', path)
+      resolve()
+    })
+  },
+  setFolderPaths ({commit}, paths) {
+    return new Promise((resolve, reject) => {
+      commit('SET_FOLDER_PATHS', paths)
+      resolve()
+    })
   },
   SET_LOADING_STATE ({ commit }, loadingState) {
-    commit('SET_LOADING_STATE', loadingState)
-  },
-  folderPaths ({commit}, paths) {
-    commit('FOLDER_PATHS', paths)
+    return new Promise((resolve, reject) => {
+      commit('SET_LOADING_STATE', loadingState)
+      resolve()
+    })
   },
   openModal ({commit}, options) {
-    console.log('didid')
-    commit('OPEN_MODAL', options)
+    return new Promise((resolve, reject) => {
+      commit('OPEN_MODAL', options)
+      resolve()
+    })
   },
   closeModal ({commit}) {
-    commit('CLOSE_MODAL')
+    return new Promise((resolve, reject) => {
+      commit('CLOSE_MODAL')
+      resolve()
+    })
   },
   initializeDownloadPool ({commit}) {
+    return new Promise((resolve, reject) => {
+      resolve()
+    })
   },
   downloadChunk ({commit}, {id, current, size}) {
-    commit('DOWNLOAD_CHUNK', {id, current, size})
+    return new Promise((resolve, reject) => {
+      commit('DOWNLOAD_CHUNK', {id, current, size})
+      resolve()
+    })
   }
 }
 
 const mutations = {
-  SET_HOME_FOLDER (state, path) {
-    if (!state.fileSystem.homeFolders) state.fileSystem.homeFolders = [{path, current: true}]
-
-    for (let i = 0; i < state.fileSystem.homeFolders.length; i++) {
-      let path = state.fileSystem.homeFolders[i]
-      path.current = false
-    }
-    process.env.HOME_FOLDER = path
-    console.log('HOME FOLDER SET', process.env.HOME_FOLDER)
-    state.fileSystem.homeFolders = [...state.fileSystem.homeFolders, {path, current: true}]
+  ADD_HOME_FOLDER (state, path) {
+    console.log('goldys', state.fileSystem.homeFolders)
+    if (!state.fileSystem.homeFolders.paths.some(p => p === path)) state.fileSystem.homeFolders.paths.push(path)
+    state.fileSystem.homeFolders.selected = path
+    global.HOME_FOLDER = path
+    console.log('HOME FOLDER ADDED', global.HOME_FOLDER)
+    FileSystemUser.writeHomeFolders(state.fileSystem.homeFolders)
+  },
+  SET_FOLDER_PATHS (state, FOLDERS) {
+    console.log('SETTIN', FOLDERS)
+    state.fileSystem.homeFolders = FOLDERS
+    global.HOME_FOLDER = FOLDERS.selected
+    FileSystemUser.writeHomeFolders(state.fileSystem.homeFolders)
   },
   SET_LOADING_STATE (state, loadingState) {
     state.loadingState = loadingState
   },
-  FOLDER_PATHS (state, paths) {
-    state.fileSystem.homeFolders = paths
-  },
   OPEN_MODAL (state, {wich, payload}) {
-    console.log('didid')
     state.modal.show = true
     state.modal.options.wich = wich
     state.modal.options.payload = payload

@@ -8,28 +8,22 @@ import * as sbFetch from './sbFetch'
 import * as youtubeHandler from './youtubeHandler'
 import electron from 'electron'
 console.log(dotenvConfig) // logging for linter not to complain
-var open = require('open')
-
-const dialog = electron.dialog
-
-let { app, BrowserWindow, session } = electron
-
-let FOLDERS = FileSystemUser.checkForUser()
+const open = require('open')
 const ipc = electron.ipcMain
-
+const dialog = electron.dialog
+const { app, BrowserWindow, session } = electron
 const Backend = process.env.BACKEND
-
+const winURL = process.env.NODE_ENV === 'development' ? `http://localhost:9080` : `file://${__dirname}/index.html`
 const filter = { // when logging in
   urls: [Backend + '/*']
 }
 
+let mainWindow
+let loginWindow
+
 if (process.env.NODE_ENV !== 'development') {
   global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
-
-let mainWindow
-let loginWindow
-const winURL = process.env.NODE_ENV === 'development' ? `http://localhost:9080` : `file://${__dirname}/index.html`
 
 let ffmpegBinsDownloaded = false
 let windowFinishedLoading = false
@@ -39,8 +33,8 @@ function isEverythingReady () {
 }
 
 function createWindow () {
-  let width = 1366
-  let height = 768
+  let width = 800
+  let height = 600
   mainWindow = new BrowserWindow({
     width,
     height,
@@ -99,53 +93,45 @@ function storePlaylists (response, redirect) {
     })
 }
 
-function retrieveAndStoreState (path) {
-  return new Promise((resolve, reject) => {
-    FileSystemUser.retrieveState(path)
-      .then(data => {
-        // console.log('LO HICIMOS?', data)
-        store.dispatch('storeDataFromDisk', data)
-          .then(() => {
-            resolve()
-          })
-      })
-      .catch(err => {
-        reject(err)
-      })
-  })
+async function retrieveAndStoreState (path) {
+  let data
+  try {
+    data = await FileSystemUser.retrieveState(path)
+    try {
+      await store.dispatch('storeDataFromDisk', data)
+    } catch (err) { throw err }
+  } catch (err) { throw err }
 }
 
-function verifyFileSystem () {
-  return new Promise((resolve, reject) => {
-    if (FOLDERS.folders.length > 0) {
-      store.dispatch('folderPaths', FOLDERS.folders)
-        .then(() => {
-          let comodin = true
-          if (FOLDERS.folders.length === 1 || comodin) {
-            store.dispatch('setHomeFolder', FOLDERS.folders[0].path)
-            retrieveAndStoreState(FOLDERS.folders[0].path)
-              .then(() => {
-                setTimeout(() => {
-                  mainWindow.webContents.send('dataStored')
-                }, 2000)
-              })
-              .catch((err) => {
-                // TODO Handle errors when retrieving and setting data
-                console.log('NOT FOOUND', err)
-                mainWindow.webContents.send('initializeSetup')
-              })
-          } else {
-            // TODO redirect to folders view
-          }
-        })
-      // guestFetch(FOLDERS.user, true)
-    } else {
-      console.log('no user')
-      setTimeout(() => {
-        mainWindow.webContents.send('initializeSetup')
-      }, 1000)
-    }
-  })
+async function verifyFileSystem () {
+  console.log('verifying dou')
+  let FOLDERS = FileSystemUser.checkForUser()
+  await store.dispatch('setFolderPaths', FOLDERS)
+  if (FOLDERS.paths.length === 0) {
+    console.log('no user')
+    return setTimeout(() => {
+      mainWindow.webContents.send('initializeSetup')
+    }, 1000)
+  }
+
+  if (FOLDERS.selected === null) {
+    // TODO redirect to folders view
+    return mainWindow.webContents.send('chooseFolder')
+  }
+
+  try {
+    await retrieveAndStoreState(FOLDERS.selected)
+    setTimeout(() => {
+      mainWindow.webContents.send('dataStored')
+    }, 2000)
+  } catch (err) {
+    // TODO Handle errors when retrieving and setting data
+    console.error('NOT FOOUND', err)
+    return setTimeout(() => {
+      mainWindow.webContents.send('initializeSetup')
+    }, 1000)
+  }
+  // guestFetch(FOLDERS.user, true)
 }
 
 function globalLoadingState () {
@@ -160,6 +146,7 @@ function LOADING (value, target) {
 app.on('ready', () => {
   createWindow()
   mainWindow.webContents.on('did-finish-load', () => {
+    console.log('webcontents')
     windowFinishedLoading = true
     isEverythingReady()
   })
@@ -238,9 +225,11 @@ function fetchMultiple (playlists, checkVersion) {
     }
   })
 }
-console.log('Home folder: ', process.env.HOME_FOLDER)
+console.log('Home folder: ', global.HOME_FOLDER)
 // :::::::::::::::::::::::::::::::::IPC:::::::::::::::::::::::::::::::::
 ipc.on('ffmpegBinsDownloaded', function () {
+  console.log('ffmpeg')
+
   ffmpegBinsDownloaded = true
   isEverythingReady()
 })
@@ -272,22 +261,30 @@ ipc.on('download', function (event) {
 })
 
 ipc.on('openYtVideo', function (event, id) {
-  // console.log('openYtVideo', id)
   open('https://www.youtube.com/watch?v=' + id)
 })
 
-ipc.on('setHomeFolder', function (event) {
-  // console.log('goty')
+ipc.on('setHomeFolder', async function () {
   dialog.showOpenDialog(mainWindow, {
     properties: ['openDirectory']
-  }, path => {
+  }, async path => {
     if (path === undefined) return
-    store.dispatch('setHomeFolder', path[0])
-      .then(() => mainWindow.webContents.send('continueToLogin'))
+    await store.dispatch('addHomeFolder', path[0])
+    try {
+      console.log('pass')
+      // if songbasket exists in file specified it will load data automatically
+      await retrieveAndStoreState(path[0])
+      setTimeout(() => {
+        mainWindow.webContents.send('dataStored')
+      }, 2000)
+    } catch (err) {
+      // Else ask to login and start a folder from 0
+      mainWindow.webContents.send('continueToLogin')
+    }
   })
 })
 
-ipc.on('login', function (event) {
+ipc.on('login', function () {
   createLoginWindow()
 })
 
@@ -332,14 +329,12 @@ ipc.on('guestSignIn', function (event, {mode, query}) {
   }
 })
 
-ipc.on('guestConfirm', function (event, userID) {
-  logme(`Fetching Playlists from Guest user ${userID}`)
+ipc.on('guestConfirm', async function (event, userID) {
   // Saving Home folder to .songbasket-userdata
-  let addNewFolder = FileSystemUser.addHomeFolder(store.state.SharedStates.fileSystem.homeFolders[0])
-  if (addNewFolder === 'already added') {
-    // handle already added folder (Tell user)
-  }
-  guestFetch(userID, true)
+  try {
+    logme(`Fetching Playlists from Guest user ${userID}`)
+    guestFetch(userID, true)
+  } catch (err) { throw err }
 })
 
 ipc.on('refreshPlaylists', function (event) {

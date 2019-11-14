@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import Vue from 'vue'
 import FileSystem from '../../../main/FileSystem/index'
-import SharedStates from './SharedStates'
+// import SharedStates from './SharedStates'
 
 // Last time changes were saved to disk
 let saveQueue = 0
@@ -16,7 +16,7 @@ function SAVE_TO_DISK (check) {
 
   if (--saveQueue > 0) return
   console.log('::::::::::::::::::::::::::::SAVING::::::::::::::::::::::::::::::::')
-  FileSystem.saveState({state, path: SharedStates.state.fileSystem.homeFolders.find(path => path.current === true).path})
+  FileSystem.saveState({state, path: global.HOME_FOLDER})
 }
 
 function LOADING (store, value, target) {

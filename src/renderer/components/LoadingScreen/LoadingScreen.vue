@@ -40,11 +40,7 @@ export default {
           break
         }
       }
-    },
-    confirmUser () {
-      ipc.send('guestConfirm', this.userOnHold.id)
     }
-
   },
   created () {
     // ipc.on('continueToLogin', () => {
