@@ -1,9 +1,7 @@
 TODO Handle removed playlists
-TODO Download GUI
+TODO Downloading tracks view
 TODO new buttons
 TODO folder view
-TODO handle existing .songbasket file
-TODO handle duplicated folder entries in .songbasket-folders file
 TODO handle quota exceeded request rejection
 TODO fix custom url not working after wrong non-existing video id is inserted
 TODO remove login button
@@ -17,8 +15,11 @@ TODO proper window size
 TODO Disable linking tracks in FAT32 & Alert user
 TODO Settings Panel
 TODO Manage .songbasket file backups
+TODO Handle playlists with no tracks
+TODO Handle unavailable and local tracks
 
 Non urgent
 TODO custom scroll
 TODO set .songbasket file hidden property
 TODO evaluate using aac
+TODO evaluate using css grid instead of flex in PlaylistList.vue

@@ -1,5 +1,4 @@
 /* eslint-disable camelcase */
-import fetch from 'electron-fetch'
 import store from '../renderer/store'
 const axios = require('axios')
 
@@ -12,54 +11,60 @@ function LOADING (value, target) {
 }
 
 // Brings back user information
-export function guestLogin (userId) {
-  return new Promise((resolve, reject) => {
-    fetch(`${Backend}/guest_sign_in?user_id=${userId}`)
-      .then(res => {
-        res.text()
-          .then(body => {
-            body = JSON.parse(body)
-            console.log(body)
-            resolve(body)
-          })
-      })
-  })
+export async function guestLogin (userId) {
+  let url = Backend + '/guest_sign_in'
+  try {
+    let res = await axios.get(url, { params: { user_id: userId } })
+    return res.data
+  } catch (err) {
+    throw err
+  }
 }
 
 // Retrieves user's playlists
-export function fetchPlaylists ({userId, logged, SBID, control}) {
-  return new Promise((resolve, reject) => {
-    fetch(`${Backend}/retrieve?user_id=${userId}&logged=${logged.toString()}&SBID=${SBID}&offset=${control.offset}&retrieve=playlists&retrieve_user_data=true`)
-      .then(res => {
-        res.text()
-          .then(body => {
-            resolve(JSON.parse(body))
-          })
-          .catch(err => reject(err))
-      })
-      .catch(err => reject(err))
-  })
+export async function fetchPlaylists ({userId, logged, SBID, control}) {
+  LOADING(true, 'Getting Playlists')
+  let url = Backend + '/retrieve'
+  let params = {
+    user_id: userId,
+    logged,
+    SBID,
+    offset: control.offset,
+    retrieve: 'playlists',
+    retrieve_user_data: true
+  }
+  try {
+    let res = await axios.get(url, {params})
+    return res.data
+  } catch (err) {
+    throw (err)
+  } finally {
+    LOADING()
+  }
 }
 
-export function getTracks ({userId, logged, SBID, control}, {id, snapshot_id}, checkVersion) {
-  let playlistId = id
-  return new Promise((resolve, reject) => {
-    LOADING(true, 'Getting Playlist Tracks')
-    fetch(`${Backend}/retrieve?user_id=${userId}&logged=${logged}&SBID=${SBID}&offset=${control.offset}&retrieve=playlist_tracks&playlist_id=${playlistId}&retrieve_user_data=false${checkVersion ? '&snapshot_id=' + snapshot_id : ''}`)
-      .then(res => {
-        LOADING()
-        res.text()
-          .then(body => {
-            resolve(JSON.parse(body))
-          })
-          .catch(error => {
-            console.log(error)
-          })
-      })
-      .catch(error => {
-        reject(error)
-      })
-  })
+export async function getTracks ({userId, logged, SBID, control}, {id, snapshot_id}, checkVersion) {
+  LOADING(true, 'Getting Playlist Tracks')
+  let url = Backend + '/retrieve'
+  let params = {
+    user_id: userId,
+    logged,
+    SBID,
+    offset: control.offset,
+    retrieve: 'playlist_tracks',
+    playlist_id: id,
+    retrieve_user_data: false
+  }
+  if (checkVersion) params.snapshot_id = snapshot_id
+  try {
+    let res = await axios.get(url, { params })
+    return res.data
+  } catch (err) {
+    console.error('ERROR AT sbFetch, getTracks::::', err)
+    throw (err)
+  } finally {
+    LOADING()
+  }
 }
 
 export function youtubizeAll (tracks) {

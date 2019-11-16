@@ -7,8 +7,6 @@ import FileSystem from '../../../main/FileSystem/index'
 let saveQueue = 0
 
 function SAVE_TO_DISK (check) {
-  // console.log('SAVIN', SharedStates.state)
-  console.log('::::::::::::::::::::::::::::TRYING TO SAVE::::::::::::::::::::::::::::::::')
   if (!check) {
     saveQueue++
     return setTimeout(() => SAVE_TO_DISK(true), 1000)

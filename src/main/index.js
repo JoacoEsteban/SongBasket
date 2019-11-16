@@ -222,6 +222,9 @@ function fetchMultiple (playlists, checkVersion) {
             if (count === 0) resolve()
           })
         })
+        .catch(err => {
+          reject(err)
+        })
     }
   })
 }
@@ -389,6 +392,9 @@ ipc.on('Youtube Convert', function () {
       .then(() => {
         LOADING()
         youtubeHandler.youtubizeAll()
+      })
+      .catch(err => {
+        console.error('ERROR AT YoutubeConvert:: fetchMultiple', err)
       })
   } else youtubeHandler.youtubizeAll()
 })

@@ -144,19 +144,21 @@ $q-true-color:rgb(103, 214, 0);
   background-color: $q-false-color;
 }
 .pl-img {
-    width: 8rem;
-    height: 8rem;
+  position: relative;
+  width: 8rem;
+  height: 8rem;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-    background-color: #2e2e2e;
+  background-color: #2e2e2e;
 
-    background-position: center;
-    background-size: cover;
+  background-position: center;
+  background-size: cover;
 }
 .pl-button-container {
+  z-index: 1;
   display: flex;
   flex-direction: column;
   height: 100%;
