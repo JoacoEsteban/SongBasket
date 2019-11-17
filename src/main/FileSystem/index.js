@@ -8,7 +8,7 @@ let NodeID3 = require('node-id3')
 const userDataPath = (electron.app || electron.remote.app).getPath('userData') + '/'
 const foldersJsonPath = userDataPath + '.songbasket-folders'
 const stateFileName = '/.songbasket'
-console.log(foldersJsonPath)
+console.log('Folder Path: ', foldersJsonPath)
 
 let homeFolderPath = () => global.HOME_FOLDER
 

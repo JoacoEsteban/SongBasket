@@ -36,7 +36,9 @@ const actions = {
     commit('SET', { key: 'FETCH_LOADING_STATE', value })
   },
   ffmpegBinsDownloaded ({commit}) {
-    commit('TRIGGER', 'FFMPEG_BINS_DOWNLOADED')
+    setTimeout(() => {
+      commit('TRIGGER', 'FFMPEG_BINS_DOWNLOADED')
+    }, 1000)
   }
 }
 
