@@ -1,24 +1,28 @@
+FIXES
+TODO stored tracks computation Ram usage and HDD Blockage
 TODO Handle removed playlists
-TODO Downloading tracks view
-TODO new buttons
-TODO folder view
 TODO handle quota exceeded request rejection
 TODO fix custom url not working after wrong non-existing video id is inserted
 TODO remove login button
-TODO Update guest user UI and loading animation
 TODO remove search by playlist switch
+TODO proper window size
+TODO Disable linking tracks in FAT32 & Alert user
+TODO Handle playlists with no tracks
+TODO Handle unavailable and local tracks
+
+FEATURES
+TODO Downloading tracks view
+TODO new buttons
+TODO folder view
+TODO Update guest user UI and loading animation
 TODO search bars
 TODO Better Loading indicators
 TODO Implement paused playlists
 TODO Implement Override with custom track
-TODO proper window size
-TODO Disable linking tracks in FAT32 & Alert user
 TODO Settings Panel
 TODO Manage .songbasket file backups
-TODO Handle playlists with no tracks
-TODO Handle unavailable and local tracks
 
-Non urgent
+NON URGENT
 TODO custom scroll
 TODO set .songbasket file hidden property
 TODO evaluate using aac

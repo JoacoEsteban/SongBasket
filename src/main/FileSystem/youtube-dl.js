@@ -97,6 +97,7 @@ export default {
 
     function convertMp3 (pathmp3, pathmp4, track, ytId) {
       return new Promise((resolve, reject) => {
+        console.log('Converting to Audio')
         let command =
           ffmpeg(pathmp4)
             .inputFormat('mp4')
@@ -145,14 +146,10 @@ export default {
                 imageBuffer: buffer
               }
             }
-
-            let tagSuccess = NodeID3.write(tags, pathmp3)
-            if (!tagSuccess) {
-              // TODO Handle error
-              reject(new Error('error while writing tags'))
-            } else {
+            NodeID3.write(tags, pathmp3, err => {
+              if (err) return reject(err)
               resolve()
-            }
+            })
           })
       })
     }
