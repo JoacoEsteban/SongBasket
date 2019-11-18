@@ -29,6 +29,7 @@ const getDefaultState = () => {
     syncedPlaylists: [],
     queuedPlaylists: [],
     cachedPlaylists: [],
+    deletedPlaylists: [],
     convertedTracks: [],
     currentPlaylist: '',
     control: {},
@@ -119,7 +120,7 @@ const actions = {
 
 const mutations = {
   STORE_DATA_FROM_DISK (state, data) {
-    let {cachedPlaylists, control, playlists, queuedPlaylists, syncedPlaylists, user, convertedTracks, lastSync} = data
+    let {cachedPlaylists, control, playlists, queuedPlaylists, syncedPlaylists, deletedPlaylists, user, convertedTracks, lastSync} = data
     state.playlists = playlists
     state.user = user
 
@@ -128,6 +129,7 @@ const mutations = {
     state.playlists = playlists
     state.queuedPlaylists = queuedPlaylists
     state.syncedPlaylists = syncedPlaylists
+    state.deletedPlaylists = deletedPlaylists
     state.user = user
     state.convertedTracks = convertedTracks
     state.lastSync = lastSync
@@ -190,6 +192,16 @@ const mutations = {
           added: [],
           removed: []
         }
+      }
+    }
+
+    for (let i = 0; i < state.syncedPlaylists.length; i++) {
+      let pl = state.syncedPlaylists[i]
+      let index = findById(pl, object.playlists.items)
+      if (index === -1) {
+        state.deletedPlaylists.push(state.playlists[findById(pl, state.playlists)])
+        state.syncedPlaylists.splice(i, 1)
+        i--
       }
     }
 

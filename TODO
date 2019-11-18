@@ -2,7 +2,6 @@ FIXES
 TODO stored tracks computation Ram usage and HDD Blockage
 TODO Handle removed playlists
 TODO handle quota exceeded request rejection
-TODO fix custom url not working after wrong non-existing video id is inserted
 TODO remove login button
 TODO remove search by playlist switch
 TODO proper window size
@@ -21,6 +20,7 @@ TODO Implement paused playlists
 TODO Implement Override with custom track
 TODO Settings Panel
 TODO Manage .songbasket file backups
+TODO Custom audio files
 
 NON URGENT
 TODO custom scroll

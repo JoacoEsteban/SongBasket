@@ -360,7 +360,7 @@ $track-height: 3.5em;
     min-width: 13em;
   }
 }
-$conversion-height: 20em;
+$conversion-height: 16em;
 $conversion-time: .3s;
 $transition-props: $conversion-time cubic-bezier(.12,.82,0,.99);
 .animation-container {
