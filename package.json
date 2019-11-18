@@ -46,7 +46,7 @@
       ]
     },
     "mac": {
-      "icon": "build/icons/icon.icns"
+      "icon": "build/icons/mac/AppIcon.icns"
     },
     "win": {
       "icon": "build/icons/icon.ico"
