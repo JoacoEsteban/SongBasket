@@ -74,7 +74,7 @@
     "vue-youtube-embed": "^2.2.2",
     "vuex": "^3.1.1",
     "vuex-electron": "^1.0.0",
-    "youtube-dl": "^2.0.1"
+    "youtube-dl": "^2.1.0"
   },
   "devDependencies": {
     "ajv": "^6.5.0",

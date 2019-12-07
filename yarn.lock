@@ -11890,7 +11890,7 @@ yeast@0.1.2:
   resolved "https://registry.yarnpkg.com/yeast/-/yeast-0.1.2.tgz#008e06d8094320c372dbc2f8ed76a0ca6c8ac419"
   integrity sha1-AI4G2AlDIMNy28L47XagymyKxBk=
 
-youtube-dl@^2.0.1:
+youtube-dl@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/youtube-dl/-/youtube-dl-2.1.0.tgz#c7761fe545ef2309669ca20a0f6e2219ca029622"
   integrity sha512-+TczsN48qrLSnxZ2EjS+aNc7Ob51h0v9lnqVdjzutk8MViq3QVrF4iKLZtl9ezGZ7IJvek4EV0KmxlgMSPAj5A==
