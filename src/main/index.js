@@ -7,6 +7,15 @@ import customGetters from '../renderer/store/customGetters'
 import * as sbFetch from './sbFetch'
 import * as youtubeHandler from './youtubeHandler'
 import electron from 'electron'
+import log from 'electron-log'
+
+let a = true
+if (process.env.NODE_ENV === 'production' || a) {
+  process.on('uncaughtException', function (error) {
+    log.warn(error)
+  })
+}
+
 console.log(dotenvConfig) // logging for linter not to complain
 const open = require('open')
 const ipc = electron.ipcMain
