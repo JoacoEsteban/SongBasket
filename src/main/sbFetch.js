@@ -30,7 +30,7 @@ export async function fetchPlaylists ({userId, logged, SBID, control}) {
     logged,
     SBID,
     offset: control.offset,
-    retrieve: 'playlists',
+    retrieve: 'user_playlists',
     retrieve_user_data: true
   }
   try {
