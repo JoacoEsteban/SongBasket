@@ -50,7 +50,6 @@ export async function getTracks ({userId, logged, SBID, control}, {id, snapshot_
     user_id: userId,
     logged,
     SBID,
-    offset: control.offset,
     retrieve: 'playlist_tracks',
     playlist_id: id,
     retrieve_user_data: false
@@ -61,7 +60,6 @@ export async function getTracks ({userId, logged, SBID, control}, {id, snapshot_
     return res.data
   } catch (err) {
     console.error('ERROR AT sbFetch, getTracks::::', err)
-    throw (err)
   } finally {
     LOADING()
   }
