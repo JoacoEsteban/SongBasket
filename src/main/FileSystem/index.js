@@ -1,18 +1,20 @@
+/* eslint-disable new-cap */
 import customGetters from '../../renderer/store/customGetters'
 import * as utils from '../../MAIN_PROCESS_UTILS'
 const electron = require('electron')
-var fs = require('fs')
-var rimraf = require('rimraf')
-let NodeID3 = require('node-id3')
+const fs = require('fs')
+const rimraf = require('rimraf')
+// const NodeID3 = require('node-id3')
+const iconv = require('iconv-lite')
 
 const userDataPath = (electron.app || electron.remote.app).getPath('userData') + '/'
 const foldersJsonPath = userDataPath + '.songbasket-folders'
 const stateFileName = '/.songbasket'
 console.log('Folder Path: ', foldersJsonPath)
 
-let homeFolderPath = () => global.HOME_FOLDER
+const homeFolderPath = () => global.HOME_FOLDER
 
-let userMethods = {
+const userMethods = {
   checkForUser: function () {
     if (fs.existsSync(foldersJsonPath)) return JSON.parse(fs.readFileSync(foldersJsonPath, 'utf8'))
 
@@ -91,26 +93,20 @@ let userMethods = {
               // cycle throug tracks and store SB ones
               for (let o = 0; o < filenames.length; o++) {
                 let file = pl.path + '/' + filenames[o]
-                NodeID3.read(file, function (err, tags) {
+                userMethods.checkMP3FileTags(file, function (err, tags) {
                   if (err) console.error(err) // TODO Handle error
-                  tags = tags.userDefinedText
-                  if (tags) {
+                  else if (tags) {
                     let track = {}
-                    let found = 2 // 2 tags to find
-                    for (let u = 0; u < tags.length; u++) {
-                      let tag = tags[u]
-                      let expression = /(songbasket|SONGBASKET)_(youtube|YOUTUBE|spotify|SPOTIFY)_(id|ID)/
-                      if (expression.test(tag.description)) {
-                        track[tag.description.toLowerCase()] = tag.value
-                        if (--found === 0) { // all tags found
-                          track.playlist = pl.id
-                          track.path = file
-                          track.file = filenames[o]
-                          allTracks.push(track)
-                          break
-                        }
-                      }
-                    }
+
+                    tags.forEach(tag => {
+                      track[tag.name] = tag.value
+                    })
+
+                    track.playlist = pl.id
+                    track.path = file
+                    track.file = filenames[o]
+
+                    allTracks.push(track)
                   }
 
                   processedTracks++
@@ -141,6 +137,69 @@ let userMethods = {
     let base = homeFolderPath() + '/'
     if (!fs.existsSync(base + oldName)) return
     fs.rename(base + oldName, base + newName)
+  },
+  checkMP3FileTags (path, fn) {
+    fs.open(path, 'r', function (err, fd) {
+      if (err) return fn(err, null)
+
+      fs.fstat(fd, function (err, stats) {
+        if (err) return closeFile(fd, err, null)
+
+        let bufferSize = stats.size < 512 ? stats.size : 512
+        let buffer = new Buffer.alloc(bufferSize)
+
+        fs.read(fd, buffer, 0, bufferSize, 0, () => {
+          let headerPointer = buffer.indexOf('TXXX')
+          if (headerPointer === -1) return closeFile(fd, null, null)
+
+          // let tagSize = 57*3 + 13
+          let tagsBuffer = new Buffer.alloc(bufferSize - headerPointer)
+
+          buffer.copy(tagsBuffer, 0, headerPointer)
+
+          let fileContents = (iconv.decode(tagsBuffer, 'ISO-8859-1').replace(/\0/g, ''))
+          fileContents = fileContents.substring(fileContents.indexOf('songbasket'))
+          let tagPosition = fileContents.indexOf('songbasket')
+          let tags = tagPosition === -1 ? null : []
+
+          console.log(fileContents)
+          for (null; tagPosition !== -1; tagPosition = fileContents.indexOf('songbasket')) {
+            let tagObj = {}
+
+            let tagEnd = fileContents.substring(tagPosition).indexOf('ÿþ')
+            tagObj.name = fileContents.slice(tagPosition, tagEnd)
+            fileContents = fileContents.substring(tagEnd + 2)
+
+            let tagLength = giveMeTagLength(tagObj.name)
+            tagObj.value = fileContents.substring(0, tagLength)
+            fileContents = fileContents.substring(fileContents.indexOf('songbasket'))
+
+            tags.push(tagObj)
+
+            console.log(tagObj)
+            console.log(fileContents)
+          }
+          console.log('\n')
+
+          closeFile(fd, null, tags)
+        })
+      })
+    })
+
+    function giveMeTagLength (name) {
+      switch (name) {
+        case 'songbasket_spotify_id':
+          return 21
+        case 'songbasket_youtube_id':
+          return 11
+        default:
+          return -1
+      }
+    }
+    function closeFile (fd, err, tags) {
+      fs.close(fd, () => {})
+      fn(err, tags)
+    }
   }
 }
 

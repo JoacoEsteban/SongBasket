@@ -174,7 +174,7 @@ app.on('activate', () => {
 })
 
 function guestFetch (query, isFirstTime) {
-  console.log(globalLoadingState().value)
+  console.log('loading?', globalLoadingState().value)
   if (globalLoadingState().value) return
   console.log('fetchin')
   store.dispatch('globalLoadingState', {value: true, target: 'PLAYLIST_REFRESH'})
@@ -211,7 +211,7 @@ function guestFetch (query, isFirstTime) {
 
   sbFetch.fetchPlaylists({ userId: query, logged: false, SBID: null, control: { offset: 0 } })
     .then(resolve => {
-      if (resolve.code === 200) {
+      if (resolve.status === 200) {
         allData = resolve
         list = true
         if (list && synced) storePlaylists(allData, isFirstTime)
@@ -307,13 +307,13 @@ ipc.on('guestSignIn', function (event, {mode, query}) {
     if (query !== null && query !== undefined) {
       sbFetch.guestLogin(query)
         .then(resolve => {
-          if (resolve.code === 404) {
+          if (resolve.status === 404) {
             mainWindow.webContents.send('not-found')
           }
-          if (resolve.code === 400) {
+          if (resolve.status === 400) {
             mainWindow.webContents.send('invalid')
           }
-          if (resolve.code === 200) {
+          if (resolve.status === 200) {
             mainWindow.webContents.send('user-found', resolve)
           }
         })
