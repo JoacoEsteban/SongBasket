@@ -217,7 +217,6 @@ export default {
             }
             if (found) {
               if (unlinkTrack) {
-                console.log('UNLINKING TRACK')
                 unlinkQueue.push(lt)
               }
               localTracks.splice(o, 1)
@@ -234,6 +233,7 @@ export default {
 
       unlinkQueue = [...unlinkQueue, ...localTracks]
       unlinkQueue.forEach(track => {
+        console.log('UNLINKING TRACK')
         unlink(track.path)
       })
 

@@ -68,6 +68,7 @@ const userMethods = {
       let allTracks = []
 
       function checkNResolve () {
+        console.log('All local tracks tags retrieved')
         if (++processedPls === syncedPlaylists.length) resolve(allTracks)
       }
       for (let i = 0; i < syncedPlaylists.length; i++) {
@@ -145,7 +146,8 @@ const userMethods = {
       fs.fstat(fd, function (err, stats) {
         if (err) return closeFile(fd, err, null)
 
-        let bufferSize = stats.size < 512 ? stats.size : 512
+        const max = 1024
+        let bufferSize = stats.size < max ? stats.size : max
         let buffer = new Buffer.alloc(bufferSize)
 
         fs.read(fd, buffer, 0, bufferSize, 0, () => {
@@ -162,7 +164,6 @@ const userMethods = {
           let tagPosition = fileContents.indexOf('songbasket')
           let tags = tagPosition === -1 ? null : []
 
-          console.log(fileContents)
           for (null; tagPosition !== -1; tagPosition = fileContents.indexOf('songbasket')) {
             let tagObj = {}
 
@@ -175,12 +176,7 @@ const userMethods = {
             fileContents = fileContents.substring(fileContents.indexOf('songbasket'))
 
             tags.push(tagObj)
-
-            console.log(tagObj)
-            console.log(fileContents)
           }
-          console.log('\n')
-
           closeFile(fd, null, tags)
         })
       })
@@ -189,7 +185,7 @@ const userMethods = {
     function giveMeTagLength (name) {
       switch (name) {
         case 'songbasket_spotify_id':
-          return 21
+          return 22
         case 'songbasket_youtube_id':
           return 11
         default:
@@ -197,8 +193,9 @@ const userMethods = {
       }
     }
     function closeFile (fd, err, tags) {
-      fs.close(fd, () => {})
-      fn(err, tags)
+      fs.close(fd, () => {
+        fn(err, tags)
+      })
     }
   }
 }
