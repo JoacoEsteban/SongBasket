@@ -74,6 +74,7 @@ export default {
       console.log('tamos listo')
       this.$store.dispatch('SET_LOADING_STATE', 'found')
       this.redirect('home')
+      ipc.send('homePushed')
     })
   }
 }

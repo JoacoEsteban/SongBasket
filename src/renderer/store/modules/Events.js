@@ -4,6 +4,7 @@ const state = {
   CURRENT_PLAYLIST_SET: false,
   SYNCED_PLAYLISTS_REFRESHED: false,
   PLAYLIST_UNSYNCED: false,
+  RESET_SELECTION: false,
   FFMPEG_BINS_DOWNLOADED: false,
   ROUTER_ANIMATION: '',
   GLOBAL_LOADING_STATE: {
@@ -25,6 +26,9 @@ const actions = {
   },
   playlistUnsynced ({commit}) {
     commit('TRIGGER', 'PLAYLIST_UNSYNCED')
+  },
+  resetSelection ({commit}) {
+    commit('TRIGGER', 'RESET_SELECTION')
   },
   routerAnimation ({commit}, animation) {
     commit('ROUTER_ANIMATION', animation)

@@ -36,6 +36,7 @@ if (process.env.NODE_ENV !== 'development') {
 
 let ffmpegBinsDownloaded = false
 let windowFinishedLoading = false
+let homePushed = false
 
 function isEverythingReady () {
   if (ffmpegBinsDownloaded && windowFinishedLoading) verifyFileSystem()
@@ -130,9 +131,7 @@ async function verifyFileSystem () {
 
   try {
     await retrieveAndStoreState(FOLDERS.selected)
-    setTimeout(() => {
-      mainWindow.webContents.send('dataStored')
-    }, 2000)
+    pushToHome()
   } catch (err) {
     // TODO Handle errors when retrieving and setting data
     console.error('NOT FOOUND', err)
@@ -150,6 +149,11 @@ function globalLoadingState () {
 function LOADING (value, target) {
   if (!value) value = false
   store.dispatch('globalLoadingState', {value, target})
+}
+
+function pushToHome () {
+  mainWindow.webContents.send('dataStored')
+  if (!homePushed) setTimeout(pushToHome, 200)
 }
 
 app.on('ready', () => {
@@ -286,9 +290,7 @@ ipc.on('setHomeFolder', async function () {
       console.log('pass')
       // if songbasket exists in file specified it will load data automatically
       await retrieveAndStoreState(path[0])
-      setTimeout(() => {
-        mainWindow.webContents.send('dataStored')
-      }, 2000)
+      pushToHome()
     } catch (err) {
       // Else ask to login and start a folder from 0
       mainWindow.webContents.send('continueToLogin')
@@ -298,6 +300,10 @@ ipc.on('setHomeFolder', async function () {
 
 ipc.on('login', function () {
   createLoginWindow()
+})
+
+ipc.on('homePushed', function () {
+  homePushed = true
 })
 
 ipc.on('guestSignIn', function (event, {mode, query}) {

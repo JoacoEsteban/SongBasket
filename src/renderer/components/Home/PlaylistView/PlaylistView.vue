@@ -22,7 +22,7 @@
             <div v-if="isSynced" @click="toggleShowingAll" class="button slim mb-1">
               {{showingAll ? 'Collapse' : 'Show'}} all
             </div>
-            <div v-if="isSynced" @click="resetAll" class="button slim">
+            <div v-if="isSynced" @click="resetAll()" class="button slim">
               Reset all
             </div>
           </div>
@@ -142,6 +142,9 @@ export default {
     },
     playlistUnsynced () {
       return this.$store.state.Events.PLAYLIST_UNSYNCED
+    },
+    resetSelection () {
+      return this.$store.state.Events.RESET_SELECTION
     }
   },
   watch: {
@@ -154,6 +157,9 @@ export default {
     },
     playlistUnsynced () {
       this.$router.push('/home')
+    },
+    resetSelection () {
+      this.resetAll(true)
     }
   },
   mounted () {
@@ -248,14 +254,17 @@ export default {
       }
       return this.showingAll
     },
-    resetAll () {
+    resetAll (confirm) {
+      console.log('daadada', confirm)
       // TODO Request confirmation
-      this.conversion.forEach(track => {
-        this.$store.dispatch('changeYtTrackSelection', {playlist: this.playlist.id, trackId: track.id, newId: null})
-      })
-      setTimeout(() => {
-        this.$forceUpdate()
-      }, 0)
+      if (confirm) {
+        this.conversion.forEach(track => {
+          this.$store.dispatch('changeYtTrackSelection', {playlist: this.playlist.id, trackId: track.id, newId: null})
+        })
+        setTimeout(() => {
+          this.$forceUpdate()
+        }, 0)
+      } else this.$store._actions.openModal[0]({wich: 'reset-all-playlist-tracks', payload: {playlistId: this.playlist.id}})
     },
     selectTrack (trackId, newId) {
       this.$store.dispatch('changeYtTrackSelection', {playlist: this.playlist.id, trackId, newId})
@@ -314,7 +323,7 @@ export default {
   /* border: 1px solid white; */
 }
 .plv-rp-data {
-  background-color: var(--global-grey-secondary);
+  // background-color: var(--global-grey-secondary);
   position: relative;
   padding: .5em;
   min-height: 3em;

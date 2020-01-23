@@ -121,31 +121,34 @@ export default {
 
     function applyTags (pathmp3, track, ytSelection) {
       let data = track.data
+      let tags = {
+        title: data.name,
+        artist: data.artists[0].name,
+        album: data.album.name,
+        userDefinedText: [{
+          description: 'songbasket_spotify_id',
+          value: data.id
+        }, {
+          description: 'songbasket_youtube_id',
+          value: ytSelection
+        }]
+      }
       return new Promise((resolve, reject) => {
         // TODO Emit applying tags
         console.log('applying tags')
         getPhoto(data.album.images[0].url)
-          .then(buffer => {
-            let tags = {
-              title: data.name,
-              artist: data.artists[0].name,
-              album: data.album.name,
-              userDefinedText: [{
-                description: 'songbasket_spotify_id',
-                value: data.id
-              }, {
-                description: 'songbasket_youtube_id',
-                value: ytSelection
-              }],
-              image: {
-                mime: 'png/jpeg' / undefined,
-                type: {
-                  id: 3,
-                  name: 'front cover'
-                },
-                imageBuffer: buffer
-              }
+          .then(imageBuffer => {
+            data.image = {
+              mime: 'png/jpeg' / undefined,
+              type: {
+                id: 3,
+                name: 'front cover'
+              },
+              imageBuffer
             }
+          })
+          .catch(() => console.error('Error when getting track photo, applying tracks anyway'))
+          .finally(() => {
             NodeID3.write(tags, pathmp3, err => {
               if (err) return reject(err)
               resolve()
@@ -162,12 +165,10 @@ export default {
           method: 'GET',
           responseType: 'stream'
         }).then(resp => {
-          // console.log('rep', resp)
           let buffer = Buffer.alloc(0)
           resp.data
             .on('data', (chunk) => {
               buffer = Buffer.concat([buffer, chunk])
-            // console.log('bu00000', buffer)
             })
             .on('end', () => {
               console.log('photo retrieved')
