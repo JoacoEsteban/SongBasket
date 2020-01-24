@@ -141,7 +141,7 @@ export default {
 }
 .home-router{
   height: 100%;
-  padding: 1.5rem 0;
+  padding-bottom: 1em;
   box-sizing: border-box;
 }
 

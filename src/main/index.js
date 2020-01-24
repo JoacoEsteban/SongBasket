@@ -34,7 +34,9 @@ if (process.env.NODE_ENV !== 'development') {
   global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
 
-let ffmpegBinsDownloaded = false
+// let ffmpegBinsDownloaded = false
+// TODO just prevent starting downloads without ffmpeg, dont block Application bootup
+let ffmpegBinsDownloaded = true
 let windowFinishedLoading = false
 let homePushed = false
 
@@ -114,7 +116,7 @@ async function retrieveAndStoreState (path) {
 }
 
 async function verifyFileSystem () {
-  console.log('verifying dou')
+  console.log('Checking for existing home folders')
   let FOLDERS = FileSystemUser.checkForUser()
   await store.dispatch('setFolderPaths', FOLDERS)
   if (FOLDERS.paths.length === 0) {

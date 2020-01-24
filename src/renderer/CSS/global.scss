@@ -127,3 +127,17 @@ body:hover{
     background: none;
     transition: transform .15s ease, background .2s ease;      
 }
+.input-light {
+    display: block;
+    margin: 0;
+    font-size: 1em;
+    outline: none;
+    width: 100%;
+    font-family: 'Poppins Light';
+    text-align: left;
+    border: none;
+    color: white;
+    background: none;
+    transition: transform .15s ease, background .2s ease;
+    padding: .25em;
+}

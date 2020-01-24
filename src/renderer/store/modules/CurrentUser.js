@@ -134,7 +134,7 @@ const mutations = {
     state.convertedTracks = convertedTracks
     state.lastSync = lastSync
 
-    console.log('DATA STORED')
+    console.log('DATA STORED. ', playlists.length, 'playlists')
   },
   UPDATE_USER_ENTITIES (state, object) {
     LOADING(this, true, 'Computing Changes')

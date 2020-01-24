@@ -1,5 +1,22 @@
 <template>
-  <div class="home-router pll-container">
+  <div ref="playlists-list" class="home-router pll-container">
+    <div class="filters-container">
+      <div class="filters-background" :style="{opacity: 1 - filterBackgroundOpacity}">
+      </div>
+      <div class="filters-content">
+        <div class="search-bar">
+          <div class="filters-background" :style="{opacity: filterBackgroundOpacity}">
+          </div>
+          <span class="label">
+            filter
+          </span>
+          <input class="input-light" type="text">
+        </div>
+        <div class="filter-buttons">
+
+        </div>
+      </div>
+    </div>
     <playlist v-for="playlist in syncedPlaylists"
     :playlist="playlist"
     :key="playlist.id"
@@ -29,6 +46,7 @@ export default {
       user: this.$store.state.CurrentUser.user,
       control: this.$store.state.CurrentUser.control,
       loading: false,
+      filterBackgroundOpacity: 0,
       syncedPlaylists: []
     }
   },
@@ -83,14 +101,57 @@ export default {
       this.loading = false
     })
     this.refreshSynced()
+
+    const containerElement = this.$refs['playlists-list']
+    containerElement.addEventListener('scroll', (e) => {
+      let ratio
+      if ((ratio = (containerElement.scrollTop / 100)) > 1) ratio = 1
+      this.filterBackgroundOpacity = ratio
+    })
   }
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
 .pll-container {
   /* margin-bottom: 2.4rem; */
   text-align: center;
   overflow: auto;
+}
+.filters-container {
+  pointer-events: none;
+  padding: .5em 0;
+  margin-bottom: 1em;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  .filters-background {
+    background: linear-gradient(180deg, var(--global-grey), transparent);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+  }
+  .filters-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1em;
+  }
+  .search-bar {
+    pointer-events: all;
+    .filters-background {
+      background: var(--global-grey);
+    }
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    border-radius: 10em;
+    padding-left: 1em;
+    padding-right: .2em;
+  }
 }
 </style>
