@@ -76,7 +76,10 @@ let router = new Router({
     }
   ]
 })
+let transitioning = false
 router.beforeEach((to, from, next) => {
+  if (transitioning) return
+  transitioning = true
   let anim1
   let anim2 = 'fast '
   let pull = 'pull'
@@ -89,16 +92,16 @@ router.beforeEach((to, from, next) => {
     anim1 = push
     anim2 += pull
   }
-
   store.dispatch('routerAnimation', anim1)
   setTimeout(() => {
     next()
-    // setTimeout(() => {
     store.dispatch('routerAnimation', anim2)
     setTimeout(() => {
-      store.dispatch('routerAnimation', 'realease')
+      store.dispatch('routerAnimation', 'release')
+      setTimeout(() => {
+        transitioning = false
+      }, 100)
     }, 100)
-    // }, 1000)
   }, 300)
 })
 

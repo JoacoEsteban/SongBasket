@@ -34,9 +34,9 @@ if (process.env.NODE_ENV !== 'development') {
   global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
 
-// let ffmpegBinsDownloaded = false
 // TODO just prevent starting downloads without ffmpeg, dont block Application bootup
-let ffmpegBinsDownloaded = true
+let ffmpegBinsDownloaded = false
+// let ffmpegBinsDownloaded = true
 let windowFinishedLoading = false
 let homePushed = false
 

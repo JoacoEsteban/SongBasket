@@ -166,7 +166,7 @@ export default {
     transform: scale(1.5);
     opacity: 0;
   }
-  &.realease {
+  &.release {
     opacity: 1;
     transform: scale(1)
   }

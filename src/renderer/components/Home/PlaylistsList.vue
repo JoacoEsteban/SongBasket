@@ -10,26 +10,31 @@
           <span class="label">
             filter
           </span>
-          <input class="input-light" type="text">
+          <input autofocus v-model.trim="searchInput" class="input-light" type="text">
         </div>
         <div class="filter-buttons">
 
         </div>
       </div>
     </div>
-    <playlist v-for="playlist in syncedPlaylists"
-    :playlist="playlist"
-    :key="playlist.id"
-    @addPlaylistToSyncQueue="$emit('addPlaylistToSyncQueue', playlist.id)"
-    @openPlaylist="$emit('openPlaylist', playlist.id)" />
-    <playlist v-for="playlist in unSyncedPlaylists"
-    :playlist="playlist"
-    :key="playlist.id"
-    @addPlaylistToSyncQueue="$emit('addPlaylistToSyncQueue', playlist.id)"
-    @openPlaylist="$emit('openPlaylist', playlist.id)" />
+    <div ref="actual-list" class="actual-list" :class="listAnimationClass">
+      <div v-if="noPlaylists" class="no-playlists">
+        No Playlists found{{allLoaded ? ' 😔' : ', try loading some more'}}
+      </div>
+      <playlist v-for="playlist in syncedPlaylistsFiltered ? syncedPlaylistsFiltered : syncedPlaylists"
+      :playlist="playlist"
+      :key="playlist.id"
+      @addPlaylistToSyncQueue="$emit('addPlaylistToSyncQueue', playlist.id)"
+      @openPlaylist="$emit('openPlaylist', playlist.id)" />
+      <playlist v-for="playlist in unSyncedPlaylistsFiltered ? unSyncedPlaylistsFiltered : unSyncedPlaylists"
+      :playlist="playlist"
+      :key="playlist.id"
+      @addPlaylistToSyncQueue="$emit('addPlaylistToSyncQueue', playlist.id)"
+      @openPlaylist="$emit('openPlaylist', playlist.id)" />
 
-    <div v-if="!allLoaded">
-      <button class="button" @click="loadMore">{{ loading ? 'Loading' : 'Load More'}}</button>
+      <div v-if="!allLoaded">
+        <button class="button" @click="loadMore">{{ loading ? 'Loading' : 'Load More'}}</button>
+      </div>
     </div>
   </div>
 </template>
@@ -46,8 +51,15 @@ export default {
       user: this.$store.state.CurrentUser.user,
       control: this.$store.state.CurrentUser.control,
       loading: false,
+      transitioning: false,
+      noPlaylists: false,
       filterBackgroundOpacity: 0,
-      syncedPlaylists: []
+      listAnimationTime: 250,
+      listAnimationClass: '',
+      searchInput: '',
+      syncedPlaylists: [],
+      syncedPlaylistsFiltered: null,
+      unSyncedPlaylistsFiltered: null
     }
   },
   components: {
@@ -70,6 +82,9 @@ export default {
   watch: {
     syncedPlaylistsRefreshed () {
       this.refreshSynced()
+    },
+    searchInput (val) {
+      this.filterPlaylists()
     }
   },
   methods: {
@@ -78,6 +93,30 @@ export default {
         this.loading = true
         ipc.send('loadMore')
       }
+    },
+    transitionPlaylists (what) {
+      return new Promise((resolve, reject) => {
+        // if (this.transitioning) resolve(false)
+        this.transitioning = true
+        this.listAnimationClass = what
+        setTimeout(() => {
+          resolve(!(this.transitioning = false))
+        }, this.listAnimationTime)
+      })
+    },
+    hidePlaylists () {
+      return new Promise((resolve, reject) => {
+        this.transitionPlaylists('hide')
+          .then(res => resolve(res))
+          .catch(err => reject(err))
+      })
+    },
+    showPlaylists () {
+      return new Promise((resolve, reject) => {
+        this.transitionPlaylists('show')
+          .then(res => resolve(res))
+          .catch(err => reject(err))
+      })
     },
     refreshSynced () {
       let all = []
@@ -94,6 +133,28 @@ export default {
         }
       }
       this.syncedPlaylists = all
+      this.filterPlaylists()
+    },
+    filterPlaylists () {
+      if (this.lastType) clearTimeout(this.lastType)
+      this.hidePlaylists()
+        .then(() => {
+          let txt = this.searchInput
+          let noPlaylists = false
+          if (!txt.length) {
+            this.unSyncedPlaylistsFiltered = null
+            this.syncedPlaylistsFiltered = null
+          } else {
+            noPlaylists = (
+              (this.syncedPlaylistsFiltered = this.syncedPlaylists.filter(pl => pl.name.toLowerCase().includes(txt))).length +
+              (this.unSyncedPlaylistsFiltered = this.unSyncedPlaylists.filter(pl => pl.name.toLowerCase().includes(txt))).length
+            ) === 0
+          }
+          this.noPlaylists = noPlaylists
+        })
+      this.lastType = setTimeout(() => {
+        this.showPlaylists()
+      }, this.listAnimationTime + 10)
     }
   },
   mounted () {
@@ -101,6 +162,7 @@ export default {
       this.loading = false
     })
     this.refreshSynced()
+    this.$refs['actual-list'].style.setProperty('--list-transition-time', this.listAnimationTime + 'ms')
 
     const containerElement = this.$refs['playlists-list']
     containerElement.addEventListener('scroll', (e) => {
@@ -113,10 +175,24 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+$bezier: cubic-bezier(0, 1, 0, 1);
+$bezier-chill: cubic-bezier(0, 1, .5, 1);
+$transition-global: 0.5s $bezier-chill;
+$transition-global-hard: 0.5s $bezier;
+
 .pll-container {
   /* margin-bottom: 2.4rem; */
   text-align: center;
   overflow: auto;
+}
+.actual-list {
+  --list-transition-time: .3s;
+  $transition: var(--list-transition-time) $bezier-chill;
+  transition: transform $transition, opacity $transition;
+  &.hide {
+    transform: translateX(-3em);
+    opacity: 0;
+  }
 }
 .filters-container {
   pointer-events: none;
@@ -153,5 +229,8 @@ export default {
     padding-left: 1em;
     padding-right: .2em;
   }
+}
+.no-playlists {
+  margin: 4em 0;
 }
 </style>

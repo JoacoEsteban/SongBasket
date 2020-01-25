@@ -67,6 +67,10 @@ export default {
             store.dispatch('downloadChunk', {started: true, id, ytId, info})
           })
 
+          video.on('error', (error) => {
+            console.error('Error when downloading video::::', error)
+          })
+
           video.pipe(fs.createWriteStream(fullPathmp4))
 
           let current = 0
@@ -149,6 +153,7 @@ export default {
           })
           .catch(() => console.error('Error when getting track photo, applying tracks anyway'))
           .finally(() => {
+            console.log('writing tags')
             NodeID3.write(tags, pathmp3, err => {
               if (err) return reject(err)
               resolve()
@@ -250,6 +255,8 @@ export default {
 
 // TODO consider both of this as async
 function unlink (path) {
+  // let a = true
+  // if (a) return
   if (fs.existsSync(path))fs.unlinkSync(path)
 }
 function link (path, newPath) {
