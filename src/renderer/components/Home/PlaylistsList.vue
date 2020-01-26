@@ -36,6 +36,9 @@
         <button class="button" @click="loadMore">{{ loading ? 'Loading' : 'Load More'}}</button>
       </div>
     </div>
+    <!-- <div class="background-container">
+      dalebro
+    </div> -->
   </div>
 </template>
 
@@ -232,5 +235,12 @@ $transition-global-hard: 0.5s $bezier;
 }
 .no-playlists {
   margin: 4em 0;
+}
+.background-container {
+  position: sticky;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
 </style>

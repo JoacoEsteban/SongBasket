@@ -14,6 +14,9 @@
       @addPlaylistToSyncQueue="addPlaylistToSyncQueue($event)"
       @openYtVideo="openYtVideo($event)"
       ></router-view>
+      <home-background
+      :class="{transitioning: routerAnimation !== 'release'}"
+      ></home-background>
 
       <user-data style="z-index: 1" @logOut="logOut"></user-data>
     </div>
@@ -27,6 +30,7 @@ import TopBar from './TopBar.vue'
 import PlaylistsList from './PlaylistsList.vue'
 import Playlist from './Playlist.vue'
 import UserData from './UserData.vue'
+import HomeBackground from './HomeBackground.vue'
 
 const electron = require('electron')
 const ipc = electron.ipcRenderer
@@ -37,7 +41,8 @@ export default {
     TopBar,
     PlaylistsList,
     Playlist,
-    UserData
+    UserData,
+    HomeBackground
   },
   data () {
     return {
@@ -149,7 +154,7 @@ export default {
 
 <style lang="scss" scoped>
 .router-view {
-  $transition: .3s cubic-bezier(.12,.82,0,.99);
+  $transition: var(--home-transition);
   transition: transform $transition, opacity $transition;
   opacity: 1;
   transform: scale(1);

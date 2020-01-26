@@ -35,8 +35,8 @@ if (process.env.NODE_ENV !== 'development') {
 }
 
 // TODO just prevent starting downloads without ffmpeg, dont block Application bootup
-let ffmpegBinsDownloaded = false
-// let ffmpegBinsDownloaded = true
+// let ffmpegBinsDownloaded = false
+let ffmpegBinsDownloaded = true
 let windowFinishedLoading = false
 let homePushed = false
 

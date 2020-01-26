@@ -32,6 +32,7 @@ export default {
         case 'setup': {
           // this.header.text = 'Let\'s find your music'
           this.$router.push('/setup')
+            .catch(err => console.error('daddddaa', err))
           break
         }
         case 'home': {
