@@ -15,14 +15,22 @@ export default {
   },
   mounted () {
     window.addEventListener('mousewheel', this.handleScroll)
+    // window.addEventListener('resize', this.handleResize)
     this.initializeCanvas()
-    setInterval(() => {
-      console.log(this.offsetTop)
-    }, 1000)
+    // setInterval(() => {
+    //   console.log(this.offsetTop)
+    // }, 1000)
   },
   methods: {
     handleScroll (e) {
       this.offsetTop += Math.round(e.deltaY * -0.25)
+    },
+    handleResize (e) {
+      let el = document.querySelector('#background-canvas')
+      el.width = window.innerWidth * this.pixelRatio
+      el.height = window.innerHeight * this.pixelRatio
+      el.style.width = window.innerWidth + 'px'
+      el.style.height = window.innerHeight + 'px'
     },
     initializeCanvas () {
       let ratio = (function () {
@@ -47,6 +55,7 @@ export default {
       let ctx = el.getContext('2d')
       ctx.setTransform(ratio, 0, 0, ratio, 0, 0)
       this.canvasContext = ctx
+      this.pixelRatio = ratio
 
       this.drawCanvas()
     },
@@ -72,7 +81,7 @@ export default {
         return circle
       }
       let circles = []
-      for (let i = 0; i < 100; i++) {
+      for (let i = 0; i < 50; i++) {
         circles.push(createCircle())
       }
       function drawCircle (circle) {
@@ -88,22 +97,22 @@ export default {
         circle.x += circle.dirX
         circle.y += circle.dirY
         if (circle.dirX > 0) {
-          if (circle.x + circle.diameter > window.innerWidth) {
-            circle.x = circle.diameter * -1
+          if (circle.x - circle.radius > window.innerWidth) {
+            circle.x = circle.radius * -1
           }
         } else {
-          if (circle.x + circle.diameter < 0) {
-            circle.x = window.innerWidth + circle.diameter
+          if (circle.x + circle.radius < 0) {
+            circle.x = window.innerWidth + circle.radius
           }
         }
         let oTop = offsetTop()
         if (circle.dirY > 0) {
-          if (circle.y + circle.diameter > window.innerHeight + oTop) {
-            circle.y = circle.diameter * -1 + oTop
+          if (circle.y - circle.radius > window.innerHeight - oTop) {
+            circle.y = circle.radius * -1 - oTop
           }
         } else {
-          if (circle.y + circle.diameter < 0 + oTop) {
-            circle.y = window.innerHeight + circle.diameter + oTop
+          if (circle.y + circle.radius < 0 - oTop) {
+            circle.y = window.innerHeight + circle.radius - oTop
           }
         }
       }
