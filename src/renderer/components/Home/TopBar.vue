@@ -33,7 +33,7 @@
       </router-link>
     </div>
 
-    <div class="tb-button-panel h100">
+    <div class="tb-button-panel" :class="{h100: !isMac}">
       <div class="df fldc aliend">
         <div id="title-bar" class="windows" v-if="!isMac">
           <div class="title-bar-buttons-container">
