@@ -14,9 +14,9 @@
       @addPlaylistToSyncQueue="addPlaylistToSyncQueue($event)"
       @openYtVideo="openYtVideo($event)"
       ></router-view>
-      <home-background
+      <!-- <home-background
       :class="{transitioning: routerAnimation !== 'release'}"
-      ></home-background>
+      ></home-background> -->
 
       <user-data style="z-index: 1" @logOut="logOut"></user-data>
     </div>
@@ -139,7 +139,7 @@ export default {
   position: relative;
   display: flex;
   text-align: center;
-  height: 100vh;
+  height: var(--max-container-height);
   overflow: hidden;
   flex-direction: column;
   justify-content: space-between;

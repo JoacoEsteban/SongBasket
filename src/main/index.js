@@ -45,12 +45,12 @@ function isEverythingReady () {
 }
 
 function createWindow () {
-  let width = 800
-  let height = 600
+  let width = 1000
+  let height = 500
   mainWindow = new BrowserWindow({
     width,
     height,
-
+    frame: false,
     minWidth: width,
     minHeight: height,
     useContentSize: true
@@ -66,6 +66,7 @@ function createWindow () {
 function createLoginWindow () {
   if (!loginWindow) { // Prevents creating multiple loginWindows
     loginWindow = new BrowserWindow({
+      frame: false,
       width: 550,
       height: 830,
       useContentSize: true
