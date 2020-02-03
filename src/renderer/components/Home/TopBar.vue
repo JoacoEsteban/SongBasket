@@ -1,5 +1,5 @@
 <template>
-  <div class="tb-container">
+  <div class="tb-container" @dblclick="maximize">
     <div class="tb-selection-numbers-container">
       <div id="title-bar" class="mac" v-if="isMac">
         <div class="title-bar-buttons-container">
@@ -29,7 +29,7 @@
     <div class="tb-mid-section">
       {{status}}
       <router-link class="nodrag" style="font-size: 1.5em;" to="/home" tag="span">
-        <home-icon />
+        <home-icon class="nodrag" />
       </router-link>
     </div>
 
@@ -124,6 +124,13 @@ export default {
         return `Last Sync: ${this.now.date} @ ${this.now.hours}`
       }
       return this.loadingState.target
+    }
+  },
+  methods: {
+    maximize (e) {
+      if (!this.isMac || e.target.classList.contains('nodrag')) return
+      console.log(e.target.classList)
+      window.toggleMaximization()
     }
   }
 }

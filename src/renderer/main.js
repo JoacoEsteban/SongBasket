@@ -10,6 +10,8 @@ if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.http = Vue.prototype.$http = axios
 Vue.config.productionTip = false
 
+let electronWindow
+
 const platform = (() => {
   switch (process.platform) {
     case 'darwin':
@@ -21,7 +23,7 @@ const platform = (() => {
 })()
 window.platform = platform
 
-function macFullscreen () {
+function toggleFullscreen () {
   let isFullscreen = false
   if (document.webkitFullscreenElement) {
     isFullscreen = true
@@ -31,11 +33,18 @@ function macFullscreen () {
   document.getElementById('max-btn').classList.remove('button-' + (isFullscreen ? 'un' : '') + 'maximize')
   document.getElementById('max-btn').classList.add('button-' + (!isFullscreen ? 'un' : '') + 'maximize')
 }
-window.toggleFullscreen = macFullscreen;
+window.toggleFullscreen = toggleFullscreen
+
+function toggleMaximization () {
+  if (electronWindow.isMaximized()) electronWindow.unmaximize()
+  else electronWindow.maximize()
+}
+window.toggleMaximization = toggleMaximization;
 
 (function () {
   function init () {
     var window = BrowserWindow.getFocusedWindow()
+    electronWindow = window
     if (!window || !document.getElementById('min-btn')) return false
     document.getElementById('min-btn').addEventListener('click', function (e) {
       window.minimize()
@@ -49,10 +58,7 @@ window.toggleFullscreen = macFullscreen;
       document.getElementById('max-btn').classList.remove('button-unmaximize')
       document.getElementById('max-btn').classList.add('button-maximize')
     })
-    document.getElementById('max-btn').addEventListener('click', platform === 'mac' ? macFullscreen : function (e) {
-      if (window.isMaximized()) window.unmaximize()
-      else window.maximize()
-    })
+    document.getElementById('max-btn').addEventListener('click', platform === 'mac' ? toggleFullscreen : toggleMaximization)
 
     if (!window || !document.getElementById('close-btn')) return false
     document.getElementById('close-btn').addEventListener('click', function (e) {
