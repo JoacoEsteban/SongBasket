@@ -4,7 +4,7 @@
 
 html{
     font-size: 30px;
-    height: 100vh;
+    height: var(--max-container-height);
     overflow: hidden;
 }
  /* width */

@@ -113,7 +113,7 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 100vh;
+  height: var(--max-container-height);
 }
 .login-header {
   min-height: 20vmax;

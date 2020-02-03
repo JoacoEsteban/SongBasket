@@ -18,10 +18,17 @@ new Vue({
 }).$mount('#app')
 
 /* eslint-disable no-unused-vars */
+console.log(customTitlebar.Themebar.mac)
 let titlebar
+let isMac = process.platform === 'darwin'
+
 function createTitleBar () {
   titlebar = new customTitlebar.Titlebar({
-    backgroundColor: customTitlebar.Color.fromHex('#333')
+    backgroundColor: customTitlebar.Color.fromHex('#333'),
+    iconsTheme: customTitlebar.Themebar[isMac ? 'mac' : 'win'],
+    titleHorizontalAlignment: 'right',
+    order: isMac ? 'inverted' : null,
+    unfocusEffect: false
   })
 
   document.documentElement.style.setProperty('--max-container-height', 'calc(100vh - ' + document.querySelector('.titlebar').offsetHeight + 'px)')

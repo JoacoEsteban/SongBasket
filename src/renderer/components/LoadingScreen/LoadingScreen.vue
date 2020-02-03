@@ -95,7 +95,7 @@ export default {
   justify-content: center;
   text-align: center;
   align-self: center;
-  height: 100vh;
+  height: var(--max-container-height);
 }
 .login-header {
   min-height: 20vmax;
