@@ -1,7 +1,7 @@
 <template>
   <div class="tb-container">
     <div class="tb-selection-numbers-container">
-      <div id="title-bar" class="mac" v-if="!isMac">
+      <div id="title-bar" class="mac" v-if="isMac">
         <div class="title-bar-buttons-container">
           <button id="min-btn" class="bar-btn button-minimize">
             <div class="mask"></div>
@@ -14,14 +14,15 @@
           </button>
         </div>
       </div>
-
-      <div>
-        <span class="tb-selection-num">{{selectedPlaylistsData.playlists[0]}}</span>
-        {{selectedPlaylistsData.playlists[1]}}
-      </div>
-      <div>
-        <span class="tb-selection-num">{{selectedPlaylistsData.tracks[0]}}</span>
-        {{selectedPlaylistsData.tracks[1]}}
+      <div class="numbers">
+        <div>
+          <span class="tb-selection-num">{{selectedPlaylistsData.playlists[0]}}</span>
+          {{selectedPlaylistsData.playlists[1]}}
+        </div>
+        <div>
+          <span class="tb-selection-num">{{selectedPlaylistsData.tracks[0]}}</span>
+          {{selectedPlaylistsData.tracks[1]}}
+        </div>
       </div>
     </div>
 
@@ -36,15 +37,15 @@
       <div class="df fldc aliend">
         <div id="title-bar" class="windows" v-if="!isMac">
           <div class="title-bar-buttons-container">
-            <button id="min-btn" class="bar-btn button-minimize">
+            <div id="min-btn" class="bar-btn button-minimize">
               <div class="mask"></div>
-            </button>
-            <button id="max-btn" class="bar-btn button-maximize">
+            </div>
+            <div id="max-btn" class="bar-btn button-unmaximize">
               <div class="mask"></div>
-            </button>
-            <button id="close-btn" class="bar-btn button-close">
+            </div>
+            <div id="close-btn" class="bar-btn button-close">
               <div class="mask"></div>
-            </button>
+            </div>
           </div>
         </div>
 
@@ -150,9 +151,11 @@ export default {
 }
 .tb-selection-numbers-container {
   font-size: 0.5rem;
-  margin: 0 0 0 0.3rem;
   box-sizing: border-box;
   width: 10rem;
+  .numbers {
+    margin: 0 0 0 0.3rem;
+  }
 }
 .tb-selection-num {
   font-size: 0.9rem;
@@ -170,7 +173,6 @@ export default {
 
 .tb-button-panel {
   width: 10rem;
-  padding-right: 0.6rem;
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -180,6 +182,7 @@ export default {
   display: flex;
   justify-content: space-between;
   width: 5rem;
+  padding-right: 0.6rem;
 }
 .tb-button {
   width: 1.2rem;

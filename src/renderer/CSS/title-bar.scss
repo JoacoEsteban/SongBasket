@@ -39,6 +39,8 @@
   background-color: transparent;
   -webkit-mask-size: 100% !important;
   mask-size: 100% !important;
+}
+#title-bar .title-bar-buttons-container .bar-btn, #title-bar .title-bar-buttons-container .bar-btn .mask {
   transition: background-color var(--transition-global);
 }
 
@@ -110,6 +112,7 @@
 }
 #title-bar.windows .title-bar-buttons-container {
   height: 100%;
+  display: flex;
 }
 
 #title-bar.windows .title-bar-buttons-container .bar-btn {
@@ -129,33 +132,34 @@
   width: 100%;
   -webkit-mask-size: 23.1% !important;
   mask-size: 23.1% !important;
+  background-color: #ccc;
 }
 
-#title-bar.windows .title-bar-buttons-container .bar-btn .mask.window-close {
+#title-bar.windows .title-bar-buttons-container .bar-btn.button-close .mask {
   -webkit-mask: url("data:image/svg+xml;charset=utf-8,%3Csvg width='11' height='11' viewBox='0 0 11 11' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6.279 5.5L11 10.221l-.779.779L5.5 6.279.779 11 0 10.221 4.721 5.5 0 .779.779 0 5.5 4.721 10.221 0 11 .779 6.279 5.5z' fill='%23000'/%3E%3C/svg%3E") no-repeat 50% 50%;
   mask: url("data:image/svg+xml;charset=utf-8,%3Csvg width='11' height='11' viewBox='0 0 11 11' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6.279 5.5L11 10.221l-.779.779L5.5 6.279.779 11 0 10.221 4.721 5.5 0 .779.779 0 5.5 4.721 10.221 0 11 .779 6.279 5.5z' fill='%23000'/%3E%3C/svg%3E") no-repeat 50% 50%;
 }
 
-#title-bar.windows .title-bar-buttons-container .bar-btn .mask.window-close:hover {
+#title-bar.windows .title-bar-buttons-container .bar-btn .mask:hover {
   background-color: #ffffff!important;
 }
 
-#title-bar.windows .title-bar-buttons-container .bar-btn .mask.window-unmaximize {
+#title-bar.windows .title-bar-buttons-container .bar-btn.button-unmaximize .mask {
   -webkit-mask: url("data:image/svg+xml;charset=utf-8,%3Csvg width='11' height='11' viewBox='0 0 11 11' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 8.798H8.798V11H0V2.202h2.202V0H11v8.798zm-3.298-5.5h-6.6v6.6h6.6v-6.6zM9.9 1.1H3.298v1.101h5.5v5.5h1.1v-6.6z' fill='%23000'/%3E%3C/svg%3E") no-repeat 50% 50%;
   mask: url("data:image/svg+xml;charset=utf-8,%3Csvg width='11' height='11' viewBox='0 0 11 11' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 8.798H8.798V11H0V2.202h2.202V0H11v8.798zm-3.298-5.5h-6.6v6.6h6.6v-6.6zM9.9 1.1H3.298v1.101h5.5v5.5h1.1v-6.6z' fill='%23000'/%3E%3C/svg%3E") no-repeat 50% 50%;
 }
 
-#title-bar.windows .title-bar-buttons-container .bar-btn .mask.window-maximize {
+#title-bar.windows .title-bar-buttons-container .bar-btn.button-maximize .mask {
   -webkit-mask: url("data:image/svg+xml;charset=utf-8,%3Csvg width='11' height='11' viewBox='0 0 11 11' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 0v11H0V0h11zM9.899 1.101H1.1V9.9h8.8V1.1z' fill='%23000'/%3E%3C/svg%3E") no-repeat 50% 50%;
   mask: url("data:image/svg+xml;charset=utf-8,%3Csvg width='11' height='11' viewBox='0 0 11 11' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 0v11H0V0h11zM9.899 1.101H1.1V9.9h8.8V1.1z' fill='%23000'/%3E%3C/svg%3E") no-repeat 50% 50%;
 }
 
-#title-bar.windows .title-bar-buttons-container .bar-btn .mask.window-minimize {
+#title-bar.windows .title-bar-buttons-container .bar-btn.button-minimize .mask {
   -webkit-mask: url("data:image/svg+xml;charset=utf-8,%3Csvg width='11' height='11' viewBox='0 0 11 11' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 4.399V5.5H0V4.399h11z' fill='%23000'/%3E%3C/svg%3E") no-repeat 50% 50%;
   mask: url("data:image/svg+xml;charset=utf-8,%3Csvg width='11' height='11' viewBox='0 0 11 11' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 4.399V5.5H0V4.399h11z' fill='%23000'/%3E%3C/svg%3E") no-repeat 50% 50%;
 }
 
-#title-bar.windows .title-bar-buttons-container .bar-btn.window-close-bg:hover {
+#title-bar.windows .title-bar-buttons-container .bar-btn.button-close:hover {
   background-color: rgba(232, 17, 35, 0.9)!important;
 }
 
@@ -168,7 +172,6 @@
 }
 
 #title-bar.windows .title-bar-buttons-container .mask {
-  background-color: #eeeeee;
 }
 
 #title-bar.windows.light .title-bar-buttons-container .mask {

@@ -12,21 +12,27 @@ Vue.config.productionTip = false;
 
 (function () {
   function init () {
-    if (!document.getElementById('min-btn')) return false
+    var window = BrowserWindow.getFocusedWindow()
+    if (!window || !document.getElementById('min-btn')) return false
     document.getElementById('min-btn').addEventListener('click', function (e) {
-      var window = BrowserWindow.getFocusedWindow()
       window.minimize()
     })
-    if (!document.getElementById('max-btn')) return false
-    console.log(document.getElementById('max-btn'))
+    if (!window || !document.getElementById('max-btn')) return false
+    window.on('maximize', (e) => {
+      document.getElementById('max-btn').classList.remove('button-maximize')
+      document.getElementById('max-btn').classList.add('button-unmaximize')
+    })
+    window.on('unmaximize', (e) => {
+      document.getElementById('max-btn').classList.remove('button-unmaximize')
+      document.getElementById('max-btn').classList.add('button-maximize')
+    })
     document.getElementById('max-btn').addEventListener('click', function (e) {
-      var window = BrowserWindow.getFocusedWindow()
-      window.maximize()
+      if (window.isMaximized()) window.unmaximize()
+      else window.maximize()
     })
 
-    if (!document.getElementById('close-btn')) return false
+    if (!window || !document.getElementById('close-btn')) return false
     document.getElementById('close-btn').addEventListener('click', function (e) {
-      var window = BrowserWindow.getFocusedWindow()
       window.close()
     })
     return true
@@ -60,4 +66,3 @@ window.platform = (() => {
       return 'other'
   }
 })()
-console.log(window.platform)
