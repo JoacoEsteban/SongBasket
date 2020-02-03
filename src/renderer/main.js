@@ -12,25 +12,32 @@ Vue.config.productionTip = false;
 
 (function () {
   function init () {
+    if (!document.getElementById('min-btn')) return false
     document.getElementById('min-btn').addEventListener('click', function (e) {
       var window = BrowserWindow.getFocusedWindow()
       window.minimize()
     })
+    if (!document.getElementById('max-btn')) return false
     console.log(document.getElementById('max-btn'))
     document.getElementById('max-btn').addEventListener('click', function (e) {
       var window = BrowserWindow.getFocusedWindow()
       window.maximize()
     })
 
+    if (!document.getElementById('close-btn')) return false
     document.getElementById('close-btn').addEventListener('click', function (e) {
       var window = BrowserWindow.getFocusedWindow()
       window.close()
     })
+    return true
   }
 
   document.onreadystatechange = function () {
+    const loop = () => {
+      if (!init()) setTimeout(loop, 1000)
+    }
     if (document.readyState === 'complete') {
-      init()
+      loop()
     }
   }
 })()
@@ -44,21 +51,13 @@ new Vue({
   template: '<App/>'
 }).$mount('#app')
 
-/* eslint-disable no-unused-vars */
-// console.log(customTitlebar.Themebar.mac)
-// let titlebar
-// let isMac = process.platform === 'darwin'
-
-// function createTitleBar () {
-//   titlebar = new customTitlebar.Titlebar({
-//     backgroundColor: customTitlebar.Color.fromHex('#333'),
-//     iconsTheme: customTitlebar.Themebar[isMac ? 'mac' : 'win'],
-//     titleHorizontalAlignment: 'right',
-//     order: isMac ? 'inverted' : null,
-//     unfocusEffect: false
-//   })
-
-//   document.documentElement.style.setProperty('--max-container-height', 'calc(100vh - ' + document.querySelector('.titlebar').offsetHeight + 'px)')
-// }
-
-// createTitleBar()
+window.platform = (() => {
+  switch (process.platform) {
+    case 'darwin':
+      return 'mac'
+    default:
+      if (process.platform.includes('win')) return 'windows'
+      return 'other'
+  }
+})()
+console.log(window.platform)

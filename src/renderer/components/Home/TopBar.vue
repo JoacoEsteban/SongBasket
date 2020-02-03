@@ -1,6 +1,20 @@
 <template>
   <div class="tb-container">
     <div class="tb-selection-numbers-container">
+      <div id="title-bar" class="mac" v-if="!isMac">
+        <div class="title-bar-buttons-container">
+          <button id="min-btn" class="bar-btn button-minimize">
+            <div class="mask"></div>
+          </button>
+          <button id="max-btn" class="bar-btn button-maximize">
+            <div class="mask"></div>
+          </button>
+          <button id="close-btn" class="bar-btn button-close">
+            <div class="mask"></div>
+          </button>
+        </div>
+      </div>
+
       <div>
         <span class="tb-selection-num">{{selectedPlaylistsData.playlists[0]}}</span>
         {{selectedPlaylistsData.playlists[1]}}
@@ -13,28 +27,40 @@
 
     <div class="tb-mid-section">
       {{status}}
-      <router-link style="font-size: 1.5em;" to="/home" tag="span">
+      <router-link class="nodrag" style="font-size: 1.5em;" to="/home" tag="span">
         <home-icon />
       </router-link>
     </div>
 
-    <div class="tb-button-panel">
-      <div class="tb-button-container">
-        <!-- TODO Disable this button in PlaylistView -->
-        <div @click="$emit('refreshPlaylists')" class="tb-button sync-icon">
-          <sync-icon></sync-icon>
+    <div class="tb-button-panel h100">
+      <div class="df fldc aliend">
+        <div id="title-bar" class="windows" v-if="!isMac">
+          <div class="title-bar-buttons-container">
+            <button id="min-btn" class="bar-btn button-minimize">
+              <div class="mask"></div>
+            </button>
+            <button id="max-btn" class="bar-btn button-maximize">
+              <div class="mask"></div>
+            </button>
+            <button id="close-btn" class="bar-btn button-close">
+              <div class="mask"></div>
+            </button>
+          </div>
         </div>
 
-        <div class="tb-button cloud-search-icon"
-        @click="$emit('youtubeConvert')"
-        >
-          <cloud-search-icon></cloud-search-icon>
-        </div>
+        <div class="tb-button-container nodrag">
+          <!-- TODO Disable this button in PlaylistView -->
+          <div @click="$emit('refreshPlaylists')" class="tb-button sync-icon">
+            <sync-icon></sync-icon>
+          </div>
 
-        <div
-        @click="$emit('download')"
-        class="tb-button download-icon">
-          <download-icon></download-icon>
+          <div class="tb-button cloud-search-icon" @click="$emit('youtubeConvert')">
+            <cloud-search-icon></cloud-search-icon>
+          </div>
+
+          <div @click="$emit('download')" class="tb-button download-icon">
+            <download-icon></download-icon>
+          </div>
         </div>
       </div>
     </div>
@@ -42,7 +68,7 @@
 </template>
 
 <script>
-import {dateFormatter} from '../../../UTILS'
+import { dateFormatter } from '../../../UTILS'
 
 import SyncIcon from '../../assets/icons/sync-icon.vue'
 import CloudSearchIcon from '../../assets/icons/cloud-search-icon.vue'
@@ -57,7 +83,8 @@ export default {
   },
   data () {
     return {
-      user: this.$store.state.CurrentUser.user
+      user: this.$store.state.CurrentUser.user,
+      isMac: window.platform === 'mac'
     }
   },
   computed: {
@@ -68,10 +95,7 @@ export default {
           st.playlists,
           'Playlist' + (st.playlists === 1 ? '' : 's') + ' selected'
         ],
-        tracks: [
-          st.tracks,
-          'Track' + (st.tracks === 1 ? '' : 's')
-        ]
+        tracks: [st.tracks, 'Track' + (st.tracks === 1 ? '' : 's')]
       }
       return ret
     },
@@ -81,7 +105,13 @@ export default {
       let hours = thisDate.time.hours + ':' + thisDate.time.minutes
       let date = ''
       if (thisDate.date.today) date = 'Today'
-      else date = thisDate.date.month + separator + thisDate.date.date + (!thisDate.date.sameYear ? (separator + thisDate.date.year) : '')
+      else {
+        date =
+          thisDate.date.month +
+          separator +
+          thisDate.date.date +
+          (!thisDate.date.sameYear ? separator + thisDate.date.year : '')
+      }
 
       return { date, hours }
     },
@@ -89,7 +119,9 @@ export default {
       return this.$store.state.Events.FETCH_LOADING_STATE
     },
     status () {
-      if (!this.loadingState.value) return `Last Sync: ${this.now.date} @ ${this.now.hours}`
+      if (!this.loadingState.value) {
+        return `Last Sync: ${this.now.date} @ ${this.now.hours}`
+      }
       return this.loadingState.target
     }
   }
@@ -99,9 +131,10 @@ export default {
 <style lang="scss">
 .tb-container {
   text-align: left;
-  min-height: 2.7rem;
+  min-height: 3.5rem;
   width: 100%;
   display: flex;
+  -webkit-app-region: drag;
   /* position: sticky; */
   /* top: 0; */
   background: var(--global-grey);
@@ -110,6 +143,10 @@ export default {
   /* margin-bottom: 1rem; */
   z-index: 10;
   justify-content: space-between;
+}
+
+.nodrag {
+  -webkit-app-region: no-drag;
 }
 .tb-selection-numbers-container {
   font-size: 0.5rem;
