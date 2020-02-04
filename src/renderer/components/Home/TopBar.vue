@@ -66,7 +66,7 @@
       </div>
     </div>
     <div class="loading-bar">
-      <div class="actual-loading-bar">
+      <div class="actual-loading-bar gradient-background-cycle-less">
       </div>
     </div>
   </div>

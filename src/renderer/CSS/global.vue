@@ -139,4 +139,57 @@ body:hover{
     transition: transform .15s ease, background .2s ease;
     padding: .25em;
 }
+
+// $factor: 7;
+// $yellow: #FFE500;
+// $pink: #FF00FF;
+
+// @keyframes background-cycle-sass {
+//     $i: 0;
+//     @while $i <=360/$factor {
+//         $keyframeSel: ceil(percentage($i*$factor/360));
+//         $degs: $i*$factor*1deg;
+        
+//         #{$keyframeSel} {
+//             background: linear-gradient($degs #{$yellow -150%, $pink});
+//             filter: hue-rotate($degs*2)
+//         }
+//         $i: $i + 1;
+//     }
+// }
+// .gradient-background-cycle-sass {
+//     --p: #{$yellow -150%, $pink};
+//     animation: background-cycle-sass 5s infinite var(--bezier-chill);
+// }
+
+
+</style>
+
+<style lang="less">
+
+@factor: 1;
+@yellow: #FFE500;
+@pink: #FF00FF;
+
+.loop (@i: 0) when (@i <=360/@factor) {
+    @keyframeSel: ceil(percentage(@i*@factor/360));
+@degs: @i*@factor*1deg;
+
+@{keyframeSel} {
+    background: linear-gradient(@degs; var(--p));
+    filter: hue-rotate(@degs*2)
+}
+
+.loop((@i + 1));
+}
+
+@keyframes background-cycle-less {
+    .loop();
+}
+
+.gradient-background-cycle-less {
+--p: @yellow -150%, @pink;
+animation: background-cycle-less 5s infinite var(--bezier-chill);
+}
+
 </style>
