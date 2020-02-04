@@ -24,9 +24,6 @@ export default {
 </script>
 
 <style lang="scss">
-@import url("../CSS/global.scss");
-
-
 .login-sb-welcome{
   font-size: 1rem;
   font-family: 'Poppins thin'

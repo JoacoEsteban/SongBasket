@@ -65,6 +65,10 @@
         </div>
       </div>
     </div>
+    <div class="loading-bar">
+      <div class="actual-loading-bar">
+      </div>
+    </div>
   </div>
 </template>
 
@@ -151,6 +155,7 @@ export default {
   /* margin-bottom: 1rem; */
   z-index: 10;
   justify-content: space-between;
+  position: relative;
 }
 
 .nodrag {
@@ -196,6 +201,19 @@ export default {
   height: 1.2rem;
   /* transition: transform .1s ease; */
 }
-.tb-button:hover {
+.loading-bar {
+  $bar-height: 3px;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  bottom: -$bar-height;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  .actual-loading-bar {
+    height: $bar-height;
+    width: 100%;
+    background-color: var(--green-loading);
+  }
 }
 </style>

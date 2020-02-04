@@ -1,3 +1,4 @@
+<style lang="scss">
 /* GLOBAL */
 #title-bar {
   -webkit-app-region: drag;
@@ -189,3 +190,4 @@
 #title-bar.windows.light .title-bar-buttons-container .bar-btn:not(.inactive):hover {
   background-color: rgba(0, 0, 0, .1);
 }
+</style>

@@ -1,8 +1,4 @@
-@import 'variables.scss';
-@import 'fonts.css';
-@import 'user-select.css';
-@import 'title-bar.scss';
-
+<style lang="scss">
 html{
     font-size: 30px;
     height: var(--max-container-height);
@@ -143,3 +139,4 @@ body:hover{
     transition: transform .15s ease, background .2s ease;
     padding: .25em;
 }
+</style>

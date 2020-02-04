@@ -1,3 +1,4 @@
+<style lang="scss">
 .df {
     display: flex;
 }
@@ -59,7 +60,7 @@
 }
 
 .box-shadow {
-    box-shadow: 5px 5px 15px 0 rgba(0, 0, 0, 0.4);
+    box-shadow: var(--box-shadow-std);
 }
 
 .w100 {
@@ -207,3 +208,4 @@
     position: absolute;
     top: 0;
 }
+</style>

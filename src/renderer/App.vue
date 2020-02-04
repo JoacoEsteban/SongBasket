@@ -8,13 +8,15 @@
 
 <script>
 import Modal from './components/Modal/Modal'
+import StylesLoader from './CSS/styles-loader'
 import electron from 'electron'
 const ipc = electron.ipcRenderer
 
 export default {
   name: 'SongBasket',
   components: {
-    Modal
+    Modal,
+    StylesLoader
   },
   mounted () {
     window.sbDebug = this
@@ -33,9 +35,6 @@ export default {
 </script>
 
 <style lang="scss">
-  @import url('./CSS/global.scss');
-  @import url('./CSS/helpers.scss');
-
   .app-container {
     height: 100%;
     position: relative;

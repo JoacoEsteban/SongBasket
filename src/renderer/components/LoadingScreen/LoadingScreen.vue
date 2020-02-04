@@ -90,6 +90,7 @@ export default {
   align-items: center;
 }
 .login-flex {
+  -webkit-app-region: drag;
   display: flex;
   flex-direction: column;
   justify-content: center;

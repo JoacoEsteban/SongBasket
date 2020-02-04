@@ -1,5 +1,7 @@
+<style lang="scss">
 :root {
   /* COLORS */
+  $dou: red;
   --body-dark: #151515;
   --global-grey: #333;
   --global-grey-secondary: #222;
@@ -7,6 +9,7 @@
   --text-black: #111;
   --button-purple: #9900cc;
   --green-accept: #1dcc00;
+  --green-loading: #{$dou};
   --red-cancel: #c00;
   --orange-custom: hsl(30, 100%, 60%);
   /* TRANSITIONS */
@@ -17,5 +20,6 @@
   --home-transition: .3s cubic-bezier(.12,.82,0,.99);
   /* VARIABLES */
   --max-container-height: calc(100vh);
-
+  --box-shadow-std: 5px 5px 15px 0 rgba(0, 0, 0, 0.4);
 }
+</style>
