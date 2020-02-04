@@ -172,24 +172,30 @@ body:hover{
 @pink: #FF00FF;
 
 .loop (@i: 0) when (@i <=360/@factor) {
-    @keyframeSel: ceil(percentage(@i*@factor/360));
-@degs: @i*@factor*1deg;
+  @keyframeSel: ceil(percentage(@i*@factor/360));
+  @degs: @i*@factor*1deg;
 
-@{keyframeSel} {
+  @{keyframeSel} {
     background: linear-gradient(@degs; var(--p));
     filter: hue-rotate(@degs*2)
-}
+  }
 
 .loop((@i + 1));
 }
 
 @keyframes background-cycle-less {
-    .loop();
+  .loop();
 }
 
 .gradient-background-cycle-less {
---p: @yellow -150%, @pink;
-animation: background-cycle-less 5s infinite var(--bezier-chill);
+  --p: @yellow -150%, @pink;
+  animation: background-cycle-less 5s infinite var(--bezier-chill);
+}
+.gradient-background-cycle-less-children {
+    > div {
+      --p: @yellow -150%, @pink;
+      animation: background-cycle-less 5s infinite var(--bezier-chill);
+    }
 }
 
 </style>

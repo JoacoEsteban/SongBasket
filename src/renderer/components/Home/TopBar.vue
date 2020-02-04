@@ -65,7 +65,7 @@
         </div>
       </div>
     </div>
-    <div class="loading-bar">
+    <div class="loading-bar" ref="loadingbar">
       <div class="actual-loading-bar gradient-background-cycle-less">
       </div>
     </div>
@@ -89,8 +89,19 @@ export default {
   data () {
     return {
       user: this.$store.state.CurrentUser.user,
-      isMac: window.platform === 'mac'
+      isMac: window.platform === 'mac',
+      loadingBar: {
+        loading: false,
+        staticLoading: false,
+        percentage: 0,
+        animationDuration: 1000
+      }
     }
+  },
+  mounted () {
+    window.bar = this
+    // document.documentElement.style.setProperty('--loading-bar-animation-duration', (this.loadingBar.animationDuration / 100) + 's')
+    this.$refs.loadingbar.style.setProperty('--animation-duration', this.loadingBar.animationDuration + 'ms')
   },
   computed: {
     selectedPlaylistsData: function () {
@@ -130,11 +141,52 @@ export default {
       return this.loadingState.target
     }
   },
+  watch: {
+    loadingState (val) {
+      this.handleLoadingState(val)
+    }
+  },
   methods: {
+    hideLoadingBar () {
+      this.removeBarClass(['static', 'dynamic'])
+      this.addBarClassTemp('hide')
+    },
+    showLoadingBar () {
+      // this.loadingBar.staticLoading = val.target.includes('Getting Playlist')
+      this.addBarClass('static')
+      this.removeBarClass('hide', 'dynamic')
+    },
+    handleLoadingState (val) {
+      // console.log('Loading', JSON.parse(JSON.stringify(val)))
+      this.loadingBar.loading = val.value
+      if (!val.value) {
+        this.hideLoadingBar()
+      } else {
+        this.showLoadingBar()
+      }
+    },
     maximize (e) {
       if (!this.isMac || e.target.classList.contains('nodrag')) return
       console.log(e.target.classList)
       window.toggleMaximization()
+    },
+    addBarClass (className) {
+      if (typeof className === 'string') className = [className]
+      className.forEach(name => {
+        this.$refs.loadingbar.classList.add(name)
+      })
+    },
+    addBarClassTemp (className) {
+      this.addBarClass(className)
+      setTimeout(() => {
+        this.removeBarClass(className)
+      }, this.loadingBar.animationDuration * 1.5)
+    },
+    removeBarClass (className) {
+      if (typeof className === 'string') className = [className]
+      className.forEach(name => {
+        this.$refs.loadingbar.classList.remove(name)
+      })
     }
   }
 }
@@ -208,12 +260,26 @@ export default {
   align-items: center;
   bottom: -$bar-height;
   left: 0;
-  right: 0;
+  right: 100%;
   pointer-events: none;
+  $transition: var(--animation-duration) var(--bezier-chill);
+  transition: left $transition, right $transition;
   .actual-loading-bar {
     height: $bar-height;
     width: 100%;
-    background-color: var(--green-loading);
+  }
+  &.hide {
+    right: 0;
+    left: 100%;
+  }
+  &.static {
+    left:0;
+    right: 0;
+  }
+  &.dynamic {
+    .actual-loading-bar {
+      background-color: var(--green-loading);
+    }
   }
 }
 </style>

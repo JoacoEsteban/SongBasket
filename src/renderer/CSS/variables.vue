@@ -1,7 +1,6 @@
 <style lang="scss">
 :root {
   /* COLORS */
-  $dou: red;
   --body-dark: #151515;
   --global-grey: #333;
   --global-grey-secondary: #222;
@@ -9,7 +8,7 @@
   --text-black: #111;
   --button-purple: #9900cc;
   --green-accept: #1dcc00;
-  --green-loading: #{$dou};
+  --green-loading: --green-accept;
   --red-cancel: #c00;
   --orange-custom: hsl(30, 100%, 60%);
   /* TRANSITIONS */

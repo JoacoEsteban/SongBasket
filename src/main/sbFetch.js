@@ -5,9 +5,13 @@ const axios = require('axios')
 const Backend = process.env.BACKEND
 console.log('BACKEND::::::', Backend)
 
+let loadingCount = 0
 function LOADING (value, target) {
   if (!value) value = false
-  store.dispatch('fetchLoadingState', {value, target})
+  if (value) loadingCount++
+  else loadingCount--
+  console.log('loadingcount', loadingCount)
+  store.dispatch('fetchLoadingState', {value: loadingCount > 0, target})
 }
 
 // Brings back user information
@@ -59,7 +63,9 @@ export async function getTracks ({userId, logged, SBID, control}, {id, snapshot_
     let res = await axios.get(url, { params })
     return res.data
   } catch (err) {
+    // TODO Check on timeouts being fucking high
     console.error('ERROR AT sbFetch, getTracks::::', err)
+    throw err
   } finally {
     LOADING()
   }
@@ -76,7 +82,7 @@ export function youtubizeAll (tracks) {
       let track = tracks[i].query
       totalTracks++
       track = JSON.stringify(track)
-      console.log('getting trackie::', track)
+      console.log('fwing trackie::', track)
       axios.post(`${Backend}/youtubize`, {
         track
       })

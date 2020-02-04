@@ -213,6 +213,7 @@ function guestFetch (query, isFirstTime) {
       })
       .catch(err => {
         // TODO Properly handle error
+        console.log(111111111111)
         console.error(err)
       })
   }
@@ -225,22 +226,33 @@ function guestFetch (query, isFirstTime) {
         if (list && synced) storePlaylists(allData, isFirstTime)
       }
     })
+    .catch(error => {
+      // TODO handle error
+      console.error(error)
+    })
 }
 
 function fetchMultiple (playlists, checkVersion) {
   return new Promise((resolve, reject) => {
     let count = playlists.length
+    let failed = false
     for (let i = 0; i < count; i++) {
       let playlist = playlists[i]
       sbFetch.getTracks(store.getters.RequestParams, playlist, checkVersion)
         .then(response => {
           store.dispatch('playlistStoreTracks', response.playlist).then(() => {
-            count--
-            if (count === 0) resolve()
+            if (--count === 0) {
+              if (!(failed)) resolve()
+              else reject(failed)
+            }
           })
         })
         .catch(err => {
-          reject(err)
+          failed = err
+          if (--count === 0) reject(err)
+        })
+        .finally(() => {
+
         })
     }
   })
@@ -390,9 +402,10 @@ ipc.on('get tracks from', function (event, id) {
         mainWindow.webContents.send('open playlist', id)
       })
       .catch(err => {
+        console.error(222222222222222) // TODO Handle error
         console.error(err) // TODO Handle error
       })
-      .finally(LOADING)
+      .finally(() => LOADING())
   } else mainWindow.webContents.send('open playlist', id)
 })
 
@@ -409,11 +422,13 @@ ipc.on('Youtube Convert', function () {
       return { id: pl }
     }), false)
       .then(() => {
-        LOADING()
         youtubeHandler.youtubizeAll()
       })
       .catch(err => {
         console.error('ERROR AT YoutubeConvert:: fetchMultiple', err)
+      })
+      .finally(() => {
+        LOADING()
       })
   } else youtubeHandler.youtubizeAll()
 })
