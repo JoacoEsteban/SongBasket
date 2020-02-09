@@ -26,6 +26,8 @@ const winURL = process.env.NODE_ENV === 'development' ? `http://localhost:9080` 
 const filter = { // when logging in
   urls: [Backend + '/*']
 }
+const isOnline = require('is-online')
+let ONLINE
 
 let mainWindow
 let loginWindow
@@ -43,6 +45,15 @@ let homePushed = false
 function isEverythingReady () {
   if (ffmpegBinsDownloaded && windowFinishedLoading) verifyFileSystem()
 }
+
+async function checkConnection () {
+  ONLINE = await isOnline()
+  if (!ONLINE) console.log()
+}
+
+setInterval(() => {
+  checkConnection()
+}, 1000)
 
 function createWindow () {
   let width = 1000
@@ -157,6 +168,7 @@ function LOADING (value, target) {
 
 function pushToHome () {
   mainWindow.webContents.send('dataStored')
+  console.log('pushin')
   if (!homePushed) setTimeout(pushToHome, 200)
 }
 

@@ -16,7 +16,11 @@ const homeFolderPath = () => global.HOME_FOLDER
 
 const userMethods = {
   checkForUser: function () {
-    if (fs.existsSync(foldersJsonPath)) return JSON.parse(fs.readFileSync(foldersJsonPath, 'utf8'))
+    try {
+      if (fs.existsSync(foldersJsonPath)) return JSON.parse(fs.readFileSync(foldersJsonPath, 'utf8'))
+    } catch (error) {
+      console.error('ERROR WHEN FOLDER PATHS JSON FILE::: FileSystem/index.js', foldersJsonPath, error)
+    }
 
     console.log('Folder paths file missing, Creating')
     let emptyFolders = {paths: [], selected: null}
@@ -55,7 +59,11 @@ const userMethods = {
         else {
           fs.readFile(filePath, (err, data) => {
             if (err) reject(err)
-            resolve(JSON.parse(data))
+            try {
+              resolve(JSON.parse(data))
+            } catch (err) {
+              console.error('ERROR WHEN PARSING STATE JSON FILE::: FileSystem/index.js', err)
+            }
           })
         }
       })

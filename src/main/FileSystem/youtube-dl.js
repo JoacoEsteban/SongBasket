@@ -89,7 +89,7 @@ export default {
                 for (let i = 1; i < trackMap[ytId].length; i++) {
                   link(fullPathmp3, global.HOME_FOLDER + '/' + utils.encodeIntoFilename(customGetters.giveMePlName(trackMap[ytId][i])) + '/' + name)
                 }
-                console.log('finished track')
+                console.log('finished track', trackIndex, allTracks.length)
               })
               .catch(() => {
                 // TODO handle error
@@ -142,7 +142,7 @@ export default {
         console.log('applying tags')
         getPhoto(data.album.images[0].url)
           .then(imageBuffer => {
-            data.image = {
+            tags.image = {
               mime: 'png/jpeg' / undefined,
               type: {
                 id: 3,
