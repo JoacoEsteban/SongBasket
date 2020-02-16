@@ -17,7 +17,6 @@ let binPath = basePath + '/bin/ffmpeg'
 if (!fs.existsSync(basePath + '/bin')) fs.mkdirSync(basePath + '/bin')
 if (!fs.existsSync(basePath + '/bin/ffmpeg')) fs.mkdirSync(basePath + '/bin/ffmpeg')
 ffbinaries.downloadBinaries(['ffmpeg', 'ffprobe'], {destination: binPath}, function () {
-  console.log('Downloaded all binaries for current platform.')
   store.dispatch('ffmpegBinsDownloaded')
   ffmpeg.setFfmpegPath(binPath + '/ffmpeg')
   ffmpeg.setFfprobePath(binPath + '/ffprobe')
