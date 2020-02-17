@@ -1,7 +1,6 @@
 import FileSystemUser from '../FileSystem/index'
 // import youtubeDl from './FileSystem/youtube-dl'
 import { logme } from '../../UTILS'
-import store from '../../renderer/store'
 import customGetters from '../../renderer/store/customGetters'
 import * as sbFetch from '../sbFetch'
 import GLOBAL from '../Global/VARIABLES'
@@ -9,6 +8,14 @@ import GLOBAL from '../Global/VARIABLES'
 let BROWSER_WINDOW
 let SESSION
 let DIALOG
+
+export const rendererMethods = {
+  documentReadyCallback: () => {
+    console.log('daaaaaaleeeeee')
+    GLOBAL.DOCUMENT_FINISHED_LOADING = true
+    isEverythingReady()
+  }
+}
 
 export function init ({ app, BrowserWindow, session, dialog }) {
   BROWSER_WINDOW = BrowserWindow
@@ -37,7 +44,7 @@ export function init ({ app, BrowserWindow, session, dialog }) {
 }
 
 export function isEverythingReady () {
-  if (GLOBAL.FFMPEG_BINS_DOWNLOADED && GLOBAL.WINDOW_FINISHED_LOADING) verifyFileSystem()
+  GLOBAL.FFMPEG_BINS_DOWNLOADED && GLOBAL.WINDOW_FINISHED_LOADING && GLOBAL.DOCUMENT_FINISHED_LOADING && verifyFileSystem()
 }
 
 export function createWindow () {
@@ -65,7 +72,7 @@ export async function setHomeFolder () {
     properties: ['openDirectory']
   }, async path => {
     if (path === undefined) return
-    await store.dispatch('addHomeFolder', path[0])
+    await GLOBAL.VUEX.dispatch('addHomeFolder', path[0])
     try {
       console.log('pass')
       // if songbasket exists in file specified it will load data automatically
@@ -112,7 +119,7 @@ export function createLoginWindow () {
 };
 
 export function storePlaylists (response, redirect) {
-  store.dispatch('updateUserEntities', response)
+  GLOBAL.VUEX.dispatch('updateUserEntities', response)
     .then(() => {
       if (redirect) {
         GLOBAL.MAIN_WINDOW.webContents.send('playlists done')
@@ -126,7 +133,7 @@ export async function retrieveAndStoreState (path) {
   try {
     data = await FileSystemUser.retrieveState(path)
     try {
-      await store.dispatch('storeDataFromDisk', data)
+      await GLOBAL.VUEX.dispatch('storeDataFromDisk', data)
     } catch (err) { throw err }
   } catch (err) { throw err }
 }
@@ -134,7 +141,7 @@ export async function retrieveAndStoreState (path) {
 export async function verifyFileSystem () {
   console.log('Checking for existing home folders')
   let FOLDERS = FileSystemUser.checkForUser()
-  await store.dispatch('setFolderPaths', FOLDERS)
+  await GLOBAL.VUEX.dispatch('setFolderPaths', FOLDERS)
   if (FOLDERS.paths.length === 0) {
     console.log('no user')
     return setTimeout(() => {
@@ -161,25 +168,24 @@ export async function verifyFileSystem () {
 }
 
 export function globalLoadingState () {
-  return store.state.Events.GLOBAL_LOADING_STATE
+  return GLOBAL.VUEX.state.Events.GLOBAL_LOADING_STATE
 }
 
 export function LOADING (value, target) {
   if (!value) value = false
-  store.dispatch('globalLoadingState', {value, target})
+  GLOBAL.VUEX.dispatch('globalLoadingState', {value, target})
 }
 
 export function pushToHome () {
+  console.log('pushnient')
   GLOBAL.MAIN_WINDOW.webContents.send('dataStored')
-  console.log('pushin')
-  if (!GLOBAL.HOME_PUSHED) setTimeout(pushToHome, 200)
 }
 
 export function guestFetch (query, isFirstTime) {
   console.log('loading?', globalLoadingState().value)
   if (globalLoadingState().value) return
   console.log('fetchin')
-  store.dispatch('globalLoadingState', {value: true, target: 'PLAYLIST_REFRESH'})
+  GLOBAL.VUEX.dispatch('globalLoadingState', {value: true, target: 'PLAYLIST_REFRESH'})
   let allData = []
 
   let list = false // List of playlists Retrieved (just metadata)
@@ -232,9 +238,9 @@ export function fetchMultiple (playlists, checkVersion) {
     let failed = false
     for (let i = 0; i < count; i++) {
       let playlist = playlists[i]
-      sbFetch.getTracks(store.getters.RequestParams, playlist, checkVersion)
+      sbFetch.getTracks(GLOBAL.VUEX.getters.RequestParams, playlist, checkVersion)
         .then(response => {
-          store.dispatch('playlistStoreTracks', response.playlist).then(() => {
+          GLOBAL.VUEX.dispatch('playlistStoreTracks', response.playlist).then(() => {
             if (--count === 0) {
               if (!(failed)) resolve()
               else reject(failed)

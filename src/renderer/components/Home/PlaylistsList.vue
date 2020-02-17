@@ -45,9 +45,6 @@
 <script>
 import Playlist from './Playlist.vue'
 
-const electron = require('electron')
-const ipc = electron.ipcRenderer
-
 export default {
   data () {
     return {
@@ -94,7 +91,7 @@ export default {
     loadMore () {
       if (!this.loading) {
         this.loading = true
-        ipc.send('loadMore')
+        window.ipc.send('loadMore')
       }
     },
     transitionPlaylists (what) {
@@ -161,7 +158,7 @@ export default {
     }
   },
   mounted () {
-    ipc.on('done loading', () => {
+    window.ipc.on('done loading', () => {
       this.loading = false
     })
     this.refreshSynced()

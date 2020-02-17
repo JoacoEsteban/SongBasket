@@ -9,8 +9,7 @@
 <script>
 import Modal from './components/Modal/Modal'
 import StylesLoader from './CSS/styles-loader'
-import electron from 'electron'
-const ipc = electron.ipcRenderer
+import $ from 'jquery'
 
 export default {
   name: 'SongBasket',
@@ -18,18 +17,38 @@ export default {
     Modal,
     StylesLoader
   },
+  methods: {
+    redirect (path, payload) {
+      switch (path) {
+        case 'setup': {
+          // this.header.text = 'Let\'s find your music'
+          this.$router.push('/setup')
+            .catch(err => console.error('daddddaa', err))
+          break
+        }
+        case 'home': {
+          return this.$router.push('/home')
+        }
+      }
+    }
+  },
+  created () {
+    window.ipc.on('initializeSetup', () => {
+      // this.$store.dispatch('SET_LOADING_STATE', 'found')
+      this.redirect('setup')
+    })
+    window.ipc.on('dataStored', async () => {
+      this.$store.dispatch('SET_LOADING_STATE', 'found')
+      this.redirect('home')
+    })
+  },
   mounted () {
     window.sbDebug = this
-  },
-  computed: {
-    ffmpegBinsDownloaded () {
-      return this.$store.state.Events.FFMPEG_BINS_DOWNLOADED
-    }
-  },
-  watch: {
-    ffmpegBinsDownloaded () {
-      ipc.send('ffmpegBinsDownloaded')
-    }
+    $(document).ready(function () {
+      setTimeout(() => {
+        window.ipc.send('DOCUMENT_READY_CALLBACK')
+      }, 1000)
+    })
   }
 }
 </script>

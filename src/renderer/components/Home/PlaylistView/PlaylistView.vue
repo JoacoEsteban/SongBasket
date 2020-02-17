@@ -255,7 +255,6 @@ export default {
       return this.showingAll
     },
     resetAll (confirm) {
-      console.log('daadada', confirm)
       // TODO Request confirmation
       if (confirm) {
         this.conversion.forEach(track => {

@@ -8,12 +8,7 @@ import * as youtubeHandler from '../youtubeHandler'
 
 // :::::::::::::::::::::::::::::::::IPC:::::::::::::::::::::::::::::::::
 export function init (ipc) {
-  ipc.on('ffmpegBinsDownloaded', function () {
-    console.log('FFMPEG DONWLOADED')
-    GLOBAL.FFMPEG_BINS_DOWNLOADED = true
-    console.log(handlers)
-    handlers.isEverythingReady()
-  })
+  ipc.on('DOCUMENT_READY_CALLBACK', handlers.rendererMethods.documentReadyCallback)
 
   ipc.on('ytTrackDetails', function (event, ytId) {
     if (handlers.globalLoadingState().value) return
@@ -51,10 +46,6 @@ export function init (ipc) {
 
   ipc.on('login', function () {
     handlers.createLoginWindow()
-  })
-
-  ipc.on('homePushed', function () {
-    GLOBAL.HOME_PUSHED = true
   })
 
   ipc.on('guestSignIn', function (event, { mode, query }) {

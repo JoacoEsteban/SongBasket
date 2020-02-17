@@ -1,6 +1,8 @@
 import store from '../../renderer/store'
 import customGetters from '../../renderer/store/customGetters'
 import * as utils from '../../MAIN_PROCESS_UTILS'
+import GLOBAL from '../Global/VARIABLES'
+import * as handlers from '../InitializationAndHandlers/handlers'
 
 const app = require('electron').app
 let basePath = (process.env.NODE_ENV === 'production' ? app.getPath('userData') : process.cwd())
@@ -17,7 +19,8 @@ let binPath = basePath + '/bin/ffmpeg'
 if (!fs.existsSync(basePath + '/bin')) fs.mkdirSync(basePath + '/bin')
 if (!fs.existsSync(basePath + '/bin/ffmpeg')) fs.mkdirSync(basePath + '/bin/ffmpeg')
 ffbinaries.downloadBinaries(['ffmpeg', 'ffprobe'], {destination: binPath}, function () {
-  store.dispatch('ffmpegBinsDownloaded')
+  GLOBAL.FFMPEG_BINS_DOWNLOADED = true
+  handlers.isEverythingReady()
   ffmpeg.setFfmpegPath(binPath + '/ffmpeg')
   ffmpeg.setFfprobePath(binPath + '/ffprobe')
 })

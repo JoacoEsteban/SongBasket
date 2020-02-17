@@ -9,6 +9,7 @@ const { BrowserWindow } = require('electron').remote
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.http = Vue.prototype.$http = axios
 Vue.config.productionTip = false
+window.ipc = require('electron').ipcRenderer
 
 let electronWindow
 
@@ -36,8 +37,7 @@ function toggleFullscreen () {
 window.toggleFullscreen = toggleFullscreen
 
 function toggleMaximization () {
-  if (electronWindow.isMaximized()) electronWindow.unmaximize()
-  else electronWindow.maximize()
+  electronWindow.isMaximized() ? electronWindow.unmaximize() : electronWindow.maximize()
 }
 window.toggleMaximization = toggleMaximization;
 

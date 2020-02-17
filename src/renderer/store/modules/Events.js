@@ -5,7 +5,6 @@ const state = {
   SYNCED_PLAYLISTS_REFRESHED: false,
   PLAYLIST_UNSYNCED: false,
   RESET_SELECTION: false,
-  FFMPEG_BINS_DOWNLOADED: false,
   ROUTER_ANIMATION: '',
   GLOBAL_LOADING_STATE: {
     value: false,
@@ -38,11 +37,6 @@ const actions = {
   },
   fetchLoadingState ({commit}, value) {
     commit('SET', { key: 'FETCH_LOADING_STATE', value })
-  },
-  ffmpegBinsDownloaded ({commit}) {
-    setTimeout(() => {
-      commit('TRIGGER', 'FFMPEG_BINS_DOWNLOADED')
-    }, 1000)
   }
 }
 

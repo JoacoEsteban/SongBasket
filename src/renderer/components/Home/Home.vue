@@ -32,9 +32,6 @@ import Playlist from './Playlist.vue'
 import UserData from './UserData.vue'
 import HomeBackground from './HomeBackground.vue'
 
-const electron = require('electron')
-const ipc = electron.ipcRenderer
-
 export default {
   components: {
 
@@ -75,12 +72,12 @@ export default {
     loadMore () {
       if (!this.loading) {
         this.loading = true
-        ipc.send('loadMore')
+        window.ipc.send('loadMore')
       }
     },
     getTracks (id) {
       if (this.playlistSynced(id)) this.setPlaylistNPush(id)
-      else ipc.send('get tracks from', id)
+      else window.ipc.send('get tracks from', id)
     },
     setPlaylistNPush (id) {
       this.$store.dispatch('setCurrentPlaylist', id)
@@ -100,17 +97,17 @@ export default {
       this.$store.dispatch('queuePlaylist', id)
     },
     youtubeConvert () {
-      ipc.send('Youtube Convert')
+      window.ipc.send('Youtube Convert')
     },
     refreshPlaylists () {
-      ipc.send('refreshPlaylists')
+      window.ipc.send('refreshPlaylists')
     },
     openYtVideo (id) {
       console.log('openYtVideo', id)
-      ipc.send('openYtVideo', id)
+      window.ipc.send('openYtVideo', id)
     },
     download () {
-      ipc.send('download')
+      window.ipc.send('download')
     }
   },
 
@@ -119,11 +116,11 @@ export default {
 
     if (this.$store.state.CurrentUser.playlists.length === 0) { this.$router.push('/empty') }
 
-    ipc.on('done loading', () => {
+    window.ipc.on('done loading', () => {
       this.loading = false
     })
 
-    ipc.on('open playlist', (event, id) => {
+    window.ipc.on('open playlist', (event, id) => {
       this.setPlaylistNPush(id)
     })
   }

@@ -18,9 +18,6 @@
 </template>
 
 <script>
-const electron = require('electron')
-const ipc = electron.ipcRenderer
-
 export default {
   data () {
     return {
@@ -64,13 +61,13 @@ export default {
       this.hide = true
       this.hideControls = true
       return new Promise(resolve => {
-        ipc.send('ytTrackDetails', this.url)
-        ipc.on('done', (event, details) => {
+        window.ipc.send('ytTrackDetails', this.url)
+        window.ipc.on('done', (event, details) => {
           let {trackId, playlistId} = this.payload
           this.$store.dispatch('customTrackUrl', {details, trackId, playlistId})
           this.$emit('close')
         })
-        ipc.on('error', () => {
+        window.ipc.on('error', () => {
           this.loadingText = 'Video not found'
           setTimeout(() => {
             this.hideControls = false

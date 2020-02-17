@@ -13,9 +13,6 @@
 </template>
 
 <script>
-const electron = require('electron')
-const ipc = electron.ipcRenderer
-
 export default {
   data () {
     return {
@@ -36,15 +33,15 @@ export default {
   },
   methods: {
     setHomeFolder () {
-      ipc.send('setHomeFolder')
+      window.ipc.send('setHomeFolder')
     },
     login () {
-      ipc.send('login')
+      window.ipc.send('login')
     },
     guestSearch (request) {
       if (this.loadingState !== 'Loading' && request.query !== '' && request.query !== undefined && request.query !== null) {
         this.$store.dispatch('SET_LOADING_STATE', 'loading')
-        ipc.send('guestSignIn', request)
+        window.ipc.send('guestSignIn', request)
       }
     },
     redirect (path, payload) {
@@ -71,29 +68,29 @@ export default {
       }
     },
     confirmUser () {
-      ipc.send('guestConfirm', this.userOnHold.id)
+      window.ipc.send('guestConfirm', this.userOnHold.id)
     }
 
   },
   mounted () {
-    ipc.on('continueToLogin', () => {
+    window.ipc.on('continueToLogin', () => {
       this.redirect('login')
     })
 
-    ipc.on('not-found', () => {
+    window.ipc.on('not-found', () => {
       this.$store.dispatch('SET_LOADING_STATE', 'not found')
     })
-    ipc.on('invalid', () => {
+    window.ipc.on('invalid', () => {
       this.$store.dispatch('SET_LOADING_STATE', 'invalid id')
     })
 
-    ipc.on('user-found', (event, user) => {
+    window.ipc.on('user-found', (event, user) => {
       this.$store.dispatch('SET_LOADING_STATE', 'found')
       this.userOnHold = user
       this.redirect('guest-verify', user)
     })
 
-    ipc.on('playlists done', () => {
+    window.ipc.on('playlists done', () => {
       this.$store.dispatch('SET_LOADING_STATE', 'found')
       this.redirect('home')
     })
