@@ -1,8 +1,6 @@
 import GLOBAL from '../Global/VARIABLES'
 import * as handlers from './handlers'
-import youtubeDl from '../FileSystem/youtube-dl'
 import * as sbFetch from '../sbFetch'
-import FileSystemUser from '../FileSystem/index'
 import store from '../../renderer/store'
 import * as youtubeHandler from '../youtubeHandler'
 
@@ -10,43 +8,15 @@ import * as youtubeHandler from '../youtubeHandler'
 export function init (ipc) {
   ipc.on('DOCUMENT_READY_CALLBACK', handlers.rendererMethods.documentReadyCallback)
 
-  ipc.on('ytTrackDetails', function (event, ytId) {
-    if (handlers.globalLoadingState().value) return
-    handlers.LOADING(true, 'ytDetails')
-    sbFetch.ytDetails(ytId)
-      .then(resp => {
-        console.log('YT Details retrieved', resp)
-        event.sender.send('done', resp)
-      })
-      .catch(err => {
-        console.error('EROR AT YTTRACKDETAILS:: ipc"ytTrackDetails"', err)
-        event.sender.send('error')
-      })
-      .finally(() => {
-        handlers.LOADING()
-      })
-  })
+  ipc.on('ytTrackDetails', handlers.getYtTrackDetails)
 
-  ipc.on('download', function (event) {
-    console.log('About to download')
-    FileSystemUser.checkDownloadPaths()
-      .then(playlists => {
-        console.log('passed')
-        youtubeDl.downloadSyncedPlaylists(playlists)
-      })
-  })
+  ipc.on('download', handlers.download)
 
-  ipc.on('openYtVideo', function (event, id) {
-    require('open')('https://www.youtube.com/watch?v=' + id)
-  })
+  ipc.on('openYtVideo', handlers.openInBrowser)
 
-  ipc.on('setHomeFolder', function () {
-    handlers.setHomeFolder()
-  })
+  ipc.on('setHomeFolder', handlers.setHomeFolder)
 
-  ipc.on('login', function () {
-    handlers.createLoginWindow()
-  })
+  ipc.on('login', handlers.createLoginWindow)
 
   ipc.on('guestSignIn', function (event, { mode, query }) {
     console.log('Guest:: Type:', mode, query)

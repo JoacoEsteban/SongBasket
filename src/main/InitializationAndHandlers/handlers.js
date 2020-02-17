@@ -4,18 +4,12 @@ import { logme } from '../../UTILS'
 import customGetters from '../../renderer/store/customGetters'
 import * as sbFetch from '../sbFetch'
 import GLOBAL from '../Global/VARIABLES'
+import youtubeDl from '../FileSystem/youtube-dl'
 // import * as youtubeHandler from './youtubeHandler'
+const openBrowser = require('open')
 let BROWSER_WINDOW
 let SESSION
 let DIALOG
-
-export const rendererMethods = {
-  documentReadyCallback: () => {
-    console.log('daaaaaaleeeeee')
-    GLOBAL.DOCUMENT_FINISHED_LOADING = true
-    isEverythingReady()
-  }
-}
 
 export function init ({ app, BrowserWindow, session, dialog }) {
   BROWSER_WINDOW = BrowserWindow
@@ -41,6 +35,43 @@ export function init ({ app, BrowserWindow, session, dialog }) {
       createWindow()
     }
   })
+}
+
+export const rendererMethods = {
+  documentReadyCallback: () => {
+    GLOBAL.DOCUMENT_FINISHED_LOADING = true
+    isEverythingReady()
+  }
+}
+
+export function getYtTrackDetails (event, ytId) {
+  if (globalLoadingState().value) return
+  LOADING(true, 'ytDetails')
+  sbFetch.ytDetails(ytId)
+    .then(resp => {
+      console.log('YT Details retrieved', resp)
+      event.sender.send('done', resp)
+    })
+    .catch(err => {
+      console.error('EROR AT YTTRACKDETAILS:: ipc"ytTrackDetails"', err)
+      event.sender.send('error')
+    })
+    .finally(() => {
+      LOADING()
+    })
+}
+
+export function openInBrowser (event, id) {
+  openBrowser('https://www.youtube.com/watch?v=' + id)
+}
+
+export function download () {
+  console.log('About to download')
+  FileSystemUser.checkDownloadPaths()
+    .then(playlists => {
+      console.log('passed')
+      youtubeDl.downloadSyncedPlaylists(playlists)
+    })
 }
 
 export function isEverythingReady () {

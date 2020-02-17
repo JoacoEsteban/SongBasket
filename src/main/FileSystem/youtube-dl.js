@@ -200,6 +200,12 @@ export default {
             console.log('playlists', qt.playlists.length, lt.playlist)
             for (let u = 0; u < qt.playlists.length; u++) {
               let pl = qt.playlists[u]
+              if (!qt.conversion) {
+                // Track was not converted
+                // If they run the conversion again this tracks will automatically convert so not really a big deal
+                // TODO just make this visible to the user 
+                continue
+              }
               pl.selected = pl.selected === null ? qt.conversion.bestMatch : pl.selected === false ? qt.custom.id : pl.selected
 
               let samePl = pl.id === lt.playlist
