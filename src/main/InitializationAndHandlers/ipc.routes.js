@@ -108,7 +108,7 @@ export function init (ipc) {
     if (handlers.globalLoadingState().value) return
     if (store.state.CurrentUser.queuedPlaylists.length + store.state.CurrentUser.syncedPlaylists.length === 0) return
 
-    console.log('FETCHING YT')
+    console.log('ABOUT TO FETCH YT')
     let unCached = store.getters.UnCachedPlaylists
     console.log('unCached', unCached)
     if (unCached.length > 0) {
@@ -116,14 +116,15 @@ export function init (ipc) {
       handlers.fetchMultiple(unCached.map(pl => {
         return { id: pl }
       }), false)
+        .finally(() => {
+          handlers.LOADING()
+        })
         .then(() => {
+          console.log('done')
           youtubeHandler.youtubizeAll()
         })
         .catch(err => {
           console.error('ERROR AT YoutubeConvert:: fetchMultiple', err)
-        })
-        .finally(() => {
-          handlers.LOADING()
         })
     } else youtubeHandler.youtubizeAll()
   })

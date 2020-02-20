@@ -35,6 +35,12 @@ const actions = {
   globalLoadingState ({commit}, value) {
     commit('SET', { key: 'GLOBAL_LOADING_STATE', value })
   },
+  downloadEvent ({commit}, params) {
+    commit('SET', { key: 'DOWNLOAD_EVENT', params })
+  },
+  conversionEvent ({commit}, params) {
+    commit('SET', { key: 'CONVERSION_EVENT', params })
+  },
   fetchLoadingState ({commit}, value) {
     commit('SET', { key: 'FETCH_LOADING_STATE', value })
   }
@@ -49,6 +55,12 @@ const mutations = {
   },
   SET (state, {key, value}) {
     Vue.set(state, key, value)
+  },
+  DOWNLOAD_EVENT (state, params) {
+
+  },
+  CONVERSION_EVENT (state, params) {
+
   }
 }
 

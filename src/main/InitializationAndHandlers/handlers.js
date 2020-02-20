@@ -1,10 +1,9 @@
 import FileSystemUser from '../FileSystem/index'
-// import youtubeDl from './FileSystem/youtube-dl'
 import { logme } from '../../UTILS'
 import customGetters from '../../renderer/store/customGetters'
 import * as sbFetch from '../sbFetch'
 import GLOBAL from '../Global/VARIABLES'
-import youtubeDl from '../FileSystem/youtube-dl'
+import youtubeDl from '../DownloadPhase/youtube-dl'
 // import * as youtubeHandler from './youtubeHandler'
 const openBrowser = require('open')
 let BROWSER_WINDOW
@@ -273,6 +272,7 @@ export function fetchMultiple (playlists, checkVersion) {
         .then(response => {
           GLOBAL.VUEX.dispatch('playlistStoreTracks', response.playlist).then(() => {
             if (--count === 0) {
+              console.log('fetch done')
               if (!(failed)) resolve()
               else reject(failed)
             }
