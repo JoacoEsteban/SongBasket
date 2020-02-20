@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import axios from 'axios'
+import $ from 'jquery'
 
 import App from './App'
 import router from './router'
@@ -7,6 +8,7 @@ import store from './store'
 const { BrowserWindow } = require('electron').remote
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
+window.$ = $
 Vue.http = Vue.prototype.$http = axios
 Vue.config.productionTip = false
 window.ipc = require('electron').ipcRenderer

@@ -50,14 +50,14 @@ export default {
 
         for (let ytId in trackMap) {
           let fullPath = global.HOME_FOLDER + '/' + utils.encodeIntoFilename(customGetters.giveMePlName(trackMap[ytId][0]))
-          let fullPathmp4 = fullPath + '/' + name + '.mp4'
+          let fullPathmp4 = fullPath + '/' + name + '_preprocessed'
           let fullPathmp3 = fullPath + '/' + name + '.mp3'
           console.log('trackie: ', trackMap[ytId])
 
           console.log('downloading ', fullPathmp4)
           let video = youtubedl(ytId,
             // Optional arguments passed to youtube-dl.
-            ['--format=18'],
+            ['--format=251'],
             // Additional options can be given for calling `child_process.execFile()`.
             { cwd: fullPath })
 
@@ -70,6 +70,7 @@ export default {
           })
 
           video.on('error', (error) => {
+            // TODO HANDLE ERROR AND STOP ROUTINE
             console.error('Error when downloading video::::', error)
           })
 
@@ -203,7 +204,7 @@ export default {
               if (!qt.conversion) {
                 // Track was not converted
                 // If they run the conversion again this tracks will automatically convert so not really a big deal
-                // TODO just make this visible to the user 
+                // TODO just make this visible to the user
                 continue
               }
               pl.selected = pl.selected === null ? qt.conversion.bestMatch : pl.selected === false ? qt.custom.id : pl.selected
