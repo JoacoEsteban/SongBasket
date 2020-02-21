@@ -6,6 +6,7 @@ import App from './App'
 import router from './router'
 import store from './store'
 const { BrowserWindow } = require('electron').remote
+const GLOBAL = require('../main/Global/VARIABLES')
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 window.$ = $
@@ -15,15 +16,7 @@ window.ipc = require('electron').ipcRenderer
 
 let electronWindow
 
-const platform = (() => {
-  switch (process.platform) {
-    case 'darwin':
-      return 'mac'
-    default:
-      if (process.platform.includes('win')) return 'windows'
-      return 'other'
-  }
-})()
+const platform = GLOBAL.PLATFORM
 window.platform = platform
 
 function toggleFullscreen () {

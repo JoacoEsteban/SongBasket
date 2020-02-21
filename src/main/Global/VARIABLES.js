@@ -7,5 +7,15 @@ module.exports = {
   BACKEND: process.env.BACKEND,
   MAIN_WINDOW: null,
   LOGIN_WINDOW: null,
-  VUEX: require('../../renderer/store').default
+  VUEX: require('../../renderer/store').default,
+  APP_CWD: (process.env.NODE_ENV === 'production' ? require('electron').app.getPath('userData') : process.cwd()),
+  PLATFORM: (() => {
+    switch (process.platform) {
+      case 'darwin':
+        return 'mac'
+      default:
+        if (process.platform.includes('win')) return 'windows'
+        return 'other'
+    }
+  })()
 }

@@ -64,7 +64,7 @@ export async function getTracks ({userId, logged, SBID, control}, {id, snapshot_
     return res.data
   } catch (err) {
     // TODO Check on timeouts being fucking high
-    console.error('ERROR AT sbFetch, getTracks::::', err)
+    console.error('ERROR AT sbFetch, getTracks::::', err.Error)
     throw err
   } finally {
     LOADING()

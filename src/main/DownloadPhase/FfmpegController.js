@@ -7,7 +7,7 @@ const ffmpeg = require('fluent-ffmpeg')
 const NodeID3 = require('node-id3')
 const axios = require('axios')
 
-const basePath = (process.env.NODE_ENV === 'production' ? require('electron').app.getPath('userData') : process.cwd())
+const basePath = GLOBAL.APP_CWD
 const binPath = basePath + '/bin/ffmpeg';
 
 (() => {

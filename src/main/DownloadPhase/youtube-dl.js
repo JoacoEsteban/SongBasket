@@ -2,11 +2,13 @@ import {extractMp3, applyTags} from './FfmpegController'
 import store from '../../renderer/store'
 import customGetters from '../../renderer/store/customGetters'
 import * as utils from '../../MAIN_PROCESS_UTILS'
-// import GLOBAL from '../Global/VARIABLES'
+import GLOBAL from '../Global/VARIABLES'
 import {downloadLinkRemove, link} from './StoredTracksChecker'
 
 const fs = require('fs')
+const PATH = require('path')
 const youtubedl = require('youtube-dl')
+const tempDownloadsFolderPath = GLOBAL.APP_CWD + '/downloads_temp/'
 
 const emitEvent = {
   download: (params) => {
@@ -80,11 +82,12 @@ function constructDownloads (tracks) {
       currentTrackVersion.playlists.push({ id: pl.id, name: customGetters.giveMePlName(pl.id) })
 
       if (!currentTrackVersion.paths) {
-        let fullPath = global.HOME_FOLDER + '/' + utils.encodeIntoFilename(trackMap[yt].playlists[0].name)
+        let fullPath = tempDownloadsFolderPath + utils.encodeIntoFilename(trackMap[yt].playlists[0].name)
         currentTrackVersion.paths = {
           fullPath,
-          fullPathmp4: fullPath + '/' + track.trackName + '.songbasket_preprocessed_file',
-          fullPathmp3: fullPath + '/' + track.trackName + '.mp3'
+          fullPathmp4: PATH.join(fullPath, track.trackName + '.songbasket_preprocessed_file'),
+          fullPathmp3: PATH.join(fullPath, track.trackName + '.mp3'),
+          finalPathmp3: PATH.join(global.HOME_FOLDER, utils.encodeIntoFilename(trackMap[yt].playlists[0].name), track.trackName + '.mp3')
         }
 
         currentTrackVersion.getFormat = async () => getTrackFormat(currentTrackVersion)
@@ -94,7 +97,7 @@ function constructDownloads (tracks) {
         currentTrackVersion.endCallback = () => {
           if (currentTrackVersion.playlists.length > 1) {
             currentTrackVersion.playlists.forEach(pl => {
-              link(currentTrackVersion.paths.fullPathmp3, global.HOME_FOLDER + '/' + utils.encodeIntoFilename(pl.name) + '/' + track.trackName)
+              link(PATH.join(currentTrackVersion.paths.fullPathmp3, global.HOME_FOLDER, utils.encodeIntoFilename(pl.name), track.trackName))
             })
           }
         }
@@ -128,7 +131,7 @@ function constructDownloads (tracks) {
       },
       downloader: null,
       startDownload: () => {
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
           console.log('about to download', track.ytId)
           track.download.downloader = youtubedl(track.ytId,
             ['--format=' + getDownloadFormatId(track.format)],
@@ -166,16 +169,31 @@ function constructDownloads (tracks) {
             emitEvent.download({type: 'end', track})
             try {
               await track.conversion.converter.convert()
+              console.log('finished conversion')
             } catch (error) {
               // TODO Handle error
               throw error
             }
 
-            console.log('finished conversion')
+            try {
+              await track.conversion.converter.move()
+              console.log('track moved')
+            } catch (error) {
+              // TODO Handle error
+              throw error
+            }
 
             track.endCallback()
             resolve()
           })
+
+          try {
+            await utils.createDirRecursive(track.paths.fullPath)
+          } catch (err) {
+            // TODO Handle error when creating tmp download dir
+            throw err
+          }
+
           download.pipe(fs.createWriteStream(track.paths.fullPathmp4))
         })
       }
@@ -207,6 +225,17 @@ function constructDownloads (tracks) {
             throw err
           }
           emitEvent.conversion({type: 'tags-end', track})
+        },
+        move: async () => {
+          // let moveFunction = utils.copyNRemove
+          let moveFunction = utils.copyNRemove
+          if (utils.isSameDisk(track.paths.fullPathmp3, track.paths.finalPathmp3)) moveFunction = utils.linkNRemove
+          try {
+            await moveFunction(track.paths.fullPathmp3, track.paths.finalPathmp3)
+          } catch (err) {
+            // TODO Handle moving error
+            throw err
+          }
         }
       }
     }
