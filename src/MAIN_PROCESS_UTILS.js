@@ -42,10 +42,10 @@ export function encodeIntoFilename (text) {
 }
 
 export async function createDirRecursive (path) {
-  let pathArray = path.split(/\//)
+  let pathArray = path.split(/\/|\\/)
   if (await pathDoesExist(path)) return
 
-  let subPath = '/'
+  let subPath = (GLOBAL.PLATFORM === 'windows' ? pathArray.splice(0, 1) : '') + '/'
   for (let i = 0; i < pathArray.length; i++) {
     subPath = PATH.join(subPath, pathArray[i])
     if (!await pathDoesExist(subPath)) {
