@@ -1,7 +1,5 @@
 /* DM Sans */
-@import url('../assets/fonts/DM-Sans/DM-Sans-Regular/example.css');
-@import url('../assets/fonts/DM-Sans/DM-Sans-Bold/example.css');
-@import url('../assets/fonts/DM-Sans/DM-Sans-Medium/example.css');
+@import url('../assets/fonts/DM-Sans/stylesheet.css');
 /* Poppins */
 @import url('../assets/fonts/Poppins/Poppins-Thin/example.css');
 @import url('../assets/fonts/Poppins/Poppins-Light/example.css');
@@ -11,3 +9,5 @@
 @import url('../assets/fonts/Poppins/Poppins-Bold/example.css');
 @import url('../assets/fonts/Poppins/Poppins-ExtraBold/example.css');
 @import url('../assets/fonts/Poppins/Poppins-Black/example.css');
+/* MADE Tommy */
+@import url('../assets/fonts/MADE Tommy/stylesheet.css');

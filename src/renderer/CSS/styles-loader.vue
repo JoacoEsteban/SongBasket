@@ -1,4 +1,5 @@
 <script>
+require('./Bootstrap/bootstrap.css')
 require('./fonts.css')
 require('./user-select.css')
 

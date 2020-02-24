@@ -1,143 +1,164 @@
 <style lang="scss">
-html{
-    font-size: 30px;
-    height: var(--max-container-height);
-    overflow: hidden;
+html {
+  font-size: 30px;
+  height: var(--max-container-height);
+  overflow: hidden;
 }
- /* width */
+/* width */
 ::-webkit-scrollbar {
-width: 7px;
+  width: 7px;
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
-background: var(--global-grey);
-padding-top: 2em;
-/* border-radius: 1em; */
+  background: var(--global-grey);
+  padding-top: 2em;
+  /* border-radius: 1em; */
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-background: #c4c4c4;
-transition: background-color
-/* border-radius: 1em; */
+  background: #c4c4c4;
+  transition: background-color;
+  /* border-radius: 1em; */
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-background: #fff;
+  background: #fff;
 }
 
+body {
+  background: var(--body-dark);
+  color: var(--text-white);
+  font-family: "made_tommy";
+  font-size: 1em;
+  margin: 0;
+  user-select: none;
+  overflow: hidden;
+  height: 100%;
+}
+body:hover {
+  cursor: default;
+}
+.text {
+  font-family: "DM Sans";
+  font-weight: normal;
+}
+.button {
+  $transition: 0.3s var(--bezier-chill);
+  outline: none;
+  font-family: "made_tommy";
+  font-weight: bold;
+  font-size: 0.7em;
+  padding: 1em 1.5em;
+  text-align: center;
+  // height: 2em;
+  /* width: 10em; */
+  border: none;
+  box-shadow: 0.1em 0.1em 0.3em 0 rgba(0, 0, 0, 0.4);
+  border-radius: 2em;
+  color: var(--text-black);
+  background: var(--text-white);
+  transition: transform $transition, background $transition, opacity $transition;
+  cursor: pointer;
 
-body{
-    background: var(--body-dark);
-    color: var(--text-white);
-    font-family: 'Poppins regular';
-    font-size: 1em;
-    margin: 0;
-    user-select: none;
-    overflow: hidden;
-    height: 100%;
-}
-body:hover{
-    cursor: default;
-}
-.button{
-    outline: none;
-    font-family: 'Poppins semibold';
-    font-size: 0.7em;
-    padding: 1em 1.5em;
-    text-align: center;
-    // height: 2em;
-    /* width: 10em; */
-    border: none;
-    box-shadow: .1em .1em .3em 0 rgba(0, 0, 0, 0.4);
-    border-radius: 2em;
-    color: var(--text-black);
-    background: var(--text-white);
-    transition: transform .15s ease, background .2s ease;
-    cursor: pointer;
-
-}
-.button:hover{
-    font-family: 'Poppins medium';
+  &:hover {
+    font-weight: 500;
     transform: scale(1.05);
     background: var(--button-purple);
     color: var(--text-white);
-}
-.button:active{
-    font-family: 'Poppins medium';
-    transform: scale(.98);
+  }
+  &:active {
+    font-weight: 500;
+    transform: scale(0.98);
     background: var(--button-purple);
     color: var(--text-white);
-}
-.button.accept {
+    opacity: 0.9;
+  }
+  &.accept {
     background-color: var(--green-accept);
     color: var(--text-white);
-    font-family: 'Poppins medium';
-}
-.button.cancel {
+    font-weight: 500;
+  }
+  &.cancel {
     background-color: var(--red-cancel);
     color: var(--text-white);
-    font-family: 'Poppins medium';
-}
-.button.slim {
-    padding: .2em 2em;
-}
-.button.disabled {
+    font-weight: 500;
+  }
+  &.slim {
+    padding: 0.2em 2em;
+  }
+  &.disabled {
     background-color: #111;
     color: var(--text-white);
     pointer-events: none;
+  }
 }
-.dev-border-w{
-    border: 1px solid white;
+.dev-border-w {
+  border: 1px solid white;
 }
-.dev-border-b{
-    border: 1px solid black;
+.dev-border-b {
+  border: 1px solid black;
 }
 
 .link-button {
-    color: var(--text-white);
-    cursor: pointer;
-    text-decoration: underline;
-    margin: 0 .3em;
+  color: var(--text-white);
+  cursor: pointer;
+  text-decoration: underline;
+  margin: 0 0.3em;
 }
 
 .icon {
-    width: 1em;
-    height: 1em;
-    transition: transform .1s ease;
+  width: 1em;
+  height: 1em;
+  transition: transform 0.1s ease;
 }
 .icon:hover {
-    transform: scale(1.25);
-    cursor: pointer;
+  transform: scale(1.25);
+  cursor: pointer;
 }
 .std-input {
-    display: block;
-    margin: 0;
-    font-size: 1em;
-    outline: none;
-    width: 100%;
-    font-family: 'Poppins black';
-    text-align: center;
-    border: none;
-    color: white;
-    background: none;
-    transition: transform .15s ease, background .2s ease;      
+  display: block;
+  margin: 0;
+  font-size: 1em;
+  outline: none;
+  width: 100%;
+  font-family: "Poppins black";
+  text-align: center;
+  border: none;
+  color: white;
+  background: none;
+  transition: transform 0.15s ease, background 0.2s ease;
 }
 .input-light {
-    display: block;
-    margin: 0;
-    font-size: 1em;
-    outline: none;
-    width: 100%;
-    font-family: 'Poppins Light';
-    text-align: left;
-    border: none;
-    color: white;
-    background: none;
-    transition: transform .15s ease, background .2s ease;
-    padding: .25em;
+  display: block;
+  margin: 0;
+  font-size: 1em;
+  outline: none;
+  width: 100%;
+  text-align: left;
+  border: none;
+  color: white;
+  background: none;
+  transition: transform 0.15s ease, background 0.2s ease;
+  padding: 0.25em;
+
+  &::-webkit-input-placeholder {
+    padding-left: 0.2em;
+  }
+
+  &:-moz-placeholder { /* Firefox 18- */
+    padding-left: 0.2em;  
+  }
+
+  &::-moz-placeholder {  /* Firefox 19+ */
+    padding-left: 0.2em;  
+  }
+
+  &:-ms-input-placeholder {  
+    padding-left: 0.2em; 
+  }
 }
 
 // $factor: 7;
@@ -149,7 +170,7 @@ body:hover{
 //     @while $i <=360/$factor {
 //         $keyframeSel: ceil(percentage($i*$factor/360));
 //         $degs: $i*$factor*1deg;
-        
+
 //         #{$keyframeSel} {
 //             background: linear-gradient($degs #{$yellow -150%, $pink});
 //             filter: hue-rotate($degs*2)
@@ -161,26 +182,23 @@ body:hover{
 //     --p: #{$yellow -150%, $pink};
 //     animation: background-cycle-sass 5s infinite var(--bezier-chill);
 // }
-
-
 </style>
 
 <style lang="less">
-
 @factor: 1;
-@yellow: #FFE500;
-@pink: #FF00FF;
+@yellow: #ffe500;
+@pink: #ff00ff;
 
 .loop (@i: 0) when (@i <=360/@factor) {
-  @keyframeSel: ceil(percentage(@i*@factor/360));
-  @degs: @i*@factor*1deg;
+  @keyframeSel: ceil(percentage(@i* @factor / 360));
+  @degs: @i* @factor*1deg;
 
   @{keyframeSel} {
     background: linear-gradient(@degs; var(--p));
-    filter: hue-rotate(@degs*2)
+    filter: hue-rotate(@degs*2);
   }
 
-.loop((@i + 1));
+  .loop((@i + 1));
 }
 
 @keyframes background-cycle-less {
@@ -192,10 +210,9 @@ body:hover{
   animation: background-cycle-less 5s infinite var(--bezier-chill);
 }
 .gradient-background-cycle-less-children {
-    > div {
-      --p: @yellow -150%, @pink;
-      animation: background-cycle-less 5s infinite var(--bezier-chill);
-    }
+  > div {
+    --p: @yellow -150%, @pink;
+    animation: background-cycle-less 5s infinite var(--bezier-chill);
+  }
 }
-
 </style>

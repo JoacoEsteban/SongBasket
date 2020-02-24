@@ -1,0 +1,35 @@
+@font-face {
+  font-family: 'DM Sans';
+  src: url('DM-Sans-Bold/DM-Sans-Bold.eot'); /* IE9 Compat Modes */
+  src: url('DM-Sans-Bold/DM-Sans-Bold.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('DM-Sans-Bold/DM-Sans-Bold.woff2') format('woff2'), /* Super Modern Browsers */
+       url('DM-Sans-Bold/DM-Sans-Bold.woff') format('woff'), /* Pretty Modern Browsers */
+       url('DM-Sans-Bold/DM-Sans-Bold.ttf')  format('truetype'), /* Safari, Android, iOS */
+       url('DM-Sans-Bold/DM-Sans-Bold.svg#svgFontName') format('svg'); /* Legacy iOS */
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  src: url('DM-Sans-Medium/DM-Sans-Medium.eot'); /* IE9 Compat Modes */
+  src: url('DM-Sans-Medium/DM-Sans-Medium.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('DM-Sans-Medium/DM-Sans-Medium.woff2') format('woff2'), /* Super Modern Browsers */
+       url('DM-Sans-Medium/DM-Sans-Medium.woff') format('woff'), /* Pretty Modern Browsers */
+       url('DM-Sans-Medium/DM-Sans-Medium.ttf')  format('truetype'), /* Safari, Android, iOS */
+       url('DM-Sans-Medium/DM-Sans-Medium.svg#svgFontName') format('svg'); /* Legacy iOS */
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'DM Sans Regular';
+  src: url('DM-Sans-Regular/DM-Sans-Regular.eot'); /* IE9 Compat Modes */
+  src: url('DM-Sans-Regular/DM-Sans-Regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('DM-Sans-Regular/DM-Sans-Regular.woff2') format('woff2'), /* Super Modern Browsers */
+       url('DM-Sans-Regular/DM-Sans-Regular.woff') format('woff'), /* Pretty Modern Browsers */
+       url('DM-Sans-Regular/DM-Sans-Regular.ttf')  format('truetype'), /* Safari, Android, iOS */
+       url('DM-Sans-Regular/DM-Sans-Regular.svg#svgFontName') format('svg'); /* Legacy iOS */
+  font-weight: normal;
+  font-style: normal;
+}

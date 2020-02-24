@@ -7,10 +7,10 @@
         <div class="search-bar">
           <div class="filters-background" :style="{opacity: filterBackgroundOpacity}">
           </div>
-          <span class="label">
+          <!-- <span class="label">
             filter
-          </span>
-          <input autofocus v-model.trim="searchInput" class="input-light" type="text">
+          </span> -->
+          <input placeholder="Start Typing" autofocus @focus="searchInputOnFocus" @blur="searchInputOnBlur" v-model.trim="searchInput" ref="search-input" class="input-light text" type="text">
         </div>
         <div class="filter-buttons">
 
@@ -19,7 +19,7 @@
     </div>
     <div ref="actual-list" class="actual-list" :class="listAnimationClass">
       <div v-if="noPlaylists" class="no-playlists">
-        No Playlists found{{allLoaded ? ' 😔' : ', try loading some more'}}
+        No Playlists found{{allLoaded ? '' : ', try loading some more'}}
       </div>
       <playlist v-for="playlist in syncedPlaylistsFiltered ? syncedPlaylistsFiltered : syncedPlaylists"
       :playlist="playlist"
@@ -94,6 +94,12 @@ export default {
         window.ipc.send('loadMore')
       }
     },
+    searchInputOnFocus () {
+      this.$root.searchInputElement = null
+    },
+    searchInputOnBlur () {
+      this.$root.searchInputElement = this.$refs['search-input']
+    },
     transitionPlaylists (what) {
       return new Promise((resolve, reject) => {
         // if (this.transitioning) resolve(false)
@@ -139,7 +145,7 @@ export default {
       if (this.lastType) clearTimeout(this.lastType)
       this.hidePlaylists()
         .then(() => {
-          let txt = this.searchInput
+          let txt = this.searchInput.toLowerCase()
           let noPlaylists = false
           if (!txt.length) {
             this.unSyncedPlaylistsFiltered = null
@@ -157,7 +163,11 @@ export default {
       }, this.listAnimationTime + 10)
     }
   },
+  beforeDestroy () {
+    this.searchInputOnFocus()
+  },
   mounted () {
+    this.searchInputOnBlur()
     window.ipc.on('done loading', () => {
       this.loading = false
     })

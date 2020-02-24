@@ -11,6 +11,10 @@ import Modal from './components/Modal/Modal'
 import StylesLoader from './CSS/styles-loader'
 import $ from 'jquery'
 
+function isAscii (code) {
+  return code >= 48 && code <= 90
+}
+
 export default {
   name: 'SongBasket',
   components: {
@@ -30,6 +34,10 @@ export default {
           return this.$router.push('/home')
         }
       }
+    },
+    handleWindowKey ({keyCode}) {
+      if (!isAscii(keyCode)) return
+      this.$root.searchInputElement && this.$root.searchInputElement.focus()
     }
   },
   created () {
@@ -41,6 +49,7 @@ export default {
       this.$store.dispatch('SET_LOADING_STATE', 'found')
       this.redirect('home')
     })
+    $(window).on('keydown', this.handleWindowKey)
   },
   mounted () {
     window.sbDebug = this
