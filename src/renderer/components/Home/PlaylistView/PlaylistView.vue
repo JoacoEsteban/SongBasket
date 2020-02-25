@@ -1,12 +1,12 @@
 <template>
   <div class="home-router plv-container">
     <div class="plv-leftpanel">
-      <div class="plv-lp-img" :style="'background-image: url('+playlist.images[0].url+')'" />
+      <div class="plv-lp-img" :style="'background-image: url('+playlistImage+')'" />
         <div class="controls">
           <div class="df fldc alic">
             <span class="track-qty">
               <span>
-                {{playlist.tracks.total}}
+                {{playlistTotalTracks}}
               </span>
                 {{trackQty}}
             </span>
@@ -44,9 +44,9 @@
           </div>
         </div>
         <div class="plv-rp-data-plname">{{playlist.name}}</div>
-        <div class="plv-rp-data-byuser">by {{playlist.owner.display_name}}</div>
+        <div class="plv-rp-data-byuser">by {{playlistOwner}}</div>
       </div>
-      <div class="plv-rp-tracklist">
+      <div class="plv-rp-tracklist" ref="tracklist-scroll">
         <div
         :class="{'hide': !showing.added || added.length === 0}"
         ref="added"
@@ -109,6 +109,15 @@ export default {
     Track
   },
   computed: {
+    playlistImage () {
+      return this.playlist.images && this.playlist.images[0] && this.playlist.images[0].url
+    },
+    playlistOwner () {
+      return this.playlist.owner && this.playlist.owner.display_name
+    },
+    playlistTotalTracks () {
+      return this.playlist.tracks && this.playlist.tracks.total
+    },
     currentPlaylist () {
       return this.$store.state.CurrentUser.currentPlaylist
     },
@@ -126,16 +135,16 @@ export default {
       }
     },
     trackQty () {
-      return ' Track' + (this.playlist.tracks.total === 1 ? '' : 's')
+      return ' Track' + (this.playlist.tracks && this.playlist.tracks.total === 1 ? '' : 's')
     },
     items () {
-      return this.playlist.tracks.items
+      return this.playlist.tracks && this.playlist.tracks.items
     },
     added () {
-      return this.playlist.tracks.added
+      return (this.playlist && this.playlist.tracks && this.playlist.tracks.added) || 0
     },
     removed () {
-      return this.playlist.tracks.removed
+      return (this.playlist && this.playlist.tracks && this.playlist.tracks.removed) || 0
     },
     syncedPlaylistsRefreshed () {
       return this.$store.state.Events.SYNCED_PLAYLISTS_REFRESHED
@@ -183,6 +192,7 @@ export default {
           setTimeout(() => {
             if (this.showing[wich]) this.$refs[wich].style.height = 'initial'
           }, 500)
+          this.$refs['tracklist-scroll'].scrollTo({top: 0, behavior: 'smooth'})
           break
         case false:
           this.$refs[wich].style.height = this.$refs[wich].scrollHeight + 'px'

@@ -51,8 +51,11 @@ export default {
     })
     $(window).on('keydown', this.handleWindowKey)
   },
-  mounted () {
+  beforeCreate () {
+    window.VUE_ROOT = this.$root
     window.sbDebug = this
+  },
+  mounted () {
     $(document).ready(function () {
       setTimeout(() => {
         window.ipc.send('DOCUMENT_READY_CALLBACK')

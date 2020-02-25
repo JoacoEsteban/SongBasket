@@ -47,7 +47,7 @@ export default {
     width: 100%;
     display: flex;
     bottom: -.1rem;
-    background: var(--global-grey);
+    background: var(--global-grey-secondary);
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: space-between;

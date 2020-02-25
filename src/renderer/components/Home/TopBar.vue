@@ -14,7 +14,7 @@
           </button>
         </div>
       </div>
-      <div class="numbers">
+      <!-- <div class="numbers">
         <div>
           <span class="tb-selection-num">{{selectedPlaylistsData.playlists[0]}}</span>
           {{selectedPlaylistsData.playlists[1]}}
@@ -23,14 +23,14 @@
           <span class="tb-selection-num">{{selectedPlaylistsData.tracks[0]}}</span>
           {{selectedPlaylistsData.tracks[1]}}
         </div>
-      </div>
+      </div> -->
     </div>
 
     <div class="tb-mid-section">
       {{status}}
-      <router-link class="nodrag" style="font-size: 1.5em;" to="/home" tag="span">
+      <!-- <router-link class="nodrag" style="font-size: 1.5em;" to="/home" tag="span">
         <home-icon class="nodrag" />
-      </router-link>
+      </router-link> -->
     </div>
 
     <div class="tb-button-panel" :class="{h100: !isMac}">
@@ -195,13 +195,13 @@ export default {
 <style lang="scss">
 .tb-container {
   text-align: left;
-  min-height: 3.5rem;
+  min-height: 1.5rem;
   width: 100%;
   display: flex;
   -webkit-app-region: drag;
   /* position: sticky; */
   /* top: 0; */
-  background: var(--global-grey);
+  background: var(--global-grey-secondary);
   flex-direction: row;
   flex-wrap: nowrap;
   /* margin-bottom: 1rem; */

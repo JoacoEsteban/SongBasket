@@ -10,7 +10,7 @@
           <!-- <span class="label">
             filter
           </span> -->
-          <input placeholder="Start Typing" autofocus @focus="searchInputOnFocus" @blur="searchInputOnBlur" v-model.trim="searchInput" ref="search-input" class="input-light text" type="text">
+          <input placeholder="Start Typing" autofocus @focus="searchInputOnFocus" @blur="searchInputOnBlur" v-model.trim="searchInput" ref="search-input" class="input-light semibold" type="text">
         </div>
         <div class="filter-buttons">
 
@@ -212,7 +212,7 @@ $transition-global-hard: 0.5s $bezier;
   top: 0;
   z-index: 1;
   .filters-background {
-    background: linear-gradient(180deg, var(--global-grey), transparent);
+    background: linear-gradient(180deg, var(--global-grey-secondary), transparent);
     position: absolute;
     top: 0;
     left: 0;
@@ -229,7 +229,7 @@ $transition-global-hard: 0.5s $bezier;
   .search-bar {
     pointer-events: all;
     .filters-background {
-      background: var(--global-grey);
+      background: var(--global-grey-secondary);
     }
     position: relative;
     overflow: hidden;

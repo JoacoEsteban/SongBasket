@@ -41,10 +41,10 @@
     font-family: "Poppins Regular";
 }
 .bold {
-    font-family: "Poppins Bold";
+    font-weight: bold;
 }
 .semibold {
-    font-family: "Poppins SemiBold";
+    font-weight: 500;
 }
 
 .point5-em {

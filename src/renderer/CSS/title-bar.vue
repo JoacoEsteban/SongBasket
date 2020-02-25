@@ -17,6 +17,7 @@
   display: flex;
   flex-direction: row-reverse;
   -webkit-app-region: no-drag;
+  margin-left: 4px;
 }
 
 #title-bar.mac .title-bar-buttons-container .bar-btn {
@@ -28,9 +29,9 @@
 
   display: inline-block;
   -webkit-app-region: no-drag;
-  height: 15px;
-  width: 15px;
-  margin: 7.5px 6px;
+  height: 12px;
+  width: 12px;
+  margin: 7.5px 4px;
   border-radius: 50%;
   overflow: hidden;
 }
