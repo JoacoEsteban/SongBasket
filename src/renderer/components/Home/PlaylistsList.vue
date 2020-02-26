@@ -32,7 +32,7 @@
       @addPlaylistToSyncQueue="$emit('addPlaylistToSyncQueue', playlist.id)"
       @openPlaylist="$emit('openPlaylist', playlist.id)" />
 
-      <div v-if="!allLoaded">
+      <div class="df aliic jucc" v-if="!allLoaded">
         <button class="button" @click="loadMore">{{ loading ? 'Loading' : 'Load More'}}</button>
       </div>
     </div>

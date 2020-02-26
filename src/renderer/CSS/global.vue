@@ -55,6 +55,9 @@ body:hover {
   text-align: center;
   // height: 2em;
   /* width: 10em; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: none;
   box-shadow: 0.1em 0.1em 0.3em 0 rgba(0, 0, 0, 0.4);
   border-radius: 2em;
@@ -87,7 +90,7 @@ body:hover {
     font-weight: 500;
   }
   &.slim {
-    padding: 0.2em 2em;
+    padding: 0.45em 2em;
   }
   &.disabled {
     background-color: #111;

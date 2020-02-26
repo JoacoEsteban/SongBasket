@@ -7,7 +7,7 @@
           <div v-if="isSynced" class="star-icons-container">
             <div v-if="playlist.tracks.added && playlist.tracks.added.length > 0" class="star-icon">
               <div class="rotate">
-                <star-icon color="#3f2" />
+                <star-icon color="#0fb300" />
               </div>
               <div class="num">
                 +{{playlist.tracks.added.length}}
