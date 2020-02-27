@@ -17,7 +17,7 @@
         </div>
       </div>
     </div>
-    <div ref="actual-list" class="actual-list" :class="listAnimationClass">
+    <div ref="actual-list" class="actual-list row" :class="listAnimationClass">
       <div v-if="noPlaylists" class="no-playlists">
         No Playlists found{{allLoaded ? '' : ', try loading some more'}}
       </div>
@@ -32,7 +32,7 @@
       @addPlaylistToSyncQueue="$emit('addPlaylistToSyncQueue', playlist.id)"
       @openPlaylist="$emit('openPlaylist', playlist.id)" />
 
-      <div class="df aliic jucc" v-if="!allLoaded">
+      <div class="df aliic jucc col-sm-12 p-0" v-if="!allLoaded">
         <button class="button" @click="loadMore">{{ loading ? 'Loading' : 'Load More'}}</button>
       </div>
     </div>

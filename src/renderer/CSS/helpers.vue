@@ -2,6 +2,9 @@
 .df {
     display: flex;
 }
+.dcontents {
+    display: contents;
+}
 .fldc {
     flex-direction: column;
 }
@@ -32,19 +35,25 @@
 }
 
 .thin {
-    font-family: "Poppins Thin";
+    font-weight: 200;
 }
 .light {
-    font-family: "Poppins Light";
+    font-weight: lighter;
 }
 .regular {
-    font-family: "Poppins Regular";
+    font-weight: normal;
 }
 .bold {
     font-weight: bold;
 }
 .semibold {
     font-weight: 500;
+}
+.uppercase {
+    text-transform: uppercase;
+}
+.lowercase {
+    text-transform: lowercase;
 }
 
 .point5-em {
@@ -71,6 +80,9 @@
     height: 100%;
 }
 
+.p-0 {
+    padding: 0;
+}
 .p-1 {
     padding: .5em;
 }
@@ -207,5 +219,17 @@
 .abs-top {
     position: absolute;
     top: 0;
+}
+.abs-full {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+}
+.rel-full {
+    position: relative;
+    width: 100%;
+    height: 100%;
 }
 </style>

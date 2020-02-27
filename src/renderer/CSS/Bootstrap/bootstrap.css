@@ -294,11 +294,11 @@ hr {
   margin-right: auto;
   margin-left: auto;
 }
-.row {
+.row-gutters {
   margin-right: -15px;
   margin-left: -15px;
 }
-.row-no-gutters {
+.row {
   margin-right: 0;
   margin-left: 0;
 }
