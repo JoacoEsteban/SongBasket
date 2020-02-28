@@ -10,7 +10,13 @@ const GLOBAL = require('../main/Global/VARIABLES')
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 window.$ = $
+$(window).on('mousedown', () => window.MOUSE_BEING_CLICKED = true)
+$(window).on('mouseup', () => window.MOUSE_BEING_CLICKED = false)
 Vue.http = Vue.prototype.$ = $
+Vue.prototype.$promiseTimeout = (time) => new Promise((resolve, reject) => setTimeout(resolve, time))
+Vue.http = Vue.prototype.$setRootVar = (key, val) => {
+  $(':root')[0].style.setProperty('--' + key, val)
+}
 Vue.http = Vue.prototype.$http = axios
 Vue.config.productionTip = false
 window.ipc = require('electron').ipcRenderer

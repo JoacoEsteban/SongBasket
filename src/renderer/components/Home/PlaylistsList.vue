@@ -4,7 +4,7 @@
       <div class="filters-background" :style="{opacity: 1 - filterBackgroundOpacity}">
       </div>
       <div class="filters-content">
-        <div class="search-bar">
+        <div class="search-bar global-scroll-shadow">
           <div class="filters-background" :style="{opacity: filterBackgroundOpacity}">
           </div>
           <!-- <span class="label">
@@ -32,7 +32,7 @@
       @addPlaylistToSyncQueue="$emit('addPlaylistToSyncQueue', playlist.id)"
       @openPlaylist="$emit('openPlaylist', playlist.id)" />
 
-      <div class="df aliic jucc col-sm-12 p-0" v-if="!allLoaded">
+      <div class="df aliic jucc col-xs-12 p-0" v-if="!allLoaded">
         <button class="button" @click="loadMore">{{ loading ? 'Loading' : 'Load More'}}</button>
       </div>
     </div>
@@ -178,7 +178,7 @@ export default {
     containerElement.addEventListener('scroll', (e) => {
       let ratio
       if ((ratio = (containerElement.scrollTop / 100)) > 1) ratio = 1
-      this.filterBackgroundOpacity = ratio
+      this.$setRootVar('scroll-opacity', (this.filterBackgroundOpacity = ratio))
     })
   }
 }
@@ -197,7 +197,6 @@ $transition-global-hard: 0.5s $bezier;
 }
 .actual-list {
   --list-transition-time: .3s;
-  overflow-x: hidden;
   $transition: var(--list-transition-time) $bezier-chill;
   transition: transform $transition, opacity $transition;
   &.hide {

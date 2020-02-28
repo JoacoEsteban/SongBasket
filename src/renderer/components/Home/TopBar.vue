@@ -1,5 +1,5 @@
 <template>
-  <div class="tb-container" @dblclick="maximize">
+  <div class="tb-container global-scroll-shadow" @dblclick="maximize">
     <div class="tb-selection-numbers-container">
       <div id="title-bar" class="mac" v-if="isMac">
         <div class="title-bar-buttons-container">

@@ -46,13 +46,13 @@
     </div>
 
 
-    <div class="transformation-parent rel-full" @mousemove="transformContainer" @mouseenter="addTransition" @mouseleave="restoreTransformation">
+    <div class="transformation-parent rel-full" @mousemove="onMouseMove" @mouseleave="onMouseLeave" @mousedown="setMouseListener">
       <div class="content" ref="content-container">
         <div class="playlist-background abs-full">
-          <div class="rel-full">
+          <div class="rel-full ovfh">
             <div class="pl-img" :style="{backgroundImage: `url(${playlistImage})`}">
             </div>
-            <div class="gradient abs-full">
+            <div class="gradient">
             </div>
           </div>
         </div>
@@ -137,6 +137,20 @@ export default {
     }
   },
   methods: {
+    onMouseMove (e) {
+      this.hovering = true
+      this.transformContainer(e)
+    },
+    onMouseLeave () {
+      this.hovering = false
+      this.restoreTransformation()
+    },
+    setMouseListener () {
+      this.$(window).on('mouseup', this.restoreTransformation)
+    },
+    promiseNextTick () {
+      return new Promise((resolve, reject) => this.$nextTick(resolve))
+    },
     addPlaylistToSyncQueue () {
       this.$store.dispatch('queuePlaylist', this.playlist.id)
     },
@@ -155,16 +169,8 @@ export default {
           return bounds
         })()}).bounds
     },
-    addTransition () {
-      const time = 1500
-      const el = this.$(this.$refs['content-container'])
-      el.css('transition', 'transform ' + time + 'ms var(--bezier-chill)')
-      if (this.transitionTimeout) clearTimeout(this.transitionTimeout)
-      this.transitionTimeout = setTimeout(() => {
-        el.css('transition', '')
-      }, time)
-    },
     transformContainer ({clientX, clientY}) {
+      if (window.MOUSE_BEING_CLICKED) return
       const bounds = this.getBounds()
       const {x, y, width, height} = bounds
 
@@ -172,8 +178,9 @@ export default {
       const tY = ((((clientY - y) / height) - 0.5) * 90 * 0.2).toFixed(4)
       this.$(this.$refs['content-container']).css('transform', `perspective(1000px) rotateX(${tY}deg) rotateY(${tX}deg) scale3d(1.05, 1.05, 1)`)
     },
-    restoreTransformation () {
-      this.addTransition()
+    async restoreTransformation () {
+      if (window.MOUSE_BEING_CLICKED || this.hovering) return
+      this.$(window).off('mouseup', this.restoreTransformation)
       this.$(this.$refs['content-container']).css('transform', '')
     }
   },
@@ -192,6 +199,19 @@ $title-size: .8em;
   box-sizing: border-box;
   padding: 1.5em 1.25em;
   padding-top: 0;
+  .transformation-parent {
+    $transition-soft:  1s cubic-bezier(0.12, 0.82, 0, 1);
+    $transition-hard:  .5s var(--bezier);
+    transition: transform $transition-soft, opacity $transition-soft;
+    &:hover {
+      transform: scale(1.03)
+    }
+    &:active {
+      transition: transform $transition-hard, opacity $transition-hard;
+      transform: scale(.98);
+      opacity: .7;
+    }
+  }
   .transformation-parent > .content {
     cursor: pointer;
     position: relative;
@@ -213,6 +233,11 @@ $title-size: .8em;
     }
     .gradient {
       // background: linear-gradient(90deg, $q-false-color 75%, rgba(0,0,0,0));
+      position: absolute;
+      top: -2px;
+      bottom: -2px;
+      right: -2px;
+      left: -2px;
       background: linear-gradient(to right, black 0%, black 73%, rgba(0, 0, 0, 0.72) 85%, rgba(0, 0, 0, 0.57) 90%, rgba(0, 0, 0, 0.51) 93%, rgba(0, 0, 0, 0.38) 96%, rgba(0, 0, 0, 0) 100%);
     }
     .pl-img {

@@ -164,6 +164,10 @@ body:hover {
   }
 }
 
+.global-scroll-shadow {
+  box-shadow: 0 3px 8px rgba(0, 0, 0, calc(var(--scroll-opacity) * 0.3))
+}
+
 // $factor: 7;
 // $yellow: #FFE500;
 // $pink: #FF00FF;

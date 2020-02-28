@@ -1,7 +1,7 @@
 <style lang="scss">
 :root {
   /* COLORS */
-  --body-dark: #151515;
+  --body-dark: #111;
   --global-grey: #333;
   --global-grey-secondary: #222;
   --text-white: #f5f5f5;
