@@ -197,7 +197,7 @@ $transition-global-hard: 0.5s $bezier;
 }
 .actual-list {
   --list-transition-time: .3s;
-  overflow: hidden;
+  overflow-x: hidden;
   $transition: var(--list-transition-time) $bezier-chill;
   transition: transform $transition, opacity $transition;
   &.hide {

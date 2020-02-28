@@ -1,5 +1,5 @@
 <template>
-  <div :class="{'queued': isQueued, 'synced': isSynced}" class="pl-container col-lg-4 col-md-6 col-sm-12">
+  <div :class="{'queued': isQueued, 'synced': isSynced}" class="pl-container col-lg-4 col-md-6 col-xs-12">
 
     <div class="dcontents" v-if="!v2">
       <div class="pl-track-count">
@@ -46,31 +46,32 @@
     </div>
 
 
-
-    <div class="content" ref="content-container" @mousemove="transformContainer" @mouseleave="restoreTransformation">
-      <div class="playlist-background abs-full">
-        <div class="rel-full">
-          <div class="pl-img" :style="{backgroundImage: `url(${playlistImage})`}">
+    <div class="transformation-parent rel-full" @mousemove="transformContainer" @mouseenter="addTransition" @mouseleave="restoreTransformation">
+      <div class="content" ref="content-container">
+        <div class="playlist-background abs-full">
+          <div class="rel-full">
+            <div class="pl-img" :style="{backgroundImage: `url(${playlistImage})`}">
+            </div>
+            <div class="gradient abs-full">
+            </div>
           </div>
-          <div class="gradient abs-full">
+        </div>
+        <div class="playlist-data">
+          <div class="title">
+            <span class="bold">
+              {{playlistName}}
+            </span>
           </div>
-        </div>
-      </div>
-      <div class="playlist-data">
-        <div class="title">
-          <span class="bold">
-            {{playlistName}}
-          </span>
-        </div>
-        <div class="track-ammount">
-          <span class="regular">
-            {{trackAmmountStr}}
-          </span>
-        </div>
-        <div class="status-indicator" :class="statusObj.class">
-          <span class="bold uppercase">
-            {{statusObj.text}}
-          </span>
+          <div class="track-ammount">
+            <span class="regular">
+              {{trackAmmountStr}}
+            </span>
+          </div>
+          <div class="status-indicator" :class="statusObj.class">
+            <span class="bold uppercase">
+              {{statusObj.text}}
+            </span>
+          </div>
         </div>
       </div>
     </div>
@@ -154,16 +155,25 @@ export default {
           return bounds
         })()}).bounds
     },
+    addTransition () {
+      const time = 1500
+      const el = this.$(this.$refs['content-container'])
+      el.css('transition', 'transform ' + time + 'ms var(--bezier-chill)')
+      if (this.transitionTimeout) clearTimeout(this.transitionTimeout)
+      this.transitionTimeout = setTimeout(() => {
+        el.css('transition', '')
+      }, time)
+    },
     transformContainer ({clientX, clientY}) {
       const bounds = this.getBounds()
       const {x, y, width, height} = bounds
 
-      const pctX = ((clientX - x) / width).toFixed(2)
-      const pctY = ((clientY - y) / height).toFixed(2)
-
-      this.$(this.$refs['content-container']).css('transform', `matrix3d(1, 0, 0, ${(pctX - 0.5) / 2 / 3000}, 0, 1, 0, ${(pctY - 0.5) / 2 / 2000}, 0, 0, 1, 0, 0, 0, 0, 0.97)`)
+      const tX = ((((clientX - x) / width) - 0.5) * 90 * 0.1).toFixed(4)
+      const tY = ((((clientY - y) / height) - 0.5) * 90 * 0.2).toFixed(4)
+      this.$(this.$refs['content-container']).css('transform', `perspective(1000px) rotateX(${tY}deg) rotateY(${tX}deg) scale3d(1.05, 1.05, 1)`)
     },
     restoreTransformation () {
+      this.addTransition()
       this.$(this.$refs['content-container']).css('transform', '')
     }
   },
@@ -182,19 +192,16 @@ $title-size: .8em;
   box-sizing: border-box;
   padding: 1.5em 1.25em;
   padding-top: 0;
-  > .content {
+  .transformation-parent > .content {
     cursor: pointer;
     position: relative;
     background: $q-false-color;
     $transition: 0.5s cubic-bezier(0.12, 0.82, 0, 1);
-    transition: transform $transition, background-color $transition,
+    transition: background-color $transition,
     box-shadow $transition, outline-width 0.1s ease;
+    will-change: transform;
     color: #f0f0f0;
     box-shadow: 0.1em 0.1em 0.3em 0 rgba(0, 0, 0, 0.4);
-
-    &:hover {
-      transform: matrix3d(1, 0, 0, 0, 0, 1, 0, -.00012, 0, 0, 1, 0, 0, 0, 0, 0.97);
-    }
   }
   z-index: 0;
 
