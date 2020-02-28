@@ -38,6 +38,9 @@ export default {
     handleWindowKey ({keyCode}) {
       if (!isAscii(keyCode)) return
       this.$root.searchInputElement && this.$root.searchInputElement.focus()
+    },
+    invalidatePlTransformCache () {
+      this.$root.plTransformInvalidation = Date.now()
     }
   },
   created () {
@@ -56,6 +59,9 @@ export default {
     window.sbDebug = this
   },
   mounted () {
+    this.$root.plTransformInvalidation = 0
+    window.addEventListener('mousewheel', this.invalidatePlTransformCache)
+    window.addEventListener('resize', this.invalidatePlTransformCache)
     $(document).ready(function () {
       setTimeout(() => {
         window.ipc.send('DOCUMENT_READY_CALLBACK')

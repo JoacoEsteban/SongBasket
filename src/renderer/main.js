@@ -10,6 +10,7 @@ const GLOBAL = require('../main/Global/VARIABLES')
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 window.$ = $
+Vue.http = Vue.prototype.$ = $
 Vue.http = Vue.prototype.$http = axios
 Vue.config.productionTip = false
 window.ipc = require('electron').ipcRenderer

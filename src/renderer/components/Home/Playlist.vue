@@ -1,5 +1,5 @@
 <template>
-  <div :class="{'queued': isQueued, 'synced': isSynced}" class="pl-container col-lg-6 col-md-12">
+  <div :class="{'queued': isQueued, 'synced': isSynced}" class="pl-container col-lg-4 col-md-6 col-sm-12">
 
     <div class="dcontents" v-if="!v2">
       <div class="pl-track-count">
@@ -47,7 +47,7 @@
 
 
 
-    <div class="content">
+    <div class="content" ref="content-container" @mousemove="transformContainer" @mouseleave="restoreTransformation">
       <div class="playlist-background abs-full">
         <div class="rel-full">
           <div class="pl-img" :style="{backgroundImage: `url(${playlistImage})`}">
@@ -90,7 +90,11 @@ export default {
   data () {
     return {
       playlistName: this.$props.playlist.name,
-      v2: true
+      v2: true,
+      bounds: {
+        bounds: null,
+        timeStamp: -1
+      }
     }
   },
   computed: {
@@ -140,6 +144,27 @@ export default {
         wich: 'unsync',
         payload: { id: this.playlist.id }
       })
+    },
+    getBounds () {
+      /* eslint-disable no-return-assign */
+      return this.$root.plTransformInvalidation < this.bounds.timeStamp ? this.bounds.bounds : (this.bounds = {timeStamp: Date.now(),
+        bounds: (() => {
+          let bounds = this.$refs['content-container'].getBoundingClientRect();
+          ['x', 'y', 'width', 'height'].forEach(k => bounds[k] = bounds[k].toFixed(2))
+          return bounds
+        })()}).bounds
+    },
+    transformContainer ({clientX, clientY}) {
+      const bounds = this.getBounds()
+      const {x, y, width, height} = bounds
+
+      const pctX = ((clientX - x) / width).toFixed(2)
+      const pctY = ((clientY - y) / height).toFixed(2)
+
+      this.$(this.$refs['content-container']).css('transform', `matrix3d(1, 0, 0, ${(pctX - 0.5) / 2 / 3000}, 0, 1, 0, ${(pctY - 0.5) / 2 / 2000}, 0, 0, 1, 0, 0, 0, 0, 0.97)`)
+    },
+    restoreTransformation () {
+      this.$(this.$refs['content-container']).css('transform', '')
     }
   },
   components: {
@@ -158,16 +183,17 @@ $title-size: .8em;
   padding: 1.5em 1.25em;
   padding-top: 0;
   > .content {
+    cursor: pointer;
     position: relative;
     background: $q-false-color;
-    $transition: 0.2s cubic-bezier(0.12, 0.82, 0, 0.99);
+    $transition: 0.5s cubic-bezier(0.12, 0.82, 0, 1);
     transition: transform $transition, background-color $transition,
     box-shadow $transition, outline-width 0.1s ease;
     color: #f0f0f0;
     box-shadow: 0.1em 0.1em 0.3em 0 rgba(0, 0, 0, 0.4);
 
     &:hover {
-      transform: scale(1.02);
+      transform: matrix3d(1, 0, 0, 0, 0, 1, 0, -.00012, 0, 0, 1, 0, 0, 0, 0, 0.97);
     }
   }
   z-index: 0;
