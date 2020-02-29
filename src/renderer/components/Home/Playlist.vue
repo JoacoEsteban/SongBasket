@@ -54,6 +54,7 @@
             </div>
             <div class="gradient">
             </div>
+            <div class="light-shine" ref="light-shine"></div>
           </div>
         </div>
         <div class="playlist-data">
@@ -174,14 +175,26 @@ export default {
       const bounds = this.getBounds()
       const {x, y, width, height} = bounds
 
-      const tX = ((((clientX - x) / width) - 0.5) * 90 * 0.1).toFixed(4)
-      const tY = ((((clientY - y) / height) - 0.5) * 90 * 0.2).toFixed(4)
-      this.$(this.$refs['content-container']).css('transform', `perspective(1000px) rotateX(${tY}deg) rotateY(${tX}deg) scale3d(1.05, 1.05, 1)`)
+      const valX = (clientX - x) / width
+      const valY = (clientY - y) / height
+
+      const tX = ((valX - 0.5) * 90 * 0.1).toFixed(4)
+      const tY = ((valY - 0.5) * 90 * 0.2).toFixed(4)
+      this.getRotationElement().css('transform', `perspective(1000px) rotateX(${tY}deg) rotateY(${tX}deg) scale3d(1.05, 1.05, 1)`)
+
+      this.getLightShineElement().css({'background-position': `${(valX * 100 / 3).toFixed(2)}% 0`, transform: `rotate(${-tY / 2}deg)`})
     },
-    async restoreTransformation () {
+    restoreTransformation () {
       if (window.MOUSE_BEING_CLICKED || this.hovering) return
       this.$(window).off('mouseup', this.restoreTransformation)
-      this.$(this.$refs['content-container']).css('transform', '')
+      this.getRotationElement().css('transform', '')
+      this.getLightShineElement().css({'background-position': '', transform: ''})
+    },
+    getRotationElement () {
+      return this.rotationElement || (this.rotationElement = this.$(this.$refs['content-container']))
+    },
+    getLightShineElement () {
+      return this.lightShineElement || (this.lightShineElement = this.$(this.$refs['light-shine']))
     }
   },
   components: {
@@ -192,19 +205,25 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-$q-false-color: #272727;
+$q-false-color: #1b1b1b;
 $q-true-color: rgb(103, 214, 0);
 $title-size: .8em;
+$transition-soft:  1s cubic-bezier(0.12, 0.82, 0, 1);
+$transition-hard:  .5s var(--bezier);
 .pl-container {
   box-sizing: border-box;
   padding: 1.5em 1.25em;
   padding-top: 0;
   .transformation-parent {
-    $transition-soft:  1s cubic-bezier(0.12, 0.82, 0, 1);
-    $transition-hard:  .5s var(--bezier);
     transition: transform $transition-soft, opacity $transition-soft;
     &:hover {
-      transform: scale(1.03)
+      transform: scale(1.03);
+      .playlist-background {
+        .light-shine {
+          transition: opacity $transition-soft;
+          opacity: 1;
+        }
+      }
     }
     &:active {
       transition: transform $transition-hard, opacity $transition-hard;
@@ -232,20 +251,36 @@ $title-size: .8em;
       justify-content: flex-end;
     }
     .gradient {
-      // background: linear-gradient(90deg, $q-false-color 75%, rgba(0,0,0,0));
       position: absolute;
-      top: -2px;
-      bottom: -2px;
-      right: -2px;
-      left: -2px;
-      background: linear-gradient(to right, black 0%, black 73%, rgba(0, 0, 0, 0.72) 85%, rgba(0, 0, 0, 0.57) 90%, rgba(0, 0, 0, 0.51) 93%, rgba(0, 0, 0, 0.38) 96%, rgba(0, 0, 0, 0) 100%);
+      $offset: -3px;
+      top: $offset;
+      bottom: $offset;
+      right: $offset;
+      left: $offset;
+      &.gradient {
+        background: linear-gradient(to right, $q-false-color 50%, transparent 150%);
+      }
+    }
+    .light-shine {
+      position: absolute;
+      $offset: -30px;
+      top: $offset;
+      bottom: $offset;
+      right: $offset;
+      left: $offset;
+      transition: opacity $transition-soft, background-position $transition-soft, transform $transition-soft;
+      // transition: opacity $transition-soft;
+      opacity: .5;
+      background: linear-gradient(31deg, transparent 50%, rgba(255,255,255,.045) 50%, transparent 100%);
+      background-size: 200%;
+      background-position: center;
     }
     .pl-img {
       background-size: cover;
       background-repeat: no-repeat;
       background-position: center;
       height: 100%;
-      width: 25%;
+      width: 50%;
     }
   }
 
