@@ -29,6 +29,10 @@ html {
   background: #ccc;
 }
 
+.nodrag {
+  -webkit-app-region: no-drag;
+}
+
 body {
   background: var(--body-dark);
   color: var(--text-white);
@@ -169,27 +173,12 @@ body:hover {
   box-shadow: 0 3px 8px rgba(0, 0, 0, calc(var(--scroll-opacity) * 0.3))
 }
 
-// $factor: 7;
-// $yellow: #FFE500;
-// $pink: #FF00FF;
-
-// @keyframes background-cycle-sass {
-//     $i: 0;
-//     @while $i <=360/$factor {
-//         $keyframeSel: ceil(percentage($i*$factor/360));
-//         $degs: $i*$factor*1deg;
-
-//         #{$keyframeSel} {
-//             background: linear-gradient($degs #{$yellow -150%, $pink});
-//             filter: hue-rotate($degs*2)
-//         }
-//         $i: $i + 1;
-//     }
-// }
-// .gradient-background-cycle-sass {
-//     --p: #{$yellow -150%, $pink};
-//     animation: background-cycle-sass 5s infinite var(--bezier-chill);
-// }
+.show-on-scroll {
+  opacity: var(--scroll-opacity);
+}
+.hide-on-scroll {
+  opacity: var(--scroll-opacity-inverted);
+}
 </style>
 
 <style lang="less">

@@ -87,7 +87,7 @@ $whole-height: 5em;
   > .content {
     padding: $offsetY var(--container-padding-x);
   }
-  z-index: 0;
+  z-index: 10;
 
   &.show {
     bottom: 0;

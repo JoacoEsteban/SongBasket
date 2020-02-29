@@ -1,5 +1,7 @@
 <template>
-  <div class="tb-container global-scroll-shadow" @dblclick="maximize">
+  <div class="tb-container" @dblclick="maximize">
+    <div class="drop-shadow abs-full show-on-scroll"></div>
+    <div class="drop-gradient abs-full hide-on-scroll"></div>
     <div class="tb-selection-numbers-container">
       <div id="title-bar" class="mac" v-if="isMac">
         <div class="title-bar-buttons-container">
@@ -227,14 +229,24 @@ export default {
   flex-direction: row;
   flex-wrap: nowrap;
   /* margin-bottom: 1rem; */
-  z-index: 10;
+  z-index: 0;
   justify-content: space-between;
   position: relative;
 }
-
-.nodrag {
-  -webkit-app-region: no-drag;
+.drop-gradient {
+  bottom: -200%;
+  top: 100%;
+  z-index: -1;
+  background: linear-gradient(to bottom, var(--global-grey-secondary), transparent);
+  opacity: var(--scroll-opacity-inverted);
 }
+.drop-shadow {
+  top: 100%;
+  bottom: -120%;
+  z-index: -1;
+  background: linear-gradient(to bottom, var(--global-grey-secondary) -50%, transparent);
+}
+
 .tb-selection-numbers-container {
   font-size: 0.5rem;
   box-sizing: border-box;

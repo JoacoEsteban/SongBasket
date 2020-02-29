@@ -149,6 +149,7 @@ export default {
   justify-content: space-between;
 }
 .home-router{
+  z-index: 1;
   height: 100%;
   padding-bottom: 1em;
   box-sizing: border-box;

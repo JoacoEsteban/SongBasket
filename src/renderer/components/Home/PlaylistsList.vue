@@ -1,8 +1,8 @@
 <template>
   <div ref="playlists-list" class="home-router pll-container">
     <div class="filters-container">
-      <div class="filters-background" :style="{opacity: 1 - filterBackgroundOpacity}">
-      </div>
+      <!-- <div class="filters-background" :style="{opacity: 1 - filterBackgroundOpacity}">
+      </div> -->
       <div class="filters-content">
         <div class="search-bar global-scroll-shadow">
           <div class="filters-background" :style="{opacity: filterBackgroundOpacity}">
@@ -141,6 +141,15 @@ export default {
       this.syncedPlaylists = all
       this.filterPlaylists()
     },
+    calcScrollOpacity () {
+      let ratio = (this.getContainerElement().scrollTop / 100)
+      if (ratio > 1) ratio = 1
+      this.$setRootVar('scroll-opacity', (this.filterBackgroundOpacity = ratio))
+      console.log(ratio)
+    },
+    getContainerElement () {
+      return (this.containerElement || (this.containerElement = this.$refs['playlists-list']))
+    },
     filterPlaylists () {
       if (this.lastType) clearTimeout(this.lastType)
       this.hidePlaylists()
@@ -174,12 +183,8 @@ export default {
     this.refreshSynced()
     this.$refs['actual-list'].style.setProperty('--list-transition-time', this.listAnimationTime + 'ms')
 
-    const containerElement = this.$refs['playlists-list']
-    containerElement.addEventListener('scroll', (e) => {
-      let ratio
-      if ((ratio = (containerElement.scrollTop / 100)) > 1) ratio = 1
-      this.$setRootVar('scroll-opacity', (this.filterBackgroundOpacity = ratio))
-    })
+    this.$(this.getContainerElement()).on('scroll', this.calcScrollOpacity)
+    this.calcScrollOpacity()
   }
 }
 </script>
