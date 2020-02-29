@@ -313,9 +313,7 @@ $transition-hard:  .5s var(--bezier);
       bottom: $offset;
       right: $offset;
       left: $offset;
-      &.gradient {
-        background: linear-gradient(to right, $q-false-color 50%, transparent 150%);
-      }
+      background: linear-gradient(to right, $q-false-color 50%, transparent 200%);
     }
     .light-shine {
       position: absolute;

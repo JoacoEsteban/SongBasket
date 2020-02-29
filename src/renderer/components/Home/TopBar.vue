@@ -1,10 +1,11 @@
 <template>
-  <div class="tb-container" @dblclick="maximize">
+  <div class="tb-container window-drag" @dblclick="maximize">
     <div class="drop-shadow abs-full show-on-scroll"></div>
     <div class="drop-gradient abs-full hide-on-scroll"></div>
-    <div class="tb-selection-numbers-container">
-      <div id="title-bar" class="mac" v-if="isMac">
-        <div class="title-bar-buttons-container">
+
+    <div class="title-bar-container">
+      <div id="title-bar" class="mac title-section">
+        <div class="title-bar-buttons-container" v-if="isMac">
           <button id="min-btn" class="bar-btn button-minimize">
             <div class="mask"></div>
           </button>
@@ -16,66 +17,45 @@
           </button>
         </div>
       </div>
-      <!-- <div class="numbers">
-        <div>
-          <span class="tb-selection-num">{{selectedPlaylistsData.playlists[0]}}</span>
-          {{selectedPlaylistsData.playlists[1]}}
-        </div>
-        <div>
-          <span class="tb-selection-num">{{selectedPlaylistsData.tracks[0]}}</span>
-          {{selectedPlaylistsData.tracks[1]}}
-        </div>
-      </div> -->
-    </div>
 
-    <div class="tb-mid-section">
-      {{status}}
-      <!-- <router-link class="nodrag" style="font-size: 1.5em;" to="/home" tag="span">
-        <home-icon class="nodrag" />
-      </router-link> -->
-    </div>
+      <div class="tb-mid-section title-section df aliic jucc">
+        {{status}}
+      </div>
 
-    <div class="tb-button-panel" :class="{h100: !isMac}">
-      <div class="df fldc aliend">
-        <div id="title-bar" class="windows" v-if="!isMac">
-          <div class="title-bar-buttons-container">
-            <div id="min-btn" class="bar-btn button-minimize">
-              <div class="mask"></div>
-            </div>
-            <div id="max-btn" class="bar-btn button-unmaximize">
-              <div class="mask"></div>
-            </div>
-            <div id="close-btn" class="bar-btn button-close">
-              <div class="mask"></div>
-            </div>
+      <div id="title-bar" class="windows title-section">
+        <div class="title-bar-buttons-container" v-if="!isMac">
+          <div id="min-btn" class="bar-btn button-minimize">
+            <div class="mask"></div>
+          </div>
+          <div id="max-btn" class="bar-btn button-unmaximize">
+            <div class="mask"></div>
+          </div>
+          <div id="close-btn" class="bar-btn button-close">
+            <div class="mask"></div>
           </div>
         </div>
-
-        <div class="section-switcher-container">
-          <div class="section-switcher-list">
-            <div class="section-switch" v-for="(section, index) in sections" :key="index" :class="{active: activeSection === section.id}">
-              <span class="section-title semibold">
-                {{section.title}}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <!-- <div class="tb-button-container nodrag">
-          <div @click="$emit('refreshPlaylists')" class="tb-button sync-icon">
-            <sync-icon></sync-icon>
-          </div>
-
-          <div class="tb-button cloud-search-icon" @click="$emit('youtubeConvert')">
-            <cloud-search-icon></cloud-search-icon>
-          </div>
-
-          <div @click="$emit('download')" class="tb-button download-icon">
-            <download-icon></download-icon>
-          </div>
-        </div> -->
       </div>
     </div>
+
+    <div class="content">
+      <div class="actual-bar-content abs-full">
+        <div class="df fldc aliend">
+
+          <div class="section-switcher-container">
+            <div class="section-switcher-list">
+              <div class="section-switch" v-for="(section, index) in sections" :key="index" :class="{active: activeSection === section.id}">
+                <span class="section-title semibold">
+                  {{section.title}}
+                </span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+
     <div class="loading-bar" ref="loadingbar">
       <div class="actual-loading-bar gradient-background-cycle-less">
       </div>
@@ -128,17 +108,20 @@ export default {
     this.activeSection = this.sections.find(s => s.title === 'Playlists').id
   },
   computed: {
-    selectedPlaylistsData: function () {
-      let st = this.$store.getters.SelectedPlaylistsCompute
-      let ret = {
-        playlists: [
-          st.playlists,
-          'Playlist' + (st.playlists === 1 ? '' : 's') + ' selected'
-        ],
-        tracks: [st.tracks, 'Track' + (st.tracks === 1 ? '' : 's')]
-      }
-      return ret
+    route () {
+      return this.$route.name
     },
+    // selectedPlaylistsData: function () {
+    //   let st = this.$store.getters.SelectedPlaylistsCompute
+    //   let ret = {
+    //     playlists: [
+    //       st.playlists,
+    //       'Playlist' + (st.playlists === 1 ? '' : 's') + ' selected'
+    //     ],
+    //     tracks: [st.tracks, 'Track' + (st.tracks === 1 ? '' : 's')]
+    //   }
+    //   return ret
+    // },
     now () {
       let separator = ' / '
       let thisDate = dateFormatter(this.$store.state.CurrentUser.lastSync)
@@ -168,6 +151,14 @@ export default {
   watch: {
     loadingState (val) {
       this.handleLoadingState(val)
+    },
+    route (val) {
+      console.log(val)
+      switch (val) {
+        case 'playlist-view':
+          console.log('pl')
+          break
+      }
     }
   },
   methods: {
@@ -190,7 +181,7 @@ export default {
       }
     },
     maximize (e) {
-      if (!this.isMac || e.target.classList.contains('nodrag')) return
+      if (!this.isMac || e.target.classList.contains('window-nodrag')) return
       console.log(e.target.classList)
       window.toggleMaximization()
     },
@@ -217,21 +208,43 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+$tb-height: var(--top-bar-height);
+$tb-title-height: 1em;
+$loading-bar-height: 3px;
+
 .tb-container {
   text-align: left;
   min-height: .5em;
   width: 100%;
   display: flex;
-  -webkit-app-region: drag;
-  /* position: sticky; */
-  /* top: 0; */
   background: var(--global-grey-secondary);
   flex-direction: row;
   flex-wrap: nowrap;
-  /* margin-bottom: 1rem; */
   z-index: 0;
   justify-content: space-between;
   position: relative;
+
+  height: $tb-height;
+  transition: height var(--transition-global);
+}
+.title-bar-container {
+  height: $tb-title-height;
+  width: 100%;
+  display: flex;
+
+  .title-section {
+    width: 100%;
+    display: flex;
+    &:nth-child(1) {
+      align-items: flex-start
+    }
+    &:nth-child(2) {
+      align-items: center
+    }
+    &:nth-child(3) {
+      align-items: flex-end
+    }
+  }
 }
 .drop-gradient {
   bottom: -200%;
@@ -247,59 +260,30 @@ export default {
   background: linear-gradient(to bottom, var(--global-grey-secondary) -50%, transparent);
 }
 
-.tb-selection-numbers-container {
-  font-size: 0.5rem;
-  box-sizing: border-box;
-  width: 10rem;
-  .numbers {
-    margin: 0 0 0 0.3rem;
-  }
-}
-.tb-selection-num {
-  font-size: 0.9rem;
-  font-family: "Poppins Semibold";
-  padding-right: 0.1rem;
-}
-
 .tb-mid-section {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  align-items: center;
-  font-size: 0.5rem;
+  font-size: 0.5em;
+  bottom: initial;
+  pointer-events: none;
+
+  padding-top: .5em;
 }
 
-.tb-button-panel {
-  width: 10rem;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  box-sizing: border-box;
+.actual-bar-content {
+  
 }
-.tb-button-container {
-  display: flex;
-  justify-content: space-between;
-  width: 5rem;
-  padding-right: 0.6rem;
-}
-.tb-button {
-  width: 1.2rem;
-  height: 1.2rem;
-  /* transition: transform .1s ease; */
-}
+
 .loading-bar {
-  $bar-height: 3px;
   position: absolute;
   display: flex;
   align-items: center;
-  bottom: -$bar-height;
+  bottom: 0;
   left: 0;
   right: 100%;
   pointer-events: none;
   $transition: var(--animation-duration) var(--bezier-chill);
   transition: left $transition, right $transition;
   .actual-loading-bar {
-    height: $bar-height;
+    height: $loading-bar-height;
     width: 100%;
   }
   &.hide {

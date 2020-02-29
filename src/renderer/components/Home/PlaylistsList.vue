@@ -1,11 +1,9 @@
 <template>
   <div ref="playlists-list" class="home-router pll-container">
     <div class="filters-container">
-      <!-- <div class="filters-background" :style="{opacity: 1 - filterBackgroundOpacity}">
-      </div> -->
       <div class="filters-content">
         <div class="search-bar global-scroll-shadow">
-          <div class="filters-background" :style="{opacity: filterBackgroundOpacity}">
+          <div class="filters-background show-on-scroll">
           </div>
           <!-- <span class="label">
             filter
@@ -59,7 +57,11 @@ export default {
       searchInput: '',
       syncedPlaylists: [],
       syncedPlaylistsFiltered: null,
-      unSyncedPlaylistsFiltered: null
+      unSyncedPlaylistsFiltered: null,
+      scrollOpKeys: {
+        kebab: 'scroll-opacity',
+        camel: this.$camelcase('scroll-opacity')
+      }
     }
   },
   components: {
@@ -144,8 +146,7 @@ export default {
     calcScrollOpacity () {
       let ratio = (this.getContainerElement().scrollTop / 100)
       if (ratio > 1) ratio = 1
-      this.$setRootVar('scroll-opacity', (this.filterBackgroundOpacity = ratio))
-      console.log(ratio)
+      this.$setRootVar(this.scrollOpKeys, (this.filterBackgroundOpacity = ratio))
     },
     getContainerElement () {
       return (this.containerElement || (this.containerElement = this.$refs['playlists-list']))

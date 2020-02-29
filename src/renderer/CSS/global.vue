@@ -29,9 +29,13 @@ html {
   background: #ccc;
 }
 
-.nodrag {
+.window-nodrag {
   -webkit-app-region: no-drag;
 }
+.window-drag {
+  -webkit-app-region: drag;
+}
+
 
 body {
   background: var(--body-dark);
