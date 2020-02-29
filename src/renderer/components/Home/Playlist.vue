@@ -48,6 +48,10 @@
 
     <div class="transformation-parent rel-full" @mousemove="onMouseMove" @mouseleave="onMouseLeave" @mousedown="setMouseListener">
       <div class="content" ref="content-container">
+        <div class="playlist-side top"></div>
+        <div class="playlist-side right"></div>
+        <div class="playlist-side bottom"></div>
+        <div class="playlist-side left"></div>
         <div class="playlist-background abs-full">
           <div class="rel-full ovfh">
             <div class="pl-img" :style="{backgroundImage: `url(${playlistImage})`}">
@@ -185,6 +189,7 @@ export default {
       this.getLightShineElement().css({'background-position': `${(valX * 100 / 3).toFixed(2)}% 0`, transform: `rotate(${-tY / 2}deg)`})
     },
     restoreTransformation () {
+      /* eslint-disable no-constant-condition */
       if (window.MOUSE_BEING_CLICKED || this.hovering) return
       this.$(window).off('mouseup', this.restoreTransformation)
       this.getRotationElement().css('transform', '')
@@ -214,8 +219,11 @@ $transition-hard:  .5s var(--bezier);
   box-sizing: border-box;
   padding: 1.5em 1.25em;
   padding-top: 0;
+  z-index: 0;
   .transformation-parent {
     transition: transform $transition-soft, opacity $transition-soft;
+    perspective: 1000px;
+    perspective-origin: 50% 100px;
     &:hover {
       transform: scale(1.03);
       .playlist-background {
@@ -230,19 +238,46 @@ $transition-hard:  .5s var(--bezier);
       transform: scale(.98);
       opacity: .7;
     }
+
+    > .content {
+      cursor: pointer;
+      position: relative;
+      background: $q-false-color;
+      $transition: 0.5s cubic-bezier(0.12, 0.82, 0, 1);
+      transition: background-color $transition,
+      box-shadow $transition, outline-width 0.1s ease;
+      transform-style: preserve-3d;
+      will-change: transform;
+      color: #f0f0f0;
+      // box-shadow: 0.1em 0.1em 0.3em 0 rgba(0, 0, 0, 0.4);
+    }
   }
-  .transformation-parent > .content {
-    cursor: pointer;
-    position: relative;
-    background: $q-false-color;
-    $transition: 0.5s cubic-bezier(0.12, 0.82, 0, 1);
-    transition: background-color $transition,
-    box-shadow $transition, outline-width 0.1s ease;
-    will-change: transform;
-    color: #f0f0f0;
-    box-shadow: 0.1em 0.1em 0.3em 0 rgba(0, 0, 0, 0.4);
+
+  .playlist-side {
+    position: absolute;
+    background: linear-gradient(#222 20%, transparent);
+    width: 100%;
+    height: 100px;
+    &.top {
+      // background: violet;
+      transform: rotateX(-96deg) translatez(-50px) translatey(55px);
+    }
+    &.bottom {
+      // background: green;
+      // transform: rotateX(-81deg) translatez(95px) translatey(61px);
+      transform: rotateX(-85deg) translatez(97px) translatey(56px);
+    }
+    &.right {
+      // background: red;
+      transform: rotateY(-96deg) translatez(-50px) translatey(55px);
+      display: none;
+    }
+    &.left {
+      // background: blue;
+      transform: rotateX(-96deg) translatez(-50px) translatey(55px);
+      display: none;
+    }
   }
-  z-index: 0;
 
   .playlist-background {
     .rel-full {
