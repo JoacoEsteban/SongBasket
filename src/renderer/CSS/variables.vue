@@ -20,5 +20,6 @@
   /* VARIABLES */
   --max-container-height: calc(100vh);
   --box-shadow-std: 5px 5px 15px 0 rgba(0, 0, 0, 0.4);
+  --container-padding-x: 1.25em;
 }
 </style>

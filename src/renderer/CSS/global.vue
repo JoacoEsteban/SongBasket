@@ -18,14 +18,15 @@ html {
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #c4c4c4;
+  background: #bbb;
   transition: background-color;
-  /* border-radius: 1em; */
+  border-radius: 1em;
+  transition: background var(--transition-global);
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #fff;
+  background: #ccc;
 }
 
 body {
@@ -112,15 +113,15 @@ body:hover {
   margin: 0 0.3em;
 }
 
-.icon {
-  width: 1em;
-  height: 1em;
-  transition: transform 0.1s ease;
-}
-.icon:hover {
-  transform: scale(1.25);
-  cursor: pointer;
-}
+// .icon {
+//   width: 1em;
+//   height: 1em;
+//   transition: transform 0.1s ease;
+// }
+// .icon:hover {
+//   transform: scale(1.25);
+//   cursor: pointer;
+// }
 .std-input {
   display: block;
   margin: 0;

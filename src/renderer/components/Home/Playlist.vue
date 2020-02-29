@@ -46,7 +46,7 @@
     </div>
 
 
-    <div class="transformation-parent rel-full" @mousemove="onMouseMove" @mouseleave="onMouseLeave" @mousedown="setMouseListener">
+    <div class="transformation-parent rel-full" @mousemove="onMouseMove" @mouseleave="onMouseLeave" @mousedown="setMouseListener" @click="handleClick">
       <div class="content" ref="content-container">
         <div class="playlist-side top"></div>
         <div class="playlist-side right"></div>
@@ -142,6 +142,13 @@ export default {
     }
   },
   methods: {
+    handleClick () {
+      if (this.isSynced) {
+        this.$emit('openPlaylist')
+      } else {
+        this.addPlaylistToSyncQueue()
+      }
+    },
     onMouseMove (e) {
       this.hovering = true
       this.transformContainer(e)
@@ -157,6 +164,7 @@ export default {
       return new Promise((resolve, reject) => this.$nextTick(resolve))
     },
     addPlaylistToSyncQueue () {
+      if (!this.isQueued) this.restoreTransformation(true)
       this.$store.dispatch('queuePlaylist', this.playlist.id)
     },
     unsync () {
@@ -184,13 +192,13 @@ export default {
 
       const tX = ((valX - 0.5) * 90 * 0.1).toFixed(4)
       const tY = ((valY - 0.5) * 90 * 0.2).toFixed(4)
-      this.getRotationElement().css('transform', `perspective(1000px) rotateX(${tY}deg) rotateY(${tX}deg) scale3d(1.05, 1.05, 1)`)
+      this.getRotationElement().css('transform', `perspective(1000px) rotateX(${tY}deg) rotateY(${tX}deg) ${this.isQueued ? '' : 'scale3d(1.05, 1.05, 1)'}`)
 
       this.getLightShineElement().css({'background-position': `${(valX * 100 / 3).toFixed(2)}% 0`, transform: `rotate(${-tY / 2}deg)`})
     },
-    restoreTransformation () {
+    restoreTransformation (force) {
       /* eslint-disable no-constant-condition */
-      if (window.MOUSE_BEING_CLICKED || this.hovering) return
+      if (!force && (window.MOUSE_BEING_CLICKED || this.hovering)) return
       this.$(window).off('mouseup', this.restoreTransformation)
       this.getRotationElement().css('transform', '')
       this.getLightShineElement().css({'background-position': '', transform: ''})
@@ -212,18 +220,17 @@ export default {
 <style lang="scss" scoped>
 $q-false-color: #1b1b1b;
 $q-true-color: rgb(103, 214, 0);
+
+$playlist-height: 4em;
 $title-size: .8em;
 $transition-soft:  1s cubic-bezier(0.12, 0.82, 0, 1);
 $transition-hard:  .5s var(--bezier);
 .pl-container {
   box-sizing: border-box;
-  padding: 1.5em 1.25em;
+  padding: 1.5em var(--container-padding-x);
   padding-top: 0;
   z-index: 0;
-  .transformation-parent {
-    transition: transform $transition-soft, opacity $transition-soft;
-    perspective: 1000px;
-    perspective-origin: 50% 100px;
+  &:not(.queued).transformation-parent {
     &:hover {
       transform: scale(1.03);
       .playlist-background {
@@ -233,6 +240,20 @@ $transition-hard:  .5s var(--bezier);
         }
       }
     }
+  }
+  .transformation-parent {
+    &:hover {
+      transform: scale(1.03);
+      .playlist-background {
+        .light-shine {
+          transition: opacity $transition-soft;
+          opacity: 1;
+        }
+      }
+    }
+    transition: transform $transition-soft, opacity $transition-soft;
+    perspective: 1000px;
+    perspective-origin: 50% 100px;
     &:active {
       transition: transform $transition-hard, opacity $transition-hard;
       transform: scale(.98);
@@ -260,12 +281,12 @@ $transition-hard:  .5s var(--bezier);
     height: 100px;
     &.top {
       // background: violet;
-      transform: rotateX(-96deg) translatez(-50px) translatey(55px);
+      transform: rotateX(-96deg) translatez(-1.666666em) translatey(1.833333em);
     }
     &.bottom {
       // background: green;
       // transform: rotateX(-81deg) translatez(95px) translatey(61px);
-      transform: rotateX(-85deg) translatez(97px) translatey(56px);
+      transform: rotateX(-85deg) translatez(3.54em) translatey(1.88em);
     }
     &.right {
       // background: red;
@@ -322,10 +343,17 @@ $transition-hard:  .5s var(--bezier);
   .playlist-data {
     text-align-last: left;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     padding: 0.6em .5em;
-
+    height: $playlist-height;
 
     .title {
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
       > span {
         font-size: $title-size;
       }
@@ -344,6 +372,19 @@ $transition-hard:  .5s var(--bezier);
       }
       > span {
         font-size: $title-size * .75;
+      }
+    }
+  }
+
+  // -----------------STATES-----------------
+
+  &.queued {
+    .transformation-parent {
+      transform: scale(.9);
+      opacity: .7;
+      &:active {
+        transform: scale(.85);
+        opacity: .5;
       }
     }
   }

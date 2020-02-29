@@ -49,8 +49,17 @@
           </div>
         </div>
 
-        <div class="tb-button-container nodrag">
-          <!-- TODO Disable this button in PlaylistView -->
+        <div class="section-switcher-container">
+          <div class="section-switcher-list">
+            <div class="section-switch" v-for="(section, index) in sections" :key="index" :class="{active: activeSection === section.id}">
+              <span class="section-title semibold">
+                {{section.title}}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- <div class="tb-button-container nodrag">
           <div @click="$emit('refreshPlaylists')" class="tb-button sync-icon">
             <sync-icon></sync-icon>
           </div>
@@ -62,7 +71,7 @@
           <div @click="$emit('download')" class="tb-button download-icon">
             <download-icon></download-icon>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
     <div class="loading-bar" ref="loadingbar">
@@ -87,6 +96,7 @@ export default {
     HomeIcon
   },
   data () {
+    let sectionId = 0
     return {
       user: this.$store.state.CurrentUser.user,
       isMac: window.platform === 'mac',
@@ -95,13 +105,25 @@ export default {
         staticLoading: false,
         percentage: 0,
         animationDuration: 1000
-      }
+      },
+      activeSection: null,
+      sections: [
+        {
+          id: ++sectionId,
+          title: 'Tracks'
+        },
+        {
+          id: ++sectionId,
+          title: 'Playlists'
+        }
+      ]
     }
   },
   mounted () {
     window.bar = this
     // document.documentElement.style.setProperty('--loading-bar-animation-duration', (this.loadingBar.animationDuration / 100) + 's')
     this.$refs.loadingbar.style.setProperty('--animation-duration', this.loadingBar.animationDuration + 'ms')
+    this.activeSection = this.sections.find(s => s.title === 'Playlists').id
   },
   computed: {
     selectedPlaylistsData: function () {
@@ -192,10 +214,10 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .tb-container {
   text-align: left;
-  min-height: 1.5rem;
+  min-height: .5em;
   width: 100%;
   display: flex;
   -webkit-app-region: drag;
@@ -279,6 +301,28 @@ export default {
   &.dynamic {
     .actual-loading-bar {
       background-color: var(--green-loading);
+    }
+  }
+}
+
+.section-switcher-container {
+  margin: 1em var(--container-padding-x);
+  // margin-top: 1em;
+}
+.section-switcher-list {
+  display: flex;
+  align-items: flex-end;
+}
+.section-switch {
+  margin-left: .3em;
+  cursor: pointer;
+  span.section-title {
+    font-size: .75em;
+    line-height: 1;
+  }
+  &.active {
+    span.section-title {
+      font-size: 1.25em;
     }
   }
 }

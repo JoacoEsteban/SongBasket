@@ -18,7 +18,12 @@
       :class="{transitioning: routerAnimation !== 'release'}"
       ></home-background> -->
 
-      <user-data style="z-index: 1" @logOut="logOut"></user-data>
+      <!-- <user-data style="z-index: 1" @logOut="logOut"></user-data> -->
+      <floating-buttons style="z-index: 1" @logOut="logOut"
+      @refreshPlaylists="refreshPlaylists"
+      @youtubeConvert="youtubeConvert"
+      @download="download"
+      ></floating-buttons>
     </div>
   </div>
 </template>
@@ -30,6 +35,7 @@ import TopBar from './TopBar.vue'
 import PlaylistsList from './PlaylistsList.vue'
 import Playlist from './Playlist.vue'
 import UserData from './UserData.vue'
+import FloatingButtons from './FloatingButtons.vue'
 import HomeBackground from './HomeBackground.vue'
 
 export default {
@@ -39,6 +45,7 @@ export default {
     PlaylistsList,
     Playlist,
     UserData,
+    FloatingButtons,
     HomeBackground
   },
   data () {
