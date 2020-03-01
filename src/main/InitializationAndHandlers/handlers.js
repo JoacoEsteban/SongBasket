@@ -107,6 +107,7 @@ export async function setHomeFolder () {
       console.log('pass')
       // if songbasket exists in file specified it will load data automatically
       await retrieveAndStoreState(path[0])
+      console.log('from sethomefolder handler')
       pushToHome()
     } catch (err) {
       // Else ask to login and start a folder from 0
@@ -186,6 +187,7 @@ export async function verifyFileSystem () {
 
   try {
     await retrieveAndStoreState(FOLDERS.selected)
+    console.log('from verify handler')
     pushToHome()
   } catch (err) {
     // TODO Handle errors when retrieving and setting data

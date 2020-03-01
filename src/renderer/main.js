@@ -15,7 +15,7 @@ $(window).on('mousedown', () => window.MOUSE_BEING_CLICKED = true)
 $(window).on('mouseup', () => window.MOUSE_BEING_CLICKED = false)
 
 Vue.prototype.$ = $
-Vue.prototype.$promiseTimeout = (time) => new Promise((resolve, reject) => setTimeout(resolve, time))
+Vue.prototype.$sleep = (time) => new Promise((resolve, reject) => setTimeout(resolve, time))
 Vue.prototype.$setRootVar = (keys, val, valJs) => {
   $(':root')[0].style.setProperty('--' + keys.kebab, val)
   window.ROOT_VARS[keys.camel] = valJs || val

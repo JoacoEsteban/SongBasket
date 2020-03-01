@@ -23,6 +23,6 @@
   --container-padding-x: 1.25em;
   --scroll-opacity: 1;
   --scroll-opacity-inverted: calc(1 - var(--scroll-opacity));
-  --top-bar-height: 3em;
+  // --top-bar-height: 3em;
 }
 </style>

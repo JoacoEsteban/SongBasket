@@ -23,17 +23,9 @@ export default {
   },
   methods: {
     redirect (path, payload) {
-      switch (path) {
-        case 'setup': {
-          // this.header.text = 'Let\'s find your music'
-          this.$router.push('/setup')
-            .catch(err => console.error('daddddaa', err))
-          break
-        }
-        case 'home': {
-          return this.$router.push('/home')
-        }
-      }
+      path = (path[0] === '/' ? '' : '/') + path
+      if (path === this.$route.fullPath) return console.error('ERROR Trying to navigate to same path')
+      this.$router.push(path)
     },
     handleWindowKey ({keyCode}) {
       if (!isAscii(keyCode)) return

@@ -126,7 +126,8 @@ export default {
           .catch(err => reject(err))
       })
     },
-    refreshSynced () {
+    async refreshSynced () {
+      await this.$sleep(2000)
       let all = []
       let pls = [...this.$store.state.CurrentUser.playlists]
       for (let i = 0; i < this.$store.state.CurrentUser.syncedPlaylists.length; i++) {
@@ -140,6 +141,7 @@ export default {
           }
         }
       }
+      console.log('aber', this.$store.state.CurrentUser.syncedPlaylists)
       this.syncedPlaylists = all
       this.filterPlaylists()
     },
@@ -168,9 +170,7 @@ export default {
           }
           this.noPlaylists = noPlaylists
         })
-      this.lastType = setTimeout(() => {
-        this.showPlaylists()
-      }, this.listAnimationTime + 10)
+      this.lastType = setTimeout(this.showPlaylists, this.listAnimationTime + 10)
     }
   },
   beforeDestroy () {

@@ -31,7 +31,7 @@
 <script>
 import 'vuex'
 
-import TopBar from './TopBar.vue'
+import TopBar from './TopBar/TopBar.vue'
 import PlaylistsList from './PlaylistsList.vue'
 import Playlist from './Playlist.vue'
 import UserData from './UserData.vue'
