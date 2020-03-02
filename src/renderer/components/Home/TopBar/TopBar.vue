@@ -19,16 +19,16 @@
       </div>
 
       <div class="tb-mid-section title-section df aliic jucc">
-        <div class="navigation left" @click="navigationBack">
-          back
+        <div class="navigation-btn left window-nodrag" @click="navigationBack">
+          <font-awesome-icon size="xs" icon="arrow-left" />
         </div>
         <div class="status-container">
           <span>
             {{status}}
           </span>
         </div>
-        <div class="navigation right" @click="navigationForw">
-          forw
+        <div class="navigation-btn right window-nodrag" @click="navigationForw">
+          <font-awesome-icon size="xs" icon="arrow-right" />
         </div>
       </div>
 
@@ -170,13 +170,13 @@ export default {
   },
   methods: {
     navigationBack () {
-      console.log('aa')
-      this.$router.push('/home')
+      if (!(this.$route.name === 'playlists-list')) this.$router.push('/home')
     },
     navigationForw () {
       // this.$router.push('/home')
     },
-    handleRouterNavigation (to) {
+    handleRouterNavigation (to, from, next) {
+      console.log('------------------------------------------------')
       switch (to.name) {
         case 'playlist-view':
           this.slideTo(1)
@@ -185,6 +185,7 @@ export default {
           this.slideTo(0)
           break
       }
+      next()
     },
     slideTo (index) {
       this.sliderPosition = -index * 100
@@ -235,7 +236,7 @@ export default {
 
 <style lang="scss" scoped>
 // $tb-height: var(--top-bar-height);
-$tb-title-height: 1em;
+$tb-title-height: var(--tb-title-height);
 $loading-bar-height: 3px;
 
 .tb-container {
@@ -298,7 +299,7 @@ $loading-bar-height: 3px;
 }
 
 .bar-slider-container {
-  transition: transform 1s var(--bezier-chill);
+  transition: transform .5s var(--bezier-chill);
   transform: translateX(var(--position-ptg))
 }
 
@@ -356,6 +357,17 @@ $loading-bar-height: 3px;
     span.section-title {
       font-size: 1.25em;
     }
+  }
+}
+
+.navigation-btn {
+  display: flex;
+  $m: .5em;
+  &.right {
+    margin-left: $m;
+  }
+  &.left {
+    margin-right: $m;
   }
 }
 </style>

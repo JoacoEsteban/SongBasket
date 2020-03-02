@@ -72,7 +72,7 @@
               {{trackAmmountStr}}
             </span>
           </div>
-          <div class="status-indicator" :class="statusObj.class">
+          <div class="playlist-status-indicator" :class="statusObj.class">
             <span class="bold uppercase">
               {{statusObj.text}}
             </span>
@@ -108,8 +108,7 @@ export default {
       return this.$store.getters.PlaylistIsQueued(this.playlist.id) >= 0
     },
     isSynced () {
-      if (this.playlist) return this.$store.getters.PlaylistIsSynced(this.playlist.id)
-      else return false
+      return this.playlist && this.$store.getters.PlaylistIsSynced(this.playlist.id)
     },
     playlistImage () {
       return this.playlist && this.playlist.images && this.playlist.images[0] && this.playlist.images[0].url
@@ -121,7 +120,6 @@ export default {
       return this.trackAmmount + ' Track' + (this.trackAmmount === 1 ? '' : 's')
     },
     status () {
-      if (this.isSynced) return 'synced'
       if (this.isSynced) return 'synced'
       else return null
     },
@@ -361,17 +359,17 @@ $transition-hard:  .5s var(--bezier);
         font-size: $title-size * .75;
       }
     }
-    .status-indicator {
-      &.synced {
-        color: var(--green-accept)
-      }
-      &.unsynced {
-        color: var(--button-purple)
-      }
-      > span {
-        font-size: $title-size * .75;
-      }
-    }
+    // .status-indicator {
+    //   &.synced {
+    //     color: var(--green-accept)
+    //   }
+    //   &.unsynced {
+    //     color: var(--button-purple)
+    //   }
+    //   > span {
+    //     font-size: $title-size * .75;
+    //   }
+    // }
   }
 
   // -----------------STATES-----------------
@@ -389,4 +387,19 @@ $transition-hard:  .5s var(--bezier);
 
 }
 
+</style>
+
+<style lang="scss">
+$title-size: .8em;
+  .playlist-status-indicator {
+    &.synced {
+      color: var(--green-accept)
+    }
+    &.unsynced {
+      color: var(--button-purple)
+    }
+    > span {
+      font-size: $title-size * .75;
+    }
+  }
 </style>

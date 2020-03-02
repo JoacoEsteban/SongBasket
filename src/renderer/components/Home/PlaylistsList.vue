@@ -127,7 +127,8 @@ export default {
       })
     },
     async refreshSynced () {
-      await this.$sleep(2000)
+      if (!this.$root.notFistTime) await this.$sleep(2000)
+      this.$root.notFistTime = true
       let all = []
       let pls = [...this.$store.state.CurrentUser.playlists]
       for (let i = 0; i < this.$store.state.CurrentUser.syncedPlaylists.length; i++) {

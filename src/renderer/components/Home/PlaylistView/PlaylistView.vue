@@ -43,8 +43,8 @@
             {{removed.length + ' ' + (removed.length === 1 ? 'track' : 'tracks')}} removed
           </div>
         </div>
-        <div class="plv-rp-data-plname">{{playlist.name}}</div>
-        <div class="plv-rp-data-byuser">by {{playlistOwner}}</div>
+        <!-- <div class="plv-rp-data-plname">{{playlist.name}}</div>
+        <div class="plv-rp-data-byuser">by {{playlistOwner}}</div> -->
       </div>
       <div class="plv-rp-tracklist" ref="tracklist-scroll">
         <div
@@ -334,8 +334,8 @@ export default {
 .plv-rp-data {
   // background-color: var(--global-grey-secondary);
   position: relative;
-  padding: .5em;
-  min-height: 3em;
+  // padding: .5em;
+  // min-height: 3em;
   z-index: 1;
 }
 

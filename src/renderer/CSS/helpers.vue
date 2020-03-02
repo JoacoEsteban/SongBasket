@@ -1,4 +1,5 @@
 <style lang="scss">
+// -----------------FLEX-----------------
 .df {
     display: flex;
 }
@@ -34,6 +35,7 @@
     flex-wrap: wrap;
 }
 
+// -----------------FONT------------------
 .thin {
     font-weight: 200;
 }
@@ -64,6 +66,7 @@
     font-size: .75em;
 }
 
+// -----------------MISC------------------
 .d-none {
     display: none;
 }
@@ -80,6 +83,7 @@
     height: 100%;
 }
 
+// -----------------BOUNDS------------------
 .p-0 {
     padding: 0;
 }
@@ -213,6 +217,7 @@
     margin-left: 2em;
 }
 
+// -----------------POSITION------------------
 .abs {
     position: absolute;
 }

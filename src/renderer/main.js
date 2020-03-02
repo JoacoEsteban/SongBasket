@@ -5,6 +5,12 @@ import $ from 'jquery'
 import App from './App'
 import router from './router'
 import store from './store'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+
+library.add(faArrowRight, faArrowLeft)
+
 const { BrowserWindow } = require('electron').remote
 const GLOBAL = require('../main/Global/VARIABLES')
 
@@ -14,6 +20,7 @@ window.$ = $
 $(window).on('mousedown', () => window.MOUSE_BEING_CLICKED = true)
 $(window).on('mouseup', () => window.MOUSE_BEING_CLICKED = false)
 
+Vue.component('font-awesome-icon', FontAwesomeIcon)
 Vue.prototype.$ = $
 Vue.prototype.$sleep = (time) => new Promise((resolve, reject) => setTimeout(resolve, time))
 Vue.prototype.$setRootVar = (keys, val, valJs) => {
