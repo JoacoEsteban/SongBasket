@@ -12,7 +12,11 @@
         <cloud-search-icon></cloud-search-icon>
       </div>
     </div>
-    <div class="floater">right</div>
+    <div class="floater">
+      <div class="sb-fab" @click="download" :class="{show: showDl}">
+        <download-icon></download-icon>
+      </div>
+    </div>
   </div>
 </div>
 </template>
@@ -53,11 +57,17 @@ export default {
     showSync () {
       return !this.loading && !this.queueIsEmpty
     },
+    showDl () {
+      return !this.loading && this.syncedPls.length
+    },
     queue () {
       return this.$store.state.CurrentUser.queuedPlaylists
     },
     queueIsEmpty () {
       return !this.queue.length
+    },
+    syncedPls () {
+      return this.$store.state.CurrentUser.syncedPlaylists
     }
   },
   methods: {
@@ -66,6 +76,9 @@ export default {
     },
     sync () {
       this.$emit('youtubeConvert')
+    },
+    download () {
+      this.$emit('download')
     }
   }
 

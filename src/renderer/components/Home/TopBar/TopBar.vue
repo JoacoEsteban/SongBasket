@@ -32,16 +32,18 @@
         </div>
       </div>
 
-      <div id="title-bar" class="windows title-section">
-        <div class="title-bar-buttons-container" v-if="!isMac">
-          <div id="min-btn" class="bar-btn button-minimize">
-            <div class="mask"></div>
-          </div>
-          <div id="max-btn" class="bar-btn button-unmaximize">
-            <div class="mask"></div>
-          </div>
-          <div id="close-btn" class="bar-btn button-close">
-            <div class="mask"></div>
+      <div class="title-section">
+        <div id="title-bar" class="windows">
+          <div class="title-bar-buttons-container" v-if="!isMac">
+            <div id="min-btn" class="bar-btn button-minimize">
+              <div class="mask"></div>
+            </div>
+            <div id="max-btn" class="bar-btn button-unmaximize">
+              <div class="mask"></div>
+            </div>
+            <div id="close-btn" class="bar-btn button-close">
+              <div class="mask"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -261,13 +263,13 @@ $loading-bar-height: 3px;
     width: 100%;
     display: flex;
     &:nth-child(1) {
-      align-items: flex-start
+      justify-content: flex-start
     }
     &:nth-child(2) {
-      align-items: center
+      justify-content: center
     }
     &:nth-child(3) {
-      align-items: flex-end
+      justify-content: flex-end
     }
   }
 }
