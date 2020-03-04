@@ -188,8 +188,8 @@ export default {
       const valX = (clientX - x) / width
       const valY = (clientY - y) / height
 
-      const tX = ((valX - 0.5) * 90 * 0.1).toFixed(4)
-      const tY = ((valY - 0.5) * 90 * 0.2).toFixed(4)
+      const tX = ((valX - 0.5) * 90 * 0.05).toFixed(4)
+      const tY = ((valY - 0.5) * 90 * 0.1).toFixed(4)
       this.getRotationElement().css('transform', `perspective(1000px) rotateX(${tY}deg) rotateY(${tX}deg) ${this.isQueued ? '' : 'scale3d(1.05, 1.05, 1)'}`)
 
       this.getLightShineElement().css({'background-position': `${(valX * 100 / 3).toFixed(2)}% 0`, transform: `rotate(${-tY / 2}deg)`})
@@ -254,6 +254,7 @@ $transition-hard:  .5s var(--bezier);
     perspective-origin: 50% 100px;
     &:active {
       transition: transform $transition-hard, opacity $transition-hard;
+      transition-delay: .075s;
       transform: scale(.98);
       opacity: .7;
     }

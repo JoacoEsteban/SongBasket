@@ -142,7 +142,6 @@ export default {
           }
         }
       }
-      console.log('aber', this.$store.state.CurrentUser.syncedPlaylists)
       this.syncedPlaylists = all
       this.filterPlaylists()
     },

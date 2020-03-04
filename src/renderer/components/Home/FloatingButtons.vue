@@ -55,7 +55,7 @@ export default {
       return !(this.loading)
     },
     showSync () {
-      return !this.loading && !this.queueIsEmpty
+      return !this.loading && (!this.queueIsEmpty || this.syncedPls.length)
     },
     showDl () {
       return !this.loading && this.syncedPls.length

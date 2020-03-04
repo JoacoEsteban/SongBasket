@@ -120,7 +120,7 @@ export default {
     this.$refs.loadingbar.style.setProperty('--animation-duration', this.loadingBar.animationDuration + 'ms')
     this.activeSection = this.sections.find(s => s.title === 'Playlists').id
 
-    this.$router.beforeEach(this.handleRouterNavigation)
+    this.$router.beforeEachQueue = [this.handleRouterNavigation, ...this.$router.beforeEachQueue]
   },
   computed: {
     route () {
@@ -176,7 +176,6 @@ export default {
       // this.$router.push('/home')
     },
     handleRouterNavigation (to, from, next) {
-      console.log('------------------------------------------------')
       switch (to.name) {
         case 'playlist-view':
           this.slideTo(1)
@@ -299,7 +298,7 @@ $loading-bar-height: 3px;
 }
 
 .bar-slider-container {
-  transition: transform .5s var(--bezier-chill);
+  transition: transform 1s var(--bezier-chill);
   transform: translateX(var(--position-ptg))
 }
 

@@ -77,7 +77,7 @@ let router = new Router({
   ]
 })
 let transitioning = false
-router.beforeEach((to, from, next) => {
+router.beforeEachQueue = [(to, from, next) => {
   if (transitioning) return
   transitioning = true
   let anim1
@@ -103,6 +103,7 @@ router.beforeEach((to, from, next) => {
       }, 100)
     }, 100)
   }, 300)
-})
+}]
+router.beforeEach((to, from, next) => router.beforeEachQueue.forEach((func, index, arr) => func(to, from, index === arr.length - 1 ? next : () => {})))
 
 export default router
