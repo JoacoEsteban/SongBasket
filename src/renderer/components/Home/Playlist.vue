@@ -46,12 +46,12 @@
     </div>
 
 
-    <div class="transformation-parent rel-full" @mousemove="onMouseMove" @mouseleave="onMouseLeave" @mousedown="setMouseListener" @click="handleClick">
+    <div class="transformation-parent rel-full" @mousemove="onMouseMove" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave" @mousedown="setMouseListener" @click="handleClick">
       <div class="content" ref="content-container">
-        <div class="playlist-side top"></div>
+        <!-- <div class="playlist-side top"></div>
         <div class="playlist-side right"></div>
         <div class="playlist-side bottom"></div>
-        <div class="playlist-side left"></div>
+        <div class="playlist-side left"></div> -->
         <div class="playlist-background abs-full">
           <div class="rel-full ovfh">
             <div class="pl-img" :style="{backgroundImage: `url(${playlistImage})`}">
@@ -147,6 +147,25 @@ export default {
         this.addPlaylistToSyncQueue()
       }
     },
+    onMouseEnter (e) {
+      this.hovering = true
+      this.animateHover()
+    },
+    animateHover () {
+      if (this.hoverTransitionsTimeout) { clearTimeout(this.hoverTransitionsTimeout); this.hoverTransitionsTimeout = null }
+      this.applyHoverTransitions()
+      this.hoverTransitionsTimeout = setTimeout(this.clearHoverTransitions, 1000)
+      this.lightTransform = false
+    },
+    applyHoverTransitions () {
+      this.getRotationElement().css('transition', 'all var(--local-hover-transition)')
+      this.getLightShineElement().css('transition', 'all var(--local-hover-transition)')
+    },
+    clearHoverTransitions () {
+      this.getRotationElement().css('transition', '')
+      this.getLightShineElement().css('transition', '')
+      this.hoverTransitionsTimeout = null
+    },
     onMouseMove (e) {
       this.hovering = true
       this.transformContainer(e)
@@ -154,6 +173,7 @@ export default {
     onMouseLeave () {
       this.hovering = false
       this.restoreTransformation()
+      this.animateHover()
     },
     setMouseListener () {
       this.$(window).on('mouseup', this.restoreTransformation)
@@ -175,30 +195,39 @@ export default {
       /* eslint-disable no-return-assign */
       return this.$root.plTransformInvalidation < this.bounds.timeStamp ? this.bounds.bounds : (this.bounds = {timeStamp: Date.now(),
         bounds: (() => {
-          let bounds = this.$refs['content-container'].getBoundingClientRect();
+          let bounds = this.getRotationElement()[0].getBoundingClientRect();
           ['x', 'y', 'width', 'height'].forEach(k => bounds[k] = bounds[k].toFixed(2))
           return bounds
         })()}).bounds
     },
-    transformContainer ({clientX, clientY}) {
+    transformContainer (e) {
       if (window.MOUSE_BEING_CLICKED) return
+      const vals = this.getContainerTransformation(e)
+      this.getRotationElement().css('transform', vals[0])
+      if ((!this.lightTransform || !this.hoverTransitionsTimeout) && (this.lightTransform = true)) this.getLightShineElement().css(vals[1])
+    },
+    getContainerTransformation ({clientX, clientY}) {
       const bounds = this.getBounds()
       const {x, y, width, height} = bounds
 
       const valX = (clientX - x) / width
       const valY = (clientY - y) / height
 
-      const tX = ((valX - 0.5) * 90 * 0.05).toFixed(4)
-      const tY = ((valY - 0.5) * 90 * 0.1).toFixed(4)
-      this.getRotationElement().css('transform', `perspective(1000px) rotateX(${tY}deg) rotateY(${tX}deg) ${this.isQueued ? '' : 'scale3d(1.05, 1.05, 1)'}`)
+      let tX = ((valX - 0.5) * 90 * 0.05).toFixed(4)
+      let tY = ((valY - 0.5) * 90 * 0.1).toFixed(4)
 
-      this.getLightShineElement().css({'background-position': `${(valX * 100 / 3).toFixed(2)}% 0`, transform: `rotate(${-tY / 2}deg)`})
+      if (tX < -2.4) tX = -2.4
+      if (tX > 2.4) tX = 2.4
+
+      if (tY < -4) tY = -4
+      if (tY > 4) tY = 4
+      return [`perspective(1000px) rotateX(${tY}deg) rotateY(${tX}deg) ${this.isQueued ? '' : 'scale3d(1.05, 1.05, 1)'}`,
+        {transform: `rotate(${-tY / 2}deg) translateX(${valX * 5}%)`}]
     },
     restoreTransformation (force) {
-      /* eslint-disable no-constant-condition */
       if (!force && (window.MOUSE_BEING_CLICKED || this.hovering)) return
       this.$(window).off('mouseup', this.restoreTransformation)
-      this.getRotationElement().css('transform', '')
+      this.getRotationElement().css('transform', `perspective(1000px) rotateX(0deg) rotateY(0deg)`)
       this.getLightShineElement().css({'background-position': '', transform: ''})
     },
     getRotationElement () {
@@ -218,12 +247,17 @@ export default {
 <style lang="scss" scoped>
 $q-false-color: #1b1b1b;
 $q-true-color: rgb(103, 214, 0);
+$bezier-tranka: cubic-bezier(0.12, 0.82, 0, 1);
 
 $playlist-height: 4em;
 $title-size: .8em;
-$transition-soft:  1s cubic-bezier(0.12, 0.82, 0, 1);
-$transition-hard:  .5s var(--bezier);
+$transition-soft:  var(--local-hover-transition);
+$transition-hard: .5s var(--bezier);
+$hovering-transition: .3s $bezier-tranka;
+
 .pl-container {
+  // --local-hover-transition: 0.5s cubic-bezier(0.12, 0.82, 0, 1);
+  --local-hover-transition: 1s #{$bezier-tranka};
   box-sizing: border-box;
   padding: 1.5em var(--container-padding-x);
   padding-top: 0;
@@ -244,7 +278,7 @@ $transition-hard:  .5s var(--bezier);
       transform: scale(1.03);
       .playlist-background {
         .light-shine {
-          transition: opacity $transition-soft;
+          // transition: opacity $transition-soft;
           opacity: 1;
         }
       }
@@ -263,9 +297,10 @@ $transition-hard:  .5s var(--bezier);
       cursor: pointer;
       position: relative;
       background: $q-false-color;
-      $transition: 0.5s cubic-bezier(0.12, 0.82, 0, 1);
+      $transition: var(--local-hover-transition);
       transition: background-color $transition,
-      box-shadow $transition, outline-width 0.1s ease;
+      box-shadow $transition;
+      // transform $transition;
       transform-style: preserve-3d;
       will-change: transform;
       color: #f0f0f0;
@@ -316,16 +351,17 @@ $transition-hard:  .5s var(--bezier);
     }
     .light-shine {
       position: absolute;
-      $offset: -30px;
-      top: $offset;
-      bottom: $offset;
-      right: $offset;
-      left: $offset;
-      transition: opacity $transition-soft, background-position $transition-soft, transform $transition-soft;
+      z-index: 1;
+      $offset: -30;
+      top: $offset*1px;
+      bottom: $offset*1px;
+      right: $offset/2*1em;
+      left: $offset/2*1em;
+      transition: opacity $hovering-transition, transform $hovering-transition;
       // transition: opacity $transition-soft;
       opacity: .5;
       background: linear-gradient(31deg, transparent 50%, rgba(255,255,255,.045) 50%, transparent 100%);
-      background-size: 200%;
+      // background: linear-gradient(31deg, transparent -100%,  rgba(0,0,0,.5) 50%, rgba(255,255,255,.045) 50%, transparent 100%);
       background-position: center;
     }
     .pl-img {

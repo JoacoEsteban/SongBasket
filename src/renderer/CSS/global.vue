@@ -20,7 +20,7 @@ html {
 ::-webkit-scrollbar-thumb {
   background: #bbb;
   transition: background-color;
-  border-radius: 1em;
+  // border-radius: 1em;
   transition: background var(--transition-global);
 }
 
