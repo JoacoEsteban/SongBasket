@@ -166,6 +166,7 @@ export default {
   watch: {
     currentPlaylist () {
       this.refreshPlaylist()
+      this.computeTracks()
     },
     syncedPlaylistsRefreshed () {
       this.refreshPlaylist()

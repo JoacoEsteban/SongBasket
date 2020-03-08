@@ -36,14 +36,15 @@ export default {
   },
   data () {
     return {
+      route: ''
     }
   },
   computed: {
-    route () {
-      return this.$route.name
-    },
+    // route () {
+    //   return this.$route.name
+    // },
     showComponent () {
-      return this.route === 'playlists-list'
+      return this.route === 'home'
     },
     loadingState () {
       return this.$store.state.Events.FETCH_LOADING_STATE
@@ -70,7 +71,17 @@ export default {
       return this.$store.state.CurrentUser.syncedPlaylists
     }
   },
+  created () {
+    this.$sbRouter.beforeTransition(this.handleTransition)
+  },
+  async mounted () {
+    await this.$sleep(1000)
+    this.handleTransition()
+  },
   methods: {
+    handleTransition (to) {
+      this.route = (to && to.name) || this.$sbRouter.path.name
+    },
     refresh () {
       this.$emit('refreshPlaylists')
     },

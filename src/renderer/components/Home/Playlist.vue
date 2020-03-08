@@ -5,19 +5,10 @@
       <div class="pl-track-count">
         {{playlist.tracks.total}} {{playlist.tracks.total === 1 ? 'Track' : 'Tracks'}}
         <div v-if="isSynced" class="star-icons-container">
-          <div v-if="playlist.tracks.added && playlist.tracks.added.length > 0" class="star-icon">
-            <div class="rotate">
-              <star-icon color="#0fb300" />
-            </div>
+          <div v-if="playlist.tracks.added && playlist.tracks.added.length" class="star-icon">
             <div class="num">+{{playlist.tracks.added.length}}</div>
           </div>
-          <div
-            v-if="playlist.tracks.removed && playlist.tracks.removed.length > 0"
-            class="star-icon"
-          >
-            <div class="rotate">
-              <star-icon color="#e33" />
-            </div>
+          <div v-if="playlist.tracks.removed && playlist.tracks.removed.length"class="star-icon">
             <div class="num">-{{playlist.tracks.removed.length}}</div>
           </div>
         </div>
@@ -62,6 +53,15 @@
           </div>
         </div>
         <div class="playlist-data">
+        <div v-if="isSynced" class="star-icons-container">
+          <div v-if="playlist.tracks.added && playlist.tracks.added.length" class="star-icon added">
+            <span class="bold">+{{playlist.tracks.added.length}}</span>
+          </div>
+          <div v-if="playlist.tracks.removed && playlist.tracks.removed.length" class="star-icon removed">
+            <span class="bold">-{{playlist.tracks.removed.length}}</span>
+          </div>
+        </div>
+
           <div class="title">
             <span class="bold">
               {{playlistName}}
@@ -351,6 +351,7 @@ $hovering-transition: .3s $bezier-tranka;
     }
     .light-shine {
       position: absolute;
+      pointer-events: none;
       z-index: 1;
       $offset: -30;
       top: $offset*1px;
@@ -408,6 +409,39 @@ $hovering-transition: .3s $bezier-tranka;
     //   }
     // }
   }
+
+  .star-icons-container {
+    position: absolute;
+    display: flex;
+    top: .2em;
+    right: .3em;
+    .star-icon {
+      // $size: 1.5em;
+      // width: $size;
+      // height: $size;
+      // margin: 0 $size/10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+
+      &:nth-last-child(1) {
+        margin-left: .3em;
+      }
+      > span {
+        line-height: 1;
+        font-size: .75em;
+      }
+
+      &.added {
+        color: var(--green-accept);
+      }
+      &.removed {
+        color: var(--red-cancel);
+      }
+    }
+  }
+
 
   // -----------------STATES-----------------
 
