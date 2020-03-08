@@ -4,6 +4,7 @@ import * as utils from '../../MAIN_PROCESS_UTILS'
 const electron = require('electron')
 const fs = require('fs')
 const rimraf = require('rimraf')
+const chokidar = require('chokidar')
 // const NodeID3 = require('node-id3')
 const iconv = require('iconv-lite')
 
@@ -13,6 +14,7 @@ const stateFileName = '/.songbasket'
 console.log('Folder Path: ', foldersJsonPath)
 
 const homeFolderPath = () => global.HOME_FOLDER
+let watchers = []
 
 const userMethods = {
   existsPromise: function (path) {
@@ -76,7 +78,7 @@ const userMethods = {
       })
     })
   },
-  checkDownloadPaths () {
+  checkDownloadPaths (path) {
     return new Promise(async (resolve, reject) => {
       let syncedPlaylists = customGetters.SyncedPlaylistsSp()
       let processedPls = 0
@@ -88,7 +90,8 @@ const userMethods = {
       }
       for (let i = 0; i < syncedPlaylists.length; i++) {
         let pl = syncedPlaylists[i]
-        pl = { id: pl.id, path: homeFolderPath() + '/' + utils.encodeIntoFilename(pl.name) }
+        // TODO Better folder name handling (to avoid repetition)
+        pl = { id: pl.id, path: (path || homeFolderPath()) + '/' + utils.encodeIntoFilename(pl.name) }
         console.log('checked', pl)
 
         if (!await checkPathThenCreate(pl.path)) checkNResolve()
@@ -211,6 +214,50 @@ const userMethods = {
         fn(err, tags)
       })
     }
+  },
+  async createPlaylistWatchers (customPath) {
+    let syncedPlaylists = customGetters.SyncedPlaylistsSp()
+    syncedPlaylists.forEach(pl => {
+      let path = (customPath || homeFolderPath()) + '/' + utils.encodeIntoFilename(pl.name)
+      console.log(path)
+
+      let watcher = chokidar.watch(path, { ignored: /[/\\]\./ })
+      watchers.push(watcher)
+
+      watcher
+        .on('add', (path) => handleWatcherEvent('add', path))
+        .on('change', (path) => handleWatcherEvent('change', path))
+        .on('unlink', (path) => handleWatcherEvent('unlink', path))
+        .on('unlinkDir', (path) => handleWatcherEvent('unlinkDir', path))
+        .on('error', (error) => handleWatcherEvent('error', error))
+        .on('ready', () => handleWatcherEvent('ready'))
+        .on('raw', (event, path, details) => handleWatcherEvent('raw', [event, path, details]))
+
+      // 'add', 'addDir' and 'change' events also receive stat() results as second
+      // argument when available: http://nodejs.org/api/fs.html#fs_class_fs_stats
+      watcher.on('change', function (path, stats) {
+        if (stats) console.log('File', path, 'changed size to', stats.size)
+      })
+
+      // Un-watch some files.
+      watcher.unwatch('new-file*')
+    })
+  }
+}
+
+function handleWatcherEvent (event, arg) {
+  console.log(event)
+  switch (event) {
+    case 'add':
+    case 'change':
+    case 'unlink':
+    case 'unlinkDir':
+      // Arg is path
+      if (/^((?!\w+\.mp3$).)*$/.test(arg)) return
+      console.log(arg, 'is valid mp3')
+      break
+    case 'error':
+      break
   }
 }
 

@@ -163,6 +163,10 @@ export async function retrieveAndStoreState (path) {
     data = await FileSystemUser.retrieveState(path)
     try {
       await GLOBAL.VUEX.dispatch('storeDataFromDisk', data)
+      // Check if folder has synced playlists to setup watchers
+      if ((await FileSystemUser.checkDownloadPaths()).length) {
+        await FileSystemUser.createPlaylistWatchers()
+      }
     } catch (err) { throw err }
   } catch (err) { throw err }
 }
@@ -185,7 +189,6 @@ export async function verifyFileSystem () {
 
   try {
     await retrieveAndStoreState(FOLDERS.selected)
-    console.log('from verify handler')
     pushToHome()
   } catch (err) {
     // TODO Handle errors when retrieving and setting data
