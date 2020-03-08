@@ -1,5 +1,5 @@
 <template>
-  <div ref="playlists-list" class="home-router pll-container">
+  <div ref="playlists-list" class="pll-container pb-2">
     <div class="filters-container">
       <div class="filters-content">
         <div class="search-bar global-scroll-shadow">
@@ -200,6 +200,7 @@ $transition-global-hard: 0.5s $bezier;
   /* margin-bottom: 2.4rem; */
   text-align: center;
   overflow: auto;
+  width: 100%;
 }
 .actual-list {
   --list-transition-time: .3s;

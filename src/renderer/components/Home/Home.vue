@@ -6,14 +6,15 @@
       @youtubeConvert="youtubeConvert"
       @download="download"
       />
-      
-      <router-view
-      :class="'router-view ' + routerAnimation"
-      path="playlists-list"
-      @openPlaylist="getTracks($event)"
-      @addPlaylistToSyncQueue="addPlaylistToSyncQueue($event)"
-      @openYtVideo="openYtVideo($event)"
-      ></router-view>
+
+        <component-loader class="home-router"
+        @openPlaylist="getTracks($event)"
+        @addPlaylistToSyncQueue="addPlaylistToSyncQueue($event)"
+        @openYtVideo="openYtVideo($event)"
+        ></component-loader>
+        <!-- <router-view
+        path="playlists-list"
+        ></router-view> -->
       <!-- <home-background
       :class="{transitioning: routerAnimation !== 'release'}"
       ></home-background> -->
@@ -32,6 +33,7 @@
 import 'vuex'
 
 import TopBar from './TopBar/TopBar.vue'
+import ComponentLoader from './ComponentLoader.vue'
 import PlaylistsList from './PlaylistsList.vue'
 import Playlist from './Playlist.vue'
 import UserData from './UserData.vue'
@@ -40,8 +42,8 @@ import HomeBackground from './HomeBackground.vue'
 
 export default {
   components: {
-
     TopBar,
+    ComponentLoader,
     PlaylistsList,
     Playlist,
     UserData,
@@ -87,7 +89,7 @@ export default {
       else window.ipc.send('get tracks from', id)
     },
     setPlaylistNPush (id) {
-      this.$store.dispatch('setCurrentPlaylist', id)
+      this.$sbRouter.push({name: 'playlist-view', params: {id}})
     },
     logOut () {
       console.log('Logging Out:::::')
@@ -95,10 +97,7 @@ export default {
       this.$store.dispatch('logout')
     },
     playlistSynced (id) {
-      for (let i = 0; i < this.syncedPlaylists.length; i++) {
-        if (this.syncedPlaylists[i].id === id) return true
-      }
-      return false
+      return this.syncedPlaylists.some(p => p.id === id)
     },
     addPlaylistToSyncQueue (id) {
       this.$store.dispatch('queuePlaylist', id)
@@ -152,7 +151,8 @@ export default {
 .home-router{
   z-index: 1;
   height: 100%;
-  padding-bottom: 1em;
+  /* padding-bottom: 1em; */
+  display: flex;
   box-sizing: border-box;
 }
 

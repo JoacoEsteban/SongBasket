@@ -19,7 +19,7 @@
       </div>
 
       <div class="tb-mid-section title-section df aliic jucc">
-        <div class="navigation-btn left window-nodrag" @click="navigationBack">
+        <div class="navigation-btn left window-nodrag" :class="{show: showPrevBtn}"  @click="navigationBack">
           <font-awesome-icon size="xs" icon="arrow-left" />
         </div>
         <div class="status-container">
@@ -27,7 +27,7 @@
             {{status}}
           </span>
         </div>
-        <div class="navigation-btn right window-nodrag" @click="navigationForw">
+        <div class="navigation-btn right window-nodrag" :class="{show: showForwBtn}" @click="navigationForw">
           <font-awesome-icon size="xs" icon="arrow-right" />
         </div>
       </div>
@@ -102,6 +102,8 @@ export default {
         animationDuration: 1000
       },
       activeSection: null,
+      showPrevBtn: this.$sbRouter.pointer,
+      showForwBtn: this.$sbRouter.isLast(),
       sections: [
         {
           id: ++sectionId,
@@ -120,7 +122,9 @@ export default {
     this.$refs.loadingbar.style.setProperty('--animation-duration', this.loadingBar.animationDuration + 'ms')
     this.activeSection = this.sections.find(s => s.title === 'Playlists').id
 
-    this.$router.beforeEachQueue = [this.handleRouterNavigation, ...this.$router.beforeEachQueue]
+    this.$sbRouter.beforeTransition(this.handleRouterNavigation)
+    this.$sbRouter.afterTransition(this.checkNavBtns)
+    this.checkNavBtns()
   },
   computed: {
     route () {
@@ -169,22 +173,25 @@ export default {
     }
   },
   methods: {
+    checkNavBtns () {
+      this.showPrevBtn = !!this.$sbRouter.pointer
+      this.showForwBtn = !this.$sbRouter.isLast()
+    },
     navigationBack () {
-      if (!(this.$route.name === 'playlists-list')) this.$router.push('/home')
+      if (!(this.$sbRouter.path.name === 'playlists-list')) this.$sbRouter.goBack()
     },
     navigationForw () {
-      // this.$router.push('/home')
+      if (!this.$sbRouter.isLast()) this.$sbRouter.goForward()
     },
-    handleRouterNavigation (to, from, next) {
+    handleRouterNavigation (to, from) {
       switch (to.name) {
         case 'playlist-view':
           this.slideTo(1)
           break
-        case 'playlists-list':
+        case 'home':
           this.slideTo(0)
           break
       }
-      next()
     },
     slideTo (index) {
       this.sliderPosition = -index * 100
@@ -360,6 +367,7 @@ $loading-bar-height: 3px;
 }
 
 .navigation-btn {
+  cursor: pointer;
   display: flex;
   $m: .5em;
   &.right {
@@ -367,6 +375,15 @@ $loading-bar-height: 3px;
   }
   &.left {
     margin-right: $m;
+  }
+  transition: opacity var(--transition-global), transform var(--transition-global);
+
+  opacity: 0;
+  transform: scale(.5);
+
+  &.show {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 </style>

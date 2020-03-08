@@ -1,5 +1,5 @@
 <template>
-  <div class="whole-container">
+  <div class="whole-container" v-if="track">
     <div class="pl-track-container">
       <div class="pl-track-info-container">
         <div class="pl-track-img-container">
@@ -108,7 +108,8 @@ export default {
     return {
       transitioning: false,
       convertionIsOpenedLocal: false,
-      transitionCount: 0
+      transitionCount: 0,
+      playlist: {}
     }
   },
   filters: {
@@ -160,9 +161,6 @@ export default {
         return this.track.artists[0].name
       }
     },
-    playlist () {
-      return this.$store.state.CurrentUser.currentPlaylist
-    },
     songDuration () {
       return this.timeFilter(this.track.duration_ms)
     },
@@ -171,8 +169,8 @@ export default {
       return this.formatDuration({minutes, seconds})
     },
     selected () {
-      if (!this.conversion) return null
-      return this.conversion.playlists.find(p => p.id === this.playlist).selected
+      if (!this.conversion && !this.conversion.playlists) return null
+      return this.conversion.playlists.find(p => p.id === this.playlist.id).selected
     },
     customTrack () {
       return this.conversion && this.conversion.custom ? { ...this.conversion.custom, custom: true } : null
@@ -181,6 +179,9 @@ export default {
       let tracks = this.conversion.conversion.yt
       return this.customTrack ? [...tracks, this.customTrack] : tracks
     }
+  },
+  created () {
+    this.playlist = this.$root.CURRENT_PLAYLSIT_OBJ
   },
   mounted () {
     window.trackDebug = this

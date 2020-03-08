@@ -1,5 +1,5 @@
 <template>
-  <div class="home-router plv-container">
+  <div class="plv-container">
     <div class="plv-leftpanel">
       <div class="plv-lp-img" :style="'background-image: url('+playlistImage+')'" />
         <div class="controls">
@@ -108,6 +108,13 @@ export default {
   components: {
     Track
   },
+  props: {
+    currentPlaylist: {
+      type: String,
+      required: false,
+      default: null
+    }
+  },
   computed: {
     playlistImage () {
       return this.playlist.images && this.playlist.images[0] && this.playlist.images[0].url
@@ -118,9 +125,9 @@ export default {
     playlistTotalTracks () {
       return this.playlist.tracks && this.playlist.tracks.total
     },
-    currentPlaylist () {
-      return this.$store.state.CurrentUser.currentPlaylist
-    },
+    // currentPlaylist () {
+    //   return this.$store.state.CurrentUser.currentPlaylist
+    // },
     ammountOfTracksBeingShown () {
       return this.items.length + (this.showing.added ? this.added.length : 0) + (this.showing.removed ? this.removed.length : 0)
     },
@@ -182,7 +189,8 @@ export default {
   },
   methods: {
     refreshPlaylist () {
-      this.playlist = this.$store.getters.PlaylistById(this.currentPlaylist)
+      this.playlist = this.$store.getters.PlaylistById(this.currentPlaylist) || {}
+      this.$root.CURRENT_PLAYLSIT_OBJ = this.playlist
     },
     toggle (wich) {
       this.showing[wich] = !this.showing[wich]
@@ -294,6 +302,7 @@ export default {
   flex-direction: row;
   /* border: 1px solid white; */
   padding: 0;
+  width: 100%;
 }
 .plv-leftpanel {
   display: flex;

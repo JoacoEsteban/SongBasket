@@ -31,10 +31,15 @@
 
 <script>
 export default {
+  data () {
+    return {
+      playlist: null
+    }
+  },
   computed: {
-    playlist () {
-      return this.$store.getters.CurrentPlaylist
-    },
+    // playlist () {
+    //   return this.$store.getters.CurrentPlaylist
+    // },
     trackAmmount () {
       return this.playlist && this.playlist.tracks && this.playlist.tracks.total
     },
@@ -62,6 +67,14 @@ export default {
           break
       }
       return devolvio
+    }
+  },
+  created () {
+    this.$sbRouter.beforeTransition(this.getPlaylist)
+  },
+  methods: {
+    getPlaylist ({params}) {
+      this.playlist = params && this.$store.getters.PlaylistById(params.id)
     }
   }
 }
