@@ -1,4 +1,5 @@
 FIXES
+TODO handle tracks with same name
 TODO Handle deleted playlists
 TODO handle quota exceeded request rejection
 TODO remove login button
