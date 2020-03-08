@@ -15,16 +15,22 @@ console.log('Folder Path: ', foldersJsonPath)
 const homeFolderPath = () => global.HOME_FOLDER
 
 const userMethods = {
-  checkForUser: function () {
+  existsPromise: function (path) {
+    return new Promise(async (resolve, reject) => {
+      let exists = await utils.promisify(fs.stat, path)
+      resolve(!exists[0] && exists[1])
+    })
+  },
+  checkForUser: async function () {
     try {
-      if (fs.existsSync(foldersJsonPath)) return JSON.parse(fs.readFileSync(foldersJsonPath, 'utf8'))
+      if (await userMethods.existsPromise(foldersJsonPath)) return JSON.parse((await utils.promisify(fs.readFile, [foldersJsonPath, 'utf8']))[1])
     } catch (error) {
       console.error('ERROR WHEN FOLDER PATHS JSON FILE::: FileSystem/index.js', foldersJsonPath, error)
     }
 
     console.log('Folder paths file missing, Creating')
     let emptyFolders = {paths: [], selected: null}
-    fs.writeFileSync(foldersJsonPath, JSON.stringify(emptyFolders), 'utf8')
+    await utils.promisify(fs.writeFile, [foldersJsonPath, JSON.stringify(emptyFolders), 'utf8'])
     return (emptyFolders)
   },
   writeHomeFolders: async function (folders) {
@@ -35,18 +41,19 @@ const userMethods = {
       throw err
     }
   },
-  saveState: function ({state, path}) {
+  saveState: async function ({state, path}) {
     // console.log('Saving state to', path)
-    return new Promise((resolve, reject) => {
-      let exists = fs.existsSync(path)
-      if (!exists) {
+    return new Promise(async (resolve, reject) => {
+      if (!(await userMethods.existsPromise(path))) {
         // TODO Handle non existing folder
       } else {
         let jsonState = JSON.stringify(state)
-        fs.writeFile(path + stateFileName, jsonState, 'utf8', (err) => {
-          if (err) reject(err)
-          else resolve()
-        })
+        try {
+          let err = await (utils.promisify(fs.writeFile, [path + stateFileName, jsonState, 'utf8']))[0]
+          err ? reject(err) : resolve()
+        } catch (error) {
+          reject(error)
+        }
       }
     })
   },
@@ -70,7 +77,7 @@ const userMethods = {
     })
   },
   checkDownloadPaths () {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       let syncedPlaylists = customGetters.SyncedPlaylistsSp()
       let processedPls = 0
       let allTracks = []
@@ -84,18 +91,19 @@ const userMethods = {
         pl = { id: pl.id, path: homeFolderPath() + '/' + utils.encodeIntoFilename(pl.name) }
         console.log('checked', pl)
 
-        if (checkPathThenCreate(pl.path)) {
+        if (!await checkPathThenCreate(pl.path)) checkNResolve()
+        else {
           // Get all files from playlist dir
           fs.readdir(pl.path, function (err, filenames) {
             if (err) {
-              console.error('error reading path', pl.path)
+              console.error('error reading folder', pl.path)
               reject(err)
               return
             }
             filenames = filenames.filter(n => n.substr(n.length - 3) === 'mp3')
-            if (filenames.length === 0) {
-              checkNResolve()
-            } else {
+
+            if (filenames.length === 0) checkNResolve()
+            else {
               // filter to just MP3 files
               // TODO Support FLAC, etc
               let processedTracks = 0
@@ -126,8 +134,6 @@ const userMethods = {
               }
             }
           })
-        } else {
-          checkNResolve()
         }
       }
     })
@@ -139,12 +145,12 @@ const userMethods = {
       callback()
     })
   },
-  renameFolder ({oldName, newName}) {
+  async renameFolder ({oldName, newName}) {
     newName = utils.encodeIntoFilename(newName)
     oldName = utils.encodeIntoFilename(oldName)
-    console.log('RENAMING FOLDER: ' + oldName + ' => ' + newName)
     let base = homeFolderPath() + '/'
-    if (!fs.existsSync(base + oldName)) return
+    if (!await userMethods.existsPromise(base + oldName)) return
+    console.log('RENAMING FOLDER: ' + oldName + ' => ' + newName)
     fs.rename(base + oldName, base + newName)
   },
   checkMP3FileTags (path, fn) {
@@ -208,9 +214,9 @@ const userMethods = {
   }
 }
 
-function checkPathThenCreate (path) {
-  let pathExists = fs.existsSync(path)
-  if (!pathExists) fs.mkdirSync(path)
+async function checkPathThenCreate (path) {
+  let pathExists = await userMethods.existsPromise(path)
+  if (!pathExists) await utils.promisify(fs.mkdir, path)
   return pathExists
 }
 

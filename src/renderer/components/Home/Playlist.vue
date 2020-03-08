@@ -8,7 +8,7 @@
           <div v-if="playlist.tracks.added && playlist.tracks.added.length" class="star-icon">
             <div class="num">+{{playlist.tracks.added.length}}</div>
           </div>
-          <div v-if="playlist.tracks.removed && playlist.tracks.removed.length"class="star-icon">
+          <div v-if="playlist.tracks.removed && playlist.tracks.removed.length" class="star-icon">
             <div class="num">-{{playlist.tracks.removed.length}}</div>
           </div>
         </div>

@@ -92,9 +92,7 @@ export function createWindow () {
 
   GLOBAL.MAIN_WINDOW.loadURL(process.env.NODE_ENV === 'development' ? `http://localhost:9080` : `file://${__dirname}/index.html`)
 
-  GLOBAL.MAIN_WINDOW.on('closed', () => {
-    GLOBAL.MAIN_WINDOW = null
-  })
+  GLOBAL.MAIN_WINDOW.on('closed', () => GLOBAL.MAIN_WINDOW = null)
 }
 
 export async function setHomeFolder () {
@@ -171,7 +169,7 @@ export async function retrieveAndStoreState (path) {
 
 export async function verifyFileSystem () {
   console.log('Checking for existing home folders')
-  let FOLDERS = FileSystemUser.checkForUser()
+  let FOLDERS = await FileSystemUser.checkForUser()
   await GLOBAL.VUEX.dispatch('setFolderPaths', FOLDERS)
   if (FOLDERS.paths.length === 0) {
     console.log('no user')
@@ -203,9 +201,13 @@ export function globalLoadingState () {
   return GLOBAL.VUEX.state.Events.GLOBAL_LOADING_STATE
 }
 
+let loadingCount = 0
 export function LOADING (value, target) {
   if (!value) value = false
-  GLOBAL.VUEX.dispatch('globalLoadingState', {value, target})
+  if (value) loadingCount++
+  else loadingCount--
+  console.log({value: loadingCount > 0, target})
+  GLOBAL.VUEX.dispatch('globalLoadingState', {value: loadingCount > 0, target})
 }
 
 export function pushToHome () {
@@ -214,10 +216,10 @@ export function pushToHome () {
 }
 
 export function guestFetch (query, isFirstTime) {
-  console.log('loading?', globalLoadingState().value)
+  console.log('loading?', globalLoadingState().value, globalLoadingState().target)
   if (globalLoadingState().value) return
   console.log('fetchin')
-  GLOBAL.VUEX.dispatch('globalLoadingState', {value: true, target: 'PLAYLIST_REFRESH'})
+  LOADING(true, 'PLAYLIST_REFRESH')
   let allData = []
 
   let list = false // List of playlists Retrieved (just metadata)
@@ -230,13 +232,12 @@ export function guestFetch (query, isFirstTime) {
   // No synced playlists
   if (!areThereSynced) synced = true
   else {
-    let ids = [...syncedPls.map(pl => {
+    let ids = syncedPls.map(pl => {
       return {
         id: pl.id,
         snapshot_id: pl.snapshot_id
       }
     })
-    ]
 
     fetchMultiple(ids, true)
       .then(() => {
@@ -248,6 +249,7 @@ export function guestFetch (query, isFirstTime) {
         console.log(111111111111)
         console.error(err)
       })
+      .finally(LOADING)
   }
 
   sbFetch.fetchPlaylists({ userId: query, logged: false, SBID: null, control: { offset: 0 } })
@@ -267,7 +269,7 @@ export function guestFetch (query, isFirstTime) {
 export function fetchMultiple (playlists, checkVersion) {
   return new Promise((resolve, reject) => {
     let count = playlists.length
-    let failed = false
+    let failed = []
     for (let i = 0; i < count; i++) {
       let playlist = playlists[i]
       sbFetch.getTracks(GLOBAL.VUEX.getters.RequestParams, playlist, checkVersion)
@@ -275,14 +277,14 @@ export function fetchMultiple (playlists, checkVersion) {
           GLOBAL.VUEX.dispatch('playlistStoreTracks', response.playlist).then(() => {
             if (--count === 0) {
               console.log('fetch done')
-              if (!(failed)) resolve()
+              if (!(failed.length)) resolve()
               else reject(failed)
             }
           })
         })
         .catch(err => {
-          failed = err
-          if (--count === 0) reject(err)
+          failed.push(err)
+          if (--count === 0) reject(failed)
         })
         .finally(() => {
 

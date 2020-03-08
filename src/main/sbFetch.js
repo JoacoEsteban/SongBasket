@@ -59,6 +59,7 @@ export async function getTracks ({userId, logged, SBID, control}, {id, snapshot_
     retrieve_user_data: false
   }
   if (checkVersion) params.snapshot_id = snapshot_id
+  console.log('snapshot_id', snapshot_id)
   try {
     let res = await axios.get(url, { params })
     return res.data

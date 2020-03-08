@@ -128,3 +128,10 @@ export function isSameDisk (path1, path2) {
       break
   }
 }
+
+export function promisify (func, params) {
+  if (!Array.isArray(params)) params = [params]
+  return new Promise((resolve, reject) => {
+    func(...params, (...args) => resolve(args))
+  })
+}

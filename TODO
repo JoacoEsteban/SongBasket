@@ -4,7 +4,7 @@ TODO Handle deleted playlists
 TODO handle quota exceeded request rejection
 TODO remove login button
 TODO remove search by playlist switch
-TODO proper window size
+TODO save window size
 TODO Disable linking tracks in FAT32 & Alert user
 TODO Handle playlists with no tracks
 TODO Handle unavailable and local tracks

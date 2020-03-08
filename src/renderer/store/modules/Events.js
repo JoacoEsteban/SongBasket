@@ -32,14 +32,14 @@ const actions = {
   routerAnimation ({commit}, animation) {
     commit('ROUTER_ANIMATION', animation)
   },
-  globalLoadingState ({commit}, value) {
-    commit('SET', { key: 'GLOBAL_LOADING_STATE', value })
-  },
   downloadEvent ({commit}, params) {
     commit('SET', { key: 'DOWNLOAD_EVENT', params })
   },
   conversionEvent ({commit}, params) {
     commit('SET', { key: 'CONVERSION_EVENT', params })
+  },
+  globalLoadingState ({commit}, value) {
+    commit('SET', { key: 'GLOBAL_LOADING_STATE', value })
   },
   fetchLoadingState ({commit}, value) {
     commit('SET', { key: 'FETCH_LOADING_STATE', value })

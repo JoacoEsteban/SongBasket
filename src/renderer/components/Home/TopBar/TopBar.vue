@@ -161,10 +161,7 @@ export default {
       return this.$store.state.Events.FETCH_LOADING_STATE
     },
     status () {
-      if (!this.loadingState.value) {
-        return `Last Sync: ${this.now.date} @ ${this.now.hours}`
-      }
-      return this.loadingState.target
+      return !this.loadingState.value ? `Last Sync: ${this.now.date} @ ${this.now.hours}` : this.loadingState.target
     }
   },
   watch: {
