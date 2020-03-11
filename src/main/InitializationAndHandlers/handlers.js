@@ -74,6 +74,7 @@ export function download () {
 }
 
 export function isEverythingReady () {
+  console.log(GLOBAL.FFMPEG_BINS_DOWNLOADED, GLOBAL.WINDOW_FINISHED_LOADING, GLOBAL.DOCUMENT_FINISHED_LOADING)
   GLOBAL.FFMPEG_BINS_DOWNLOADED && GLOBAL.WINDOW_FINISHED_LOADING && GLOBAL.DOCUMENT_FINISHED_LOADING && verifyFileSystem()
 }
 
@@ -87,7 +88,10 @@ export function createWindow () {
     minWidth: width,
     minHeight: height,
     backgroundColor: '#333',
-    useContentSize: true
+    useContentSize: true,
+    webPreferences: {
+      nodeIntegration: true
+    }
   })
 
   GLOBAL.MAIN_WINDOW.loadURL(process.env.NODE_ENV === 'development' ? `http://localhost:9080` : `file://${__dirname}/index.html`)
@@ -96,22 +100,21 @@ export function createWindow () {
 }
 
 export async function setHomeFolder () {
-  DIALOG.showOpenDialog(GLOBAL.MAIN_WINDOW, {
+  let { canceled, filePaths } = await DIALOG.showOpenDialog(GLOBAL.MAIN_WINDOW, {
     properties: ['openDirectory']
-  }, async path => {
-    if (path === undefined) return
-    await GLOBAL.VUEX.dispatch('addHomeFolder', path[0])
-    try {
-      console.log('pass')
-      // if songbasket exists in file specified it will load data automatically
-      await retrieveAndStoreState(path[0])
-      console.log('from sethomefolder handler')
-      pushToHome()
-    } catch (err) {
-      // Else ask to login and start a folder from 0
-      GLOBAL.MAIN_WINDOW.webContents.send('continueToLogin')
-    }
   })
+  if (canceled) return
+  await GLOBAL.VUEX.dispatch('addHomeFolder', filePaths[0])
+  try {
+    console.log('pass')
+    // if songbasket exists in file specified it will load data automatically
+    await retrieveAndStoreState(filePaths[0])
+    console.log('from sethomefolder handler')
+    pushToHome()
+  } catch (err) {
+    // Else ask to login and start a folder from 0
+    GLOBAL.MAIN_WINDOW.webContents.send('continueToLogin')
+  }
 }
 
 export function createLoginWindow () {
@@ -164,9 +167,9 @@ export async function retrieveAndStoreState (path) {
     try {
       await GLOBAL.VUEX.dispatch('storeDataFromDisk', data)
       // Check if folder has synced playlists to setup watchers
-      if ((await FileSystemUser.checkDownloadPaths()).length) {
-        await FileSystemUser.createPlaylistWatchers()
-      }
+      // if ((await FileSystemUser.checkDownloadPaths()).length) {
+      //   await FileSystemUser.createPlaylistWatchers()
+      // }
     } catch (err) { throw err }
   } catch (err) { throw err }
 }

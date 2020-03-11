@@ -37,7 +37,7 @@ const userMethods = {
   },
   writeHomeFolders: async function (folders) {
     try {
-      await fs.writeFile(foldersJsonPath, JSON.stringify(folders))
+      await utils.promisify(fs.writeFile, [foldersJsonPath, JSON.stringify(folders), 'utf8'])
       return 'success'
     } catch (err) {
       throw err
