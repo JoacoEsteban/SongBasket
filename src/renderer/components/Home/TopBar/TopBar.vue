@@ -49,8 +49,8 @@
       </div>
     </div>
 
-    <div class="bar-slider-container rel-full df" :style="{'--position-ptg': sliderPosition + '%'}">
-      <div class="df fldc aliend bar-slide">
+    <div class="bar-slider-container h-fc rel-full df" :style="{'--position-ptg': sliderPosition + '%'}">
+      <div class="df fldc aliend bar-slide h-fc">
         <div class="section-switcher-container">
           <div class="section-switcher-list">
             <div class="section-switch" v-for="(section, index) in sections" :key="index" :class="{active: activeSection === section.id}">
@@ -244,7 +244,8 @@ $loading-bar-height: 3px;
 
 .tb-container {
   text-align: left;
-  min-height: .5em;
+  // min-height: .5em;
+  min-height: fit-content;
   width: 100%;
   display: flex;
   background: var(--global-grey-secondary);

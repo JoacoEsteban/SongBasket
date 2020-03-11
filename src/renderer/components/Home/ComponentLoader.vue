@@ -44,7 +44,7 @@ export default {
   methods: {
     async handleAnimation (to) {
       if (this.transitioning) return
-      this.transitioning = true
+      this.transitioning = this.$sbRouter.setTransitioningState(true)
       let anim1
       let anim2 = 'fast '
       let pull = 'pull'
@@ -67,7 +67,7 @@ export default {
       this.routerAnimation = 'release'
 
       await sleep(100)
-      this.transitioning = false
+      this.transitioning = this.$sbRouter.setTransitioningState()
     },
     makeTransition (to) {
       this.currentPath = to

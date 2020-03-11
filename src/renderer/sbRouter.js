@@ -5,6 +5,7 @@ export default class {
     this.pointer = -1
     this.beforeTransitionCallbacks = []
     this.afterTransitionCallbacks = []
+    this.transitioning = false
   }
 
   beforeTransition (func) {
@@ -12,6 +13,10 @@ export default class {
   }
   afterTransition (func) {
     this.afterTransitionCallbacks.push(func)
+  }
+
+  setTransitioningState (bool) {
+    return this.transitioning = !!bool
   }
 
   giveMeCurrent () {
@@ -34,6 +39,7 @@ export default class {
   }
 
   async push (location) {
+    if (this.transitioning) return
     if (typeof location === 'string') location = {name: location, params: {}}
     if (this.isSamePath(location)) return console.error('Same Path')
 
@@ -46,6 +52,7 @@ export default class {
   }
 
   goBack () {
+    if (this.transitioning) return
     if (this.pointer === 0) return
     this.onBeforeTransition(this.history[this.pointer - 1]) // To
     this.pointer--
@@ -54,6 +61,7 @@ export default class {
   }
 
   goForward () {
+    if (this.transitioning) return
     if (this.isLast()) return
     this.onBeforeTransition(this.history[this.pointer + 1]) // To
     this.pointer++
