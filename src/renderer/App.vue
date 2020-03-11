@@ -28,7 +28,19 @@ export default {
       this.$router.push(path)
     },
     handleWindowKey ({keyCode}) {
-      if (!isAscii(keyCode)) return
+      if (isAscii(keyCode) || (keyCode === 8 && this.$root.searchInputElement && this.$root.searchInputElement.value.length)) return this.focusSearchbar()
+    },
+    handleMouseKey ({button}) {
+      switch (button) {
+        case 3:
+          this.$sbRouter.goBack()
+          break
+        case 4:
+          this.$sbRouter.goForward()
+          break
+      }
+    },
+    focusSearchbar () {
       this.$root.searchInputElement && this.$root.searchInputElement.focus()
     },
     invalidatePlTransformCache () {
@@ -45,6 +57,7 @@ export default {
       this.redirect('home')
     })
     $(window).on('keydown', this.handleWindowKey)
+    $(window).on('mousedown', this.handleMouseKey)
   },
   beforeCreate () {
     window.VUE_ROOT = this.$root
