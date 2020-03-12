@@ -89,6 +89,7 @@ import 'vuex'
 import PlaylistIcon from '../../assets/icons/playlist-icon'
 import StarIcon from '../Icons/star-icon'
 
+let index = 0
 export default {
   props: {
     playlist: Object
@@ -155,11 +156,10 @@ export default {
       if (this.hoverTransitionsTimeout) { clearTimeout(this.hoverTransitionsTimeout); this.hoverTransitionsTimeout = null }
       this.applyHoverTransitions()
       this.hoverTransitionsTimeout = setTimeout(this.clearHoverTransitions, 1000)
-      this.lightTransform = false
     },
     applyHoverTransitions () {
-      this.getRotationElement().css('transition', 'all var(--local-hover-transition)')
-      this.getLightShineElement().css('transition', 'all var(--local-hover-transition)')
+      this.getRotationElement().css('transition', 'transform var(--local-hover-transition)')
+      this.getLightShineElement().css('transition', 'all var(--local-hover-transition-fast)')
     },
     clearHoverTransitions () {
       this.getRotationElement().css('transition', '')
@@ -201,10 +201,12 @@ export default {
         })()}).bounds
     },
     transformContainer (e) {
+      if (this.hoverTransitionsTimeout && Date.now() - index < 50) return
+      index = Date.now()
       if (window.MOUSE_BEING_CLICKED) return
       const vals = this.getContainerTransformation(e)
       this.getRotationElement().css('transform', vals[0])
-      if ((!this.lightTransform || !this.hoverTransitionsTimeout) && (this.lightTransform = true)) this.getLightShineElement().css(vals[1])
+      this.getLightShineElement().css(vals[1])
     },
     getContainerTransformation ({clientX, clientY}) {
       const bounds = this.getBounds()
@@ -258,6 +260,7 @@ $hovering-transition: .3s $bezier-tranka;
 .pl-container {
   // --local-hover-transition: 0.5s cubic-bezier(0.12, 0.82, 0, 1);
   --local-hover-transition: 1s #{$bezier-tranka};
+  --local-hover-transition-fast: .5s #{$bezier-tranka};
   box-sizing: border-box;
   padding: 1.5em var(--container-padding-x);
   padding-top: 0;
@@ -358,7 +361,7 @@ $hovering-transition: .3s $bezier-tranka;
       bottom: $offset*1px;
       right: $offset/2*1em;
       left: $offset/2*1em;
-      transition: opacity $hovering-transition, transform $hovering-transition;
+      transition: opacity $hovering-transition;
       // transition: opacity $transition-soft;
       opacity: .5;
       background: linear-gradient(31deg, transparent 50%, rgba(255,255,255,.045) 50%, transparent 100%);
@@ -413,8 +416,8 @@ $hovering-transition: .3s $bezier-tranka;
   .star-icons-container {
     position: absolute;
     display: flex;
-    top: .2em;
-    right: .3em;
+    bottom: .3em;
+    right: .5em;
     .star-icon {
       // $size: 1.5em;
       // width: $size;
@@ -430,7 +433,7 @@ $hovering-transition: .3s $bezier-tranka;
       }
       > span {
         line-height: 1;
-        font-size: .75em;
+        font-size: 1.25em;
       }
 
       &.added {
