@@ -376,8 +376,8 @@ $loading-bar-height: 3px;
   }
   transition: opacity var(--transition-global), transform var(--transition-global);
 
-  opacity: 0;
-  transform: scale(.5);
+  opacity: .1;
+  transform: scale(.8);
 
   &.show {
     opacity: 1;

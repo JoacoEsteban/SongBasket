@@ -99,7 +99,7 @@ export default {
 <style lang="scss" scoped>
 $t: var(--transition-global);
 $offsetY: .5em;
-$gradient-height: 2em;
+$gradient-height: 5em;
 $whole-height: 5em;
 .floating-buttons-container {
   pointer-events: none;

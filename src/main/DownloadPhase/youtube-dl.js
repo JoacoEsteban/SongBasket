@@ -82,11 +82,11 @@ function constructDownloads (tracks) {
       currentTrackVersion.playlists.push({ id: pl.id, name: customGetters.giveMePlName(pl.id) })
 
       if (!currentTrackVersion.paths) {
-        let fullPath = tempDownloadsFolderPath + utils.encodeIntoFilename(trackMap[yt].playlists[0].name)
+        let fullPath = tempDownloadsFolderPath + utils.encodeIntoFilename(trackMap[yt].playlists[0].id)
         currentTrackVersion.paths = {
           fullPath,
-          fullPathmp4: PATH.join(fullPath, track.trackName + '.songbasket_preprocessed_file'),
-          fullPathmp3: PATH.join(fullPath, track.trackName + '.mp3'),
+          fullPathmp4: PATH.join(fullPath, track.id + '.songbasket_preprocessed_file'),
+          fullPathmp3: PATH.join(fullPath, track.id + '.mp3'),
           finalPathmp3: PATH.join(global.HOME_FOLDER, utils.encodeIntoFilename(trackMap[yt].playlists[0].name), track.trackName + '.mp3')
         }
 
@@ -146,27 +146,27 @@ function constructDownloads (tracks) {
             console.log('size: ' + info.size)
             track.download.info.size = info.size
             track.download.info.downloadStarted = true
-            emitEvent.download({type: 'start', track})
+            emitEvent.download({type: 'start', track: track.id})
           })
 
           download.on('data', (chunk) => {
             track.download.info.currentSize += chunk.length
             // console.log(Math.round(track.download.info.currentSize / track.download.info.size * 100) + '%')
-            emitEvent.download({type: 'chunk', track})
+            emitEvent.download({type: 'chunk', track: track.id})
           })
 
           download.on('error', (error) => {
             // TODO HANDLE ERROR AND STOP ROUTINE
             console.error('Error when downloading video::::', error)
             track.download.info.downloadError = error
-            emitEvent.download({type: 'error', track})
+            emitEvent.download({type: 'error', track: track.id})
             reject(error)
           })
 
           download.on('end', async () => {
             if (track.download.info.downloadError) return
             console.log('track downloaded')
-            emitEvent.download({type: 'end', track})
+            emitEvent.download({type: 'end', track: track.id})
             try {
               await track.conversion.converter.convert()
               console.log('finished conversion')
@@ -208,23 +208,25 @@ function constructDownloads (tracks) {
       converter: {
         convert: async () => {
           try {
-            emitEvent.conversion({type: 'extraction-start', track})
+            emitEvent.conversion({type: 'extraction-start', track: track.id})
+            console.log('1111')
             await extractMp3(track.paths.fullPathmp3, track.paths.fullPathmp4, track.format)
+            console.log('222')
           } catch (err) {
-            emitEvent.conversion({type: 'extraction-error', track})
+            emitEvent.conversion({type: 'extraction-error', track: track.id})
             throw err
           }
-          emitEvent.conversion({type: 'extraction-end', track})
+          emitEvent.conversion({type: 'extraction-end', track: track.id})
 
           try {
-            emitEvent.conversion({type: 'tags-start', track})
+            emitEvent.conversion({type: 'tags-start', track: track.id})
             await applyTags(track.paths.fullPathmp3, spotifyData, track.ytId)
             console.log('finished tags')
           } catch (err) {
-            emitEvent.conversion({type: 'tags-error', track})
+            emitEvent.conversion({type: 'tags-error', track: track.id})
             throw err
           }
-          emitEvent.conversion({type: 'tags-end', track})
+          emitEvent.conversion({type: 'tags-end', track: track.id})
         },
         move: async () => {
           // let moveFunction = utils.copyNRemove

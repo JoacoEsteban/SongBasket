@@ -27,9 +27,13 @@ export function extractMp3 (pathmp3, pathmp4, inputFormat) {
     let command =
           ffmpeg(pathmp4)
             .inputFormat(inputFormat)
-            .on('end', () => {
+            .on('end', async () => {
               // TODO Emit convertion starting
-              fs.unlink(pathmp4)
+              try {
+                await fs.unlink(pathmp4)
+              } catch (err) {
+                console.error(err)
+              }
               console.log('Finished processing')
               resolve()
             })

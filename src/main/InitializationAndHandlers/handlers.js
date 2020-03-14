@@ -253,7 +253,7 @@ export function guestFetch (query, isFirstTime) {
       .catch(err => {
         // TODO Properly handle error
         console.log(111111111111)
-        console.error(err)
+        console.error(err.Error)
       })
       .finally(LOADING)
   }
