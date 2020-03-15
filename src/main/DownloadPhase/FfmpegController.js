@@ -1,5 +1,6 @@
 import GLOBAL from '../Global/VARIABLES'
 import * as handlers from '../InitializationAndHandlers/handlers'
+import * as utils from '../../MAIN_PROCESS_UTILS'
 const fs = require('fs')
 const ffbinaries = require('ffbinaries')
 const ffmpeg = require('fluent-ffmpeg')
@@ -30,7 +31,7 @@ export function extractMp3 (pathmp3, pathmp4, inputFormat) {
             .on('end', async () => {
               // TODO Emit convertion starting
               try {
-                await fs.unlink(pathmp4)
+                await utils.promisify(fs.unlink, pathmp4)
               } catch (err) {
                 console.error(err)
               }

@@ -1,5 +1,4 @@
 FIXES
-TODO handle tracks with same name
 TODO Handle deleted playlists
 TODO handle quota exceeded request rejection
 TODO remove login button
@@ -8,21 +7,26 @@ TODO save window size
 TODO Disable linking tracks in FAT32 & Alert user
 TODO Handle playlists with no tracks
 TODO Handle unavailable and local tracks
+TODO Research YTDL Crashing
 
 FEATURES
+--View--
 TODO Downloading tracks view
 TODO new buttons
 TODO folder view
-TODO Update guest user UI and loading animation
-TODO search bars
+TODO Update guest user UI and loading splash animation
+TODO playlist view and tracks view search bar
 TODO Better Loading indicators
-TODO Implement paused playlists
+TODO Settings Panel view
+--Controllers--
+TODO Implement paused playlists & tracks
 TODO Implement Override with custom track
-TODO Settings Panel
 TODO Manage .songbasket file backups
 TODO Custom audio files
 TODO check filesystem when getting into playlist view
 TODO alt key drags all window (KDE-like)
+TODO Pause downloads
+TODO Resume unfinished downloads (paused & error'd)
 
 NON URGENT
 TODO custom scroll

@@ -87,7 +87,8 @@ function constructDownloads (tracks) {
           fullPath,
           fullPathmp4: PATH.join(fullPath, track.id + '.songbasket_preprocessed_file'),
           fullPathmp3: PATH.join(fullPath, track.id + '.mp3'),
-          finalPathmp3: PATH.join(global.HOME_FOLDER, utils.encodeIntoFilename(trackMap[yt].playlists[0].name), track.trackName + '.mp3')
+          finalPathmp3: PATH.join(global.HOME_FOLDER, utils.encodeIntoFilename(trackMap[yt].playlists[0].name), track.trackName + '.mp3'),
+          finalPathmp3Alt: PATH.join(global.HOME_FOLDER, utils.encodeIntoFilename(trackMap[yt].playlists[0].name), track.trackName + ' - ' + track.id + '.mp3')
         }
 
         currentTrackVersion.getFormat = async () => getTrackFormat(currentTrackVersion)
@@ -231,6 +232,7 @@ function constructDownloads (tracks) {
         move: async () => {
           // let moveFunction = utils.copyNRemove
           let moveFunction = utils.copyNRemove
+          if (await utils.pathDoesExist(track.paths.finalPathmp3)) track.paths.finalPathmp3 = track.paths.finalPathmp3Alt
           if (utils.isSameDisk(track.paths.fullPathmp3, track.paths.finalPathmp3)) moveFunction = utils.linkNRemove
           try {
             await moveFunction(track.paths.fullPathmp3, track.paths.finalPathmp3)

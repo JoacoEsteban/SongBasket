@@ -25,7 +25,7 @@ const userMethods = {
   },
   checkForUser: async function () {
     try {
-      if (await userMethods.existsPromise(foldersJsonPath)) return JSON.parse((await utils.promisify(fs.readFile, [foldersJsonPath, 'utf8']))[1])
+      if (await utils.pathDoesExist(foldersJsonPath)) return JSON.parse((await utils.promisify(fs.readFile, [foldersJsonPath, 'utf8']))[1])
     } catch (error) {
       console.error('ERROR WHEN FOLDER PATHS JSON FILE::: FileSystem/index.js', foldersJsonPath, error)
     }
@@ -46,7 +46,7 @@ const userMethods = {
   saveState: async function ({state, path}) {
     // console.log('Saving state to', path)
     return new Promise(async (resolve, reject) => {
-      if (!(await userMethods.existsPromise(path))) {
+      if (!(await utils.pathDoesExist(path))) {
         // TODO Handle non existing folder
       } else {
         let jsonState = JSON.stringify(state)
@@ -152,7 +152,7 @@ const userMethods = {
     newName = utils.encodeIntoFilename(newName)
     oldName = utils.encodeIntoFilename(oldName)
     let base = homeFolderPath() + '/'
-    if (!await userMethods.existsPromise(base + oldName)) return
+    if (!await utils.pathDoesExist(base + oldName)) return
     console.log('RENAMING FOLDER: ' + oldName + ' => ' + newName)
     fs.rename(base + oldName, base + newName)
   },
@@ -262,7 +262,7 @@ function handleWatcherEvent (event, arg) {
 }
 
 async function checkPathThenCreate (path) {
-  let pathExists = await userMethods.existsPromise(path)
+  let pathExists = await utils.pathDoesExist(path)
   if (!pathExists) await utils.promisify(fs.mkdir, path)
   return pathExists
 }
