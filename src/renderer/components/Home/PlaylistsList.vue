@@ -146,12 +146,13 @@ export default {
       this.filterPlaylists()
     },
     calcScrollOpacity () {
+      console.log('scroll')
       let ratio = (this.getContainerElement().scrollTop / 100)
       if (ratio > 1) ratio = 1
       this.$setRootVar(this.scrollOpKeys, (this.filterBackgroundOpacity = ratio))
     },
     getContainerElement () {
-      return (this.containerElement || (this.containerElement = this.$refs['playlists-list']))
+      return (this.containerElement || (this.containerElement = this.$root.$refs['home-router']))
     },
     filterPlaylists () {
       if (this.lastType) clearTimeout(this.lastType)
@@ -183,9 +184,13 @@ export default {
     })
     this.refreshSynced()
     this.$refs['actual-list'].style.setProperty('--list-transition-time', this.listAnimationTime + 'ms')
-
-    this.$(this.getContainerElement()).on('scroll', this.calcScrollOpacity)
-    this.calcScrollOpacity()
+    this.$root.plListEnv = this
+    this.$root.onComponentLoaderMount = function () {
+      console.log('dousinho')
+      const env = this.$root.plListEnv
+      this.$(env.getContainerElement()).on('scroll', env.calcScrollOpacity)
+      env.calcScrollOpacity()
+    }
   }
 }
 </script>
@@ -199,7 +204,7 @@ $transition-global-hard: 0.5s $bezier;
 .pll-container {
   /* margin-bottom: 2.4rem; */
   text-align: center;
-  overflow: auto;
+  height: fit-content;
   width: 100%;
 }
 .actual-list {

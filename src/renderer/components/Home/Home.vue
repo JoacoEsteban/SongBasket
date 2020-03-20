@@ -146,14 +146,14 @@ export default {
   height: var(--max-container-height);
   overflow: hidden;
   flex-direction: column;
-  justify-content: space-between;
 }
 .home-router{
   z-index: 1;
-  height: 100%;
+  max-height: 100%;
   /* padding-bottom: 1em; */
   display: flex;
   box-sizing: border-box;
+  overflow: auto;
 }
 
 </style>

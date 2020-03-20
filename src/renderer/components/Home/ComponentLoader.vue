@@ -1,5 +1,5 @@
 <template>
-  <div :class="'router-view ' + routerAnimation">
+  <div :class="'router-view ' + routerAnimation"  ref="home-router">
     <playlists-list
       v-show="showPlList"
       @openPlaylist="$emit('openPlaylist', $event)"
@@ -40,6 +40,11 @@ export default {
     sleep = this.$sleep
     this.$sbRouter.beforeTransition(this.handleRouteChange)
     this.$sbRouter.push({name: 'home', params: {which: 'playlists-list'}})
+  },
+  mounted () {
+    this.$root.$refs['home-router'] = this.$refs['home-router']
+    console.log(this.$root.$refs['home-router'], this.$refs['home-router'])
+    this.$root.onComponentLoaderMount() && this.$root.onComponentLoaderMount()
   },
   methods: {
     async handleAnimation (to) {
