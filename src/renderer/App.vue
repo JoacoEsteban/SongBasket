@@ -27,7 +27,11 @@ export default {
       if (path === this.$route.fullPath) return console.error('ERROR Trying to navigate to same path')
       this.$router.push(path)
     },
-    handleWindowKey ({keyCode}) {
+    handleWindowKey ({keyCode, metaKey}) {
+      if (metaKey) {
+        if (keyCode === 219) return this.$sbRouter.goBack()
+        if (keyCode === 221) return this.$sbRouter.goForward()
+      }
       if (isAscii(keyCode) || (keyCode === 8 && this.$root.searchInputElement && this.$root.searchInputElement.value.length)) return this.focusSearchbar()
     },
     handleMouseKey ({button}) {
@@ -61,6 +65,7 @@ export default {
   },
   beforeCreate () {
     window.VUE_ROOT = this.$root
+    window.VUEX = this.$store.state
     window.sbDebug = this
   },
   mounted () {

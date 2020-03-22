@@ -146,7 +146,6 @@ export default {
       this.filterPlaylists()
     },
     calcScrollOpacity () {
-      console.log('scroll')
       let ratio = (this.getContainerElement().scrollTop / 100)
       if (ratio > 1) ratio = 1
       this.$setRootVar(this.scrollOpKeys, (this.filterBackgroundOpacity = ratio))

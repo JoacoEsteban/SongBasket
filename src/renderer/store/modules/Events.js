@@ -39,6 +39,7 @@ const actions = {
     commit('SET', { key: 'CONVERSION_EVENT', params })
   },
   globalLoadingState ({commit}, value) {
+    value.target = value.target || ''
     commit('SET', { key: 'GLOBAL_LOADING_STATE', value })
   },
   fetchLoadingState ({commit}, value) {

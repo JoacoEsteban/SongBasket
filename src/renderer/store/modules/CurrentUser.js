@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 import Vue from 'vue'
 import FileSystem from '../../../main/FileSystem/index'
+import trackUtils from '../Helpers/Tracks'
 // import SharedStates from './SharedStates'
 
 // Last time changes were saved to disk
@@ -366,59 +367,48 @@ const mutations = {
     }
     SAVE_TO_DISK()
   },
-  YOUTUBIZE_RESULT (state, convertedTracks) {
-    state.convertedTracks = convertedTracks
+  async YOUTUBIZE_RESULT (state, convertedTracks) {
+    state.convertedTracks.push(...convertedTracks.map(convertedTrack => trackUtils.calculateBestMatch(convertedTrack)).filter(t => t));
+    ([...state.queuedPlaylists]).forEach(pl => {
+      state.syncedPlaylists.push(pl)
+      state.queuedPlaylists = state.queuedPlaylists.filter(p => p !== pl)
+      state.cachedPlaylists = state.cachedPlaylists.filter(p => p !== pl)
+    })
 
-    for (let i = 0; i < state.syncedPlaylists.length; i++) {
-      this.dispatch('commitTrackChanges', state.syncedPlaylists[i])
-    }
-    let queued = [...state.queuedPlaylists]
-    console.log('dou', queued)
-    for (let i = 0; i < queued.length; i++) {
-      let id = queued[i]
-      state.syncedPlaylists = [...state.syncedPlaylists, id]
-      let index = findById(id, state.queuedPlaylists)
-      if (index >= 0) state.queuedPlaylists.splice(index, 1)
-      index = findById(id, state.cachedPlaylists)
-      if (index >= 0) state.cachedPlaylists.splice(index, 1)
-
-      this.dispatch('commitTrackChanges', id)
-    }
+    state.syncedPlaylists.forEach(async pl => this.dispatch('commitTrackChanges', pl))
 
     this.dispatch('syncedPlaylistsRefreshed', {}, {root: true})
+    console.log(state.convertedTracks.some(t => t) && state.convertedTracks.some(t => t.flags))
     SAVE_TO_DISK()
   },
   COMMIT_TRACK_CHANGES (state, id) {
     let index = findById(id, state.playlists)
     if (index === -1) {
-      console.log('PLAYLIST NOT FOUND WHEN COMMITING CHANGES')
+      console.error('PLAYLIST NOT FOUND WHEN COMMITING CHANGES')
       return
     }
     let tracks = state.playlists[index].tracks
 
     // Remove playlist from converted tracks registries
-    if (tracks.removed.length !== 0) {
-      for (let i = 0; i < tracks.removed.length; i++) {
-        let rem = tracks.removed[i]
+    if (tracks.removed && tracks.removed.length) {
+      console.time(id)
+      tracks.removed.forEach(rem => {
         for (let o = 0; o < state.convertedTracks.length; o++) {
-          if (rem.id === state.convertedTracks[o].id) {
-            state.convertedTracks[o].playlists = state.convertedTracks[o].playlists.filter(pl => pl.id !== id)
-            if (state.convertedTracks[o].playlists.length === 0) state.convertedTracks.splice(o, 1) // Track not being used by any playlist. Removing track
+          const track = state.convertedTracks[o]
+          if (rem.id === track.id) {
+            track.playlists = track.playlists.filter(pl => pl.id !== id)
+            if (!track.playlists.length) state.convertedTracks.splice(o, 1) // Track not being used by any playlist. Removing track
+            break
           }
         }
-      }
-    }
+      })
+      console.timeEnd(id)
+    } else if (!tracks.added || !tracks.added.length) return
+    if (tracks) if (tracks.length) return
 
-    state.playlists[index] = {
-      ...state.playlists[index],
-      tracks: {
-        ...tracks,
-        items: [...tracks.items, ...tracks.added],
-        added: [],
-        removed: []
-      }
-    }
-    SAVE_TO_DISK()
+    state.playlists[index].tracks.items.push(...(tracks.added || []))
+    state.playlists[index].tracks.added = []
+    state.playlists[index].tracks.removed = []
   },
   CHANGE_YT_TRACK_SELECTION (state, {playlist, trackId, newId}) {
     let index = findById(trackId, state.convertedTracks)
@@ -437,7 +427,7 @@ const mutations = {
     trackObj.playlists[index].selected = newId
     SAVE_TO_DISK()
   },
-  UNSYNC_PLAYLIST (state, id) {
+  async UNSYNC_PLAYLIST (state, id) {
     // Removes tracks from conversion
     console.log('UNSYNCING ', id)
     let index = findById(id, state.syncedPlaylists)
@@ -454,7 +444,7 @@ const mutations = {
           added: []
         }
 
-        this.dispatch('commitTrackChanges', id)
+        await this.dispatch('commitTrackChanges', id)
       }
     }
     if (success) {

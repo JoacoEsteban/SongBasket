@@ -1,34 +1,6 @@
 <template>
   <div class="plv-container">
-    <div class="plv-leftpanel">
-      <div class="plv-lp-img" :style="'background-image: url('+playlistImage+')'" />
-        <div class="controls">
-          <div class="df fldc alic">
-            <span class="track-qty">
-              <span>
-                {{playlistTotalTracks}}
-              </span>
-                {{trackQty}}
-            </span>
-            <button
-              v-if="!isSynced"
-              class="button"
-              @click="$emit('addPlaylistToSyncQueue', playlist.id)"
-            >{{isQueued ? 'Unqueue' : 'Queue'}}</button>
-            <button v-if="isSynced" class="button" @click="unsync">Unsync</button>
-          </div>
 
-          <div>
-            <div v-if="isSynced" @click="toggleShowingAll" class="button slim mb-1">
-              {{showingAll ? 'Collapse' : 'Show'}} all
-            </div>
-            <div v-if="isSynced" @click="resetAll()" class="button slim">
-              Reset all
-            </div>
-          </div>
-        </div>
-
-    </div>
     <div class="plv-rightpanel">
       <div class="plv-rp-data">
         <div class="changes-container">

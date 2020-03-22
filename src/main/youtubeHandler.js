@@ -30,15 +30,14 @@ export function youtubizeAll () {
   makeQueries()
 
   sbFetch.youtubizeAll(ALL_TRACKS)
-    .then(CONVERTED_TRACKS => {
-      // console.log('REITERAMO::::: ', CONVERTED_TRACKS)
-      store.dispatch('youtubizeResult', [...CONVERTED_TRACKS])
+    .then(tracksWithConversion => {
+      store.dispatch('youtubizeResult', tracksWithConversion)
     })
     .catch(err => {
       console.error(err) // TODO handle error
     })
     .finally(() => {
-      store.dispatch('globalLoadingState', {value: false, target: ''})
+      store.dispatch('globalLoadingState', {value: false})
     })
 }
 
@@ -108,7 +107,7 @@ function findDuplicatedTracks () {
 function makeQueries () {
   console.log('queries', ALL_TRACKS.length)
   for (let o = 0; o < ALL_TRACKS.length; o++) {
-    if (ALL_TRACKS[o].query !== null) continue
+    if (ALL_TRACKS[o].query) continue
     console.log('queries', o)
     let track = ALL_TRACKS[o].data
 

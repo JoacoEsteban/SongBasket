@@ -102,7 +102,8 @@ $tit-fz: 1.2em;
   }
 }
 .data {
-  margin: var(--tb-title-height) 0;
+  margin-top: calc(var(--tb-title-height) * 1.5);
+  margin-bottom: 1em;
   > div {
     line-height: 1;
     display: flex;

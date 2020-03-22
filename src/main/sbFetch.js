@@ -65,7 +65,7 @@ export async function getTracks ({userId, logged, SBID, control}, {id, snapshot_
     return res.data
   } catch (err) {
     // TODO Check on timeouts being fucking high
-    console.error('ERROR AT sbFetch, getTracks::::', err.Error)
+    console.error('ERROR AT sbFetch, getTracks::::', err)
     throw err
   } finally {
     LOADING()
@@ -79,22 +79,23 @@ export function youtubizeAll (tracks) {
   return new Promise((resolve, reject) => {
     LOADING(true, 'Converting')
     for (let i = 0; i < tracks.length; i++) {
-      if (tracks[i].conversion !== null) continue
-      let track = tracks[i].query
+      if ((tracks[i].flags = (tracks[i].flags || {})) && tracks[i].flags.converted) { console.log('nono skipping'); continue }
       totalTracks++
-      track = JSON.stringify(track)
-      console.log('fwing trackie::', track)
       axios.post(`${Backend}/youtubize`, {
-        track
+        track: JSON.stringify(tracks[i].query)
       })
         .then(res => {
+          if (!res || !res.data) throw new Error('Conversion doesn\'t exist')
           tracks[i].conversion = res.data
+          tracks[i].flags.converted = true
+          tracks[i].flags.conversionError = false
           succeded++
           // TODO Emit success event
         })
         .catch(err => {
+          tracks[i].flags.conversionError = true
           // Failed tracks will remain with 'conversion' object NULL
-          console.log('Error', err)
+          console.log('Error when converting', err)
           failed++
           // TODO Emit fail event
         })
