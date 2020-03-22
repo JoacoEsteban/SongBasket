@@ -90,6 +90,12 @@ const actions = {
       resolve()
     })
   },
+  reprocessAllTracks ({ commit }) {
+    return new Promise((resolve, reject) => {
+      commit('REPROCESS_ALL_TRACKS')
+      resolve()
+    })
+  },
   youtubizeResult ({ commit }, convertedTracks) {
     return new Promise((resolve, reject) => {
       commit('YOUTUBIZE_RESULT', convertedTracks)
@@ -377,13 +383,16 @@ const mutations = {
     }
     SAVE_TO_DISK()
   },
+  REPROCESS_ALL_TRACKS () {
+    Vue.set(state, 'convertedTracks', state.convertedTracks.map(convertedTrack => trackUtils.calculateBestMatch(convertedTrack, true)).filter(t => t))
+    console.log('all tracks reprocessed')
+    this.dispatch('syncedPlaylistsRefreshed', {}, {root: true})
+  },
   async YOUTUBIZE_RESULT (state, convertedTracks) {
-    console.log(state.convertedTracks.length)
-    let newTracks = convertedTracks.map(convertedTrack => trackUtils.calculateBestMatch(convertedTrack))
-    newTracks = newTracks.filter(t => t)
-    console.log('LENGTH', newTracks.length)
+    let newTracks = convertedTracks.map(convertedTrack => trackUtils.calculateBestMatch(convertedTrack)).filter(t => t)
+    console.log(state.convertedTracks.length, 'old tracks ---------- ', newTracks.length, 'new tracks')
     state.convertedTracks.push(...newTracks);
-    // Vue.set(state, 'convertedTracks', newTracks);
+
     ([...state.queuedPlaylists]).forEach(pl => {
       state.syncedPlaylists.push(pl)
       state.queuedPlaylists = state.queuedPlaylists.filter(p => p !== pl)

@@ -105,7 +105,7 @@ export function init (ipc) {
   })
 
   ipc.on('Youtube Convert', function () {
-    if (handlers.globalLoadingState().value) return
+    if (handlers.globalLoadingState().value) return console.log('loading', handlers.globalLoadingState())
     if (store.state.CurrentUser.queuedPlaylists.length + store.state.CurrentUser.syncedPlaylists.length === 0) return
 
     console.log('ABOUT TO FETCH YT')
