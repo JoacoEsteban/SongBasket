@@ -2,8 +2,8 @@
 import Vue from 'vue'
 import FileSystem from '../../../main/FileSystem/index'
 import trackUtils from '../Helpers/Tracks'
-// import SharedStates from './SharedStates'
 
+// import SharedStates from './SharedStates'
 // Last time changes were saved to disk
 let saveQueue = 0
 
@@ -46,6 +46,9 @@ const actions = {
       commit('STORE_DATA_FROM_DISK', data)
       resolve()
     })
+  },
+  saveToDisk () {
+    SAVE_TO_DISK()
   },
   updateUserEntities ({ commit }, object) {
     commit('UPDATE_USER_ENTITIES', object)
@@ -90,6 +93,12 @@ const actions = {
   youtubizeResult ({ commit }, convertedTracks) {
     return new Promise((resolve, reject) => {
       commit('YOUTUBIZE_RESULT', convertedTracks)
+      resolve()
+    })
+  },
+  setConvertedTracksProcessedFlag ({ commit }, val) {
+    return new Promise((resolve, reject) => {
+      commit('SET_CONVERTED_TRACKS_PROCESSED_FLAG', val)
       resolve()
     })
   },
@@ -200,13 +209,14 @@ const mutations = {
       let pl = state.syncedPlaylists[i]
       let index = findById(pl, object.playlists.items)
       if (index === -1) {
+        if (!state.deletedPlaylists) state.deletedPlaylists = []
         state.deletedPlaylists.push(state.playlists[findById(pl, state.playlists)])
         state.syncedPlaylists.splice(i, 1)
         i--
       }
     }
 
-    state.playlists = object.playlists.items
+    Vue.set(state, 'playlists', object.playlists.items)
 
     state.control = {
       total: object.playlists.total,
@@ -368,18 +378,30 @@ const mutations = {
     SAVE_TO_DISK()
   },
   async YOUTUBIZE_RESULT (state, convertedTracks) {
-    state.convertedTracks.push(...convertedTracks.map(convertedTrack => trackUtils.calculateBestMatch(convertedTrack)).filter(t => t));
+    console.log(state.convertedTracks.length)
+    let newTracks = convertedTracks.map(convertedTrack => trackUtils.calculateBestMatch(convertedTrack))
+    newTracks = newTracks.filter(t => t)
+    console.log('LENGTH', newTracks.length)
+    state.convertedTracks.push(...newTracks);
+    // Vue.set(state, 'convertedTracks', newTracks);
     ([...state.queuedPlaylists]).forEach(pl => {
       state.syncedPlaylists.push(pl)
       state.queuedPlaylists = state.queuedPlaylists.filter(p => p !== pl)
       state.cachedPlaylists = state.cachedPlaylists.filter(p => p !== pl)
     })
+    console.log(state.convertedTracks.length)
 
     state.syncedPlaylists.forEach(async pl => this.dispatch('commitTrackChanges', pl))
 
     this.dispatch('syncedPlaylistsRefreshed', {}, {root: true})
     console.log(state.convertedTracks.some(t => t) && state.convertedTracks.some(t => t.flags))
+    setTimeout(((env) => {
+      return () => env.dispatch('setConvertedTracksProcessedFlag')
+    })(this), 100)
     SAVE_TO_DISK()
+  },
+  SET_CONVERTED_TRACKS_PROCESSED_FLAG (state, val = true) {
+    state.convertedTracks.forEach(t => t.flags.processed = val)
   },
   COMMIT_TRACK_CHANGES (state, id) {
     let index = findById(id, state.playlists)
@@ -404,7 +426,6 @@ const mutations = {
       })
       console.timeEnd(id)
     } else if (!tracks.added || !tracks.added.length) return
-    if (tracks) if (tracks.length) return
 
     state.playlists[index].tracks.items.push(...(tracks.added || []))
     state.playlists[index].tracks.added = []

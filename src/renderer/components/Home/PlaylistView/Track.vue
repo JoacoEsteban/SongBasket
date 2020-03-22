@@ -73,8 +73,7 @@
               </div>
             </div>
             <div class="pl-track-data-up">
-              <div class="pl-track-data-name ellipsis center">
-                {{track.snippet.title | decodeUri}}
+              <div class="pl-track-data-name ellipsis center" v-html="track.nameFormatted">
               </div>
               <div class="pl-track-data-byartist ">
                 uploader <span class="bold">{{track.snippet.channelTitle | decodeUri}}</span>
@@ -227,6 +226,11 @@ export default {
 }
 </script>
 
+<style lang="scss">
+span.matching-token {
+  color: var(--green-accept)
+}
+</style>
 <style lang="scss" scoped>
 /* TODO Media Query for List View */
 .whole-container {

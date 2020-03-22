@@ -79,15 +79,18 @@ export function youtubizeAll (tracks) {
   return new Promise((resolve, reject) => {
     LOADING(true, 'Converting')
     for (let i = 0; i < tracks.length; i++) {
-      if ((tracks[i].flags = (tracks[i].flags || {})) && tracks[i].flags.converted) { console.log('nono skipping'); continue }
+      if (((tracks[i].flags = (tracks[i].flags || {})) && tracks[i].flags.converted) || (tracks[i].conversion && (tracks[i].flags.converted = true))) { console.log('nono skipping'); continue }
       totalTracks++
+      console.log('before post')
       axios.post(`${Backend}/youtubize`, {
         track: JSON.stringify(tracks[i].query)
       })
         .then(res => {
+          console.log('onThen')
           if (!res || !res.data) throw new Error('Conversion doesn\'t exist')
           tracks[i].conversion = res.data
           tracks[i].flags.converted = true
+          tracks[i].flags.processed = false
           tracks[i].flags.conversionError = false
           succeded++
           // TODO Emit success event

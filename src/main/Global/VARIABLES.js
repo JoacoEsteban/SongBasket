@@ -8,6 +8,7 @@ module.exports = {
   MAIN_WINDOW: null,
   LOGIN_WINDOW: null,
   VUEX: require('../../renderer/store').default,
+  SAVE_TO_DISK: null,
   APP_CWD: (process.env.NODE_ENV === 'production' ? require('electron').app.getPath('userData') : process.cwd()),
   PLATFORM: (() => {
     switch (process.platform) {
