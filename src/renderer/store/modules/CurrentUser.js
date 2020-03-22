@@ -396,7 +396,7 @@ const mutations = {
     ([...state.queuedPlaylists]).forEach(pl => {
       state.syncedPlaylists.push(pl)
       state.queuedPlaylists = state.queuedPlaylists.filter(p => p !== pl)
-      state.cachedPlaylists = state.cachedPlaylists.filter(p => p !== pl)
+      state.cachedPlaylists = state.cachedPlaylists.filter(p => p.id !== pl)
     })
     console.log(state.convertedTracks.length)
 

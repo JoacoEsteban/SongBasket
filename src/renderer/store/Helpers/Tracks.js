@@ -4,7 +4,7 @@ export default {
   calculateBestMatch (track, force) {
     if (!force && track.flags.processed) return null
     track = cloneObject(track)
-    track.conversion.nameTokens = [...track.data.name.split(' ').map(str => makeValidRegex(str)).filter(str => str.str.length > 2), ...track.data.artists.map(a => makeValidRegex(a.name))] // All words from trackname & artist split into array
+    track.conversion.nameTokens = [...track.data.name.split(' ').map(str => makeValidRegex(str)).filter(str => str.str.length > 2 && !isInvalidWord(str.str)), ...track.data.artists.map(a => makeValidRegex(a.name))] // All words from trackname & artist split into array
 
     let nameTokens = track.conversion.nameTokens
     nameTokens = nameTokens.filter((a, index1) => { // Removes dupes
@@ -12,7 +12,7 @@ export default {
         if (a.str === b.str && index1 !== index2) return false
       })
       return true
-    }).sort((a, b) => a.length > b.length ? -1 : 1)
+    })
 
     track.conversion.yt.forEach(conv => exec({
       track,
@@ -24,6 +24,12 @@ export default {
   }
 }
 
+const invalidWords = [
+  'the'
+]
+
+const isInvalidWord = str => invalidWords.includes(str.toLowerCase())
+
 const exec = ({
   track,
   conv,
@@ -33,7 +39,11 @@ const exec = ({
   conv.durationDiff = round(conv.duration - (track.duration || (track.duration = track.data.duration_ms / 1000)))
   conv.durationScore = round(1 / (1.1 ** (Math.abs(conv.durationDiff) / 10))) // 1 === same duration, difference makes it go down
   conv.wordScore = round(conv.matchedTokensCount / track.conversion.nameTokens.length) // 1 === all tokens match
-  conv.isDoubtlyConversion = (conv.wordScore === 0 || (conv.wordScore + conv.durationScore < 1))
+  // Conversion doesn't get enough score to be trusty if:
+  // // - No word matches
+  // // - 1st token not found (first word of trackname)
+  // // - both scores don't add up to 1
+  conv.isDoubtlyConversion = (conv.wordScore === 0 || !conv.nameTokensMap[0] || (conv.wordScore + conv.durationScore < 1))
 }
 
 const findTokens = (conv, nameTokens) => {
