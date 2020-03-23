@@ -86,6 +86,13 @@
     height: 100%;
 }
 
+.ellipsis {
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 // -----------------BOUNDS------------------
 .p-0 {
     padding: 0;

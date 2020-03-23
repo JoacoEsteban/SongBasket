@@ -1,61 +1,7 @@
 <template>
-  <div class="plv-container">
-
-    <div class="plv-rightpanel">
-      <div class="plv-rp-data">
-        <div class="changes-container">
-          <div
-          @click="toggle('added')"
-          v-if="added.length > 0" class="button accept thin">
-            {{added.length + ' ' + (added.length === 1 ? 'track' : 'tracks')}} added
-          </div>
-          <div
-          @click="toggle('removed')"
-          v-if="removed.length > 0" class="button cancel thin">
-            {{removed.length + ' ' + (removed.length === 1 ? 'track' : 'tracks')}} removed
-          </div>
-        </div>
-        <!-- <div class="plv-rp-data-plname">{{playlist.name}}</div>
-        <div class="plv-rp-data-byuser">by {{playlistOwner}}</div> -->
-      </div>
-      <div class="plv-rp-tracklist" ref="tracklist-scroll">
-        <div
-        :class="{'hide': !showing.added || added.length === 0}"
-        ref="added"
-        class="added changes-tracks-container">
-          <Track
-            v-for="(track, index) in added"
-            :key="index"
-            :track="track"
-          />
-        </div>
-        <div
-        :class="{'hide': !showing.removed || removed.length === 0}"
-        ref="removed"
-        class="removed changes-tracks-container">
-          <Track
-            :isRemoved="true"
-            v-for="(track, index) in removed"
-            :key="index"
-            :track="track"
-            :conversion="giveMeConversion(track.id)"
-            :convertionIsOpened="convertionIsOpened(track.id)"
-            @toggleConversion="toggleConversion(track.id, $event)"
-            @openYtVideo="$emit('openYtVideo', $event)"
-          />
-        </div>
-        <Track
-          v-for="(track, index) in items"
-          :key="index"
-          :track="track"
-          :conversion="giveMeConversion(track.id)"
-          :convertionIsOpened="convertionIsOpened(track.id)"
-          @toggleConversion="toggleConversion(track.id, $event)"
-          @selectTrack="selectTrack(track.id, $event)"
-          @customTrackUrl="customTrackUrl(track.id)"
-          @openYtVideo="$emit('openYtVideo', $event)"
-        />
-      </div>
+  <div class="plv-container w100">
+    <div class="track-list row">
+      <Track v-for="(item, index) in items" :item="item" :key="index" />
     </div>
   </div>
 </template>
@@ -97,9 +43,6 @@ export default {
     playlistTotalTracks () {
       return this.playlist.tracks && this.playlist.tracks.total
     },
-    // currentPlaylist () {
-    //   return this.$store.state.CurrentUser.currentPlaylist
-    // },
     ammountOfTracksBeingShown () {
       return this.items.length + (this.showing.added ? this.added.length : 0) + (this.showing.removed ? this.removed.length : 0)
     },
@@ -270,115 +213,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.plv-container {
-  display: flex;
-  flex-direction: row;
-  /* border: 1px solid white; */
-  padding: 0;
+.track-list {
   width: 100%;
-}
-.plv-leftpanel {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  /* border: 1px solid white; */
-  padding-top: .5em;
-  min-width: 8em;
-  .controls {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    height: 100%;
-    padding-bottom: .5em;
-  }
-}
-.plv-lp-img {
-  background-size: cover;
-  width: 92%;
-  padding-bottom: 92%;
-  margin-bottom: .3em;
-}
-.track-qty {
-  font-size: .6em;
-  > span {
-    font-family: "Poppins Bold"
-  }
-}
-.plv-rightpanel {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-
-  /* border: 1px solid white; */
-}
-.plv-rp-data {
-  // background-color: var(--global-grey-secondary);
-  position: relative;
-  // padding: .5em;
-  // min-height: 3em;
-  z-index: 1;
-}
-
-.changes-container {
-  $size:2em;
-  bottom: $size / -2;
-  left: 0;
-  right: 0;
-  position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: $size;
-  pointer-events: none;
-
-  > div {
-    pointer-events: all;
-    margin: 0 .5em;
-    padding: .3em 2em;
-    font-size: .7em;
-    font-family: "Poppins SemiBold";
-    z-index: 1;
-  }
-}
-
-.plv-rp-data-plname {
-  font-family: "Poppins Black";
-  text-align: left;
-  font-size: 1.5em;
-  line-height: 1;
-}
-.plv-rp-data-byuser {
-  font-family: "poppins regular";
-  text-align: left;
-  font-size: 0.9em;
-  line-height: 1.3;
-}
-.plv-rp-tracklist {
-  /* height: 150%; */
-  z-index: 0;
-  padding: 0 .5em;
-  overflow-y: scroll;
-
-  .changes-tracks-container {
-    padding: 1px .5em;
-    height: 0px;
-    border-radius: .2em;
-    margin: .3em 0;
-    $transition: .5s cubic-bezier(.12,.82,0,.99);
-    transition: height $transition, margin $transition, opacity $transition;
-    &.added {
-      background-color: var(--green-accept);
-    }
-    &.removed {
-      background-color: var(--red-cancel);
-    }
-
-    &.hide {
-      opacity: 0;
-      margin: 0;
-    }
-  }
+  overflow: hidden;
+  padding-top: 1em;
 }
 </style>

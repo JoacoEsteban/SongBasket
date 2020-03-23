@@ -9,7 +9,7 @@ let loadingCount = 0
 function LOADING (value, target) {
   if (!value) value = false
   if (value) loadingCount++
-  else loadingCount--
+  else loadingCount && loadingCount--
   console.log('loadingcount', loadingCount)
   store.dispatch('fetchLoadingState', {value: loadingCount > 0, target})
 }
