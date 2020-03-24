@@ -254,38 +254,6 @@ const mutations = {
 
   PLAYLIST_STORE_TRACKS (state, playlist) {
     playlist = {...playlist}
-    function playlistComputeChanges (oldPl, newPl) {
-      // Starting with both local spotify copy and local youtube copy
-      // Tracks will be compared between both arrays and if it's a match, then both will be spliced from both arrays
-      // If there are no changes, then both arrays will be empty
-
-      let added = [ ...newPl ]
-      let removed = [ ...oldPl ]
-      let items = [] // Tracks that are preserved between versions
-
-      if (removed.length > 0) { // This checks if the synced playlist has not been added to DB yet, if so, then every song will be 'new'
-        let i = 0
-        while (i < added.length) {
-          let a = added[i]
-          let found = false
-
-          for (let o = 0; o < removed.length; o++) {
-            let r = removed[o]
-
-            if (a.id === r.id) {
-              // No changes to track
-              found = true
-              removed.splice(o, 1)
-              // Preserved track is stored
-              items = [...items, ...added.splice(i, 1)]
-              break
-            }
-          }
-          if (!found) i++
-        }
-      } else removed = []
-      return {added, items, removed}
-    }
 
     if (playlist.same_version === true) {
       // If backend says it's the same version, no overwrite
@@ -295,48 +263,54 @@ const mutations = {
 
     let index = findById(playlist.id, state.playlists)
     // If there are changes with local version, overwrite
-    if (index >= 0) {
-      let oldName = state.playlists[index].name
-      let newName = playlist.name
-      console.log('NAMES', oldName, newName)
-      if (newName !== oldName) {
-        console.log('DIFFERENT')
-        FileSystem.renameFolder({oldName, newName}) // Rename Folder
+    if (index === -1) return console.error('PLAYLIST NOT FOUND WHEN SETTING TRACKS INSIDE STATE (VUEX)')
+
+    const statePl = state.playlists[index]
+    // If playlist is synced, then I will compute differences with previous local version
+    if (state.syncedPlaylists.some(p => p === playlist.id)) {
+      let cb
+      let oldName
+      if (statePl.name !== playlist.name) {
+        oldName = statePl.folderName
+        statePl.folderName = null
+        cb = () => FileSystem.renameFolder({oldName, newName: playlist.folderName}) // Rename Folder
       }
 
-      // If playlist is synced, then I will compute differences with previous local version
-      let syncIndex = findById(playlist.id, state.syncedPlaylists)
-      if (syncIndex >= 0) {
-        let oldPl = [
-          ...state.playlists[index].tracks.items,
-          ...state.playlists[index].tracks.removed
-        ]
-        // Compute track changes
-        // Using just removed and items. Im not using added because they will pop up in the new data.
-        let {items, removed, added} = playlistComputeChanges(oldPl, playlist.tracks.items)
-        playlist.tracks = {
-          ...playlist.tracks,
-          items,
-          added,
-          removed
-        }
-      } else {
-        // Playlist is not synced so I dont care about computing changes
-        playlist.tracks = {
-          ...playlist.tracks,
-          added: [],
-          removed: []
-        }
-        let {id, snapshot_id} = playlist
-        this.dispatch('playlistUpdateCached', {id, snapshot_id})
-      }
-      console.log(playlist.tracks.added.length + ' TRACKS ARE NOT SYNCED FROM PLAYLIST ' + playlist.name)
-      state.playlists.splice(index, 1, playlist)
-      // console.log('SON, ITS TIME NOW', state.playlists[index].tracks.added.map(p => p.name))
-      this.dispatch('syncedPlaylistsRefreshed', {}, {root: true})
+      playlist.folderName = statePl.folderName || (() => {
+        let name = playlist.name
+        if (state.playlists.some(p => p.name === playlist.name && p.id !== playlist.id)) name += ' - ' + playlist.id
+        return name
+      })()
+      if (cb) cb()
 
-      SAVE_TO_DISK()
-    } else console.log('PLAYLIST NOT FOUND WHEN SETTING TRACKS INSIDE STATE (VUEX)')
+      let oldPl = [
+        ...statePl.tracks.items,
+        ...statePl.tracks.removed
+      ]
+      // Compute track changes
+      // Using just removed and items. Im not using added because they will pop up in the new data.
+      let {items, removed, added} = playlistComputeChanges(oldPl, playlist.tracks.items)
+      playlist.tracks = {
+        ...playlist.tracks,
+        items,
+        added,
+        removed
+      }
+    } else {
+      // Playlist is not synced so I dont care about computing changes
+      playlist.tracks = {
+        ...playlist.tracks,
+        added: [],
+        removed: []
+      }
+      let {id, snapshot_id} = playlist
+      this.dispatch('playlistUpdateCached', {id, snapshot_id})
+    }
+    state.playlists.splice(index, 1, playlist)
+    // console.log('SON, ITS TIME NOW', state.playlists[index].tracks.added.map(p => p.name))
+    this.dispatch('syncedPlaylistsRefreshed', {}, {root: true})
+
+    SAVE_TO_DISK()
   },
 
   PLAYLIST_UPDATE_CACHED (state, {id, snapshot_id}) {
@@ -659,4 +633,37 @@ function findById (id, obj) {
     }
   }
   return -1
+}
+
+function playlistComputeChanges (oldPl, newPl) {
+  // Starting with both local spotify copy and local youtube copy
+  // Tracks will be compared between both arrays and if it's a match, then both will be spliced from both arrays
+  // If there are no changes, then both arrays will be empty
+
+  let added = [ ...newPl ]
+  let removed = [ ...oldPl ]
+  let items = [] // Tracks that are preserved between versions
+
+  if (removed.length > 0) { // This checks if the synced playlist has not been added to DB yet, if so, then every song will be 'new'
+    let i = 0
+    while (i < added.length) {
+      let a = added[i]
+      let found = false
+
+      for (let o = 0; o < removed.length; o++) {
+        let r = removed[o]
+
+        if (a.id === r.id) {
+          // No changes to track
+          found = true
+          removed.splice(o, 1)
+          // Preserved track is stored
+          items = [...items, ...added.splice(i, 1)]
+          break
+        }
+      }
+      if (!found) i++
+    }
+  } else removed = []
+  return {added, items, removed}
 }
