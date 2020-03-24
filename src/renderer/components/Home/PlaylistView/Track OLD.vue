@@ -444,7 +444,7 @@ $transition-props: $conversion-time cubic-bezier(.12,.82,0,.99);
       transform: scale(1);
       border-color: var(--green-accept);
       &.custom {
-        border-color: var(--orange-custom)
+        border-color: var(--custom-selection-color)
       }
     }
 

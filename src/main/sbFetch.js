@@ -90,12 +90,13 @@ export function youtubizeAll (tracks) {
           if (!res || !res.data) throw new Error('Conversion doesn\'t exist')
           tracks[i].conversion = res.data
           tracks[i].flags.converted = true
-          tracks[i].flags.processed = false
           tracks[i].flags.conversionError = false
           succeded++
           // TODO Emit success event
         })
         .catch(err => {
+          tracks[i].conversion = null
+          tracks[i].flags.converted = false
           tracks[i].flags.conversionError = true
           // Failed tracks will remain with 'conversion' object NULL
           console.log('Error when converting', err)
@@ -103,6 +104,7 @@ export function youtubizeAll (tracks) {
           // TODO Emit fail event
         })
         .finally(() => {
+          tracks[i].flags.processed = false
           areAllFinished(resolve)
         })
     }

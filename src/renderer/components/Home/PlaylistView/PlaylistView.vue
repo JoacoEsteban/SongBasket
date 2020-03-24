@@ -1,7 +1,10 @@
 <template>
   <div class="plv-container w100">
     <div class="track-list row">
-      <Track v-for="(item, index) in items" :item="item" :key="index" />
+      <div class="dcontents" v-if="isSynced">
+        <Track v-for="(item, index) in added" :isNew="true" :item="item" :key="index" />
+      </div>
+      <Track v-for="(item, index) in (isSynced ? conversion : items)" :item="item" :key="index" />
     </div>
   </div>
 </template>
@@ -96,8 +99,8 @@ export default {
   },
   mounted () {
     console.log('PLAYLISTTTTT:::::', this.playlist)
-    this.computeTracks()
     this.refreshPlaylist()
+    this.computeTracks()
     window.plViewDebug = this
   },
   destroyed () {
@@ -127,20 +130,7 @@ export default {
       }
     },
     computeTracks () {
-      console.log('computing', this.isSynced)
-      if (!this.isSynced) return
-      let allTracks = this.$store.state.CurrentUser.convertedTracks
-      console.log('alltracks', allTracks)
-      let plTracks = []
-
-      for (let i = 0; i < allTracks.length; i++) {
-        let track = allTracks[i]
-        if (track.playlists.some(pl => pl.id === this.currentPlaylist)) {
-          plTracks.push(track)
-        }
-      }
-
-      this.conversion = plTracks
+      this.conversion = this.$store.state.CurrentUser.convertedTracks.filter(t => t.playlists.some(pl => pl.id === this.currentPlaylist))
     },
     youtubeId (id) {
       let c = this.conversion.tracks
@@ -151,14 +141,7 @@ export default {
       return null
     },
     giveMeConversion (id) {
-      if (!this.isSynced) return null
-      let tracks = this.conversion
-      for (let i = 0; i < tracks.length; i++) {
-        let track = tracks[i]
-        if (track.id === id) {
-          return track
-        }
-      }
+      return this.conversion.find(t => t.id === id)
     },
     toggleConversion (id, intention) {
       // Intention is what the toggle wants to do
@@ -189,15 +172,13 @@ export default {
       return this.showingAll
     },
     resetAll (confirm) {
-      // TODO Request confirmation
-      if (confirm) {
-        this.conversion.forEach(track => {
-          this.$store.dispatch('changeYtTrackSelection', {playlist: this.playlist.id, trackId: track.id, newId: null})
-        })
-        setTimeout(() => {
-          this.$forceUpdate()
-        }, 0)
-      } else this.$store._actions.openModal[0]({wich: 'reset-all-playlist-tracks', payload: {playlistId: this.playlist.id}})
+      if (!confirm) return this.$store._actions.openModal[0]({wich: 'reset-all-playlist-tracks', payload: {playlistId: this.playlist.id}})
+      this.conversion.forEach(track => {
+        this.$store.dispatch('changeYtTrackSelection', {playlist: this.playlist.id, trackId: track.id, newId: null})
+      })
+      setTimeout(() => {
+        this.$forceUpdate()
+      }, 0)
     },
     selectTrack (trackId, newId) {
       this.$store.dispatch('changeYtTrackSelection', {playlist: this.playlist.id, trackId, newId})

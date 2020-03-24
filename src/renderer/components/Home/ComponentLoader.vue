@@ -25,7 +25,7 @@ export default {
   },
   data () {
     return {
-      currentPath: this.$sbRouter.path.name,
+      currentPath: this.$sbRouter.path,
       componentBeingShown: this.$sbRouter.path.name,
       transitioning: false,
       routerAnimation: ''

@@ -6,6 +6,7 @@ import { faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 import SbRouter from './sbRouter'
+import TrackController from './controllers/Track.controller'
 
 library.add(faArrowRight, faArrowLeft)
 
@@ -29,7 +30,7 @@ export default (Vue) => {
   }
   Vue.prototype.$camelcase = require('camelcase')
   Vue.prototype.$pascalcase = require('pascalcase')
-
+  setControllers(Vue)
   // -----sb-router-----
 
   Vue.prototype.$sbRouter = new SbRouter()
@@ -99,4 +100,10 @@ export default (Vue) => {
       }
     }
   })()
+}
+
+function setControllers (Vue) {
+  Vue.prototype.$controllers = {
+    track: TrackController
+  }
 }

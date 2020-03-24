@@ -1,5 +1,5 @@
 <template>
-<div class="card-container" :class="classObject">
+<div class="card-container" :class="classObject" :style="styleObject">
   <div class="transformation-parent rel-full" @mousemove="onMouseMove" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave" @mousedown="setMouseListener" @click="handleClick">
     <div class="content" ref="content-container">
       <div class="card-background abs-full">
@@ -64,6 +64,17 @@ export default {
       }
       obj[this.rowClasses] = true
       return obj
+    },
+    styleObject () {
+      const px = this.options.paddingX || ''
+      const py = this.options.paddingY || ''
+
+      return {
+        'padding-top': py,
+        'padding-bottom': py,
+        'padding-left': px,
+        'padding-right': px
+      }
     }
   },
   mounted () {

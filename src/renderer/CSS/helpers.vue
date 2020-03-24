@@ -251,4 +251,12 @@
 .ovfh {
     overflow: hidden;
 }
+
+// -----------------POSITION------------------
+.color-green {
+    color: var(--green-accept)
+}
+.bg-green {
+    background-color: var(--green-accept)
+}
 </style>

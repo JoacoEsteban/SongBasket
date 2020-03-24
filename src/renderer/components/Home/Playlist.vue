@@ -149,8 +149,8 @@ $hovering-transition: .3s $bezier-tranka;
 .track-changes-container {
   position: absolute;
   display: flex;
-  bottom: .3em;
-  right: .5em;
+  bottom: 0;
+  right: 0;
   .track-change {
     // $size: 1.5em;
     // width: $size;

@@ -128,21 +128,19 @@ export default {
     },
     async refreshSynced () {
       if (!this.$root.notFistTime) await this.$sleep(2000)
-      this.$root.notFistTime = true
+      this.$root.notFistTime = true // is set in root not to be resetted when instance is destroyed
       let all = []
       let pls = [...this.$store.state.CurrentUser.playlists]
-      for (let i = 0; i < this.$store.state.CurrentUser.syncedPlaylists.length; i++) {
-        let syncPl = this.$store.state.CurrentUser.syncedPlaylists[i]
-        for (let o = 0; o < pls.length; o++) {
-          let pl = pls[o]
+      this.$store.state.CurrentUser.syncedPlaylists.forEach(syncPl => {
+        for (const i in pls) {
+          let pl = pls[i]
           if (pl.id === syncPl) {
-            all = [...all, pl]
-            pls.splice(o, 1)
+            all.push(pls.splice(i, 1)[0])
             break
           }
         }
-      }
-      this.syncedPlaylists = all
+      })
+      this.syncedPlaylists = all.sort((a, b) => a.tracks.added.length > b.tracks.added.length ? -1 : 1)
       this.filterPlaylists()
     },
     calcScrollOpacity () {

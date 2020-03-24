@@ -10,7 +10,8 @@
   --green-accept: #1dcc00;
   --green-loading: --green-accept;
   --red-cancel: #c00;
-  --orange-custom: hsl(30, 100%, 60%);
+  --custom-selection-color: hsl(30, 100%, 60%);
+  --orange-warning: hsl(15, 100%, 50%);
   /* TRANSITIONS */
   --bezier: cubic-bezier(0, 1, 0, 1);
   --bezier-chill: cubic-bezier(0, 1, .5, 1);

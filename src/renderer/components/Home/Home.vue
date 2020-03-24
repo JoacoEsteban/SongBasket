@@ -8,7 +8,7 @@
       />
 
         <component-loader class="home-router"
-        @openPlaylist="getTracks($event)"
+        @openPlaylist="openPlaylist($event)"
         @addPlaylistToSyncQueue="addPlaylistToSyncQueue($event)"
         @openYtVideo="openYtVideo($event)"
         ></component-loader>
@@ -84,9 +84,9 @@ export default {
         window.ipc.send('loadMore')
       }
     },
-    getTracks (id) {
-      if (this.playlistSynced(id)) this.setPlaylistNPush(id)
-      else window.ipc.send('get tracks from', id)
+    openPlaylist (id) {
+      if (this.playlistSynced(id)) return this.setPlaylistNPush(id)
+      window.ipc.send('get tracks from', id)
     },
     setPlaylistNPush (id) {
       this.$sbRouter.push({name: 'playlist-view', params: {id}})
