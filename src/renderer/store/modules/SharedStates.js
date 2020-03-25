@@ -1,4 +1,4 @@
-import FileSystemUser from '../../../main/FileSystem/index'
+import FSController from '../../../main/controllers/FileSystem/index'
 // import Vue from 'vue'
 
 const getDefaultState = () => {
@@ -76,13 +76,13 @@ const mutations = {
     state.fileSystem.homeFolders.selected = path
     global.HOME_FOLDER = path
     console.log('HOME FOLDER ADDED', global.HOME_FOLDER)
-    FileSystemUser.writeHomeFolders(state.fileSystem.homeFolders)
+    FSController.UserMethods.writeHomeFolders(state.fileSystem.homeFolders)
   },
   SET_FOLDER_PATHS (state, FOLDERS) {
     console.log('SETTIN', FOLDERS)
     state.fileSystem.homeFolders = FOLDERS
     global.HOME_FOLDER = FOLDERS.selected
-    FileSystemUser.writeHomeFolders(state.fileSystem.homeFolders)
+    FSController.UserMethods.writeHomeFolders(state.fileSystem.homeFolders)
   },
   SET_LOADING_STATE (state, loadingState) {
     state.loadingState = loadingState

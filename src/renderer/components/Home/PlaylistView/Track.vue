@@ -62,7 +62,7 @@ export default {
       cardOptions: {
         height: '2.5em',
         xRotationFactor: 0.01,
-        hovScaleFactor: 1,
+        hovScaleFactor: false,
         paddingY: '.5em',
         paddingX: '.5em'
       },

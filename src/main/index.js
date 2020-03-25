@@ -3,8 +3,8 @@ import log from 'electron-log'
 import dotenvConfig from './dotenvConfig'
 console.log(dotenvConfig) // logging for linter not to complain
 
-require('./InitializationAndHandlers/handlers').init(electron)
-require('./InitializationAndHandlers/ipc.routes').init(electron.ipcMain)
+require('./controllers/InitializationAndHandlers/handlers').init(electron)
+require('./controllers/InitializationAndHandlers/ipc.routes').init(electron.ipcMain)
 
 let a = true
 if (process.env.NODE_ENV === 'production' || a) {

@@ -1,8 +1,12 @@
-import GLOBAL from '../Global/VARIABLES'
+// import GLOBAL from '../../Global/VARIABLES'
 import * as handlers from './handlers'
-import * as sbFetch from '../sbFetch'
-import store from '../../renderer/store'
-import * as youtubeHandler from '../youtubeHandler'
+import * as sbFetch from '../../sbFetch'
+import store from '../../../renderer/store'
+import * as youtubeHandler from '../../youtubeHandler'
+import FileWatchers from '../FileSystem/FileWatchers'
+import IpcController from './ipc.controller'
+
+const ipcSend = IpcController.send
 
 // :::::::::::::::::::::::::::::::::IPC:::::::::::::::::::::::::::::::::
 export function init (ipc) {
@@ -25,13 +29,13 @@ export function init (ipc) {
         sbFetch.guestLogin(query)
           .then(resolve => {
             if (resolve.status === 404) {
-              GLOBAL.MAIN_WINDOW.webContents.send('not-found')
+              ipcSend('not-found')
             }
             if (resolve.status === 400) {
-              GLOBAL.MAIN_WINDOW.webContents.send('invalid')
+              ipcSend('invalid')
             }
             if (resolve.status === 200) {
-              GLOBAL.MAIN_WINDOW.webContents.send('user-found', resolve)
+              ipcSend('user-found', resolve)
             }
           })
           .catch(err => console.log(err))
@@ -78,7 +82,7 @@ export function init (ipc) {
     sbFetch.fetchPlaylists(store.getters.RequestParams)
       .then(resolve => {
         store.dispatch('updatePlaylists', resolve.playlists).then(() => {
-          GLOBAL.MAIN_WINDOW.webContents.send('done loading')
+          ipcSend('done loading')
         })
       })
       .catch(err => {
@@ -94,14 +98,14 @@ export function init (ipc) {
       console.log('LOADING FROM ', id)
       handlers.fetchMultiple([{ id }], false)
         .then(() => {
-          GLOBAL.MAIN_WINDOW.webContents.send('open playlist', id)
+          ipcSend('open playlist', id)
         })
         .catch(err => {
           console.error(222222222222222) // TODO Handle error
           console.error(err) // TODO Handle error
         })
         .finally(handlers.LOADING)
-    } else GLOBAL.MAIN_WINDOW.webContents.send('open playlist', id)
+    } else ipcSend('open playlist', id)
   })
 
   ipc.on('Youtube Convert', function () {
@@ -127,5 +131,19 @@ export function init (ipc) {
           console.error('ERROR AT YoutubeConvert:: fetchMultiple', err)
         })
     } else youtubeHandler.youtubizeAll()
+  })
+
+  // FileWatchers
+
+  ipc.on('FileWatchers:ASK_TRACKS', function () {
+    console.log('beforeask')
+    ipcSend('FileWatchers:RETRIEVED_TRACKS', FileWatchers.retrieveTracks())
+  })
+
+  FileWatchers.on('added', track => {
+    ipcSend('FileWatchers:ADDED', track)
+  })
+  FileWatchers.on('removed', track => {
+    ipcSend('FileWatchers:REMOVED', track)
   })
 }

@@ -48,6 +48,7 @@ export default {
         x: this.$props.options.xRotationFactor !== undefined ? this.$props.options.xRotationFactor : 0.05,
         y: this.$props.options.yRotationFactor !== undefined ? this.$props.options.yRotationFactor : 0.1,
         scaleFactor: (() => {
+          if (this.$props.options.hovScaleFactor === false) return ''
           let num = this.$props.options.hovScaleFactor !== undefined ? this.$props.options.hovScaleFactor : 1.05
           return `scale3d(${num}, ${num}, 1)`
         })()
@@ -184,7 +185,7 @@ $hovering-transition: .3s $bezier-tranka;
   --local-hover-transition: 1s #{$bezier-tranka};
   --local-hover-transition-fast: .5s #{$bezier-tranka};
   box-sizing: border-box;
-  padding: 1.5em var(--container-padding-x);
+  padding: var(--container-padding-x) calc(var(--container-padding-x) / 2);
   padding-top: 0;
   z-index: 0;
   &:not(.pressed).transformation-parent {

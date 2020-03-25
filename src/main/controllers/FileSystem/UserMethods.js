@@ -1,10 +1,9 @@
 /* eslint-disable new-cap */
-import customGetters from '../../renderer/store/customGetters'
-import * as utils from '../../MAIN_PROCESS_UTILS'
+import customGetters from '../../../renderer/store/customGetters'
+import * as utils from '../../../MAIN_PROCESS_UTILS'
 const electron = require('electron')
 const fs = require('fs')
 const rimraf = require('rimraf')
-const chokidar = require('chokidar')
 // const NodeID3 = require('node-id3')
 const iconv = require('iconv-lite')
 
@@ -14,9 +13,8 @@ const stateFileName = '/.songbasket'
 console.log('Folder Path: ', foldersJsonPath)
 
 const homeFolderPath = () => global.HOME_FOLDER
-let watchers = []
 
-const userMethods = {
+const UserMethods = {
   existsPromise: function (path) {
     return new Promise(async (resolve, reject) => {
       let exists = await utils.promisify(fs.stat, path)
@@ -91,7 +89,7 @@ const userMethods = {
       for (let i = 0; i < syncedPlaylists.length; i++) {
         let pl = syncedPlaylists[i]
         // TODO Better folder name handling (to avoid repetition)
-        pl = { id: pl.id, path: (path || homeFolderPath()) + '/' + utils.encodeIntoFilename(pl.name) }
+        pl = { id: pl.id, path: (path || homeFolderPath()) + '/' + utils.encodeIntoFilename(pl.folderName || pl.name) }
         console.log('checked', pl)
 
         if (!await checkPathThenCreate(pl.path)) checkNResolve()
@@ -113,27 +111,30 @@ const userMethods = {
               // cycle throug tracks and store SB ones
               for (let o = 0; o < filenames.length; o++) {
                 let file = pl.path + '/' + filenames[o]
-                userMethods.checkMP3FileTags(file, function (err, tags) {
-                  if (err) console.error(err) // TODO Handle error
-                  else if (tags) {
-                    let track = {}
+                UserMethods.retrieveMP3FileTags(file)
+                  .then(tags => {
+                    if (tags) {
+                      let track = {}
 
-                    tags.forEach(tag => {
-                      track[tag.name] = tag.value
-                    })
+                      tags.forEach(tag => {
+                        track[tag.name] = tag.value
+                      })
 
-                    track.playlist = pl.id
-                    track.path = file
-                    track.file = filenames[o]
+                      track.playlist = pl.id
+                      track.path = file
+                      track.file = filenames[o]
 
-                    allTracks.push(track)
-                  }
+                      allTracks.push(track)
+                    }
 
-                  processedTracks++
-                  if (processedTracks === filenames.length) {
-                    checkNResolve()
-                  }
-                })
+                    processedTracks++
+                    if (processedTracks === filenames.length) {
+                      checkNResolve()
+                    }
+                  })
+                  .catch(err => {
+                    if (err) console.error(err) // TODO Handle error
+                  })
               }
             }
           })
@@ -156,108 +157,68 @@ const userMethods = {
     console.log('RENAMING FOLDER: ' + oldName + ' => ' + newName)
     fs.rename(base + oldName, base + newName)
   },
-  checkMP3FileTags (path, fn) {
-    fs.open(path, 'r', function (err, fd) {
-      if (err) return fn(err, null)
+  retrieveMP3FileTags (path) {
+    return new Promise((resolve, reject) => {
+      fs.open(path, 'r', function (err, fd) {
+        if (err) return reject(err)
 
-      fs.fstat(fd, function (err, stats) {
-        if (err) return closeFile(fd, err, null)
+        fs.fstat(fd, function (err, stats) {
+          if (err) return closeFile(fd, err, null)
 
-        const max = 1024
-        let bufferSize = stats.size < max ? stats.size : max
-        let buffer = new Buffer.alloc(bufferSize)
+          const max = 1024
+          let bufferSize = stats.size < max ? stats.size : max
+          let buffer = new Buffer.alloc(bufferSize)
 
-        fs.read(fd, buffer, 0, bufferSize, 0, () => {
-          let headerPointer = buffer.indexOf('TXXX')
-          if (headerPointer === -1) return closeFile(fd, null, null)
+          fs.read(fd, buffer, 0, bufferSize, 0, () => {
+            let headerPointer = buffer.indexOf('TXXX')
+            // Track doesn't contain SB tags
+            if (headerPointer === -1) return closeFile(fd, null, null)
 
-          // let tagSize = 57*3 + 13
-          let tagsBuffer = new Buffer.alloc(bufferSize - headerPointer)
+            // let tagSize = 57*3 + 13
+            let tagsBuffer = new Buffer.alloc(bufferSize - headerPointer)
 
-          buffer.copy(tagsBuffer, 0, headerPointer)
+            buffer.copy(tagsBuffer, 0, headerPointer)
 
-          let fileContents = (iconv.decode(tagsBuffer, 'ISO-8859-1').replace(/\0/g, ''))
-          fileContents = fileContents.substring(fileContents.indexOf('songbasket'))
-          let tagPosition = fileContents.indexOf('songbasket')
-          let tags = tagPosition === -1 ? null : []
-
-          for (null; tagPosition !== -1; tagPosition = fileContents.indexOf('songbasket')) {
-            let tagObj = {}
-
-            let tagEnd = fileContents.substring(tagPosition).indexOf('ÿþ')
-            tagObj.name = fileContents.slice(tagPosition, tagEnd)
-            fileContents = fileContents.substring(tagEnd + 2)
-
-            let tagLength = giveMeTagLength(tagObj.name)
-            tagObj.value = fileContents.substring(0, tagLength)
+            let fileContents = (iconv.decode(tagsBuffer, 'ISO-8859-1').replace(/\0/g, ''))
             fileContents = fileContents.substring(fileContents.indexOf('songbasket'))
+            let tagPosition = fileContents.indexOf('songbasket')
+            let tags = tagPosition === -1 ? null : []
 
-            tags.push(tagObj)
-          }
-          closeFile(fd, null, tags)
+            for (null; tagPosition !== -1; tagPosition = fileContents.indexOf('songbasket')) {
+              let tagObj = {}
+
+              let tagEnd = fileContents.substring(tagPosition).indexOf('ÿþ')
+              tagObj.name = fileContents.slice(tagPosition, tagEnd)
+              fileContents = fileContents.substring(tagEnd + 2)
+
+              let tagLength = giveMeTagLength(tagObj.name)
+              tagObj.value = fileContents.substring(0, tagLength)
+              fileContents = fileContents.substring(fileContents.indexOf('songbasket'))
+
+              tags.push(tagObj)
+            }
+            closeFile(fd, null, tags)
+          })
         })
       })
-    })
 
-    function giveMeTagLength (name) {
-      switch (name) {
-        case 'songbasket_spotify_id':
-          return 22
-        case 'songbasket_youtube_id':
-          return 11
-        default:
-          return -1
+      function giveMeTagLength (name) {
+        switch (name) {
+          case 'songbasket_spotify_id':
+            return 22
+          case 'songbasket_youtube_id':
+            return 11
+          default:
+            return -1
+        }
       }
-    }
-    function closeFile (fd, err, tags) {
-      fs.close(fd, () => {
-        fn(err, tags)
-      })
-    }
-  },
-  async createPlaylistWatchers (customPath) {
-    let syncedPlaylists = customGetters.SyncedPlaylistsSp()
-    syncedPlaylists.forEach(pl => {
-      let path = (customPath || homeFolderPath()) + '/' + utils.encodeIntoFilename(pl.name)
-      console.log(path)
-
-      let watcher = chokidar.watch(path, { ignored: /[/\\]\./ })
-      watchers.push(watcher)
-
-      watcher
-        .on('add', (path) => handleWatcherEvent('add', path))
-        .on('change', (path) => handleWatcherEvent('change', path))
-        .on('unlink', (path) => handleWatcherEvent('unlink', path))
-        .on('unlinkDir', (path) => handleWatcherEvent('unlinkDir', path))
-        .on('error', (error) => handleWatcherEvent('error', error))
-        .on('ready', () => handleWatcherEvent('ready'))
-        .on('raw', (event, path, details) => handleWatcherEvent('raw', [event, path, details]))
-
-      // 'add', 'addDir' and 'change' events also receive stat() results as second
-      // argument when available: http://nodejs.org/api/fs.html#fs_class_fs_stats
-      watcher.on('change', function (path, stats) {
-        if (stats) console.log('File', path, 'changed size to', stats.size)
-      })
-
-      // Un-watch some files.
-      watcher.unwatch('new-file*')
+      function closeFile (fd, err, tags) {
+        fs.close(fd, () => {
+          if (err) reject(err)
+          else resolve(tags)
+        })
+      }
     })
-  }
-}
-
-function handleWatcherEvent (event, arg) {
-  console.log(event)
-  switch (event) {
-    case 'add':
-    case 'change':
-    case 'unlink':
-    case 'unlinkDir':
-      // Arg is path
-      if (/^((?!\w+\.mp3$).)*$/.test(arg)) return
-      console.log(arg, 'is valid mp3')
-      break
-    case 'error':
-      break
   }
 }
 
@@ -267,4 +228,4 @@ async function checkPathThenCreate (path) {
   return pathExists
 }
 
-export default userMethods
+export default UserMethods

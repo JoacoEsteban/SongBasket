@@ -9,10 +9,10 @@ export default class {
   }
 
   beforeTransition (func) {
-    this.beforeTransitionCallbacks.push(func)
+    if (typeof func === 'function') this.beforeTransitionCallbacks.push(func)
   }
   afterTransition (func) {
-    this.afterTransitionCallbacks.push(func)
+    if (typeof func === 'function') this.afterTransitionCallbacks.push(func)
   }
 
   setTransitioningState (bool) {

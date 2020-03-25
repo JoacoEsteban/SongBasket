@@ -94,7 +94,7 @@ export default {
       }
     },
     addPlaylistToSyncQueue () {
-      if (!this.isQueued) this.restoreTransformation(true)
+      // if (!this.isQueued) this.restoreTransformation(true)
       this.$store.dispatch('queuePlaylist', this.playlist.id)
     },
     unsync () {

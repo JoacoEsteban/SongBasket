@@ -1,5 +1,5 @@
-import customGetters from '../../renderer/store/customGetters'
-import * as utils from '../../MAIN_PROCESS_UTILS'
+import customGetters from '../../../renderer/store/customGetters'
+import * as utils from '../../../MAIN_PROCESS_UTILS'
 
 const fs = require('fs')
 

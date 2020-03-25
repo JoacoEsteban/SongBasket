@@ -1,11 +1,14 @@
-import FileSystemUser from '../FileSystem/index'
-import { logme } from '../../UTILS'
-import customGetters from '../../renderer/store/customGetters'
-import * as sbFetch from '../sbFetch'
-import GLOBAL from '../Global/VARIABLES'
+import FSControler from '../FileSystem/index'
+import { logme } from '../../../UTILS'
+import customGetters from '../../../renderer/store/customGetters'
+import * as sbFetch from '../../sbFetch'
+import GLOBAL from '../../Global/VARIABLES'
+import IpcController from './ipc.controller'
 import youtubeDl from '../DownloadPhase/youtube-dl'
-// import * as youtubeHandler from './youtubeHandler'
+
 const openBrowser = require('open')
+const ipcSend = IpcController.send
+
 let BROWSER_WINDOW
 let SESSION
 let DIALOG
@@ -66,7 +69,7 @@ export function openInBrowser (event, id) {
 
 export function download () {
   console.log('About to download')
-  FileSystemUser.checkDownloadPaths()
+  FSControler.UserMethods.checkDownloadPaths()
     .then(playlists => {
       console.log('passed')
       youtubeDl.downloadSyncedPlaylists(playlists)
@@ -113,7 +116,7 @@ export async function setHomeFolder () {
     pushToHome()
   } catch (err) {
     // Else ask to login and start a folder from 0
-    GLOBAL.MAIN_WINDOW.webContents.send('continueToLogin')
+    ipcSend('continueToLogin')
   }
 }
 
@@ -154,7 +157,7 @@ export function storePlaylists (response, redirect) {
   GLOBAL.VUEX.dispatch('updateUserEntities', response)
     .then(() => {
       if (redirect) {
-        GLOBAL.MAIN_WINDOW.webContents.send('playlists done')
+        ipcSend('playlists done')
         if (GLOBAL.LOGIN_WINDOW) GLOBAL.LOGIN_WINDOW.close()
       }
     })
@@ -163,31 +166,29 @@ export function storePlaylists (response, redirect) {
 export async function retrieveAndStoreState (path) {
   let data
   try {
-    data = await FileSystemUser.retrieveState(path)
+    data = await FSControler.UserMethods.retrieveState(path)
     try {
       await GLOBAL.VUEX.dispatch('storeDataFromDisk', data)
       // Check if folder has synced playlists to setup watchers
-      // if ((await FileSystemUser.checkDownloadPaths()).length) {
-      //   await FileSystemUser.createPlaylistWatchers()
-      // }
+      await FSControler.FileWatchers.createPlaylistWatchers()
     } catch (err) { throw err }
   } catch (err) { throw err }
 }
 
 export async function verifyFileSystem () {
   console.log('Checking for existing home folders')
-  let FOLDERS = await FileSystemUser.checkForUser()
+  let FOLDERS = await FSControler.UserMethods.checkForUser()
   await GLOBAL.VUEX.dispatch('setFolderPaths', FOLDERS)
   if (FOLDERS.paths.length === 0) {
     console.log('no user')
     return setTimeout(() => {
-      GLOBAL.MAIN_WINDOW.webContents.send('initializeSetup')
+      ipcSend('initializeSetup')
     }, 1000)
   }
 
   if (FOLDERS.selected === null) {
     // TODO redirect to folders view
-    return GLOBAL.MAIN_WINDOW.webContents.send('chooseFolder')
+    return ipcSend('chooseFolder')
   }
 
   try {
@@ -197,7 +198,7 @@ export async function verifyFileSystem () {
     // TODO Handle errors when retrieving and setting data
     console.error('NOT FOOUND', err)
     return setTimeout(() => {
-      GLOBAL.MAIN_WINDOW.webContents.send('initializeSetup')
+      ipcSend('initializeSetup')
     }, 1000)
   }
   // guestFetch(FOLDERS.user, true)
@@ -218,7 +219,7 @@ export function LOADING (value, target) {
 
 export function pushToHome () {
   console.log('pushnient')
-  GLOBAL.MAIN_WINDOW.webContents.send('dataStored')
+  ipcSend('dataStored')
 }
 
 export function guestFetch (query, isFirstTime) {

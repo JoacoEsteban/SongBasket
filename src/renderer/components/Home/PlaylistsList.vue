@@ -1,5 +1,5 @@
 <template>
-  <div ref="playlists-list" class="pll-container pb-2">
+  <div ref="playlists-list" class="pll-container">
     <div class="filters-container">
       <div class="filters-content">
         <div class="search-bar global-scroll-shadow">
@@ -203,6 +203,9 @@ $transition-global-hard: 0.5s $bezier;
   text-align: center;
   height: fit-content;
   width: 100%;
+  box-sizing: border-box;
+  padding: var(--container-padding-x);
+  padding-top: 0;
 }
 .actual-list {
   --list-transition-time: .3s;
@@ -233,7 +236,7 @@ $transition-global-hard: 0.5s $bezier;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 1em;
+    // padding: 0 1em;
   }
   .search-bar {
     pointer-events: all;

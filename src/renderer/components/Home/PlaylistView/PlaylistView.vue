@@ -197,6 +197,8 @@ export default {
 .track-list {
   width: 100%;
   overflow: hidden;
-  padding-top: 1em;
+  padding: 1em;
+  padding-top: 0;
+  box-sizing: border-box;
 }
 </style>

@@ -1,8 +1,8 @@
 import {extractMp3, applyTags} from './FfmpegController'
-import store from '../../renderer/store'
-import customGetters from '../../renderer/store/customGetters'
-import * as utils from '../../MAIN_PROCESS_UTILS'
-import GLOBAL from '../Global/VARIABLES'
+import store from '../../../renderer/store'
+import customGetters from '../../../renderer/store/customGetters'
+import * as utils from '../../../MAIN_PROCESS_UTILS'
+import GLOBAL from '../../Global/VARIABLES'
 import {downloadLinkRemove, link} from './StoredTracksChecker'
 
 const fs = require('fs')

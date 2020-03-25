@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import Vue from 'vue'
-import FileSystem from '../../../main/FileSystem/index'
+import FSController from '../../../main/controllers/FileSystem/index'
 import trackUtils from '../Helpers/Tracks'
 
 // import SharedStates from './SharedStates'
@@ -15,7 +15,7 @@ function SAVE_TO_DISK (check) {
 
   if (--saveQueue > 0) return
   console.log('::::::::::::::::::::::::::::SAVING::::::::::::::::::::::::::::::::')
-  FileSystem.saveState({state, path: global.HOME_FOLDER})
+  FSController.UserMethods.saveState({state, path: global.HOME_FOLDER})
 }
 
 function LOADING (store, value, target) {
@@ -273,7 +273,7 @@ const mutations = {
       if (statePl.name !== playlist.name) {
         oldName = statePl.folderName
         statePl.folderName = null
-        cb = () => FileSystem.renameFolder({oldName, newName: playlist.folderName}) // Rename Folder
+        cb = () => FSController.FileWatchers.renameFolder({oldName, newName: playlist.folderName}) // Rename Folder
       }
 
       playlist.folderName = statePl.folderName || (() => {
@@ -452,7 +452,7 @@ const mutations = {
       }
     }
     if (success) {
-      FileSystem.deletePlaylist(state.playlists[index].name, () => {
+      FSController.UserMethods.deletePlaylist(state.playlists[index].name, () => {
         this.dispatch('syncedPlaylistsRefreshed', {}, {root: true})
         this.dispatch('playlistUnsynced', {}, {root: true})
         SAVE_TO_DISK()

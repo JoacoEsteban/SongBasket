@@ -1,6 +1,6 @@
-import GLOBAL from '../Global/VARIABLES'
+import GLOBAL from '../../Global/VARIABLES'
 import * as handlers from '../InitializationAndHandlers/handlers'
-import * as utils from '../../MAIN_PROCESS_UTILS'
+import * as utils from '../../../MAIN_PROCESS_UTILS'
 const fs = require('fs')
 const ffbinaries = require('ffbinaries')
 const ffmpeg = require('fluent-ffmpeg')
