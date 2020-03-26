@@ -1,10 +1,38 @@
 <template>
   <div class="plv-container w100">
     <div class="track-list row">
-      <div class="dcontents" v-if="isSynced">
-        <Track v-for="(item, index) in added" :isNew="true" :item="item" :key="index" />
+
+      <div class="changes-container" v-if="isSynced">
+        <div class="mb-1" v-if="added.length">
+          <div class="list">
+            <div class="label-container">
+              <span class="point75-em">
+                Added <span class="color-green">+{{added.length}}</span>
+              </span>
+            </div>
+          </div>
+          <div class="horizontal-scroller pt-0">
+            <Track v-for="(item, index) in added" :isNew="true" :item="item" :key="index" />
+          </div>
+        </div>
+
+        <div class="mb-1" v-if="removed.length">
+          <div class="list">
+            <div class="label-container">
+              <span class="point75-em">
+                Removed <span class="color-red">-{{removed.length}}</span>
+              </span>
+            </div>
+          </div>
+          <div class="horizontal-scroller pt-0">
+            <Track v-for="(item, index) in removed" :isRemoved="true" :item="item" :key="index" />
+          </div>
+        </div>
       </div>
-      <Track v-for="(item, index) in (isSynced ? conversion : items)" :item="item" :key="index" />
+
+      <div class="list">
+        <Track v-for="(item, index) in (isSynced ? conversion : items)" :item="item" :key="index" />
+      </div>
     </div>
   </div>
 </template>
@@ -30,11 +58,7 @@ export default {
     Track
   },
   props: {
-    currentPlaylist: {
-      type: String,
-      required: false,
-      default: null
-    }
+    currentPlaylist: String
   },
   computed: {
     playlistImage () {
@@ -101,6 +125,7 @@ export default {
     console.log('PLAYLISTTTTT:::::', this.playlist)
     this.refreshPlaylist()
     this.computeTracks()
+    this.$root.PlaylistViewInstance = this
     window.plViewDebug = this
   },
   destroyed () {
@@ -130,7 +155,13 @@ export default {
       }
     },
     computeTracks () {
-      this.conversion = this.$store.state.CurrentUser.convertedTracks.filter(t => t.playlists.some(pl => pl.id === this.currentPlaylist))
+      console.log('computing')
+      this.conversion = this.$store.state.CurrentUser.convertedTracks.filter(t => t.playlists.some(pl => pl.id === this.currentPlaylist)).map(track => {
+        const cloned = {...track}
+        cloned.selection = this.$controllers.track.getSelection(cloned, this.currentPlaylist)
+        cloned.status = this.$controllers.track.getStatus(cloned)
+        return cloned
+      }).sort(this.$controllers.track.sort)
     },
     youtubeId (id) {
       let c = this.conversion.tracks
@@ -139,9 +170,6 @@ export default {
       }
       console.log('TRACK NOT FOUND')
       return null
-    },
-    giveMeConversion (id) {
-      return this.conversion.find(t => t.id === id)
     },
     toggleConversion (id, intention) {
       // Intention is what the toggle wants to do
@@ -195,10 +223,24 @@ export default {
 
 <style lang="scss" scoped>
 .track-list {
+  --card-padding-x: .5em;
+  --padding-x: 1em;
   width: 100%;
   overflow: hidden;
-  padding: 1em;
+  padding: var(--padding-x) 0;
   padding-top: 0;
   box-sizing: border-box;
+  .list {
+    padding: 0 var(--padding-x);
+  }
+}
+
+.changes-container {
+  .label-container {
+    font-weight: bold;
+    text-transform: uppercase;
+    text-align: left;
+    padding-left: calc(.3em + var(--card-padding-x));
+  }
 }
 </style>

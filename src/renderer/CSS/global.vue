@@ -183,6 +183,17 @@ body:hover {
 .hide-on-scroll {
   opacity: var(--scroll-opacity-inverted);
 }
+
+.horizontal-scroller {
+  box-sizing: border-box;
+  display: flex;
+  overflow: auto;
+  padding: var(--padding-x);
+  padding-bottom: 0;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
 </style>
 
 <style lang="less">

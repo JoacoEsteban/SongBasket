@@ -55,19 +55,19 @@ export default {
       return pl && pl.id
     },
     onAddedTrack (e, track) {
-      const tracks = this.$root.downloadedTracks
+      const tracks = this.$root.DOWNLOADED_TRACKS
 
       if (!tracks[track.spotify_id]) tracks[track.spotify_id] = {}
       if (!tracks[track.spotify_id][track.youtube_id]) tracks[track.spotify_id][track.youtube_id] = { playlists: [] }
 
       const id = this.getPlaylistIdFromFoldername(track.playlist)
-      console.log('aber', track.playlist, id)
       if (!id) return
       tracks[track.spotify_id][track.youtube_id].playlists.push(id)
-      console.log('redy bb queonda', track)
+
+      this.propagateFileChange({...track, playlistId: id})
     },
     onRemovedTrack (e, track) {
-      const tracks = this.$root.downloadedTracks
+      const tracks = this.$root.DOWNLOADED_TRACKS
 
       if (!tracks[track.spotify_id] || !tracks[track.spotify_id][track.youtube_id]) return
       const trackRef = tracks[track.spotify_id][track.youtube_id]
@@ -78,7 +78,20 @@ export default {
       if (!trackRef.playlists.length) {
         tracks[track.spotify_id][track.youtube_id] = undefined
       }
-      console.log('Removed', track)
+      this.propagateFileChange({...track, playlistId: id})
+    },
+    propagateFileChange (track) {
+      const path = this.$sbRouter.giveMeCurrent()
+      switch (path.name) {
+        case 'playlist-view':
+          if (path.params.id !== track.playlistId) return
+          if (this.propagationTimeout) clearTimeout(this.propagationTimeout)
+          this.propagationTimeout = setTimeout(() => {
+            this.$root.PlaylistViewInstance.computeTracks()
+            this.propagationTimeout = null
+          }, 200)
+          break
+      }
     },
     onRetrievedTracks (e, tracks) {
       for (const primKey in tracks) {
@@ -86,7 +99,7 @@ export default {
           tracks[primKey][secKey].playlists = tracks[primKey][secKey].playlists.map(p => this.getPlaylistIdFromFoldername(p))
         }
       }
-      this.$root.downloadedTracks = tracks
+      this.$root.DOWNLOADED_TRACKS = tracks
     }
   },
   created () {
@@ -106,10 +119,9 @@ export default {
     $(window).on('mousedown', this.handleMouseKey)
   },
   beforeCreate () {
-    this.$root.downloadedTracks = {}
+    this.$root.DOWNLOADED_TRACKS = {}
     // window.ipc.on('FileWatchers:READY', (e, tracks) => {
-    //   console.log('redy bb queonda', e, tracks)
-    //   this.$root.downloadedTracks = tracks
+    //   this.$root.DOWNLOADED_TRACKS = tracks
     // })
     window.VUE_ROOT = this.$root
     window.VUEX = this.$store.state

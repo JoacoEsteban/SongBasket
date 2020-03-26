@@ -21,7 +21,6 @@ const FileWatchers = {
     let syncedPlaylists = customGetters.SyncedPlaylistsSp()
     syncedPlaylists.forEach(pl => {
       let path = (customPath || homeFolderPath()) + '/' + utils.encodeIntoFilename(pl.folderName || pl.name)
-      // console.log(path)
 
       // READY++
 
@@ -94,7 +93,6 @@ const FileWatchers = {
   },
 
   async handleWatcherEvent (event, args) {
-    // console.log(event)
     if (event === 'raw') {
 
     } else if (event === 'ready') {
@@ -106,7 +104,6 @@ const FileWatchers = {
       switch (event) {
         case 'add':
           let tags = await this.retrieveTags(path)
-          console.log('add', tags)
           if (tags) this.addTrack(path, tags)
           break
         case 'unlink':
@@ -129,7 +126,6 @@ const FileWatchers = {
   },
   trigger (event, params) {
     // if (READY > 0) return
-    console.log(event, params)
     const stack = giveMeStack(event)
     if (stack) stack.forEach(fn => fn(params))
   }

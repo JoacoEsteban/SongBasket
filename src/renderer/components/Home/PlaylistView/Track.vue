@@ -15,9 +15,12 @@
         <span class="bold uppercase point75-em color-green" v-if="isNew">
           new
         </span>
+        <span class="bold uppercase point75-em color-red" v-if="isRemoved">
+          removed
+        </span>
         
-        <span class="bold uppercase point75-em" :style="{color: trackData.status.color}">
-          {{trackData.status.str}}
+        <span class="bold uppercase point75-em" v-if="itemFormatted.status" :style="{color: itemFormatted.status.color}">
+          {{itemFormatted.status.str}}
         </span>
       </div>
     </div>
@@ -33,7 +36,8 @@ export default {
       Object,
       required: true
     },
-    isNew: Boolean
+    isNew: Boolean,
+    isRemoved: Boolean
   },
   components: {
     Card
@@ -41,21 +45,13 @@ export default {
   computed: {
     itemFormatted () {
       const album = this.item.album || this.item.data.album
-      const itm = this.item
-      return (itm && {
-        ...itm,
-        selection: itm.conversion && itm.conversion.yt.find(yt => yt.id === (itm.playlists.find(p => p.id === this.playlistId).selected || itm.conversion.bestMatch)),
+      return (this.item && {
+        ...this.item,
         backgroundImage: album && album.images && album.images[0] && album.images[0].url
       }) || {}
     }
   },
   methods: {
-    calcStatus () {
-      this.trackData.status = this.trackController.getStatus(this.itemFormatted)
-    }
-  },
-  mounted () {
-    this.calcStatus()
   },
   data () {
     return {
@@ -64,15 +60,8 @@ export default {
         xRotationFactor: 0.01,
         hovScaleFactor: false,
         paddingY: '.5em',
-        paddingX: '.5em'
-      },
-      playlistId: this.$sbRouter.giveMeCurrent().params.id,
-      trackData: {
-        status: {
-          slug: '',
-          color: '',
-          str: ''
-        }
+        paddingX: 'var(--card-padding-x)',
+        size: this.isNew || this.isRemoved ? '.8em' : ''
       },
       trackController: this.$controllers.track
     }

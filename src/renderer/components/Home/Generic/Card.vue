@@ -11,7 +11,7 @@
           <div class="light-shine" ref="light-shine"></div>
         </div>
       </div>
-      <div class="card-default-slot" :style="{height: this.options.height || '4em'}">
+      <div class="card-default-slot" :style="{height: this.options.height || '4em', 'font-size': this.options.size || ''}">
         <slot>
         </slot>
       </div>
@@ -188,6 +188,7 @@ $hovering-transition: .3s $bezier-tranka;
   padding: var(--container-padding-x) calc(var(--container-padding-x) / 2);
   padding-top: 0;
   z-index: 0;
+  flex-shrink: 0;
   &:not(.pressed).transformation-parent {
     &:hover {
       transform: scale(1.03);

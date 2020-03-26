@@ -110,6 +110,9 @@
     padding: 2em;
 }
 
+.pb-0 {
+    padding-bottom: 0;
+}
 .pb-1 {
     padding-bottom: .5em;
 }
@@ -123,6 +126,9 @@
     padding-bottom: 2em;
 }
 
+.pt-0 {
+    padding-top: 0;
+}
 .pt-1 {
     padding-top: .5em;
 }
@@ -136,6 +142,9 @@
     padding-top: 2em;
 }
 
+.pr-0 {
+    padding-right: 0;
+}
 .pr-1 {
     padding-right: .5em;
 }
@@ -149,6 +158,9 @@
     padding-right: 2em;
 }
 
+.pl-0 {
+    padding-left: 0;
+}
 .pl-1 {
     padding-left: .5em;
 }
@@ -162,6 +174,9 @@
     padding-left: 2em;
 }
 
+.m-0 {
+    margin: 0;
+}
 .m-1 {
     margin: .5em;
 }
@@ -175,6 +190,9 @@
     margin: 2em;
 }
 
+.mb-0 {
+    margin-bottom: 0;
+}
 .mb-1 {
     margin-bottom: .5em;
 }
@@ -188,6 +206,9 @@
     margin-bottom: 2em;
 }
 
+.mt-0 {
+    margin-top: 0;
+}
 .mt-1 {
     margin-top: .5em;
 }
@@ -201,6 +222,9 @@
     margin-top: 2em;
 }
 
+.mr-0 {
+    margin-right: 0;
+}
 .mr-1 {
     margin-right: .5em;
 }
@@ -214,6 +238,9 @@
     margin-right: 2em;
 }
 
+.ml-0 {
+    margin-left: 0;
+}
 .ml-1 {
     margin-left: .5em;
 }
@@ -253,10 +280,28 @@
 }
 
 // -----------------POSITION------------------
+// -----------------TEXT-POSITION------------------
+.text-center {
+    text-align: center;
+}
+.text-left {
+    text-align: left;
+}
+.text-right {
+    text-align: right;
+}
+// -----------------TEXT-POSITION------------------
 .color-green {
     color: var(--green-accept)
 }
 .bg-green {
     background-color: var(--green-accept)
+}
+
+.color-red {
+    color: var(--red-cancel)
+}
+.bg-red {
+    background-color: var(--red-cancel)
 }
 </style>

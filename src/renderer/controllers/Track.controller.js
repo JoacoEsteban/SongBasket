@@ -1,12 +1,17 @@
+let VueInstance
+
 const TrackController = {
   getArtists: (item) => (item.artists || item.data.artists).map(({name}) => name).join(', '),
+  getSelection: (track, playlistId) => {
+    return track.conversion && track.conversion.yt.find(yt => yt.id === (track.playlists.find(p => p.id === playlistId).selected || track.conversion.bestMatch))
+  },
   getStatus: function (t) {
     const slug = (() => {
       const f = t.flags || {converted: false}
       if (f.paused) return 'paused'
       if (!f.converted) return 'awaiting-conversion'
       if (f.conversionError) return 'error'
-      if (f.downloaded) return 'downloaded'
+      if (this.isDownloaded(t)) return 'downloaded'
       // if (f.customSelection) return 'custom-selection'
       // check selected doubtly conversion
       if (t.flags.conversionIsApplied || !t.selection.isDoubtlyConversion || f.customSelection) return 'awaiting-download'
@@ -18,6 +23,18 @@ const TrackController = {
       str: Strings[slug],
       color: Colors[slug]
     }
+  },
+  sort (a, b) {
+    if (a.status.slug === 'downloaded') return 1
+    if (b.status.slug === 'downloaded') return -1
+
+    if (a.status.slug === 'review-conversion') return -1
+    if (b.status.slug === 'review-conversion') return 1
+    return 0
+  },
+  isDownloaded: function ({id, selection}) {
+    const dlTrack = (VueInstance || (VueInstance = require('../main').default)).DOWNLOADED_TRACKS[id]
+    return !!(dlTrack && dlTrack[selection.id])
   }
 }
 

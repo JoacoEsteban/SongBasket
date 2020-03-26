@@ -5,9 +5,6 @@
         <div class="search-bar global-scroll-shadow">
           <div class="filters-background show-on-scroll">
           </div>
-          <!-- <span class="label">
-            filter
-          </span> -->
           <input placeholder="Start Typing" autofocus @focus="searchInputOnFocus" @blur="searchInputOnBlur" v-model.trim="searchInput" ref="search-input" class="input-light semibold" type="text">
         </div>
         <div class="filter-buttons">
@@ -19,16 +16,20 @@
       <div v-if="noPlaylists" class="no-playlists">
         No Playlists found{{allLoaded ? '' : ', try loading some more'}}
       </div>
-      <playlist v-for="playlist in syncedPlaylistsFiltered ? syncedPlaylistsFiltered : syncedPlaylists"
-      :playlist="playlist"
-      :key="playlist.id"
-      @addPlaylistToSyncQueue="$emit('addPlaylistToSyncQueue', playlist.id)"
-      @openPlaylist="$emit('openPlaylist', playlist.id)" />
-      <playlist v-for="playlist in unSyncedPlaylistsFiltered ? unSyncedPlaylistsFiltered : unSyncedPlaylists"
-      :playlist="playlist"
-      :key="playlist.id"
-      @addPlaylistToSyncQueue="$emit('addPlaylistToSyncQueue', playlist.id)"
-      @openPlaylist="$emit('openPlaylist', playlist.id)" />
+      <div class="horizontal-scroller">
+        <playlist v-for="playlist in syncedPlaylistsFiltered ? syncedPlaylistsFiltered : syncedPlaylists"
+        :playlist="playlist"
+        :key="playlist.id"
+        @addPlaylistToSyncQueue="$emit('addPlaylistToSyncQueue', playlist.id)"
+        @openPlaylist="$emit('openPlaylist', playlist.id)" />
+      </div>
+      <div class="list">
+        <playlist v-for="playlist in unSyncedPlaylistsFiltered ? unSyncedPlaylistsFiltered : unSyncedPlaylists"
+        :playlist="playlist"
+        :key="playlist.id"
+        @addPlaylistToSyncQueue="$emit('addPlaylistToSyncQueue', playlist.id)"
+        @openPlaylist="$emit('openPlaylist', playlist.id)" />
+      </div>
 
       <div class="df aliic jucc col-xs-12 p-0" v-if="!allLoaded">
         <button class="button" @click="loadMore">{{ loading ? 'Loading' : 'Load More'}}</button>
@@ -140,7 +141,7 @@ export default {
           }
         }
       })
-      this.syncedPlaylists = all.sort((a, b) => a.tracks.added.length > b.tracks.added.length ? -1 : 1)
+      this.syncedPlaylists = all.sort((a, b) => (b.tracks.added.length + b.tracks.removed.length) - (a.tracks.added.length + a.tracks.removed.length))
       this.filterPlaylists()
     },
     calcScrollOpacity () {
@@ -199,12 +200,13 @@ $transition-global: 0.5s $bezier-chill;
 $transition-global-hard: 0.5s $bezier;
 
 .pll-container {
+  --padding-x: var(--container-padding-x);
   /* margin-bottom: 2.4rem; */
   text-align: center;
   height: fit-content;
   width: 100%;
   box-sizing: border-box;
-  padding: var(--container-padding-x);
+  padding: var(--container-padding-x) 0;
   padding-top: 0;
 }
 .actual-list {
@@ -214,6 +216,9 @@ $transition-global-hard: 0.5s $bezier;
   &.hide {
     transform: translateX(-3em);
     opacity: 0;
+  }
+  > .list {
+    padding: 0 var(--padding-x);
   }
 }
 .filters-container {
