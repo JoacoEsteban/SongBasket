@@ -31,7 +31,9 @@
       </div>
 
       <div class="list">
-        <Track v-for="(item, index) in (isSynced ? conversion : items)" :item="item" :key="index" />
+        <Track v-for="(item, index) in (isSynced ? conversion : items)" :item="item" :key="index"
+          @review-track="reviewTrack(item)"
+        />
       </div>
     </div>
   </div>
@@ -103,6 +105,9 @@ export default {
     },
     resetSelection () {
       return this.$store.state.Events.RESET_SELECTION
+    },
+    doubtfulTracks () {
+      return this.conversion.filter(t => t.selection && t.selection.isDoubtlyConversion)
     }
   },
   watch: {
@@ -122,7 +127,6 @@ export default {
     }
   },
   mounted () {
-    console.log('PLAYLISTTTTT:::::', this.playlist)
     this.refreshPlaylist()
     this.computeTracks()
     this.$root.PlaylistViewInstance = this
@@ -135,6 +139,12 @@ export default {
     refreshPlaylist () {
       this.playlist = this.$store.getters.PlaylistById(this.currentPlaylist) || {}
       this.$root.CURRENT_PLAYLSIT_OBJ = this.playlist
+    },
+    reviewTrack (track) {
+      this.$root.OPEN_MODAL({
+        wich: 'track-review',
+        payload: { tracks: this.doubtfulTracks, index: this.doubtfulTracks.indexOf(track) }
+      })
     },
     toggle (wich) {
       this.showing[wich] = !this.showing[wich]
@@ -155,7 +165,6 @@ export default {
       }
     },
     computeTracks () {
-      console.log('computing')
       this.conversion = this.$store.state.CurrentUser.convertedTracks.filter(t => t.playlists.some(pl => pl.id === this.currentPlaylist)).map(track => {
         const cloned = {...track}
         cloned.selection = this.$controllers.track.getSelection(cloned, this.currentPlaylist)
@@ -200,7 +209,7 @@ export default {
       return this.showingAll
     },
     resetAll (confirm) {
-      if (!confirm) return this.$store._actions.openModal[0]({wich: 'reset-all-playlist-tracks', payload: {playlistId: this.playlist.id}})
+      if (!confirm) return this.$root.OPEN_MODAL({wich: 'reset-all-playlist-tracks', payload: {playlistId: this.playlist.id}})
       this.conversion.forEach(track => {
         this.$store.dispatch('changeYtTrackSelection', {playlist: this.playlist.id, trackId: track.id, newId: null})
       })
@@ -212,7 +221,7 @@ export default {
       this.$store.dispatch('changeYtTrackSelection', {playlist: this.playlist.id, trackId, newId})
     },
     customTrackUrl (trackId) {
-      this.$store._actions.openModal[0]({wich: 'custom-track-url', payload: {trackId, playlistId: this.playlist.id}})
+      this.$root.OPEN_MODAL({wich: 'custom-track-url', payload: {trackId, playlistId: this.playlist.id}})
     },
     unsync () {
       this.$store.dispatch('openModal', {wich: 'unsync', payload: {id: this.playlist.id}})

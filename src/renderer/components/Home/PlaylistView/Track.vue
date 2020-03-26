@@ -1,5 +1,5 @@
 <template>
-  <Card :item="itemFormatted" row-classes="col-lg-3 col-md-4 col-s-6 col-xs-12" :options="cardOptions">
+  <Card :item="itemFormatted" :row-classes="rowClasses" :options="cardOptions" @click="handleClick">
     <div class="w100 point75-em">
       <div class="ellipsis">
         <span class="bold">
@@ -37,7 +37,8 @@ export default {
       required: true
     },
     isNew: Boolean,
-    isRemoved: Boolean
+    isRemoved: Boolean,
+    isReviewing: Boolean
   },
   components: {
     Card
@@ -52,6 +53,22 @@ export default {
     }
   },
   methods: {
+    getCallback () {
+      const status = this.item.status && this.item.status.slug
+      switch (status) {
+        case 'review-conversion':
+          return this.openReviewModal
+        default:
+          return null
+      }
+    },
+    handleClick () {
+      if (this.clickCB === undefined) this.clickCB = this.getCallback()
+      if (typeof this.clickCB === 'function') this.clickCB()
+    },
+    openReviewModal () {
+      this.$emit('review-track')
+    }
   },
   data () {
     return {
@@ -63,7 +80,9 @@ export default {
         paddingX: 'var(--card-padding-x)',
         size: this.isNew || this.isRemoved ? '.8em' : ''
       },
-      trackController: this.$controllers.track
+      rowClasses: this.isReviewing ? 'col-sm-12' : 'col-lg-3 col-md-4 col-s-6 col-xs-12',
+      trackController: this.$controllers.track,
+      clickCB: undefined
     }
   }
 }

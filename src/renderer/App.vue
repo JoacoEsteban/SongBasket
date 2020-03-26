@@ -129,6 +129,7 @@ export default {
   },
   mounted () {
     this.$root.plTransformInvalidation = 0
+    this.$root.OPEN_MODAL = this.$store._actions.openModal[0]
     window.addEventListener('mousewheel', this.invalidatePlTransformCache)
     window.addEventListener('resize', this.invalidatePlTransformCache)
     $(document).ready(function () {
