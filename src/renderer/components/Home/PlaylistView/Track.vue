@@ -56,6 +56,7 @@ export default {
     getCallback () {
       const status = this.item.status && this.item.status.slug
       switch (status) {
+        case 'awaiting-download':
         case 'review-conversion':
           return this.openReviewModal
         default:

@@ -143,7 +143,7 @@ export default {
     reviewTrack (track) {
       this.$root.OPEN_MODAL({
         wich: 'track-review',
-        payload: { tracks: this.doubtfulTracks, index: this.doubtfulTracks.indexOf(track) }
+        payload: { tracks: this.conversion, index: this.conversion.indexOf(track) }
       })
     },
     toggle (wich) {

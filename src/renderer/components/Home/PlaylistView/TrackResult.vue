@@ -2,10 +2,9 @@
   <Card :item="itemFormatted" :row-classes="rowClasses" :options="cardOptions" @click="handleClick">
     <div class="w100 point75-em df alic">
       <div class="ellipsis pr-2">
-        <div class="issue color-red point75-em semibold">{{itemFormatted.issue}}</div>
-        <div class="ellipsis">
-          <span class="">
-            {{itemFormatted.name}}
+        <div class="issue color-red point75-em semibold" v-if="itemFormatted.issue" >{{itemFormatted.issue}}</div>
+        <div class="ellipsis name">
+          <span v-html="itemFormatted.name">
           </span>
         </div>
         <div class="ellipsis">
@@ -46,7 +45,7 @@ export default {
         ...itm,
         name: itm.nameFormatted,
         uploader: snippet.channelTitle,
-        issue: ((itm.wordScore === 0 || !itm.nameTokensMap[0]) ? 'Name' : 'Duration') + ' Doesn\'t match',
+        issue: itm.isDoubtlyConversion ? ((itm.wordScore === 0 || !itm.nameTokensMap[0]) ? 'Name' : 'Duration') + ' Doesn\'t match' : null,
         backgroundImage: snippet && snippet.thumbnails && snippet.thumbnails.high.url
       }) || {}
     }
@@ -83,10 +82,16 @@ export default {
 </script>
 
 
+<style lang="scss" >
+span.matching-token {
+  color: var(--green-accept);
+  font-weight: 500;
+}
+</style>
 <style lang="scss" scoped>
-  .duration-diff {
-    > span {
-      font-size: 3em;
-    }
+.duration-diff {
+  > span {
+    font-size: 3em;
   }
+}
 </style>
