@@ -143,7 +143,7 @@ export default {
     reviewTrack (track) {
       this.$root.OPEN_MODAL({
         wich: 'track-review',
-        payload: { tracks: this.conversion, index: this.conversion.indexOf(track) }
+        payload: { tracks: this.conversion, index: this.conversion.indexOf(track), playlistId: this.currentPlaylist }
       })
     },
     toggle (wich) {
@@ -168,7 +168,7 @@ export default {
       this.conversion = this.$store.state.CurrentUser.convertedTracks.filter(t => t.playlists.some(pl => pl.id === this.currentPlaylist)).map(track => {
         const cloned = {...track}
         cloned.selection = this.$controllers.track.getSelection(cloned, this.currentPlaylist)
-        cloned.status = this.$controllers.track.getStatus(cloned)
+        cloned.status = this.$controllers.track.getStatus(cloned, this.currentPlaylist)
         return cloned
       }).sort(this.$controllers.track.sort)
     },

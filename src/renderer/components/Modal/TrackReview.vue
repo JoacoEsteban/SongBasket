@@ -2,6 +2,10 @@
   <div class="track-review-container row">
     <Track :item="item" :isReviewing="true"/>
     <TrackResult v-for="(item, index) in conversions" :key="index" :item="item" :durationColor="durationColor(item)" />
+
+    <div @click="selectCustomUrl" class="link-button">
+      Use Custom URL
+    </div>
   </div>
 </template>
 
@@ -17,7 +21,8 @@ export default {
       return this.options.tracks[this.options.index]
     },
     conversions () {
-      return this.item.conversion.yt
+      console.log('aber', this.item)
+      return this.item.conversion.yt.concat(this.item.custom || [])
     },
     min () {
       let min = Math.abs(this.conversions[0].durationDiff)
@@ -43,6 +48,9 @@ export default {
       const deg = 150 - 150 * Math.abs(durationDiff / this.max)
       console.log(deg, durationDiff, this.max)
       return `hsl(${deg}, 100%, 50%)`
+    },
+    selectCustomUrl () {
+      this.$root.OPEN_MODAL({wich: 'custom-track-url', payload: {trackId: this.item.id, playlistId: this.options.playlistId}})
     }
   },
   components: {

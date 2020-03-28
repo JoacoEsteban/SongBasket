@@ -3,7 +3,12 @@ let VueInstance
 const TrackController = {
   getArtists: (item) => (item.artists || item.data.artists).map(({name}) => name).join(', '),
   getSelection: (track, playlistId) => {
-    return track.conversion && track.conversion.yt.find(yt => yt.id === (track.playlists.find(p => p.id === playlistId).selected || track.conversion.bestMatch))
+    let selectionId = track.playlists.find(p => p.id === playlistId).selected
+
+    if (selectionId === false) return track.custom
+    if (selectionId === null) selectionId = track.conversion.bestMatch
+
+    return track.conversion && track.conversion.yt.find(yt => yt.id === selectionId)
   },
   getStatus: function (t) {
     const slug = (() => {
@@ -12,9 +17,9 @@ const TrackController = {
       if (!f.converted) return 'awaiting-conversion'
       if (f.conversionError) return 'error'
       if (this.isDownloaded(t)) return 'downloaded'
-      // if (f.customSelection) return 'custom-selection'
       // check selected doubtly conversion
-      if (t.flags.conversionIsApplied || !t.selection.isDoubtlyConversion || f.customSelection) return 'awaiting-download'
+      if (t.selection.isCustomTrack) return 'custom:awaiting-download'
+      if (f.conversionIsApplied || !t.selection.isDoubtlyConversion) return 'awaiting-download'
       return 'review-conversion'
     })()
 
@@ -45,6 +50,7 @@ const Colors = {
   'downloaded': 'var(--green-accept)',
   'custom-selection': 'var(--custom-selection-color)',
   'awaiting-download': 'var(--button-purple)',
+  'custom:awaiting-download': 'var(--custom-selection-color)',
   'review-conversion': 'var(--orange-warning)'
 }
 const Strings = {
@@ -54,6 +60,7 @@ const Strings = {
   'downloaded': 'downloaded',
   'custom-selection': 'paused',
   'awaiting-download': 'awaiting download',
+  'custom:awaiting-download': 'awaiting download | custom',
   'review-conversion': 'review conversion'
 }
 

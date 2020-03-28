@@ -460,13 +460,13 @@ const mutations = {
     } else console.error('Playlist not found when unsyncing :: UNSYNC_PLAYLIST')
   },
   CUSTOM_TRACK_URL (state, {details, trackId, playlistId}) {
-    let track = state.convertedTracks[findById(trackId, state.convertedTracks)]
-    if (track === undefined) return console.error('TRACK NOT FOUND IN CONVERTED TRACKS :: CUSTOM_TRACK_URL')
+    const track = state.convertedTracks[findById(trackId, state.convertedTracks)]
+    if (!track) return console.error('TRACK NOT FOUND IN CONVERTED TRACKS :: CUSTOM_TRACK_URL')
+    const playlist = track.playlists.find(pl => pl.id === playlistId)
+    if (!playlist) return console.error('PLAYLIST NOT FOUND IN CONVERTED TRACK :: CUSTOM_TRACK_URL')
+
+    details.isCustomTrack = true
     track.custom = details
-
-    let playlist = track.playlists[findById(playlistId, track.playlists)]
-    if (playlist === undefined) return console.error('PLAYLIST NOT FOUND IN CONVERTED TRACK :: CUSTOM_TRACK_URL')
-
     playlist.selected = false
     SAVE_TO_DISK()
   }

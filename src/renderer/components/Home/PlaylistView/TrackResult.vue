@@ -9,13 +9,13 @@
         </div>
         <div class="ellipsis">
           <span class="regular point75-em">
-            uploader <span class="semibold">{{itemFormatted.uploader}}</span>
+            <span class="semibold">{{itemFormatted.uploader}}</span>
           </span>
         </div>
       </div>
       <div class="duration-diff">
         <span class="bold" :style="{color: durationColor}">
-          {{Math.abs(Math.round(itemFormatted.durationDiff))}}''
+          {{itemFormatted.duration}}
         </span>
       </div>
     </div>
@@ -41,12 +41,14 @@ export default {
       const itm = this.item
       console.log(itm)
       const snippet = itm.snippet
+      const isCustom = itm.isCustomTrack
       return (itm && {
         ...itm,
-        name: itm.nameFormatted,
+        name: isCustom ? snippet.title : itm.nameFormatted,
         uploader: snippet.channelTitle,
-        issue: itm.isDoubtlyConversion ? ((itm.wordScore === 0 || !itm.nameTokensMap[0]) ? 'Name' : 'Duration') + ' Doesn\'t match' : null,
-        backgroundImage: snippet && snippet.thumbnails && snippet.thumbnails.high.url
+        issue: !isCustom && itm.isDoubtlyConversion ? ((itm.wordScore === 0 || !itm.nameTokensMap[0]) ? 'Name' : 'Duration') + ' Doesn\'t match' : null,
+        backgroundImage: snippet && snippet.thumbnails && snippet.thumbnails.high.url,
+        duration: isCustom ? 'CUSTOM' : Math.abs(Math.round(itm.durationDiff)) + '\'\''
       }) || {}
     }
   },

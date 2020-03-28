@@ -57,6 +57,7 @@ export default {
       const status = this.item.status && this.item.status.slug
       switch (status) {
         case 'awaiting-download':
+        case 'custom:awaiting-download':
         case 'review-conversion':
           return this.openReviewModal
         default:

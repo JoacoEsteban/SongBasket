@@ -1,5 +1,5 @@
 <template>
-  <Card @click="handleClick" :pressed="isQueued" :item="playlistFormatted">
+  <Card @click="handleClick" :pressed="isQueued" :item="playlistFormatted" :options="cardOptions">
     <div class="playlist-data">
       <div v-if="isSynced" class="track-changes-container">
         <div v-if="playlist.tracks.added && playlist.tracks.added.length" class="track-change added">
@@ -68,6 +68,12 @@ export default {
     status () {
       if (this.isSynced) return 'synced'
       else return null
+    },
+    cardOptions () {
+      return this.isSynced ? {
+        size: '.8em',
+        height: '3.5em'
+      } : {}
     },
     statusObj () {
       let devolvio = {
