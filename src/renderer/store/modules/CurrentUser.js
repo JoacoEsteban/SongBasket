@@ -90,9 +90,15 @@ const actions = {
       resolve()
     })
   },
-  reprocessAllTracks ({ commit }) {
+  removeConversionDuplicates ({ commit }) {
     return new Promise((resolve, reject) => {
-      commit('REPROCESS_ALL_TRACKS')
+      commit('REMOVE_CONVERSION_DUPLICATES')
+      resolve()
+    })
+  },
+  reprocessAllTracks ({ commit }, params) {
+    return new Promise((resolve, reject) => {
+      commit('REPROCESS_ALL_TRACKS', params)
       resolve()
     })
   },
@@ -357,8 +363,49 @@ const mutations = {
     }
     SAVE_TO_DISK()
   },
-  REPROCESS_ALL_TRACKS () {
-    Vue.set(state, 'convertedTracks', state.convertedTracks.map(convertedTrack => trackUtils.calculateBestMatch(convertedTrack, true)).filter(t => t))
+  REMOVE_CONVERSION_DUPLICATES () {
+    let cloned = [...state.convertedTracks]
+    console.log(cloned[0].id)
+
+    for (const key in cloned) {
+      const itm1 = cloned[key]
+      for (const key2 in cloned) {
+        const itm2 = cloned[key2]
+        if (itm1 === itm2) continue
+        if (itm1.id === itm2.id) {
+          cloned.splice(parseInt(key), 1)
+          break
+        }
+      }
+    }
+
+    // cloned = cloned.filter((a, index1) => { // Removes dupes
+    //   return !cloned.some((b, index2) => {
+    //     if (a.id === b.id && index1 !== index2) {
+    //       console.log(a.data, b.data)
+    //       return true
+    //     }
+    //   })
+    // })
+    console.log(cloned)
+    state.convertedTracks = cloned
+  },
+  REPROCESS_ALL_TRACKS (params = {}) {
+    Vue.set(state, 'convertedTracks', state.convertedTracks.map(convertedTrack => {
+      if (convertedTrack.custom) {
+        convertedTrack.custom.isCustomTrack = true
+        if (params.forceCustom) {
+          convertedTrack.playlists.forEach(pl => pl.selection = false)
+        }
+      }
+      if (!convertedTrack.flags) {
+        convertedTrack.flags = {
+          converted: !!convertedTrack.conversion,
+          conversionError: !convertedTrack.conversion
+        }
+      }
+      return trackUtils.calculateBestMatch(convertedTrack, true)
+    }).filter(t => t))
     console.log('all tracks reprocessed')
     this.dispatch('syncedPlaylistsRefreshed', {}, {root: true})
   },
@@ -427,6 +474,8 @@ const mutations = {
       console.error('Playlist that the track was synced into was not found:: CurrentUser.js :: CHANGE_YT_TRACK_SELECTION')
       return
     }
+
+    console.log('averr', trackObj, newId)
 
     trackObj.playlists[index].selected = newId
     SAVE_TO_DISK()
@@ -667,3 +716,22 @@ function playlistComputeChanges (oldPl, newPl) {
   } else removed = []
   return {added, items, removed}
 }
+
+// function cloneObject (aObject) {
+//   return clone(aObject)
+// }
+
+// function clone (aObject) {
+//   if (!aObject) {
+//     return aObject
+//   }
+
+//   let v
+//   let bObject = Array.isArray(aObject) ? [] : {}
+//   for (const k in aObject) {
+//     v = aObject[k]
+//     bObject[k] = (typeof v === 'object') ? clone(v) : v
+//   }
+
+//   return bObject
+// }

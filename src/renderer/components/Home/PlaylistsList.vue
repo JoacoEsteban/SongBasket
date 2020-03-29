@@ -128,10 +128,12 @@ export default {
       })
     },
     async refreshSynced () {
-      if (!this.$root.notFistTime) await this.$sleep(2000)
+      // TODO FIX THIS
+      if (!this.$root.notFistTime) await this.$sleep(5000)
       this.$root.notFistTime = true // is set in root not to be resetted when instance is destroyed
       let all = []
       let pls = [...this.$store.state.CurrentUser.playlists]
+      // console.log(pls)
       this.$store.state.CurrentUser.syncedPlaylists.forEach(syncPl => {
         for (const i in pls) {
           let pl = pls[i]
@@ -223,7 +225,7 @@ $transition-global-hard: 0.5s $bezier;
 }
 .filters-container {
   pointer-events: none;
-  padding: .5em 0;
+  padding: .5em;
   margin-bottom: 1em;
   position: sticky;
   top: 0;

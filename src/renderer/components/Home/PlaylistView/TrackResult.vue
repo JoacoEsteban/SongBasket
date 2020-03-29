@@ -1,5 +1,5 @@
 <template>
-  <Card :item="itemFormatted" :row-classes="rowClasses" :options="cardOptions" @click="handleClick">
+  <Card :item="itemFormatted" :row-classes="rowClasses + (isSelected ? ' border-green' : ' border-transparent')" :options="cardOptions" @click="handleClick">
     <div class="w100 point75-em df alic">
       <div class="ellipsis pr-2">
         <div class="issue color-red point75-em semibold" v-if="itemFormatted.issue" >{{itemFormatted.issue}}</div>
@@ -31,7 +31,8 @@ export default {
       Object,
       required: true
     },
-    durationColor: String
+    durationColor: String,
+    isSelected: Boolean
   },
   components: {
     Card
@@ -39,7 +40,6 @@ export default {
   computed: {
     itemFormatted () {
       const itm = this.item
-      console.log(itm)
       const snippet = itm.snippet
       const isCustom = itm.isCustomTrack
       return (itm && {
@@ -63,8 +63,7 @@ export default {
     //   }
     // },
     handleClick () {
-      // if (this.clickCB === undefined) this.clickCB = this.getCallback()
-      // if (typeof this.clickCB === 'function') this.clickCB()
+      this.$emit('setSelection')
     }
   },
   data () {

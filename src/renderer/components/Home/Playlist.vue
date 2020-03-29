@@ -66,8 +66,22 @@ export default {
       return this.trackAmmount + ' Track' + (this.trackAmmount === 1 ? '' : 's')
     },
     status () {
-      if (this.isSynced) return 'synced'
-      else return null
+      // if (this.isSynced) console.log('dirty', this.hasDirtyConversion)
+      if (this.isSynced) return (this.hasDirtyConversion ? 'synced:dirty' : 'synced')
+      // if (this.isSynced) return 'synced'
+      return null
+    },
+    hasDirtyConversion () {
+      return this.isSynced && this.$store.state.CurrentUser.convertedTracks.some(t => {
+        const pl = (t.playlists.find(pl => pl.id === this.playlist.id))
+        if (!pl) return false
+        let selectionId = pl.selected
+
+        if (selectionId === false) return false
+        if (selectionId === null) selectionId = t.conversion.bestMatch
+
+        return t.conversion && t.conversion.yt.find(yt => yt.id === selectionId).isDoubtlyConversion
+      })
     },
     cardOptions () {
       return this.isSynced ? {
@@ -84,6 +98,10 @@ export default {
         case 'synced':
           devolvio.class = 'synced'
           devolvio.text = 'synced'
+          break
+        case 'synced:dirty':
+          devolvio.class = 'synced-dirty'
+          devolvio.text = 'dirty synced'
           break
         case null:
           break
@@ -188,6 +206,9 @@ $hovering-transition: .3s $bezier-tranka;
 <style lang="scss">
 $title-size: .8em;
   .playlist-status-indicator {
+    &.synced-dirty {
+      color: var(--orange-warning)
+    }
     &.synced {
       color: var(--green-accept)
     }

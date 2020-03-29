@@ -13,6 +13,9 @@
         <span>
           {{playlist.name}}
         </span>
+        <div class="button" @click="downloadPlaylist">
+          Download TEMP
+        </div>
       </div>
       <div class="track-count regular">
         <span>
@@ -75,6 +78,10 @@ export default {
   methods: {
     getPlaylist ({params}) {
       this.playlist = params && this.$store.getters.PlaylistById(params.id)
+    },
+    downloadPlaylist () {
+      if (!(this.playlist && this.playlist.id)) return
+      window.ipc.send('download', [this.playlist.id])
     }
   }
 }

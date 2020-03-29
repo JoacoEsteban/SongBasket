@@ -1,7 +1,8 @@
 <template>
   <div class="track-review-container row">
     <Track :item="item" :isReviewing="true"/>
-    <TrackResult v-for="(item, index) in conversions" :key="index" :item="item" :durationColor="durationColor(item)" />
+
+    <TrackResult :is-selected="convItem === item.selection" @setSelection="setSelection(convItem)" v-for="(convItem, index) in conversions" :key="index" :item="convItem" :durationColor="durationColor(convItem)" />
 
     <div @click="selectCustomUrl" class="link-button">
       Use Custom URL
@@ -21,7 +22,6 @@ export default {
       return this.options.tracks[this.options.index]
     },
     conversions () {
-      console.log('aber', this.item)
       return this.item.conversion.yt.concat(this.item.custom || [])
     },
     min () {
@@ -35,7 +35,6 @@ export default {
     max () {
       let max = 0
       this.conversions.forEach(({durationDiff}) => {
-        console.log(durationDiff)
         durationDiff = Math.abs(durationDiff)
         if (durationDiff > max) max = durationDiff
       })
@@ -46,11 +45,17 @@ export default {
     durationColor ({durationDiff}) {
       durationDiff = Math.abs(durationDiff)
       const deg = 150 - 150 * Math.abs(durationDiff / this.max)
-      console.log(deg, durationDiff, this.max)
       return `hsl(${deg}, 100%, 50%)`
     },
     selectCustomUrl () {
       this.$root.OPEN_MODAL({wich: 'custom-track-url', payload: {trackId: this.item.id, playlistId: this.options.playlistId}})
+    },
+    setSelection (item) {
+      if (item.id === this.item.selection.id) return
+      let newId = item.id
+      if (item.isCustomTrack) newId = false
+
+      this.$store.dispatch('changeYtTrackSelection', {playlist: this.options.playlistId, trackId: this.item.id, newId})
     }
   },
   components: {

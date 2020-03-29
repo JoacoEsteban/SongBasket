@@ -64,6 +64,7 @@ const FileWatchers = {
   retrieveTracks () {
     const tracksFormatted = {}
     for (const key in this.tracks) {
+      if (!this.tracks[key]) continue
       const { spotify_id, youtube_id } = this.tracks[key]
       if (!tracksFormatted[spotify_id]) tracksFormatted[spotify_id] = {}
       if (!tracksFormatted[spotify_id][youtube_id]) tracksFormatted[spotify_id][youtube_id] = { playlists: [] }
@@ -104,6 +105,7 @@ const FileWatchers = {
       switch (event) {
         case 'add':
           let tags = await this.retrieveTags(path)
+          if (tags && tags.spotify_id === '1r0BHXwfQIGczvSFlSuACX') console.log('aber')
           if (tags) this.addTrack(path, tags)
           break
         case 'unlink':
@@ -131,7 +133,8 @@ const FileWatchers = {
   }
 }
 
-const isValidAudioPath = (path) => !(/^((?!\w+\.mp3$).)*$/.test(path))
+const fileRegex = /(\w|-|\(|\)| |\.)+\.mp3+$/
+const isValidAudioPath = (path) => (fileRegex.test(path))
 
 const getNameFromPath = (path) => {
   path = PATH.dirname(path)

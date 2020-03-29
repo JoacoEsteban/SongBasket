@@ -19,10 +19,9 @@ export default {
     }
     return all
   },
-  giveMePlName (id) {
+  giveMePlFolderName (id) {
     let state = store.state.CurrentUser
-    for (let i = 0; i < state.playlists.length; i++) {
-      if (id === state.playlists[i].id) return state.playlists[i].name
-    }
+    const pl = state.playlists.find(pl => pl.id === id)
+    return pl && (pl.folderName || pl.name)
   }
 }

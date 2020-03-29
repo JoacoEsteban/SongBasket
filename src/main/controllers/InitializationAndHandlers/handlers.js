@@ -67,12 +67,12 @@ export function openInBrowser (event, id) {
   openBrowser('https://www.youtube.com/watch?v=' + id)
 }
 
-export function download () {
+export function download (e, plFilter) {
   console.log('About to download')
   FSControler.UserMethods.checkDownloadPaths()
-    .then(playlists => {
+    .then(tracks => {
       console.log('passed')
-      youtubeDl.downloadSyncedPlaylists(playlists)
+      youtubeDl.downloadSyncedPlaylists(tracks, plFilter)
     })
 }
 

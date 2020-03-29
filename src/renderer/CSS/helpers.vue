@@ -297,11 +297,18 @@
 .bg-green {
     background-color: var(--green-accept)
 }
+.border-green {
+    border: 1px solid var(--green-accept)
+}
 
 .color-red {
     color: var(--red-cancel)
 }
 .bg-red {
     background-color: var(--red-cancel)
+}
+
+.border-transparent {
+    border: 1px solid transparent
 }
 </style>

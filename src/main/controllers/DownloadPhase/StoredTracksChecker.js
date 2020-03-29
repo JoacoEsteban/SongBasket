@@ -40,8 +40,11 @@ export function downloadLinkRemove (localTracks, queryTracks) {
                 unlinkTrack = true
               }
               if (!samePl) { // Same version, diff pl. Hardlink into this playlist
-                console.log('LINKING EXISTING TRACK')
-                linkQueue.push({paths: [lt.path, global.HOME_FOLDER + '/' + utils.encodeIntoFilename(customGetters.giveMePlName(pl.id)) + '/' + lt.file], indexes: [i, u]})
+                const plPath = customGetters.giveMePlFolderName(pl.id)
+                if (plPath) {
+                  console.log('LINKING EXISTING TRACK')
+                  linkQueue.push({paths: [lt.path, global.HOME_FOLDER + '/' + utils.encodeIntoFilename(plPath) + '/' + lt.file], indexes: [i, u]})
+                }
               }
             }
           }

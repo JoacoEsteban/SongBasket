@@ -20,9 +20,12 @@ const emitEvent = {
 }
 
 export default {
-  downloadSyncedPlaylists (localTracks) {
+  downloadSyncedPlaylists (localTracks, plFilter) {
     console.log('Stored tracks: ', localTracks.length)
-    let allTracks = downloadLinkRemove(localTracks, utils.cloneObject(store.state.CurrentUser.convertedTracks))
+    let tracksToDownload = store.state.CurrentUser.convertedTracks
+    if (plFilter) tracksToDownload = tracksToDownload.filter(t => t.playlists.some(pl => plFilter.includes(pl.id)))
+
+    const allTracks = downloadLinkRemove(localTracks, utils.cloneObject(tracksToDownload))
 
     constructDownloads(allTracks)
 
@@ -76,30 +79,33 @@ function constructDownloads (tracks) {
     let trackMap = (track.trackMap = {})
     track.trackName = utils.encodeIntoFilename(track.data.name) // colons turnt into hyphens at the filename
     track.playlists.forEach(pl => {
-      let yt = pl.selected === null ? track.conversion.bestMatch : pl.selected === false ? track.custom.id : pl.selected
-      if (!trackMap[yt]) trackMap[yt] = {spId: track.data.id, ytId: yt, playlists: []}
-      const currentTrackVersion = trackMap[yt]
-      currentTrackVersion.playlists.push({ id: pl.id, name: customGetters.giveMePlName(pl.id) })
+      const plName = customGetters.giveMePlFolderName(pl.id)
+      if (plName) {
+        let yt = pl.selected === null ? track.conversion.bestMatch : pl.selected === false ? track.custom.id : pl.selected
+        if (!trackMap[yt]) trackMap[yt] = {spId: track.data.id, ytId: yt, playlists: []}
+        const currentTrackVersion = trackMap[yt]
+        currentTrackVersion.playlists.push({ id: pl.id, name: plName })
 
-      if (!currentTrackVersion.paths) {
-        let fullPath = tempDownloadsFolderPath + utils.encodeIntoFilename(trackMap[yt].playlists[0].id)
-        currentTrackVersion.paths = {
-          fullPath,
-          fullPathmp4: PATH.join(fullPath, track.id + '.songbasket_preprocessed_file'),
-          fullPathmp3: PATH.join(fullPath, track.id + '.mp3'),
-          finalPathmp3: PATH.join(global.HOME_FOLDER, utils.encodeIntoFilename(trackMap[yt].playlists[0].name), track.trackName + '.mp3'),
-          finalPathmp3Alt: PATH.join(global.HOME_FOLDER, utils.encodeIntoFilename(trackMap[yt].playlists[0].name), track.trackName + ' - ' + track.id + '.mp3')
-        }
+        if (!currentTrackVersion.paths) {
+          let fullPath = tempDownloadsFolderPath + utils.encodeIntoFilename(trackMap[yt].playlists[0].id)
+          currentTrackVersion.paths = {
+            fullPath,
+            fullPathmp4: PATH.join(fullPath, track.id + '.songbasket_preprocessed_file'),
+            fullPathmp3: PATH.join(fullPath, track.id + '.mp3'),
+            finalPathmp3: PATH.join(global.HOME_FOLDER, utils.encodeIntoFilename(trackMap[yt].playlists[0].name), track.trackName + '.mp3'),
+            finalPathmp3Alt: PATH.join(global.HOME_FOLDER, utils.encodeIntoFilename(trackMap[yt].playlists[0].name), track.trackName + ' - ' + track.id + '.mp3')
+          }
 
-        currentTrackVersion.getFormat = async () => getTrackFormat(currentTrackVersion)
-        currentTrackVersion.constructDownload = () => constructVideoDownload(currentTrackVersion)
-        currentTrackVersion.constructConversion = () => constructVideoConversion(currentTrackVersion, track.data)
+          currentTrackVersion.getFormat = async () => getTrackFormat(currentTrackVersion)
+          currentTrackVersion.constructDownload = () => constructVideoDownload(currentTrackVersion)
+          currentTrackVersion.constructConversion = () => constructVideoConversion(currentTrackVersion, track.data)
 
-        currentTrackVersion.endCallback = () => {
-          if (currentTrackVersion.playlists.length > 1) {
-            currentTrackVersion.playlists.forEach(pl => {
-              link(PATH.join(currentTrackVersion.paths.fullPathmp3, global.HOME_FOLDER, utils.encodeIntoFilename(pl.name), track.trackName))
-            })
+          currentTrackVersion.endCallback = () => {
+            if (currentTrackVersion.playlists.length > 1) {
+              currentTrackVersion.playlists.forEach(pl => {
+                link(PATH.join(currentTrackVersion.paths.fullPathmp3, global.HOME_FOLDER, utils.encodeIntoFilename(pl.name), track.trackName))
+              })
+            }
           }
         }
       }
@@ -210,9 +216,7 @@ function constructDownloads (tracks) {
         convert: async () => {
           try {
             emitEvent.conversion({type: 'extraction-start', track: track.id})
-            console.log('1111')
             await extractMp3(track.paths.fullPathmp3, track.paths.fullPathmp4, track.format)
-            console.log('222')
           } catch (err) {
             emitEvent.conversion({type: 'extraction-error', track: track.id})
             throw err
