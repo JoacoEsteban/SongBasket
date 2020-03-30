@@ -22,6 +22,7 @@ module.exports = {
     'no-return-assign': 0,
     // allow async-await
     'generator-star-spacing': 0,
+    'curly': 0,
     // allow debugger during development
     'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0
   }

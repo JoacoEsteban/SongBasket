@@ -13,8 +13,11 @@
         <span>
           {{playlist.name}}
         </span>
-        <div class="button" @click="downloadPlaylist">
+        <!-- <div class="button" @click="downloadPlaylist">
           Download TEMP
+        </div> -->
+        <div class="button" @click="unsyncPlaylist">
+          Unsync TEMP
         </div>
       </div>
       <div class="track-count regular">
@@ -82,6 +85,9 @@ export default {
     downloadPlaylist () {
       if (!(this.playlist && this.playlist.id)) return
       window.ipc.send('download', [this.playlist.id])
+    },
+    unsyncPlaylist () {
+      this.$store.dispatch('openModal', {wich: 'unsync', payload: {id: this.playlist.id}})
     }
   }
 }

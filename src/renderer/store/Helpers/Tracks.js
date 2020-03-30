@@ -2,7 +2,7 @@ import he from 'he'
 
 export default {
   calculateBestMatch (track, force) {
-    if (!force && track.flags.processed) return null
+    if (!force && track.flags.processed) return track
     track = cloneObject(track)
     track.conversion.nameTokens = [...track.data.name.split(' ').map(str => makeValidRegex(str)).filter(str => str.str.length > 2 && !isInvalidWord(str.str)), ...track.data.artists.map(a => makeValidRegex(a.name))] // All words from trackname & artist split into array
 
@@ -20,6 +20,7 @@ export default {
       nameTokens
     }))
     calcBestMatch(track)
+    track.flags.processed = true
     return track
   }
 }

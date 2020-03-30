@@ -47,14 +47,13 @@ function findDuplicatedTracks () {
   // Accumulating tracks to fetch
   let pls = []
   for (let i = 0; i < ALL_PLAYLISTS.length; i++) {
-    let pl = ALL_PLAYLISTS[i]
-    let tracks = pl.synced ? pl.tracks.added : pl.tracks.items
+    const pl = ALL_PLAYLISTS[i]
+    const tracks = (pl.tracks)[pl.synced ? 'added' : 'items']
     if (tracks.length === 0) {
-      ALL_PLAYLISTS.splice(i, 1)
-      i--
+      ALL_PLAYLISTS.splice(i--, 1)
       continue
     }
-    pls = [ ...pls, {id: pl.id, tracks} ]
+    pls.push({id: pl.id, tracks})
   }
   // No new tracks
   if (pls.length === 0) return false
@@ -62,10 +61,10 @@ function findDuplicatedTracks () {
   // Computing duplicated tracks
   console.log('checkin', pls)
   for (let i = 0; i < pls.length; i++) {
-    let playlist = pls[i]
-    // console.log('loopin', playlist)
+    const playlist = pls[i]
+    // TODO Turn into for...of array.entries()
     for (let o = 0; o < playlist.tracks.length; o++) {
-      let dirtyTrack = playlist.tracks[o]
+      const dirtyTrack = playlist.tracks[o]
       let found = false
       for (let u = 0; u < ALL_TRACKS.length; u++) {
         let cleanTrack = ALL_TRACKS[u]
@@ -82,20 +81,22 @@ function findDuplicatedTracks () {
       }
       // Pushing to playlist register if found
       if (found !== false) {
-        ALL_TRACKS[found] = {
-          ...ALL_TRACKS[found],
-          playlists: utils.removeDuplicationId([...ALL_TRACKS[found].playlists, plTrackModel]) // Adding new added playlists to local conversion of track
-        }
+        if (!ALL_TRACKS[found].playlists.some(pl => pl.id === plTrackModel.id)) ALL_TRACKS[found].playlists.push(plTrackModel) // Adding new added playlists to local conversion of track
       } else {
         console.log('new track', dirtyTrack.name, dirtyTrack.id)
         // Create new track entry if not found
-        ALL_TRACKS.push({
+        ALL_TRACKS.push({ // TODO centralize models
           id: dirtyTrack.id,
           data: dirtyTrack,
           playlists: [plTrackModel],
           conversion: null,
           custom: null,
-          query: null
+          query: null,
+          flags: {
+            converted: false,
+            conversionError: false,
+            processed: false
+          }
         })
       }
     }

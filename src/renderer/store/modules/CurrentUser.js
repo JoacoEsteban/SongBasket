@@ -410,9 +410,7 @@ const mutations = {
     this.dispatch('syncedPlaylistsRefreshed', {}, {root: true})
   },
   async YOUTUBIZE_RESULT (state, convertedTracks) {
-    let newTracks = convertedTracks.map(convertedTrack => trackUtils.calculateBestMatch(convertedTrack)).filter(t => t)
-    console.log(state.convertedTracks.length, 'old tracks ---------- ', newTracks.length, 'new tracks')
-    state.convertedTracks.push(...newTracks);
+    state.convertedTracks = convertedTracks.map(convertedTrack => trackUtils.calculateBestMatch(convertedTrack)).filter(t => t);
 
     ([...state.queuedPlaylists]).forEach(pl => {
       state.syncedPlaylists.push(pl)
@@ -425,9 +423,9 @@ const mutations = {
 
     this.dispatch('syncedPlaylistsRefreshed', {}, {root: true})
     console.log(state.convertedTracks.some(t => t) && state.convertedTracks.some(t => t.flags))
-    setTimeout(((env) => {
-      return () => env.dispatch('setConvertedTracksProcessedFlag')
-    })(this), 100)
+    // setTimeout(((env) => {
+    //   return () => env.dispatch('setConvertedTracksProcessedFlag')
+    // })(this), 100)
     SAVE_TO_DISK()
   },
   SET_CONVERTED_TRACKS_PROCESSED_FLAG (state, val = true) {

@@ -3,6 +3,7 @@ import customGetters from '../../../renderer/store/customGetters'
 import * as utils from '../../../MAIN_PROCESS_UTILS'
 const electron = require('electron')
 const fs = require('fs')
+const PATH = require('path')
 const rimraf = require('rimraf')
 // const NodeID3 = require('node-id3')
 const iconv = require('iconv-lite')
@@ -89,7 +90,7 @@ const UserMethods = {
       for (let i = 0; i < syncedPlaylists.length; i++) {
         let pl = syncedPlaylists[i]
         // TODO Better folder name handling (to avoid repetition)
-        pl = { id: pl.id, path: (path || homeFolderPath()) + '/' + utils.encodeIntoFilename(pl.folderName || pl.name) }
+        pl = { id: pl.id, path: PATH.join((path || homeFolderPath()), utils.encodeIntoFilename(pl.folderName || pl.name)) }
         console.log('checked', pl)
 
         if (!await checkPathThenCreate(pl.path)) checkNResolve()
@@ -110,7 +111,7 @@ const UserMethods = {
               let processedTracks = 0
               // cycle throug tracks and store SB ones
               for (let o = 0; o < filenames.length; o++) {
-                let file = pl.path + '/' + filenames[o]
+                let file = PATH.join(pl.path, filenames[o])
                 UserMethods.retrieveMP3FileTags(file)
                   .then(tags => {
                     if (tags) {

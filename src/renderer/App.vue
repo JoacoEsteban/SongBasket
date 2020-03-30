@@ -81,7 +81,7 @@ export default {
       this.propagateFileChange({...track, playlistId: id})
     },
     propagateFileChange (track) {
-      const path = this.$sbRouter.giveMeCurrent()
+      const path = this.$sbRouter.giveMeCurrent() || {}
       switch (path.name) {
         case 'playlist-view':
           if (path.params.id !== track.playlistId) return
@@ -123,8 +123,9 @@ export default {
     // window.ipc.on('FileWatchers:READY', (e, tracks) => {
     //   this.$root.DOWNLOADED_TRACKS = tracks
     // })
-    window.VUE_ROOT = this.$root
-    window.VUEX = this.$store.state
+    window.ROOT = this.$root
+    window.VUEX = this.$store
+    window.VUEX_CURRENT_USER = this.$store.state.CurrentUser
     window.sbDebug = this
   },
   mounted () {
