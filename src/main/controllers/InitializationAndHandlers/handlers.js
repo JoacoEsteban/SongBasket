@@ -71,7 +71,7 @@ export function download (e, plFilter) {
   console.log('About to download')
   FSControler.UserMethods.retrieveLocalTracks()
     .then(tracks => {
-      console.log('passed')
+      console.log('passed', tracks.map(t => t.file))
       youtubeDl.downloadSyncedPlaylists(tracks, plFilter)
     })
 }

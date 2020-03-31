@@ -13,9 +13,9 @@
         <span>
           {{playlist.name}}
         </span>
-        <!-- <div class="button" @click="downloadPlaylist">
+        <div class="button" @click="downloadPlaylist">
           Download TEMP
-        </div> -->
+        </div>
         <div class="button" @click="unsyncPlaylist">
           Unsync TEMP
         </div>

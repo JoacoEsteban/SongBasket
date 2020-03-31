@@ -25,7 +25,7 @@ export default {
     let tracksToDownload = store.state.CurrentUser.convertedTracks
     if (plFilter) tracksToDownload = tracksToDownload.filter(t => t.playlists.some(pl => plFilter.includes(pl.id)))
 
-    const allTracks = downloadLinkRemove(localTracks, utils.cloneObject(tracksToDownload))
+    const allTracks = downloadLinkRemove(localTracks, utils.cloneObject(tracksToDownload), plFilter)
 
     constructDownloads(allTracks)
 

@@ -78,9 +78,9 @@ const UserMethods = {
       })
     })
   },
-  retrieveLocalTracks (path) {
+  retrieveLocalTracks (plFilter = false) {
     return new Promise(async (resolve, reject) => {
-      let syncedPlaylists = customGetters.SyncedPlaylistsSp().map(pl => ({ id: pl.id, path: PATH.join((path || homeFolderPath()), utils.encodeIntoFilename(pl.folderName || pl.name)) }))
+      let syncedPlaylists = customGetters.SyncedPlaylistsSp().filter(pl => plFilter ? plFilter.includes(pl.id) : true).map(pl => ({ id: pl.id, path: PATH.join((homeFolderPath()), utils.encodeIntoFilename(pl.folderName || pl.name)) }))
       let processedPls = 0
       let allTracks = []
 

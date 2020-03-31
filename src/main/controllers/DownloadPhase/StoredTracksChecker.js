@@ -4,8 +4,8 @@ const fs = require('fs')
 const PATH = require('path')
 const uuid = require('uuid')
 
-export function downloadLinkRemove (localTracks, queryTracks) {
-  return VTWO(localTracks, queryTracks)
+export function downloadLinkRemove (localTracks, queryTracks, plFilter = []) {
+  return VTWO(localTracks, queryTracks, plFilter || [])
 }
 
 // TODO turn both of this as async
@@ -20,7 +20,9 @@ export function link (path, newPath) {
   return true
 }
 
-function VTWO (localTracks, queryTracks = []) {
+function VTWO (localTracks, queryTracks = [], plFilter = []) {
+  if (plFilter.length) localTracks.forEach(lTrack => lTrack.dontUnlink = !plFilter.includes(lTrack.playlist)) // prevents unlinking tracks when filtering playlist
+
   queryTracks = queryTracks.filter(qTrack => {
     if (!qTrack.conversion) return false
 
