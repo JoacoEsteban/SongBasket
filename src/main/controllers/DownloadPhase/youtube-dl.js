@@ -26,8 +26,7 @@ export default {
     if (plFilter) tracksToDownload = tracksToDownload.filter(t => t.playlists.some(pl => plFilter.includes(pl.id)))
 
     const allTracks = downloadLinkRemove(localTracks, utils.cloneObject(tracksToDownload))
-    /* eslint-disable no-unreachable */
-    return
+
     constructDownloads(allTracks)
 
     const downloadTrack = async (index, index2) => {
@@ -57,22 +56,10 @@ export default {
 
 function constructDownloads (tracks) {
   const exec = () => {
-    for (let i = 0; i < tracks.length; i++) {
-      let track = tracks[i]
-      if (track.conversion === null) {
-        track = null
-        continue
-      }
-
-      if (!createTrackMap(track)) {
-        track = null
-        continue
-      }
-
+    tracks = tracks.filter(track => {
       // Undownloadable tracks filtered & trackMap created
-    }
-
-    tracks = tracks.filter(track => !!track)
+      if (track.conversion === null || !createTrackMap(track)) return false
+    })
   }
 
   // CONSTRUCTOR FUNCTIONS
@@ -81,20 +68,20 @@ function constructDownloads (tracks) {
     track.trackName = utils.encodeIntoFilename(track.data.name) // colons turnt into hyphens at the filename
     track.playlists.forEach(pl => {
       const plName = customGetters.giveMePlFolderName(pl.id)
+      let yt = track.selection
+      if (!trackMap[yt]) trackMap[yt] = { spId: track.data.id, ytId: yt, playlists: [] }
       if (plName) {
-        let yt = pl.selected === null ? track.conversion.bestMatch : pl.selected === false ? track.custom.id : pl.selected
-        if (!trackMap[yt]) trackMap[yt] = {spId: track.data.id, ytId: yt, playlists: []}
         const currentTrackVersion = trackMap[yt]
-        currentTrackVersion.playlists.push({ id: pl.id, name: plName })
+        currentTrackVersion.playlists.push({ id: pl.id, folderName: plName })
 
         if (!currentTrackVersion.paths) {
-          let fullPath = tempDownloadsFolderPath + utils.encodeIntoFilename(trackMap[yt].playlists[0].id)
+          const fullPath = PATH.join(tempDownloadsFolderPath, utils.encodeIntoFilename(trackMap[yt].playlists[0].id))
           currentTrackVersion.paths = {
             fullPath,
             fullPathmp4: PATH.join(fullPath, track.id + '.songbasket_preprocessed_file'),
             fullPathmp3: PATH.join(fullPath, track.id + '.mp3'),
-            finalPathmp3: PATH.join(global.HOME_FOLDER, utils.encodeIntoFilename(trackMap[yt].playlists[0].name), track.trackName + '.mp3'),
-            finalPathmp3Alt: PATH.join(global.HOME_FOLDER, utils.encodeIntoFilename(trackMap[yt].playlists[0].name), track.trackName + ' - ' + track.id + '.mp3')
+            finalPathmp3: PATH.join(global.HOME_FOLDER, utils.encodeIntoFilename(trackMap[yt].playlists[0].folderName), track.trackName + '.mp3'),
+            finalPathmp3Alt: PATH.join(global.HOME_FOLDER, utils.encodeIntoFilename(trackMap[yt].playlists[0].folderName), track.trackName + ' - ' + track.id + '.mp3')
           }
 
           currentTrackVersion.getFormat = async () => getTrackFormat(currentTrackVersion)
@@ -104,7 +91,7 @@ function constructDownloads (tracks) {
           currentTrackVersion.endCallback = () => {
             if (currentTrackVersion.playlists.length > 1) {
               currentTrackVersion.playlists.forEach(pl => {
-                link(PATH.join(currentTrackVersion.paths.fullPathmp3, global.HOME_FOLDER, utils.encodeIntoFilename(pl.name), track.trackName))
+                link(PATH.join(currentTrackVersion.paths.fullPathmp3, global.HOME_FOLDER, utils.encodeIntoFilename(pl.folderName), track.trackName))
               })
             }
           }

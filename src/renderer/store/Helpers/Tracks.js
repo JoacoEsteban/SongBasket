@@ -64,6 +64,7 @@ const calcBestMatch = (track) => {
     if (!b.wordScore && a.wordScore) return -1
     return (a.durationScore + a.wordScore * 1.5) > (b.durationScore + b.wordScore * 1.5) ? -1 : 1 // Wordscore gets boosted because of priority of name match over duration
   }))[0].id
+  track.conversion[0].isBestMatch = true
 }
 
 const makeValidRegex = str => {

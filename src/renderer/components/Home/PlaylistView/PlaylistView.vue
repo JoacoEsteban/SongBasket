@@ -107,7 +107,7 @@ export default {
       return this.$store.state.Events.RESET_SELECTION
     },
     doubtfulTracks () {
-      return this.conversion.filter(t => t.selection && t.selection.isDoubtlyConversion)
+      return this.conversion.filter(t => t.selectionObj && t.selectionObj.isDoubtlyConversion)
     }
   },
   watch: {
@@ -167,8 +167,9 @@ export default {
     computeTracks () {
       this.conversion = this.$store.state.CurrentUser.convertedTracks.filter(t => t.playlists.some(pl => pl.id === this.currentPlaylist)).map(track => {
         const cloned = {...track}
-        cloned.selection = this.$controllers.track.getSelection(cloned, this.currentPlaylist)
-        cloned.status = this.$controllers.track.getStatus(cloned, this.currentPlaylist)
+        this.$controllers.track.populateTrackSelection(cloned)
+        if (!cloned.selectionObj) console.log(cloned)
+        cloned.status = this.$controllers.track.getStatus(cloned)
         return cloned
       }).sort(this.$controllers.track.sort)
     },

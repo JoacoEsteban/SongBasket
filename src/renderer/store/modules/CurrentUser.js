@@ -126,10 +126,11 @@ const actions = {
       resolve()
     })
   },
-  changeYtTrackSelection ({ commit }, {playlist, trackId, newId}) {
+  changeYtTrackSelection ({ commit }, {trackId, newId}) {
     return new Promise((resolve, reject) => {
-      commit('CHANGE_YT_TRACK_SELECTION', {playlist, trackId, newId})
-      resolve()
+      const res = commit('CHANGE_YT_TRACK_SELECTION', {trackId, newId})
+      if (res && res.succeeded) resolve()
+      // else reject(res && res.error)
     })
   },
   unsyncPlaylist ({commit}, id) {
@@ -475,24 +476,21 @@ const mutations = {
     state.playlists[index].tracks.added = []
     state.playlists[index].tracks.removed = []
   },
-  CHANGE_YT_TRACK_SELECTION (state, {playlist, trackId, newId}) {
-    let index = findById(trackId, state.convertedTracks)
-    if (index === -1) {
-      console.error('Converted Track not found:: CurrentUser.js :: CHANGE_YT_TRACK_SELECTION')
-      return
+  CHANGE_YT_TRACK_SELECTION (state, {trackId, newId}) {
+    const retorno = {
+      succeeded: false,
+      error: null
     }
+    if (newId === undefined) return (retorno.error = new Error('New selection id does not exist:: CurrentUser.js :: CHANGE_YT_TRACK_SELECTION')) && retorno
 
-    let trackObj = state.convertedTracks[index]
-    index = findById(playlist, trackObj.playlists)
-    if (index === -1) {
-      console.error('Playlist that the track was synced into was not found:: CurrentUser.js :: CHANGE_YT_TRACK_SELECTION')
-      return
-    }
+    const track = state.convertedTracks.find(t => t.id === trackId)
+    if (!track) return (retorno.error = new Error('Converted Track not found:: CurrentUser.js :: CHANGE_YT_TRACK_SELECTION')) && retorno
 
-    console.log('averr', trackObj, newId)
+    track.selection = newId
+    track.flags.selectionIsApplied = true
 
-    trackObj.playlists[index].selected = newId
     SAVE_TO_DISK()
+    return (retorno.succeeded = true) && retorno
   },
   async UNSYNC_PLAYLIST (state, id) {
     // Removes tracks from conversion

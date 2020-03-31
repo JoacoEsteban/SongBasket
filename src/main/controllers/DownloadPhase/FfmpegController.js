@@ -29,7 +29,7 @@ export function extractMp3 (pathmp3, pathmp4, inputFormat) {
           ffmpeg(pathmp4)
             .inputFormat(inputFormat)
             .on('progress', function (progress) {
-              console.log('Processing: ' + progress.percent + '% done')
+              // console.log('Processing: ' + progress.percent + '% done')
             })
             .on('end', async () => {
               // TODO Emit convertion starting

@@ -2,7 +2,7 @@
   <div class="track-review-container row">
     <Track :item="item" :isReviewing="true"/>
 
-    <TrackResult :is-selected="convItem === item.selection" @setSelection="setSelection(convItem)" v-for="(convItem, index) in conversions" :key="index" :item="convItem" :durationColor="durationColor(convItem)" />
+    <TrackResult :is-selected="convItem === item.selectionObj" @setSelection="setSelection(convItem)" v-for="(convItem, index) in conversions" :key="index" :item="convItem" :durationColor="durationColor(convItem)" />
 
     <div @click="selectCustomUrl" class="link-button">
       Use Custom URL
@@ -50,12 +50,18 @@ export default {
     selectCustomUrl () {
       this.$root.OPEN_MODAL({wich: 'custom-track-url', payload: {trackId: this.item.id, playlistId: this.options.playlistId}})
     },
-    setSelection (item) {
-      if (item.id === this.item.selection.id) return
+    async setSelection (item) {
+      if (item.id === this.item.selectionObj.id) return
       let newId = item.id
       if (item.isCustomTrack) newId = false
+      if (item.isBestMatch) newId = null
 
-      this.$store.dispatch('changeYtTrackSelection', {playlist: this.options.playlistId, trackId: this.item.id, newId})
+      try {
+        await this.$store.dispatch('changeYtTrackSelection', {trackId: this.item.id, newId})
+        this.$controllers.track.populateTrackSelection(this.item)
+      } catch (error) {
+        console.error(error)
+      }
     }
   },
   components: {
