@@ -76,8 +76,7 @@ function findDuplicatedTracks () {
       }
 
       let plTrackModel = {
-        id: playlist.id,
-        selected: null
+        id: playlist.id
       }
       // Pushing to playlist register if found
       if (found !== false) {
@@ -90,6 +89,7 @@ function findDuplicatedTracks () {
           data: dirtyTrack,
           playlists: [plTrackModel],
           conversion: null,
+          selection: null,
           custom: null,
           query: null,
           flags: {

@@ -96,6 +96,12 @@ const actions = {
       resolve()
     })
   },
+  cleanTracks ({ commit }) {
+    return new Promise((resolve, reject) => {
+      commit('CLEAN_TRACKS')
+      resolve()
+    })
+  },
   reprocessAllTracks ({ commit }, params) {
     return new Promise((resolve, reject) => {
       commit('REPROCESS_ALL_TRACKS', params)
@@ -390,12 +396,22 @@ const mutations = {
     console.log(cloned)
     state.convertedTracks = cloned
   },
+  CLEAN_TRACKS () {
+    state.convertedTracks = cloneObject(state.convertedTracks).filter(track => {
+      track.playlists = track.playlists.filter(pl => {
+        const playlist = state.playlists.find(p => p.id === pl.id)
+        return (playlist && playlist.tracks.items.some(t => t.id === track.id))
+      })
+      return track.playlists.length
+    })
+  },
   REPROCESS_ALL_TRACKS (params = {}) {
     Vue.set(state, 'convertedTracks', state.convertedTracks.map(convertedTrack => {
+      convertedTrack.selection = null
       if (convertedTrack.custom) {
         convertedTrack.custom.isCustomTrack = true
         if (params.forceCustom) {
-          convertedTrack.playlists.forEach(pl => pl.selection = false)
+          convertedTrack.selection = false
         }
       }
       if (!convertedTrack.flags) {
@@ -715,21 +731,21 @@ function playlistComputeChanges (oldPl, newPl) {
   return {added, items, removed}
 }
 
-// function cloneObject (aObject) {
-//   return clone(aObject)
-// }
+function cloneObject (aObject) {
+  return clone(aObject)
+}
 
-// function clone (aObject) {
-//   if (!aObject) {
-//     return aObject
-//   }
+function clone (aObject) {
+  if (!aObject) {
+    return aObject
+  }
 
-//   let v
-//   let bObject = Array.isArray(aObject) ? [] : {}
-//   for (const k in aObject) {
-//     v = aObject[k]
-//     bObject[k] = (typeof v === 'object') ? clone(v) : v
-//   }
+  let v
+  let bObject = Array.isArray(aObject) ? [] : {}
+  for (const k in aObject) {
+    v = aObject[k]
+    bObject[k] = (typeof v === 'object') ? clone(v) : v
+  }
 
-//   return bObject
-// }
+  return bObject
+}

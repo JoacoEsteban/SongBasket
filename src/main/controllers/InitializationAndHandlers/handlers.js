@@ -69,7 +69,7 @@ export function openInBrowser (event, id) {
 
 export function download (e, plFilter) {
   console.log('About to download')
-  FSControler.UserMethods.checkDownloadPaths()
+  FSControler.UserMethods.retrieveLocalTracks()
     .then(tracks => {
       console.log('passed')
       youtubeDl.downloadSyncedPlaylists(tracks, plFilter)

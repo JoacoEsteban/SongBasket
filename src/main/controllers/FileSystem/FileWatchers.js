@@ -2,6 +2,7 @@ import customGetters from '../../../renderer/store/customGetters'
 import chokidar from 'chokidar'
 import * as utils from '../../../MAIN_PROCESS_UTILS'
 import UserMethods from './UserMethods'
+import REGEX from '../../Global/REGEX'
 
 const PATH = require('path')
 
@@ -17,7 +18,7 @@ const FileWatchers = {
   tracks: {},
   watchers: [],
   async createPlaylistWatchers (customPath) {
-    if (!(await UserMethods.checkDownloadPaths()).length) return
+    if (!(await UserMethods.retrieveLocalTracks()).length) return
     let syncedPlaylists = customGetters.SyncedPlaylistsSp()
     syncedPlaylists.forEach(pl => {
       let path = (customPath || homeFolderPath()) + '/' + utils.encodeIntoFilename(pl.folderName || pl.name)
@@ -133,8 +134,7 @@ const FileWatchers = {
   }
 }
 
-const fileRegex = /(\w|-|\(|\)| |\.)+\.mp3+$/
-const isValidAudioPath = (path) => (fileRegex.test(path))
+const isValidAudioPath = (path) => (REGEX.mp3File.test(path))
 
 const getNameFromPath = (path) => {
   path = PATH.dirname(path)

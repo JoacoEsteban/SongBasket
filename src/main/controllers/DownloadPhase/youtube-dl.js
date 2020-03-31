@@ -26,7 +26,8 @@ export default {
     if (plFilter) tracksToDownload = tracksToDownload.filter(t => t.playlists.some(pl => plFilter.includes(pl.id)))
 
     const allTracks = downloadLinkRemove(localTracks, utils.cloneObject(tracksToDownload))
-
+    /* eslint-disable no-unreachable */
+    return
     constructDownloads(allTracks)
 
     const downloadTrack = async (index, index2) => {

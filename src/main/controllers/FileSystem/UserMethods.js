@@ -1,6 +1,7 @@
 /* eslint-disable new-cap */
 import customGetters from '../../../renderer/store/customGetters'
 import * as utils from '../../../MAIN_PROCESS_UTILS'
+import REGEX from '../../Global/REGEX'
 const electron = require('electron')
 const fs = require('fs')
 const PATH = require('path')
@@ -77,66 +78,44 @@ const UserMethods = {
       })
     })
   },
-  checkDownloadPaths (path) {
+  retrieveLocalTracks (path) {
     return new Promise(async (resolve, reject) => {
-      let syncedPlaylists = customGetters.SyncedPlaylistsSp()
+      let syncedPlaylists = customGetters.SyncedPlaylistsSp().map(pl => ({ id: pl.id, path: PATH.join((path || homeFolderPath()), utils.encodeIntoFilename(pl.folderName || pl.name)) }))
       let processedPls = 0
       let allTracks = []
 
-      function checkNResolve () {
-        console.log('All local tracks tags retrieved')
-        if (++processedPls === syncedPlaylists.length) resolve(allTracks)
-      }
-      for (let i = 0; i < syncedPlaylists.length; i++) {
-        let pl = syncedPlaylists[i]
-        // TODO Better folder name handling (to avoid repetition)
-        pl = { id: pl.id, path: PATH.join((path || homeFolderPath()), utils.encodeIntoFilename(pl.folderName || pl.name)) }
-        console.log('checked', pl)
+      const checkNResolve = () => (++processedPls === syncedPlaylists.length) && resolve(allTracks)
 
+      for (let pl of syncedPlaylists) {
         if (!await checkPathThenCreate(pl.path)) checkNResolve()
         else {
           // Get all files from playlist dir
           fs.readdir(pl.path, function (err, filenames) {
-            if (err) {
-              console.error('error reading folder', pl.path)
-              reject(err)
-              return
-            }
-            filenames = filenames.filter(n => n.substr(n.length - 3) === 'mp3')
-
-            if (filenames.length === 0) checkNResolve()
+            if (err) return reject(err)
+            filenames = filenames.filter(f => REGEX.mp3File.test(f)) // filter to just MP3 files
+            if (!filenames.length) checkNResolve()
             else {
-              // filter to just MP3 files
-              // TODO Support FLAC, etc
               let processedTracks = 0
-              // cycle throug tracks and store SB ones
-              for (let o = 0; o < filenames.length; o++) {
-                let file = PATH.join(pl.path, filenames[o])
-                UserMethods.retrieveMP3FileTags(file)
+              filenames.forEach(file => {
+                const filePath = PATH.join(pl.path, file)
+                UserMethods.retrieveMP3FileTags(filePath)
                   .then(tags => {
-                    if (tags) {
-                      let track = {}
-
+                    if (tags) allTracks.push((() => {
+                      const track = {
+                        playlist: pl.id,
+                        path: filePath,
+                        file: file
+                      }
                       tags.forEach(tag => {
                         track[tag.name] = tag.value
                       })
 
-                      track.playlist = pl.id
-                      track.path = file
-                      track.file = filenames[o]
-
-                      allTracks.push(track)
-                    }
-
-                    processedTracks++
-                    if (processedTracks === filenames.length) {
-                      checkNResolve()
-                    }
+                      return track
+                    })())
+                    if (++processedTracks === filenames.length) checkNResolve()
                   })
-                  .catch(err => {
-                    if (err) console.error(err) // TODO Handle error
-                  })
-              }
+                  .catch(err => reject(err)) // TODO Handle error
+              })
             }
           })
         }
