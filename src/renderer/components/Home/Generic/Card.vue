@@ -4,7 +4,7 @@
     <div class="content" ref="content-container">
       <div class="card-background abs-full">
         <div class="rel-full ovfh">
-          <div class="pl-img" :style="{backgroundImage: `url(${bgImage})`}">
+          <div class="card-img" :style="{backgroundImage: `url(${bgImage})`}">
           </div>
           <div class="gradient">
           </div>
@@ -236,6 +236,7 @@ $hovering-transition: .3s $bezier-tranka;
   }
 
   .card-background {
+    --gradient-offset: 50%;
     .rel-full {
       display: flex;
       align-items: center;
@@ -248,7 +249,7 @@ $hovering-transition: .3s $bezier-tranka;
       bottom: $offset;
       right: $offset;
       left: $offset;
-      background: linear-gradient(to right, $q-false-color 50%, transparent 200%);
+      background: linear-gradient(to right, $q-false-color var(--gradient-offset), transparent 200%);
     }
     .light-shine {
       position: absolute;
@@ -266,12 +267,13 @@ $hovering-transition: .3s $bezier-tranka;
       // background: linear-gradient(31deg, transparent -100%,  rgba(0,0,0,.5) 50%, rgba(255,255,255,.045) 50%, transparent 100%);
       background-position: center;
     }
-    .pl-img {
+    .card-img {
+      --card-img-width: 50%;
       background-size: cover;
       background-repeat: no-repeat;
       background-position: center;
       height: 100%;
-      width: 50%;
+      width: var(--card-img-width);
     }
   }
 

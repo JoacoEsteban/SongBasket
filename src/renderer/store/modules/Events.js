@@ -13,6 +13,11 @@ const state = {
   FETCH_LOADING_STATE: {
     value: false,
     target: ''
+  },
+  CURRENT_DOWNLOAD: {
+    id: null, // song id
+    state: null, // eg: downloading, extracting, applying tags
+    ptg: null // eg: 36%
   }
 }
 

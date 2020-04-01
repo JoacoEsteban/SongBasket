@@ -5,23 +5,28 @@
       @openPlaylist="$emit('openPlaylist', $event)"
       @addPlaylistToSyncQueue="$emit('addPlaylistToSyncQueue', $event)"
     ></playlists-list>
-    <playlists-view
+    <playlist-view
       v-show="componentBeingShown === 'playlist-view'"
       :currentPlaylist="currentPath.params && currentPath.params.id"
       @openYtVideo="$emit('openYtVideo', $event)"
-    ></playlists-view>
+    ></playlist-view>
+    <downloads-view
+      v-show="componentBeingShown === 'downloads-view'"
+    ></downloads-view>
   </div>
 </template>
 
 <script>
 import PlaylistsList from './PlaylistsList'
-import PlaylistsView from './PlaylistView/PlaylistView'
+import PlaylistView from './PlaylistView/PlaylistView'
+import DownloadsView from './DownloadsView/DownloadsView'
 let sleep
 
 export default {
   components: {
     PlaylistsList,
-    PlaylistsView
+    PlaylistView,
+    DownloadsView
   },
   data () {
     return {

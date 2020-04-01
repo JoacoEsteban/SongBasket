@@ -61,7 +61,8 @@
           </div>
         </div>
       </div>
-      <playlist-view-slide class="bar-slide"></playlist-view-slide>
+      <playlist-view-slide v-show="currentPath === 'playlist-view'" class="bar-slide"></playlist-view-slide>
+      <downloads-view-slide v-show="currentPath === 'downloads-view'" class="bar-slide"></downloads-view-slide>
     </div>
 
 
@@ -76,6 +77,7 @@
 import { dateFormatter } from '../../../../UTILS'
 
 import PlaylistViewSlide from './slides/PlaylistViewSlide.vue'
+import DownloadsViewSlide from './slides/DownloadsViewSlide.vue'
 
 import SyncIcon from '@/assets/icons/sync-icon.vue'
 import CloudSearchIcon from '@/assets/icons/cloud-search-icon.vue'
@@ -87,6 +89,7 @@ export default {
     SyncIcon,
     CloudSearchIcon,
     PlaylistViewSlide,
+    DownloadsViewSlide,
     HomeIcon
   },
   data () {
@@ -99,8 +102,9 @@ export default {
         loading: false,
         staticLoading: false,
         percentage: 0,
-        animationDuration: 1000
+        animationDuration: 750
       },
+      currentPath: null,
       activeSection: null,
       showPrevBtn: this.$sbRouter.pointer,
       showForwBtn: this.$sbRouter.isLast(),
@@ -181,7 +185,9 @@ export default {
       if (!this.$sbRouter.isLast()) this.$sbRouter.goForward()
     },
     handleRouterNavigation (to, from) {
+      this.currentPath = to.name
       switch (to.name) {
+        case 'downloads-view':
         case 'playlist-view':
           this.slideTo(1)
           break
@@ -310,7 +316,7 @@ $loading-bar-height: 3px;
 .bar-slide {
   // display: inline-block;
   min-width: 100%;height: 100%;
-
+  box-sizing: border-box;
 }
 
 .loading-bar {

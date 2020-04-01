@@ -1,7 +1,8 @@
 let VueInstance
-
+const getVueInstance = () => (VueInstance || (VueInstance = require('../main').default))
 const TrackController = {
-  getArtists: (item) => (item.artists || item.data.artists).map(({name}) => name).join(', '),
+  getArtistsString: (item) => (item.artists || item.data.artists).map(({name}) => name).join(', '),
+  getPlaylistsString: (item) => item.playlists.map(({id}) => getVueInstance().$store.getters.PlaylistById(id)).map(({name}) => name).join(', '),
   populateTrackSelection: (track) => {
     let selectionId = track.selection
 
@@ -38,7 +39,7 @@ const TrackController = {
     return 0
   },
   isDownloaded: function ({id, selectionObj}) {
-    const dlTrack = (VueInstance || (VueInstance = require('../main').default)).DOWNLOADED_TRACKS[id]
+    const dlTrack = getVueInstance().DOWNLOADED_TRACKS[id]
     return !!(dlTrack && dlTrack[selectionObj.id])
   }
 }

@@ -27,11 +27,21 @@ export default {
       if (path === this.$route.fullPath) return console.error('ERROR Trying to navigate to same path')
       this.$router.push(path)
     },
-    handleWindowKey ({keyCode, metaKey}) {
-      if (metaKey) {
-        if (keyCode === 219) return this.$sbRouter.goBack()
-        if (keyCode === 221) return this.$sbRouter.goForward()
+    handleMetaKeyCombo (keyCode) {
+      switch (keyCode) {
+        case 219:
+          return this.$sbRouter.goBack()
+        case 221:
+          return this.$sbRouter.goForward()
+        case 68:
+          return this.$sbRouter.push({name: 'downloads-view'})
+        default:
+          console.log(keyCode)
       }
+    },
+    handleWindowKey (e) {
+      const {keyCode, metaKey} = e
+      if (metaKey) return this.handleMetaKeyCombo(keyCode, e)
       if (isAscii(keyCode) || (keyCode === 8 && this.$root.searchInputElement && this.$root.searchInputElement.value.length)) return this.focusSearchbar()
     },
     handleMouseKey ({button}) {

@@ -8,7 +8,7 @@
       </div>
       <div class="ellipsis">
         <span class="regular point75-em">
-          {{trackController.getArtists(itemFormatted)}}
+          {{trackController.getArtistsString(itemFormatted)}}
         </span>
       </div>
       <div class="ellipsis track-status">

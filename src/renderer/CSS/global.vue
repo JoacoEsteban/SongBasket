@@ -121,6 +121,11 @@ body:hover {
   margin: 0 0.3em;
 }
 
+.sb-title {
+  font-weight: bold;
+  font-size: 1.5em;
+}
+
 // .icon {
 //   width: 1em;
 //   height: 1em;

@@ -85,7 +85,12 @@
 .h-fc {
     height: 100%;
 }
-
+.lh1 {
+    line-height: 1;
+}
+.lh1point5 {
+    line-height: 1.5;
+}
 .ellipsis {
     width: 100%;
     overflow: hidden;
@@ -93,7 +98,14 @@
     white-space: nowrap;
 }
 
+.half-op {
+    opacity: 0.5;
+}
+
 // -----------------BOUNDS------------------
+.p-0imp {
+    padding: 0 !important;
+}
 .p-0 {
     padding: 0;
 }
