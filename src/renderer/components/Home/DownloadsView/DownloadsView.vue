@@ -14,22 +14,16 @@ export default {
   },
   computed: {
     downloads () {
-      return this.$store.state.CurrentUser.convertedTracks.slice(0, 10)
+      return (this.$store.state.Events.DOWNLOAD_QUEUE || []).map(t => this.$store.state.CurrentUser.convertedTracks.find(track => t.id === track.id))
     },
     currentTrackDownload () {
       return this.$store.state.Events.CURRENT_DOWNLOAD
     }
   },
   methods: {
-    giveMeTrackDownloadStatus (track, index) {
-      if (index > 0 && this.currentTrackDownload.id !== track.id) return {state: 'awaiting'}
-      // return this.currentTrackDownload
-      return {
-        id: null,
-        state: 'downloading',
-        ptg: 74,
-        label: 'downloading 74%'
-      }
+    giveMeTrackDownloadStatus (track) {
+      // if (this.currentTrackDownload !== track.id) return {state: 'awaiting'}
+      return this.$store.state.Events.DOWNLOAD_QUEUE.find(t => t.id === track.id)
     }
   }
 }

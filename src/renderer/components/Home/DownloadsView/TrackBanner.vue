@@ -4,7 +4,7 @@
       <div class="background-progress" :style="{'--progress': (downloadStatus.ptg || 0) + '%'}" :class="downloadStatus.state" v-if="isDownload">
         <div class="progress-label df alic">
           <span class="uppercase half-op point5-em semibold">
-            {{downloadStatus.label}}
+            {{downloadStatus.state + ' ' + downloadStatus.ptg}}%
           </span>
         </div>
       </div>
@@ -92,7 +92,7 @@ export default {
       &.awaiting {
         opacity: .5;
       }
-      &.downloading {
+      &.downloading, &.extracting {
         background-color: var(--global-grey)
       }
     }

@@ -11,11 +11,30 @@ const youtubedl = require('youtube-dl')
 const tempDownloadsFolderPath = GLOBAL.APP_CWD + '/downloads_temp/'
 
 const emitEvent = {
-  download: (params) => {
-    store.dispatch('downloadEvent', params)
+  lastEvent: null,
+  timeoutInProgress: false,
+  makeTimeout: (params, key) => {
+    params.type = key + ':' + params.type
+    emitEvent.lastEvent = params
+
+    if (emitEvent.timeoutInProgress) return
+    emitEvent.timeoutInProgress = true
+    setTimeout(() => {
+      store.dispatch('downloadEvent', emitEvent.lastEvent)
+      emitEvent.timeoutInProgress = false
+    }, 200)
   },
-  conversion: (params) => {
-    store.dispatch('conversionEvent', params)
+  downloadStarted: (tracks) => {
+    store.dispatch('downloadStarted', tracks.map(t => t.id))
+  },
+  download: (params) => {
+    emitEvent.makeTimeout(params, 'download')
+  },
+  extraction: (params) => {
+    emitEvent.makeTimeout(params, 'extraction')
+  },
+  tags: (params) => {
+    emitEvent.makeTimeout(params, 'tags')
   }
 }
 
@@ -28,6 +47,8 @@ export default {
     const allTracks = downloadLinkRemove(localTracks, utils.cloneObject(tracksToDownload), plFilter)
 
     constructDownloads(allTracks)
+
+    emitEvent.downloadStarted(allTracks)
 
     const downloadTrack = async (index, index2) => {
       if (!allTracks[index]) return console.log('ALL TRACKS DOWNLOADED')
@@ -47,7 +68,7 @@ export default {
     const initializeTrack = async (track) => {
       await track.getFormat()
       track.constructDownload()
-      track.constructConversion()
+      track.constructExtraction()
     }
 
     downloadTrack(0, 0)
@@ -58,7 +79,7 @@ function constructDownloads (tracks) {
   const exec = () => {
     tracks = tracks.filter(track => {
       // Undownloadable tracks filtered & trackMap created
-      if (track.conversion === null || !createTrackMap(track)) return false
+      if (track.extraction === null || !createTrackMap(track)) return false
     })
   }
 
@@ -86,12 +107,12 @@ function constructDownloads (tracks) {
 
           currentTrackVersion.getFormat = async () => getTrackFormat(currentTrackVersion)
           currentTrackVersion.constructDownload = () => constructVideoDownload(currentTrackVersion)
-          currentTrackVersion.constructConversion = () => constructVideoConversion(currentTrackVersion, track.data)
+          currentTrackVersion.constructExtraction = () => constructVideoExtraction(currentTrackVersion, track.data)
 
           currentTrackVersion.endCallback = () => {
             if (currentTrackVersion.playlists.length > 1) {
               currentTrackVersion.playlists.forEach(pl => {
-                link(PATH.join(currentTrackVersion.paths.fullPathmp3, global.HOME_FOLDER, utils.encodeIntoFilename(pl.folderName), track.trackName))
+                link(currentTrackVersion.paths.finalPathmp3, PATH.join(global.HOME_FOLDER, utils.encodeIntoFilename(pl.folderName), track.trackName + '.mp3'))
               })
             }
           }
@@ -141,37 +162,37 @@ function constructDownloads (tracks) {
             console.log('size: ' + info.size)
             track.download.info.size = info.size
             track.download.info.downloadStarted = true
-            emitEvent.download({type: 'start', track: track.id})
+            emitEvent.download({type: 'start', id: track.spId})
           })
 
           download.on('data', (chunk) => {
             track.download.info.currentSize += chunk.length
-            // console.log(Math.round(track.download.info.currentSize / track.download.info.size * 100) + '%')
-            emitEvent.download({type: 'chunk', track: track.id})
+            const ptg = Math.round(track.download.info.currentSize / track.download.info.size * 100)
+            emitEvent.download({type: 'progress', id: track.spId, ptg})
           })
 
           download.on('error', (error) => {
             // TODO HANDLE ERROR AND STOP ROUTINE
             console.error('Error when downloading video::::', error)
             track.download.info.downloadError = error
-            emitEvent.download({type: 'error', track: track.id})
+            emitEvent.download({type: 'error', id: track.spId})
             reject(error)
           })
 
           download.on('end', async () => {
             if (track.download.info.downloadError) return
             console.log('track downloaded')
-            emitEvent.download({type: 'end', track: track.id})
+            emitEvent.download({type: 'end', id: track.spId})
             try {
-              await track.conversion.converter.convert()
-              console.log('finished conversion')
+              await track.extraction.converter.convert()
+              console.log('finished extraction')
             } catch (error) {
               // TODO Handle error
               throw error
             }
 
             try {
-              await track.conversion.converter.move()
+              await track.extraction.converter.move()
               console.log('track moved')
             } catch (error) {
               // TODO Handle error
@@ -195,31 +216,33 @@ function constructDownloads (tracks) {
     }
   }
 
-  const constructVideoConversion = (track, spotifyData) => {
-    track.conversion = {
+  const constructVideoExtraction = (track, spotifyData) => {
+    track.extraction = {
       info: {
 
       },
       converter: {
         convert: async () => {
           try {
-            emitEvent.conversion({type: 'extraction-start', track: track.id})
-            await extractMp3(track.paths.fullPathmp3, track.paths.fullPathmp4, track.format)
+            emitEvent.extraction({type: 'start', id: track.spId})
+            await extractMp3(track.paths.fullPathmp3, track.paths.fullPathmp4, track.format, progress => {
+              emitEvent.extraction({type: 'progress', id: track.spId, ptg: Math.round(progress.percent)})
+            })
           } catch (err) {
-            emitEvent.conversion({type: 'extraction-error', track: track.id})
+            emitEvent.extraction({type: 'error', id: track.spId})
             throw err
           }
-          emitEvent.conversion({type: 'extraction-end', track: track.id})
+          emitEvent.extraction({type: 'end', id: track.spId})
 
           try {
-            emitEvent.conversion({type: 'tags-start', track: track.id})
+            emitEvent.tags({type: 'start', id: track.spId})
             await applyTags(track.paths.fullPathmp3, spotifyData, track.ytId)
             console.log('finished tags')
           } catch (err) {
-            emitEvent.conversion({type: 'tags-error', track: track.id})
+            emitEvent.tags({type: 'error', id: track.spId})
             throw err
           }
-          emitEvent.conversion({type: 'tags-end', track: track.id})
+          emitEvent.tags({type: 'end', id: track.spId})
         },
         move: async () => {
           // let moveFunction = utils.copyNRemove

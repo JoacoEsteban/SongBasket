@@ -14,11 +14,8 @@ const state = {
     value: false,
     target: ''
   },
-  CURRENT_DOWNLOAD: {
-    id: null, // song id
-    state: null, // eg: downloading, extracting, applying tags
-    ptg: null // eg: 36%
-  }
+  DOWNLOAD_QUEUE: [],
+  CURRENT_DOWNLOAD: null // id from current download
 }
 
 const actions = {
@@ -37,11 +34,12 @@ const actions = {
   routerAnimation ({commit}, animation) {
     commit('ROUTER_ANIMATION', animation)
   },
-  downloadEvent ({commit}, params) {
-    commit('SET', { key: 'DOWNLOAD_EVENT', params })
+  downloadStarted ({commit}, tracks) {
+    commit('DOWNLOAD_STARTED', tracks)
   },
-  conversionEvent ({commit}, params) {
-    commit('SET', { key: 'CONVERSION_EVENT', params })
+  downloadEvent ({commit}, params) {
+    console.log('EVENT', params)
+    commit('DOWNLOAD_EVENT', params)
   },
   globalLoadingState ({commit}, value) {
     value.target = value.target || ''
@@ -62,11 +60,72 @@ const mutations = {
   SET (state, {key, value}) {
     Vue.set(state, key, value)
   },
-  DOWNLOAD_EVENT (state, params) {
-
+  DOWNLOAD_STARTED (state, tracks) {
+    state.DOWNLOAD_QUEUE = tracks.map(id => ({
+      id, // song id
+      state: 'awaiting', // eg: downloading, extracting, applying tags
+      ptg: 0 // eg: 36%
+    }))
   },
-  CONVERSION_EVENT (state, params) {
-
+  DOWNLOAD_EVENT (state, {id, ptg, type}) {
+    const track = state.DOWNLOAD_QUEUE.find(t => t.id === id)
+    if (!track) return
+    type = type.split(':')
+    switch (type[0]) {
+      case 'download':
+        switch (type[1]) {
+          case 'start':
+            state.CURRENT_DOWNLOAD = id
+            track.state = 'downloading'
+            track.ptg = 0
+            break
+          case 'progress':
+            track.state = 'downloading'
+            track.ptg = ptg
+            break
+          case 'error':
+            // TODO Handle error
+            break
+          case 'end':
+            track.state = 'download:end'
+            break
+        }
+        break
+      case 'extraction':
+        switch (type[1]) {
+          case 'start':
+            track.state = 'extracting'
+            track.ptg = 0
+            break
+          case 'progress':
+            track.ptg = ptg
+            break
+          case 'error':
+            // TODO Handle error
+            break
+          case 'end':
+            track.state = 'extraction:end'
+            break
+        }
+        break
+      case 'tags':
+        switch (type[1]) {
+          case 'start':
+            track.state = 'tags'
+            track.ptg = 0
+            break
+          // case 'progress':
+          //   track.ptg = ptg
+          //   break
+          case 'error':
+            // TODO Handle error
+            break
+          case 'end':
+            track.state = 'tags:end'
+            break
+        }
+        break
+    }
   }
 }
 
