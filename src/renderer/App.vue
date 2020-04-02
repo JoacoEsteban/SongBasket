@@ -41,7 +41,7 @@ export default {
     },
     handleWindowKey (e) {
       const {keyCode, metaKey} = e
-      if (metaKey) return this.handleMetaKeyCombo(keyCode, e)
+      if (metaKey && keyCode !== 8) return this.handleMetaKeyCombo(keyCode, e)
       if (isAscii(keyCode) || (keyCode === 8 && this.$root.searchInputElement && this.$root.searchInputElement.value.length)) return this.focusSearchbar()
     },
     handleMouseKey ({button}) {

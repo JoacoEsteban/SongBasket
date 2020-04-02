@@ -87,7 +87,7 @@ const mutations = {
             // TODO Handle error
             break
           case 'end':
-            track.state = 'download:end'
+            track.state = 'download_end'
             break
         }
         break
@@ -104,7 +104,7 @@ const mutations = {
             // TODO Handle error
             break
           case 'end':
-            track.state = 'extraction:end'
+            track.state = 'extraction_end'
             break
         }
         break
@@ -121,7 +121,7 @@ const mutations = {
             // TODO Handle error
             break
           case 'end':
-            track.state = 'tags:end'
+            track.state = 'tags_end'
             break
         }
         break

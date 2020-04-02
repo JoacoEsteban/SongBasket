@@ -170,6 +170,7 @@ export async function retrieveAndStoreState (path) {
     try {
       await GLOBAL.VUEX.dispatch('storeDataFromDisk', data)
       // Check if folder has synced playlists to setup watchers
+      await FSControler.UserMethods.setFolderIcons()
       await FSControler.FileWatchers.createPlaylistWatchers()
     } catch (err) { throw err }
   } catch (err) { throw err }

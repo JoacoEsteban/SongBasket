@@ -67,6 +67,7 @@
     "electron-log": "^4.0.2",
     "ffbinaries": "^1.1.4",
     "ffmpeg": "^0.0.4",
+    "fileicon": "^0.2.4",
     "fluent-ffmpeg": "^2.1.2",
     "he": "^1.2.0",
     "iconv-lite": "^0.5.1",

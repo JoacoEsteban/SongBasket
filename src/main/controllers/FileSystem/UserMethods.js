@@ -1,6 +1,7 @@
 /* eslint-disable new-cap */
 import customGetters from '../../../renderer/store/customGetters'
 import * as utils from '../../../MAIN_PROCESS_UTILS'
+import Helpers from './Helpers'
 import REGEX from '../../Global/REGEX'
 const electron = require('electron')
 const fs = require('fs')
@@ -198,6 +199,18 @@ const UserMethods = {
           else resolve(tags)
         })
       }
+    })
+  },
+  checkPathThenCreate,
+  async setFolderIcons (plFilter) {
+    const iconSetter = Helpers.getIconSetterHelper()
+    if (!iconSetter) return console.error('NO ICONSETTER FOR THIS PLATFORM')
+    const pls = customGetters.SyncedPlaylistsSp().filter(p => !plFilter || plFilter.includes(p.id)).map(({folderName, name, images}) => ({ path: PATH.join((homeFolderPath()), utils.encodeIntoFilename(folderName || name)).replace(/ /g, '\\ '), imageUrl: images && images[0] && images[0].url })).filter(pl => pl.path && pl.imageUrl)
+
+    pls.forEach(async pl => {
+      if (await iconSetter.test(pl.path)) return
+      const downloader = new Helpers.plIconDownloader(pl, iconSetter)
+      downloader.exec()
     })
   }
 }

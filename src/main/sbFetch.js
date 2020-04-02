@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import store from '../renderer/store'
-const axios = require('axios')
+import axios from 'axios'
 
 const Backend = process.env.BACKEND
 console.log('BACKEND::::::', Backend)
@@ -86,7 +86,7 @@ export function youtubizeAll (tracks) {
         track: JSON.stringify(tracks[i].query)
       })
         .then(res => {
-          console.log('onThen')
+          console.log('on .then => conversion successful?', !!(res && res.data))
           if (!res || !res.data) throw new Error('Conversion doesn\'t exist')
           tracks[i].conversion = res.data
           tracks[i].flags.converted = true

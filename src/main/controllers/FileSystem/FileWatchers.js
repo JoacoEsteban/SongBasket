@@ -17,11 +17,11 @@ const onTrackRemovedFns = []
 const FileWatchers = {
   tracks: {},
   watchers: [],
-  async createPlaylistWatchers (customPath) {
+  async createPlaylistWatchers () {
     if (!(await UserMethods.retrieveLocalTracks()).length) return
     let syncedPlaylists = customGetters.SyncedPlaylistsSp()
     syncedPlaylists.forEach(pl => {
-      let path = (customPath || homeFolderPath()) + '/' + utils.encodeIntoFilename(pl.folderName || pl.name)
+      let path = homeFolderPath() + '/' + utils.encodeIntoFilename(pl.folderName || pl.name)
 
       // READY++
 

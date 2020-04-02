@@ -89,11 +89,16 @@ export default {
     z-index: 0;
     position: relative;
     &.download {
-      &.awaiting {
+      &.awaiting, &.finished {
         opacity: .5;
       }
-      &.downloading, &.extracting {
+      &.downloading, &.extracting, &.tags {
         background-color: var(--global-grey)
+      }
+      &[class*="_end"] {
+        .background-progress {
+          opacity: 0;
+        }
       }
     }
   }
@@ -115,7 +120,7 @@ export default {
     position: absolute;
     left: 0;top: 0;bottom: 0;
     width: var(--progress);
-    transition: width 1s var(--bezier-chill);
+    transition: width 1s var(--bezier-chill), opacity .2s var(--bezier-chill);
     z-index: 0;
     display: flex;
     align-items: flex-start;
@@ -127,9 +132,14 @@ export default {
     &.extracting {
       background: linear-gradient(258.84deg, rgba(148, 0, 204, 0.75) 1.53%, rgba(251, 0, 255, 0.75) 100%);
     }
+    &.tags {
+      --p: #ffe500 -150%, #ff00ff;
+      animation: background-cycle-less 5s infinite var(--bezier-chill);
+    }
 
     .progress-label {
       padding: .2em .3em;
+      white-space: nowrap;
     }
   }
   .track-info {

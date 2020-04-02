@@ -75,7 +75,7 @@ export default {
       return this.isSynced && this.$store.state.CurrentUser.convertedTracks.some(t => {
         const pl = (t.playlists.find(pl => pl.id === this.playlist.id))
         if (!pl) return false
-        let selectionId = pl.selected
+        let selectionId = t.selection
 
         if (selectionId === false) return false
         if (selectionId === null) selectionId = t.conversion.bestMatch
