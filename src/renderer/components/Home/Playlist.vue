@@ -60,28 +60,34 @@ export default {
       return this.playlist && this.playlist.images && this.playlist.images[0] && this.playlist.images[0].url
     },
     trackAmmount () {
-      return this.playlist && this.playlist.tracks && this.playlist.tracks.total
+      return (this.playlist && this.playlist.tracks && this.playlist.tracks.total) || 0
     },
     trackAmmountStr () {
       return this.trackAmmount + ' Track' + (this.trackAmmount === 1 ? '' : 's')
     },
     status () {
-      // if (this.isSynced) console.log('dirty', this.hasDirtyConversion)
-      if (this.isSynced) return (this.hasDirtyConversion ? 'synced:dirty' : 'synced')
+      // if (this.isSynced) console.log('dirty', this.dirtyConversionsAmount)
+      if (this.isSynced) return (this.dirtyConversionsAmount ? 'synced:dirty' : 'synced')
       // if (this.isSynced) return 'synced'
       return null
     },
-    hasDirtyConversion () {
-      return this.isSynced && this.$store.state.CurrentUser.convertedTracks.some(t => {
-        const pl = (t.playlists.find(pl => pl.id === this.playlist.id))
-        if (!pl) return false
+    dirtyConversionsAmount () {
+      let count = 0
+      this.isSynced && this.$store.state.CurrentUser.convertedTracks.forEach(t => {
+        // filter to just undownloaded tracks
+        if (!(t.playlists.some(pl => pl.id === this.playlist.id))) return false
+        if (t.flags.selectionIsApplied) return false
         let selectionId = t.selection
 
         if (selectionId === false) return false
         if (selectionId === null) selectionId = t.conversion.bestMatch
 
-        return t.conversion && t.conversion.yt.find(yt => yt.id === selectionId).isDoubtlyConversion
+        if (this.isTrackDownloaded(t.id, selectionId)) return false
+
+        const selection = t.conversion && t.conversion.yt.find(yt => yt.id === selectionId)
+        selection.isDoubtlyConversion && ++count && console.log('aber cual', t)
       })
+      return count
     },
     cardOptions () {
       return this.isSynced ? {
@@ -100,8 +106,9 @@ export default {
           devolvio.text = 'synced'
           break
         case 'synced:dirty':
+          const num = this.dirtyConversionsAmount
           devolvio.class = 'synced-dirty'
-          devolvio.text = 'dirty synced'
+          devolvio.text = `review ${num} conversion${(num - 1) ? 's' : ''}`
           break
         case null:
           break
@@ -110,6 +117,12 @@ export default {
     }
   },
   methods: {
+    isTrackDownloaded (sp, yt) {
+      // TODO Check if this is working and rethink track and plalylist status computing location
+      if (!sp || !yt) console.log('aber', sp, yt)
+      const track = this.$root.DOWNLOADED_TRACKS[sp]
+      return track && track[yt] && track[yt].playlists && track[yt].playlists.some(p => p === this.playlist.id)
+    },
     handleClick () {
       if (this.isSynced) {
         this.$emit('openPlaylist')

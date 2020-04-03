@@ -69,6 +69,7 @@ const calcBestMatch = (track) => {
 
 const makeValidRegex = str => {
   let regex = str
+  regex = regex.replace(/\*/g, '\\*')
   regex = regex.replace(/\(/g, '\\(')
   regex = regex.replace(/\)/g, '\\)')
   // TODO Fix this replacing incorrectly

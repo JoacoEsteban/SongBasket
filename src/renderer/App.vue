@@ -36,7 +36,6 @@ export default {
         case 68:
           return this.$sbRouter.push({name: 'downloads-view'})
         default:
-          console.log(keyCode)
       }
     },
     handleWindowKey (e) {

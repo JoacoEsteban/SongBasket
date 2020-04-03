@@ -202,13 +202,16 @@ const UserMethods = {
     })
   },
   checkPathThenCreate,
-  async setFolderIcons (plFilter) {
+  async setFolderIcons (plFilter, params = { force: false }) {
+    if (typeof plFilter === 'string') plFilter = [plFilter]
+    if (!Array.isArray(plFilter)) plFilter = null
+
     const iconSetter = Helpers.getIconSetterHelper()
     if (!iconSetter) return console.error('NO ICONSETTER FOR THIS PLATFORM')
     const pls = customGetters.SyncedPlaylistsSp().filter(p => !plFilter || plFilter.includes(p.id)).map(({folderName, name, images}) => ({ path: PATH.join((homeFolderPath()), utils.encodeIntoFilename(folderName || name)).replace(/ /g, '\\ '), imageUrl: images && images[0] && images[0].url })).filter(pl => pl.path && pl.imageUrl)
 
     pls.forEach(async pl => {
-      if (await iconSetter.test(pl.path)) return
+      if (!params.force && await iconSetter.test(pl.path)) return
       const downloader = new Helpers.plIconDownloader(pl, iconSetter)
       downloader.exec()
     })

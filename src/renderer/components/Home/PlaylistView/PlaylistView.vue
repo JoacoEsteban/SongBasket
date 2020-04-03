@@ -120,7 +120,7 @@ export default {
       this.computeTracks()
     },
     playlistUnsynced () {
-      this.$sbRouter.push('home')
+      this.$sbRouter.push({name: 'home', params: {which: 'playlists-list'}})
     },
     resetSelection () {
       this.resetAll(true)

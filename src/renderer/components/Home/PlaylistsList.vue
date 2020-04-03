@@ -143,8 +143,13 @@ export default {
           }
         }
       })
-      this.syncedPlaylists = all.sort((a, b) => (b.tracks.added.length + b.tracks.removed.length) - (a.tracks.added.length + a.tracks.removed.length))
+      this.syncedPlaylists = all.sort(this.sortFn)
       this.filterPlaylists()
+    },
+    sortFn (a, b) {
+      const trackDiffs = (b.tracks.added.length + b.tracks.removed.length) - (a.tracks.added.length + a.tracks.removed.length)
+      // TODO sort by dirty conversions count
+      return trackDiffs
     },
     calcScrollOpacity () {
       let ratio = (this.getContainerElement().scrollTop / 100)

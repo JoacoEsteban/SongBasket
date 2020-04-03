@@ -281,12 +281,17 @@ const mutations = {
     const statePl = state.playlists[index]
     // If playlist is synced, then I will compute differences with previous local version
     if (state.syncedPlaylists.some(p => p === playlist.id)) {
-      let cb
+      const cbs = []
       let oldName
       if (statePl.name !== playlist.name) {
-        oldName = statePl.folderName
+        oldName = statePl.folderName || statePl.name
         statePl.folderName = null
-        cb = () => FSController.FileWatchers.renameFolder({oldName, newName: playlist.folderName}) // Rename Folder
+        cbs.push(() => FSController.FileWatchers.renameFolder({oldName, newName: playlist.folderName})) // Rename Folder
+      }
+
+      if ((statePl.images && statePl.images[0] && statePl.images[0].url) !== (playlist.images && playlist.images[0] && playlist.images[0].url)) {
+        console.log('new folder image', statePl.name, statePl.images[0].url, playlist.images[0].url)
+        cbs.push(() => FSController.UserMethods.setFolderIcons(playlist.id, {force: true}))
       }
 
       playlist.folderName = statePl.folderName || (() => {
@@ -294,7 +299,7 @@ const mutations = {
         if (state.playlists.some(p => p.name === playlist.name && p.id !== playlist.id)) name += ' - ' + playlist.id
         return name
       })()
-      if (cb) cb()
+      cbs.forEach(cb => cb())
 
       let oldPl = [
         ...statePl.tracks.items,
@@ -310,7 +315,7 @@ const mutations = {
         removed
       }
     } else {
-      // Playlist is not synced so I dont care about computing changes
+      // Playlist was not synced before so I dont care about computing changes
       playlist.tracks = {
         ...playlist.tracks,
         added: [],
@@ -318,6 +323,7 @@ const mutations = {
       }
       let {id, snapshot_id} = playlist
       this.dispatch('playlistUpdateCached', {id, snapshot_id})
+      FSController.UserMethods.setFolderIcons(playlist.id, {force: true}) // creates folder and sets icon
     }
     state.playlists.splice(index, 1, playlist)
     // console.log('SON, ITS TIME NOW', state.playlists[index].tracks.added.map(p => p.name))
@@ -408,12 +414,10 @@ const mutations = {
   },
   REPROCESS_ALL_TRACKS (params = {}) {
     Vue.set(state, 'convertedTracks', state.convertedTracks.map(convertedTrack => {
-      convertedTrack.selection = null
+      if (params.resetSelection) convertedTrack.selection = null
       if (convertedTrack.custom) {
         convertedTrack.custom.isCustomTrack = true
-        if (params.forceCustom) {
-          convertedTrack.selection = false
-        }
+        if (params.forceCustom) convertedTrack.selection = false
       }
       if (!convertedTrack.flags) {
         convertedTrack.flags = {
