@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import FSController from '../../../main/controllers/FileSystem/index'
 // import Vue from 'vue'
 
@@ -11,7 +12,9 @@ const getDefaultState = () => {
     },
     loadingState: null,
     modal: defaultModal(),
-    downloadPool: []
+    downloadPool: [],
+    CONNECTED_TO_INTERNET: true,
+    CONNECTED_TO_API: true
   }
 }
 function defaultModal () {
@@ -44,6 +47,9 @@ const actions = {
       resolve()
     })
   },
+  connectionChange ({commit}, value) {
+    commit('SET', {key: 'CONNECTED_TO_INTERNET', value})
+  },
   openModal ({commit}, options) {
     return new Promise((resolve, reject) => {
       commit('OPEN_MODAL', options)
@@ -70,6 +76,12 @@ const actions = {
 }
 
 const mutations = {
+  TRIGGER (state, key) {
+    state[key] = !state[key]
+  },
+  SET (state, {key, value}) {
+    Vue.set(state, key, value)
+  },
   ADD_HOME_FOLDER (state, path) {
     console.log('goldys', state.fileSystem.homeFolders)
     if (!state.fileSystem.homeFolders.paths.some(p => p === path)) state.fileSystem.homeFolders.paths.push(path)

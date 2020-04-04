@@ -19,6 +19,8 @@
   --transition-global-hard: 0.5s var(--bezier);
   --home-transition: .3s cubic-bezier(.12,.82,0,.99);
   /* VARIABLES */
+  --body-color: var(--body-dark);
+  --body-color-disconnected: #903;
   --max-container-height: calc(100vh);
   --box-shadow-std: 5px 5px 15px 0 rgba(0, 0, 0, 0.4);
   --container-padding-x: 1.25em;

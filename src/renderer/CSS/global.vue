@@ -3,6 +3,11 @@ html {
   font-size: 30px;
   height: var(--max-container-height);
   overflow: hidden;
+  &.disconnected {
+    body {
+      --body-color: var(--body-color-disconnected);
+    }
+  }
 }
 /* width */
 ::-webkit-scrollbar {
@@ -38,14 +43,16 @@ html {
 
 
 body {
-  background: var(--body-dark);
+  background-color: var(--body-color);
   color: var(--text-white);
-  font-family: "made_tommy";
+  font-family: "made_tommy", sans-serif;
   font-size: 1em;
   margin: 0;
   user-select: none;
   overflow: hidden;
   height: 100%;
+  $t: 1s var(--bezier-chill);
+  transition: background-color $t, color $t;
 }
 body:hover {
   cursor: default;
@@ -122,7 +129,7 @@ body:hover {
 }
 
 .sb-title {
-  font-weight: bold;
+  font-weight: 500;
   font-size: 1.5em;
 }
 

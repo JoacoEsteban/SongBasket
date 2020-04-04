@@ -1,26 +1,25 @@
 import customGetters from '../../../renderer/store/customGetters'
 import * as utils from '../../../MAIN_PROCESS_UTILS'
-const fs = require('fs')
 const PATH = require('path')
 const uuid = require('uuid')
 
-export function downloadLinkRemove (localTracks, queryTracks, plFilter = []) {
+export async function downloadLinkRemove (localTracks, queryTracks, plFilter = []) {
   return VTWO(localTracks, queryTracks, plFilter || [])
 }
 
 // TODO turn both of this as async
-export function unlink (path) {
-  if (fs.existsSync(path)) fs.unlinkSync(path)
+export async function unlink (path) {
+  if (await utils.pathDoesExist(path)) await utils.unlink(path)
 }
-export function link (path, newPath) {
+export async function link (path, newPath) {
   console.log('linking ', path, newPath)
-  if (!fs.existsSync(path)) throw new Error()
-  if (fs.existsSync(newPath)) return false
-  fs.linkSync(path, newPath)
+  if (!await utils.pathDoesExist(path)) throw new Error()
+  if (await utils.pathDoesExist(newPath)) return false
+  await utils.link(path, newPath)
   return true
 }
 
-function VTWO (localTracks, queryTracks = [], plFilter = []) {
+async function VTWO (localTracks, queryTracks = [], plFilter = []) {
   if (plFilter.length) localTracks.forEach(lTrack => lTrack.dontUnlink = !plFilter.includes(lTrack.playlist)) // prevents unlinking tracks when filtering playlist
 
   queryTracks = queryTracks.filter(qTrack => {
@@ -53,36 +52,42 @@ function VTWO (localTracks, queryTracks = [], plFilter = []) {
   console.log('to link', queryTracks.filter(t => !t.downloadFlags.download).map(t => t.data.name))
   console.log('to unlink', localTracks.filter(t => !t.dontUnlink).map(t => t.path))
 
-  queryTracks = queryTracks.filter(qTrack => {
+  queryTracks = queryTracks.filter(async qTrack => {
     if (qTrack.downloadFlags.download) return true
-    linkTrackToPlaylists(qTrack)
+    await linkTrackToPlaylists(qTrack)
     return false
   })
 
-  localTracks.forEach(lTrack => {
-    if (!lTrack.dontUnlink) unlink(lTrack.path)
+  localTracks.forEach(async lTrack => {
+    if (!lTrack.dontUnlink) await unlink(lTrack.path)
   })
 
   return queryTracks
 }
 
-const linkTrackToPlaylists = (track) => {
-  track.playlists.forEach(pl => {
+const linkTrackToPlaylists = async (track) => {
+  track.playlists.forEach(async pl => {
     let plPath = customGetters.giveMePlFolderName(pl.id)
+    console.log(plPath)
     if (!plPath) return
+    console.log(1)
     plPath = PATH.join(global.HOME_FOLDER, utils.encodeIntoFilename(plPath))
+    console.log(2)
     let fileName = track.downloadFlags.linkData.file.replace('.mp3', '')
+    console.log(3)
     let didLink = false
 
     for (let i = 0; !didLink && i < 10; i++) {
       let suffix = i === 0 ? '' : (' - ' + uuid.v4())
       if (i > 1) suffix += (' - ' + i)
       try {
-        didLink = link(track.downloadFlags.linkData.path, PATH.join(plPath, fileName + suffix + '.mp3'))
+        didLink = await link(track.downloadFlags.linkData.path, PATH.join(plPath, fileName + suffix + '.mp3'))
+        if (didLink) return
       } catch (error) {
         console.error(error || 'TRACK TO LINK DOESN\'T EXIST')
         return
       }
     }
+    throw new Error('COULD NOT LINK TRACK')
   })
 }

@@ -74,7 +74,7 @@
 </template>
 
 <script>
-import { dateFormatter } from '../../../../UTILS'
+import { dateFormatter } from '../../../utils'
 
 import PlaylistViewSlide from './slides/PlaylistViewSlide.vue'
 import DownloadsViewSlide from './slides/DownloadsViewSlide.vue'

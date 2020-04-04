@@ -32,13 +32,12 @@ const actions = {
     commit('TRIGGER', 'RESET_SELECTION')
   },
   routerAnimation ({commit}, animation) {
-    commit('ROUTER_ANIMATION', animation)
+    commit('SET', {key: 'ROUTER_ANIMATION', value: animation})
   },
   downloadStarted ({commit}, tracks) {
     commit('DOWNLOAD_STARTED', tracks)
   },
   downloadEvent ({commit}, params) {
-    console.log('EVENT', params)
     commit('DOWNLOAD_EVENT', params)
   },
   globalLoadingState ({commit}, value) {
@@ -53,9 +52,6 @@ const actions = {
 const mutations = {
   TRIGGER (state, key) {
     state[key] = !state[key]
-  },
-  ROUTER_ANIMATION (state, animation) {
-    state.ROUTER_ANIMATION = animation
   },
   SET (state, {key, value}) {
     Vue.set(state, key, value)
@@ -85,6 +81,7 @@ const mutations = {
             break
           case 'error':
             // TODO Handle error
+            track.state = 'download_error'
             break
           case 'end':
             track.state = 'download_end'
@@ -102,6 +99,7 @@ const mutations = {
             break
           case 'error':
             // TODO Handle error
+            track.state = 'extraction_error'
             break
           case 'end':
             track.state = 'extraction_end'
@@ -112,13 +110,13 @@ const mutations = {
         switch (type[1]) {
           case 'start':
             track.state = 'tags'
-            track.ptg = 0
             break
           // case 'progress':
           //   track.ptg = ptg
           //   break
           case 'error':
             // TODO Handle error
+            track.state = 'tags_error'
             break
           case 'end':
             track.state = 'tags_end'

@@ -61,45 +61,38 @@ export async function createDirRecursive (path) {
 
 export function pathDoesExist (path) {
   return new Promise((resolve, reject) => {
-    fs.stat(path, (err, noterr) => {
-      resolve(!err)
-    })
+    fs.stat(path, err => resolve(!err))
+  })
+}
+export function link (path, path2) {
+  return new Promise((resolve, reject) => {
+    fs.link(path, path2, err => err ? reject(err) : resolve())
+  })
+}
+export function unlink (path) {
+  return new Promise((resolve, reject) => {
+    fs.unlink(path, err => err ? reject(err) : resolve())
   })
 }
 export function createDir (path) {
   return new Promise((resolve, reject) => {
-    fs.mkdir(path, (err, noterr) => {
-      if (err) reject(err)
-      else resolve()
-    })
+    fs.mkdir(path, err => err ? reject(err) : resolve())
   })
 }
 
 export function linkNRemove (path1, path2) {
   return new Promise((resolve, reject) => {
-    fs.link(path1, path2, (err, noterr) => {
-      if (err) reject(err)
-      else {
-        fs.unlink(path1, (err, noterr) => {
-          if (err) reject(err)
-          else resolve()
-        })
-      }
-    })
+    link(path1, path2)
+      .then(() => {
+        unlink(path1)
+          .then(resolve)
+          .catch(reject)
+      })
+      .catch(reject)
   })
 }
 export function copyNRemove (path1, path2) {
-  return new Promise((resolve, reject) => {
-    fs.copyFile(path1, path2, (err, noterr) => {
-      if (err) reject(err)
-      else {
-        fs.unlink(path1, (err, noterr) => {
-          if (err) reject(err)
-          else resolve()
-        })
-      }
-    })
-  })
+  return new Promise((resolve, reject) => fs.copyFile(path1, path2, err => err ? reject(err) : fs.unlink(path1, err => err ? reject(err) : resolve())))
 }
 
 export function isSameDisk (path1, path2) {

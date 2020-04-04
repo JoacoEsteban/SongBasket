@@ -48,7 +48,7 @@ export default {
         uploader: snippet.channelTitle,
         issue: !isCustom && itm.isDoubtlyConversion ? ((itm.wordScore === 0 || !itm.nameTokensMap[0]) ? 'Name' : 'Duration') + ' Doesn\'t match' : null,
         backgroundImage: snippet && snippet.thumbnails && snippet.thumbnails.high.url,
-        duration: isCustom ? 'CUSTOM' : Math.abs(Math.round(itm.durationDiff)) + '\'\''
+        duration: isCustom ? 'CUSTOM' : (Math.round(itm.durationDiff)) + '\'\''
       }) || {}
     }
   },

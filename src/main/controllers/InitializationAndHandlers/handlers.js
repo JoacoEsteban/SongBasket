@@ -5,6 +5,7 @@ import * as sbFetch from '../../sbFetch'
 import GLOBAL from '../../Global/VARIABLES'
 import IpcController from './ipc.controller'
 import youtubeDl from '../DownloadPhase/youtube-dl'
+import connectionController from './connection.controller'
 
 const openBrowser = require('open')
 const ipcSend = IpcController.send
@@ -18,6 +19,11 @@ export function init ({ app, BrowserWindow, session, dialog }) {
   SESSION = session
   DIALOG = dialog
   app.on('ready', () => {
+    connectionController.init({
+      connectionChangeCallback: (value) => {
+        ipcSend('Connection:CHANGE', value)
+      }
+    })
     createWindow()
     GLOBAL.MAIN_WINDOW.webContents.on('did-finish-load', () => {
       console.log('webcontents')
@@ -71,7 +77,6 @@ export function download (e, plFilter) {
   console.log('About to download')
   FSControler.UserMethods.retrieveLocalTracks()
     .then(tracks => {
-      console.log('passed', tracks.map(t => t.file))
       youtubeDl.downloadSyncedPlaylists(tracks, plFilter)
     })
 }

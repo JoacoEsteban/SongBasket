@@ -63,8 +63,8 @@ export default {
       return new Promise(resolve => {
         window.ipc.send('ytTrackDetails', this.url)
         window.ipc.on('done', (event, details) => {
-          let {trackId, playlistId} = this.payload
-          this.$store.dispatch('customTrackUrl', {details, trackId, playlistId})
+          let {trackId} = this.payload
+          this.$store.dispatch('customTrackUrl', {details, trackId})
           this.$emit('close')
         })
         window.ipc.on('error', () => {

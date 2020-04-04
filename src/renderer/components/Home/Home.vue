@@ -114,6 +114,7 @@ export default {
     },
     download () {
       window.ipc.send('download')
+      this.$sbRouter.push({name: 'downloads-view'})
     }
   },
 

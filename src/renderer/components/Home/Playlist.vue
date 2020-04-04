@@ -85,7 +85,7 @@ export default {
         if (this.isTrackDownloaded(t.id, selectionId)) return false
 
         const selection = t.conversion && t.conversion.yt.find(yt => yt.id === selectionId)
-        selection.isDoubtlyConversion && ++count && console.log('aber cual', t)
+        selection.isDoubtlyConversion && ++count
       })
       return count
     },

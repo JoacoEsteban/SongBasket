@@ -139,9 +139,9 @@ const actions = {
       resolve()
     })
   },
-  customTrackUrl ({commit}, {details, trackId, playlistId}) {
+  customTrackUrl ({commit}, {details, trackId}) {
     return new Promise((resolve, reject) => {
-      commit('CUSTOM_TRACK_URL', {details, trackId, playlistId})
+      commit('CUSTOM_TRACK_URL', {details, trackId})
       resolve()
     })
   }
@@ -404,9 +404,10 @@ const mutations = {
     state.convertedTracks = cloned
   },
   CLEAN_TRACKS () {
+    const playlists = state.syncedPlaylists.map(id => state.playlists.find(pl => pl.id === id))
     state.convertedTracks = cloneObject(state.convertedTracks).filter(track => {
       track.playlists = track.playlists.filter(pl => {
-        const playlist = state.playlists.find(p => p.id === pl.id)
+        const playlist = playlists.find(p => p.id === pl.id)
         return (playlist && playlist.tracks.items.some(t => t.id === track.id))
       })
       return track.playlists.length
@@ -462,7 +463,6 @@ const mutations = {
 
     // Remove playlist from converted tracks registries
     if (tracks.removed && tracks.removed.length) {
-      console.time(id)
       tracks.removed.forEach(rem => {
         for (let o = 0; o < state.convertedTracks.length; o++) {
           const track = state.convertedTracks[o]
@@ -473,7 +473,6 @@ const mutations = {
           }
         }
       })
-      console.timeEnd(id)
     } else if (!tracks.added || !tracks.added.length) return
 
     state.playlists[index].tracks.items.push(...(tracks.added || []))
@@ -524,15 +523,13 @@ const mutations = {
       })
     } else console.error('Playlist not found when unsyncing :: UNSYNC_PLAYLIST')
   },
-  CUSTOM_TRACK_URL (state, {details, trackId, playlistId}) {
+  CUSTOM_TRACK_URL (state, {details, trackId}) {
     const track = state.convertedTracks[findById(trackId, state.convertedTracks)]
     if (!track) return console.error('TRACK NOT FOUND IN CONVERTED TRACKS :: CUSTOM_TRACK_URL')
-    const playlist = track.playlists.find(pl => pl.id === playlistId)
-    if (!playlist) return console.error('PLAYLIST NOT FOUND IN CONVERTED TRACK :: CUSTOM_TRACK_URL')
 
     details.isCustomTrack = true
     track.custom = details
-    playlist.selected = false
+    track.selection = false
     SAVE_TO_DISK()
   }
 }

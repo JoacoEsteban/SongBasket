@@ -85,6 +85,7 @@ export default {
     downloadPlaylist () {
       if (!(this.playlist && this.playlist.id)) return
       window.ipc.send('download', [this.playlist.id])
+      this.$sbRouter.push({name: 'downloads-view'})
     },
     unsyncPlaylist () {
       this.$store.dispatch('openModal', {wich: 'unsync', payload: {id: this.playlist.id}})

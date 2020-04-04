@@ -2,7 +2,7 @@
 import * as handlers from './handlers'
 import * as sbFetch from '../../sbFetch'
 import store from '../../../renderer/store'
-import * as youtubeHandler from '../../youtubeHandler'
+import * as youtubeHandler from '../../queryMaker'
 import FileWatchers from '../FileSystem/FileWatchers'
 import IpcController from './ipc.controller'
 

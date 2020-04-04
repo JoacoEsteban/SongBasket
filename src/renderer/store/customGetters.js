@@ -22,6 +22,7 @@ export default {
   giveMePlFolderName (id) {
     let state = store.state.CurrentUser
     const pl = state.playlists.find(pl => pl.id === id)
+    if (!pl) console.log(id, pl, pl && pl.folderName, pl && pl.name)
     return pl && (pl.folderName || pl.name)
   }
 }

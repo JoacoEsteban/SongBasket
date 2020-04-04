@@ -83,6 +83,17 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+$err1: rgba(255, 0, 100, 0.75) 1.53%;
+$err2: rgba(255, 35, 0, 0.75) 100%;
+$error-bg: linear-gradient(258.84deg, $err1, $err2);
+
+$dl1: rgba(36, 255, 0, 0.75) 1.53%;
+$dl2: rgba(0, 255, 136, 0.75) 100%;
+$download-bg: linear-gradient(258.84deg, $dl1, $dl2);
+
+$ex1: rgba(148, 0, 204, 0.75) 1.53%;
+$ex2: rgba(251, 0, 255, 0.75) 100%;
+$extraction-bg: linear-gradient(258.84deg, $ex1, $ex2);
   .track-banner-container {
     height: 7em;
     transition: opacity var(--transition-global), background-color var(--transition-global);
@@ -93,11 +104,18 @@ export default {
         opacity: .5;
       }
       &.downloading, &.extracting, &.tags {
-        background-color: var(--global-grey)
+        background-color: var(--global-grey);
+        box-shadow: inset 0px 0 48px 17px #0005;
       }
-      &[class*="_end"] {
+      &[class*='end'] {
         .background-progress {
           opacity: 0;
+        }
+      }
+      &[class*='error'] {
+        .background-progress {
+          --progress: 100% !important;
+          background: $error-bg;
         }
       }
     }
@@ -125,16 +143,18 @@ export default {
     display: flex;
     align-items: flex-start;
     justify-content: flex-end;
+    box-shadow: inset 0px 0 48px 17px #0004;
 
     &.downloading {
-      background: linear-gradient(258.84deg, rgba(36, 255, 0, 0.75) 1.53%, rgba(0, 255, 136, 0.75) 100%);
+      background: $download-bg;
     }
     &.extracting {
-      background: linear-gradient(258.84deg, rgba(148, 0, 204, 0.75) 1.53%, rgba(251, 0, 255, 0.75) 100%);
+      background: $extraction-bg;
     }
     &.tags {
       --p: #ffe500 -150%, #ff00ff;
       animation: background-cycle-less 5s infinite var(--bezier-chill);
+      --progress: 100% !important;
     }
 
     .progress-label {

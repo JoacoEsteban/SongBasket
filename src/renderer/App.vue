@@ -1,5 +1,5 @@
 <template>
-  <div  class="app-container">
+  <div class="app-container">
       <router-view id="app">
       </router-view>
       <modal />
@@ -20,6 +20,16 @@ export default {
   components: {
     Modal,
     StylesLoader
+  },
+  watch: {
+    isConnected (val) {
+      this.$('html')[val ? 'removeClass' : 'addClass']('disconnected')
+    }
+  },
+  computed: {
+    isConnected () {
+      return this.$store.state.SharedStates.CONNECTED_TO_INTERNET
+    }
   },
   methods: {
     redirect (path, payload) {
@@ -109,9 +119,14 @@ export default {
         }
       }
       this.$root.DOWNLOADED_TRACKS = tracks
+    },
+    onConnectionChange (e, val) {
+      console.log('form view')
+      this.$store.dispatch('connectionChange', val)
     }
   },
   created () {
+    window.ipc.on('Connection:CHANGE', this.onConnectionChange)
     window.ipc.on('FileWatchers:ADDED', this.onAddedTrack)
     window.ipc.on('FileWatchers:REMOVED', this.onRemovedTrack)
     window.ipc.on('FileWatchers:RETRIEVED_TRACKS', this.onRetrievedTracks)

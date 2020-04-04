@@ -24,8 +24,7 @@ const binPath = basePath + '/bin/ffmpeg';
 
 export function extractMp3 (pathmp3, pathmp4, inputFormat, progressCb) {
   return new Promise((resolve, reject) => {
-    console.log('Converting to Audio')
-    let command =
+    const command =
           ffmpeg(pathmp4)
             .inputFormat(inputFormat)
             .on('progress', progressCb)
