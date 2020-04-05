@@ -94,7 +94,7 @@ export default {
     loadMore () {
       if (!this.loading) {
         this.loading = true
-        window.ipc.send('loadMore')
+        this.$IPC.send('loadMore')
       }
     },
     searchInputOnFocus () {
@@ -184,7 +184,7 @@ export default {
   },
   mounted () {
     this.searchInputOnBlur()
-    window.ipc.on('done loading', () => {
+    this.$IPC.on('done loading', () => {
       this.loading = false
     })
     this.refreshSynced()

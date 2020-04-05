@@ -95,7 +95,7 @@ export function createWindow () {
     frame: false,
     minWidth: width,
     minHeight: height,
-    backgroundColor: '#333',
+    backgroundColor: '#151515',
     useContentSize: true,
     webPreferences: {
       nodeIntegration: true

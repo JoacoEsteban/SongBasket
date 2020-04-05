@@ -81,12 +81,12 @@ export default {
     loadMore () {
       if (!this.loading) {
         this.loading = true
-        window.ipc.send('loadMore')
+        this.$IPC.send('loadMore')
       }
     },
     openPlaylist (id) {
       if (this.playlistSynced(id)) return this.setPlaylistNPush(id)
-      window.ipc.send('get tracks from', id)
+      this.$IPC.send('get tracks from', id)
     },
     setPlaylistNPush (id) {
       this.$sbRouter.push({name: 'playlist-view', params: {id}})
@@ -103,17 +103,17 @@ export default {
       this.$store.dispatch('queuePlaylist', id)
     },
     youtubeConvert () {
-      window.ipc.send('Youtube Convert')
+      this.$IPC.send('Youtube Convert')
     },
     refreshPlaylists () {
-      window.ipc.send('refreshPlaylists')
+      this.$IPC.send('refreshPlaylists')
     },
     openYtVideo (id) {
       console.log('openYtVideo', id)
-      window.ipc.send('openYtVideo', id)
+      this.$IPC.send('openYtVideo', id)
     },
     download () {
-      window.ipc.send('download')
+      this.$IPC.send('download')
       this.$sbRouter.push({name: 'downloads-view'})
     }
   },
@@ -124,11 +124,11 @@ export default {
 
     if (this.$store.state.CurrentUser.playlists.length === 0) { this.$router.push('/empty') }
 
-    window.ipc.on('done loading', () => {
+    this.$IPC.on('done loading', () => {
       this.loading = false
     })
 
-    window.ipc.on('open playlist', (event, id) => {
+    this.$IPC.on('open playlist', (event, id) => {
       this.setPlaylistNPush(id)
     })
   }

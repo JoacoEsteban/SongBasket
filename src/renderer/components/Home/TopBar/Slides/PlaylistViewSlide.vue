@@ -84,7 +84,7 @@ export default {
     },
     downloadPlaylist () {
       if (!(this.playlist && this.playlist.id)) return
-      window.ipc.send('download', [this.playlist.id])
+      this.$IPC.send('download', [this.playlist.id])
       this.$sbRouter.push({name: 'downloads-view'})
     },
     unsyncPlaylist () {

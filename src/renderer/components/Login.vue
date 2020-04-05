@@ -29,9 +29,8 @@ export default {
   font-family: 'Poppins thin'
 }
 .login-sb-title {
-  font-size: 4.2rem;
-  font-weight: bold;
-  font-family: "poppins regular";
+  font-size: 4.2em;
+  font-weight: 500;
   margin-bottom: 1.5rem;
   line-height: 1
 }

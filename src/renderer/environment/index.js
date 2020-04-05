@@ -1,52 +1,15 @@
-import axios from 'axios'
-import $ from 'jquery'
-
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-
-import SbRouter from './sbRouter'
-import TrackController from './controllers/Track.controller'
-
-library.add(faArrowRight, faArrowLeft)
-
 const { BrowserWindow } = require('electron').remote
-const GLOBAL = require('../main/Global/VARIABLES')
+const GLOBAL = require('../../main/Global/VARIABLES')
 
 export default (Vue) => {
   // -----------------VUE-----------------
-
-  if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
-
-  Vue.http = Vue.prototype.$http = axios
-  Vue.config.productionTip = false
-
-  Vue.component('font-awesome-icon', FontAwesomeIcon)
-  Vue.prototype.$ = $
-  Vue.prototype.$sleep = (time) => new Promise((resolve, reject) => setTimeout(resolve, time))
-  Vue.prototype.$setRootVar = (keys, val, valJs) => {
-    $(':root')[0].style.setProperty('--' + keys.kebab, val)
-    window.ROOT_VARS[keys.camel] = valJs || val
-  }
-  Vue.prototype.$camelcase = require('camelcase')
-  Vue.prototype.$pascalcase = require('pascalcase')
-  setControllers(Vue)
-  // -----sb-router-----
-
-  Vue.prototype.$sbRouter = new SbRouter()
-
+  require('./vue.renderer.config').default(Vue)
   // -----------------WINDOW-----------------
-
-  window.ROOT_VARS = {}
-  window.$ = $
-  $(window).on('mousedown', () => window.MOUSE_BEING_CLICKED = true)
-  $(window).on('mouseup', () => window.MOUSE_BEING_CLICKED = false)
-  window.ipc = require('electron').ipcRenderer
+  require('./window.renderer.config').default(window)
 
   let electronWindow
 
-  const platform = GLOBAL.PLATFORM
-  window.platform = platform
+  const platform = window.platform = GLOBAL.PLATFORM
 
   function toggleFullscreen () {
     let isFullscreen = false
@@ -67,13 +30,13 @@ export default (Vue) => {
 
   (function () {
     function init () {
-      var window = BrowserWindow.getFocusedWindow()
-      electronWindow = window
-      if (!window || !document.getElementById('min-btn')) return false
+      let count = 0
+      const window = electronWindow = BrowserWindow.getFocusedWindow()
+      if (!window || !document.getElementById('min-btn') || !document.getElementById('max-btn') || !document.getElementById('close-btn')) return false
+      console.log('in', ++count)
       document.getElementById('min-btn').addEventListener('click', function (e) {
         window.minimize()
       })
-      if (!window || !document.getElementById('max-btn')) return false
       window.on('maximize', (e) => {
         document.getElementById('max-btn').classList.remove('button-maximize')
         document.getElementById('max-btn').classList.add('button-unmaximize')
@@ -84,7 +47,6 @@ export default (Vue) => {
       })
       document.getElementById('max-btn').addEventListener('click', platform === 'mac' ? toggleFullscreen : toggleMaximization)
 
-      if (!window || !document.getElementById('close-btn')) return false
       document.getElementById('close-btn').addEventListener('click', function (e) {
         window.close()
       })
@@ -100,10 +62,4 @@ export default (Vue) => {
       }
     }
   })()
-}
-
-function setControllers (Vue) {
-  Vue.prototype.$controllers = {
-    track: TrackController
-  }
 }

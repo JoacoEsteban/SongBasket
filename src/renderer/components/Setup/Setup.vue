@@ -33,15 +33,15 @@ export default {
   },
   methods: {
     setHomeFolder () {
-      window.ipc.send('setHomeFolder')
+      this.$IPC.send('setHomeFolder')
     },
     login () {
-      window.ipc.send('login')
+      this.$IPC.send('login')
     },
     guestSearch (request) {
       if (this.loadingState !== 'Loading' && request.query !== '' && request.query !== undefined && request.query !== null) {
         this.$store.dispatch('SET_LOADING_STATE', 'loading')
-        window.ipc.send('guestSignIn', request)
+        this.$IPC.send('guestSignIn', request)
       }
     },
     redirect (path, payload) {
@@ -68,29 +68,29 @@ export default {
       }
     },
     confirmUser () {
-      window.ipc.send('guestConfirm', this.userOnHold.id)
+      this.$IPC.send('guestConfirm', this.userOnHold.id)
     }
 
   },
   mounted () {
-    window.ipc.on('continueToLogin', () => {
+    this.$IPC.on('continueToLogin', () => {
       this.redirect('login')
     })
 
-    window.ipc.on('not-found', () => {
+    this.$IPC.on('not-found', () => {
       this.$store.dispatch('SET_LOADING_STATE', 'not found')
     })
-    window.ipc.on('invalid', () => {
+    this.$IPC.on('invalid', () => {
       this.$store.dispatch('SET_LOADING_STATE', 'invalid id')
     })
 
-    window.ipc.on('user-found', (event, user) => {
+    this.$IPC.on('user-found', (event, user) => {
       this.$store.dispatch('SET_LOADING_STATE', 'found')
       this.userOnHold = user
       this.redirect('guest-verify', user)
     })
 
-    window.ipc.on('playlists done', () => {
+    this.$IPC.on('playlists done', () => {
       this.$store.dispatch('SET_LOADING_STATE', 'found')
       this.redirect('home')
     })

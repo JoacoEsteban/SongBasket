@@ -61,13 +61,13 @@ export default {
       this.hide = true
       this.hideControls = true
       return new Promise(resolve => {
-        window.ipc.send('ytTrackDetails', this.url)
-        window.ipc.on('done', (event, details) => {
+        this.$IPC.send('ytTrackDetails', this.url)
+        this.$IPC.on('done', (event, details) => {
           let {trackId} = this.payload
           this.$store.dispatch('customTrackUrl', {details, trackId})
           this.$emit('close')
         })
-        window.ipc.on('error', () => {
+        this.$IPC.on('error', () => {
           this.loadingText = 'Video not found'
           setTimeout(() => {
             this.hideControls = false
