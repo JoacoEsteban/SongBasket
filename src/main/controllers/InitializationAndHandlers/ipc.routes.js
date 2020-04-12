@@ -69,9 +69,7 @@ export function init (ipc) {
     } catch (err) { throw err }
   })
 
-  ipc.on('refreshPlaylists', function (event) {
-    handlers.guestFetch(store.getters.RequestParams.userId, false)
-  })
+  ipc.on('refreshPlaylists', handlers.refresh)
 
   ipc.on('loadMore', function (event) {
     if (handlers.globalLoadingState().value) return

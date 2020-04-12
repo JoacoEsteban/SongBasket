@@ -159,6 +159,7 @@ export async function verifyFileSystem () {
 
   try {
     await retrieveAndStoreState(FOLDERS.selected)
+    await core.setSongbasketIdGlobally()
     pushToHome()
   } catch (err) {
     // TODO Handle errors when retrieving and setting data
@@ -176,9 +177,7 @@ export function globalLoadingState () {
 
 let loadingCount = 0
 export function LOADING (value, target) {
-  if (!value) value = false
-  if (value) loadingCount++
-  else loadingCount--
+  value ? loadingCount++ : loadingCount--
   console.log({value: loadingCount > 0, target})
   GLOBAL.VUEX.dispatch('globalLoadingState', {value: loadingCount > 0, target})
 }
@@ -264,4 +263,12 @@ export function fetchMultiple (playlists, checkVersion) {
         })
     }
   })
+}
+
+// ------- revision v2 -------
+
+export async function refresh () {
+  LOADING(true, 'Refreshing')
+  await core.updateAll()
+  LOADING()
 }

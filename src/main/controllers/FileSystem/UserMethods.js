@@ -86,6 +86,7 @@ const UserMethods = {
       let allTracks = []
 
       const checkNResolve = () => (++processedPls === syncedPlaylists.length) && resolve(allTracks)
+      if (!syncedPlaylists.length) --processedPls && checkNResolve()
 
       for (let pl of syncedPlaylists) {
         if (!await checkPathThenCreate(pl.path)) checkNResolve()

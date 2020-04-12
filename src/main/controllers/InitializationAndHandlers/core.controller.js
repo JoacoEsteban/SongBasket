@@ -55,7 +55,7 @@ const core = {
       throw error
     }
   },
-  setSongbasketIdGlobally: async id => {
+  setSongbasketIdGlobally: async (id = GETTERS.currentUserId()) => {
     try {
       global.USER_ID = id
       global.SONGBASKET_ID = await core.getCredentials()
