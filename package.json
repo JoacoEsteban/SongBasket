@@ -46,13 +46,13 @@
       ]
     },
     "mac": {
-      "icon": "build/icons/mac/AppIcon.icns"
+      "icon": "assets/icons/mac/songbasket.icns"
     },
     "win": {
-      "icon": "build/icons/icon.ico"
+      "icon": "assets/icons/songbasket.ico"
     },
     "linux": {
-      "icon": "build/icons"
+      "icon": "assets/icons/png"
     }
   },
   "dependencies": {
@@ -73,6 +73,7 @@
     "iconv-lite": "^0.5.1",
     "is-online": "^8.2.1",
     "jquery": "^3.4.1",
+    "keytar": "^5.4.0",
     "less": "^3.10.3",
     "less-loader": "^5.0.0",
     "node-id3": "^0.1.11",
@@ -110,6 +111,7 @@
     "electron-builder": "^20.19.2",
     "electron-debug": "^1.5.0",
     "electron-devtools-installer": "^2.2.4",
+    "electron-rebuild": "^1.10.1",
     "eslint": "^4.19.1",
     "eslint-config-standard": "^11.0.0",
     "eslint-friendly-formatter": "^4.0.1",

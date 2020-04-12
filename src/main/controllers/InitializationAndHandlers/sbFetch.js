@@ -1,9 +1,23 @@
 /* eslint-disable camelcase */
-import store from '../renderer/store'
+import store from '../../../renderer/store'
 import axios from 'axios'
 
+import PATHS from '../../Global/PATHS'
+const URL = PATHS.makeUrl
+
+let Api
+export function createAxiosInstance () {
+  Api = axios.create({
+    baseURL: PATHS.BASE,
+    timeout: 2000,
+    headers: {
+      'Authorization': 'Bearer ' + global.SONGBASKET_ID,
+      'user_id': global.USER_ID
+    }
+  })
+}
+
 const Backend = process.env.BACKEND
-console.log('BACKEND::::::', Backend)
 
 let loadingCount = 0
 function LOADING (value, target) {
@@ -15,11 +29,10 @@ function LOADING (value, target) {
 }
 
 // Brings back user information
-export async function guestLogin (userId) {
-  let url = Backend + '/guest_sign_in'
+export async function guestCheck (userId) {
   try {
-    let res = await axios.get(url, { params: { user_id: userId } })
-    return res.data
+    let res = await Api.get(URL(PATHS.USER, userId))
+    return res && res.data
   } catch (err) {
     throw err
   }
@@ -41,7 +54,7 @@ export async function fetchPlaylists ({userId, logged, SBID, control}) {
     let res = await axios.get(url, {params})
     return res.data
   } catch (err) {
-    throw (err)
+    throw err
   } finally {
     LOADING()
   }
@@ -65,7 +78,7 @@ export async function getTracks ({userId, logged, SBID, control}, {id, snapshot_
     return res.data
   } catch (err) {
     // TODO Check on timeouts being fucking high
-    console.error('ERROR AT sbFetch, getTracks::::', err)
+    console.error('ERROR AT sbFetch, getTracks::::', err.data, err.data.reason.join(', '))
     throw err
   } finally {
     LOADING()
@@ -131,4 +144,38 @@ export function ytDetails (id) {
         LOADING()
       })
   })
+}
+
+// ------------ revision 2 ------------
+
+export const getMe = async () => {
+  try {
+    const res = await Api.get(PATHS.ME)
+    return res && res.data
+  } catch (error) {
+    throw error
+  }
+}
+
+export const getUserPlaylists = async (user_id) => {
+  try {
+    const res = await Api.get(PATHS.USER_PLAYLISTS(user_id))
+    return res && res.data
+  } catch (error) {
+    throw error
+  }
+}
+
+export const getPlaylist = async ({ id, snapshot_id }) => {
+  try {
+    const params = {}
+    if (snapshot_id) params.snapshot_id = snapshot_id
+
+    const res = await Api.get(PATHS.PLAYLIST(id), { params })
+    if (res.status === 304) return null
+
+    return res && res.data
+  } catch (error) {
+    throw error
+  }
 }

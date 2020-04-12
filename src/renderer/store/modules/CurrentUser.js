@@ -47,6 +47,12 @@ const actions = {
       resolve()
     })
   },
+  setUser ({commit}, userData) {
+    return new Promise((resolve, reject) => {
+      commit('SET_USER', userData)
+      resolve()
+    })
+  },
   saveToDisk () {
     SAVE_TO_DISK()
   },
@@ -149,10 +155,10 @@ const actions = {
 
 const mutations = {
   STORE_DATA_FROM_DISK (state, data) {
-    let {cachedPlaylists, control, playlists, queuedPlaylists, syncedPlaylists, deletedPlaylists, user, convertedTracks, lastSync} = data
+    const {cachedPlaylists, control, playlists, queuedPlaylists, syncedPlaylists, deletedPlaylists, user, convertedTracks, lastSync} = data
+
     state.playlists = playlists
     state.user = user
-
     state.cachedPlaylists = cachedPlaylists
     state.control = control
     state.playlists = playlists
@@ -165,7 +171,10 @@ const mutations = {
 
     console.log('DATA STORED. ', playlists.length, 'playlists')
   },
-  UPDATE_USER_ENTITIES (state, object) {
+  SET_USER (state, userData) {
+    state.user = userData
+  },
+  UPDATE_USER_ENTITIES (state, playlists) {
     LOADING(this, true, 'Computing Changes')
 
     function isCachedOrSynced (id) {
@@ -182,24 +191,20 @@ const mutations = {
       return {c, s}
     }
 
-    state.user = object.user
-    state.user.logged = object.request.logged
-    state.user.SBID = object.request.SBID
-
     if (state.cachedPlaylists.length > 0 || state.syncedPlaylists.length > 0) {
-      for (let i = 0; i < object.playlists.items.length; i++) {
-        let currentPlaylist = object.playlists.items[i]
+      for (let i = 0; i < playlists.items.length; i++) {
+        let currentPlaylist = playlists.items[i]
         let cachedOrSynced = isCachedOrSynced(currentPlaylist.id)
         if (!cachedOrSynced.c && !cachedOrSynced.s) {
-          object.playlists.items[i].items = []
-          object.playlists.items[i].added = []
-          object.playlists.items[i].removed = []
+          playlists.items[i].items = []
+          playlists.items[i].added = []
+          playlists.items[i].removed = []
         }
 
         if (cachedOrSynced.c !== false) {
           // console.log('IS CACHED::')
           if (cachedOrSynced.c === currentPlaylist.snapshot_id) {
-            object.playlists.items.splice(i, 1, state.playlists[findById(currentPlaylist.id, state.playlists)])
+            playlists.items.splice(i, 1, state.playlists[findById(currentPlaylist.id, state.playlists)])
           } else {
             this.dispatch('findAndUncache', currentPlaylist.id)
           }
@@ -208,15 +213,15 @@ const mutations = {
         if (cachedOrSynced.s) {
           // If playlist is synced, it will have already been processed, so im just replacing it
           let index = findById(currentPlaylist.id, state.playlists)
-          object.playlists.items.splice(i, 1, state.playlists[index])
+          playlists.items.splice(i, 1, state.playlists[index])
           continue
         }
       }
     } else {
       // console.log('NO CACHED OR SYNCED PLS')
-      for (let i = 0; i < object.playlists.items.length; i++) {
-        object.playlists.items[i].tracks = {
-          ...object.playlists.items[i].tracks,
+      for (let i = 0; i < playlists.items.length; i++) {
+        playlists.items[i].tracks = {
+          ...playlists.items[i].tracks,
           items: [],
           added: [],
           removed: []
@@ -226,7 +231,7 @@ const mutations = {
 
     for (let i = 0; i < state.syncedPlaylists.length; i++) {
       let pl = state.syncedPlaylists[i]
-      let index = findById(pl, object.playlists.items)
+      let index = findById(pl, playlists.items)
       if (index === -1) {
         if (!state.deletedPlaylists) state.deletedPlaylists = []
         state.deletedPlaylists.push(state.playlists[findById(pl, state.playlists)])
@@ -235,10 +240,10 @@ const mutations = {
       }
     }
 
-    Vue.set(state, 'playlists', object.playlists.items)
+    Vue.set(state, 'playlists', playlists.items)
 
     state.control = {
-      total: object.playlists.total,
+      total: playlists.total,
       offset: state.playlists.length
     }
 
@@ -247,7 +252,6 @@ const mutations = {
     this.dispatch('syncedPlaylistsRefreshed', {}, {root: true})
     SAVE_TO_DISK()
   },
-
   UPDATE_PLAYLISTS (state, playlists) {
     for (let i = 0; i < playlists.items.length; i++) {
       Vue.set(state.playlists, state.playlists.length, playlists.items[i])
@@ -266,15 +270,7 @@ const mutations = {
   },
 
   PLAYLIST_STORE_TRACKS (state, playlist) {
-    playlist = {...playlist}
-
-    if (playlist.same_version === true) {
-      // If backend says it's the same version, no overwrite
-      console.log('RETRIEVED SAME VERSION. NOT OVERWRITTING')
-      return
-    }
-
-    let index = findById(playlist.id, state.playlists)
+    const index = findById(playlist.id, state.playlists)
     // If there are changes with local version, overwrite
     if (index === -1) return console.error('PLAYLIST NOT FOUND WHEN SETTING TRACKS INSIDE STATE (VUEX)')
 
@@ -326,7 +322,6 @@ const mutations = {
       FSController.UserMethods.setFolderIcons(playlist.id, {force: true}) // creates folder and sets icon
     }
     state.playlists.splice(index, 1, playlist)
-    // console.log('SON, ITS TIME NOW', state.playlists[index].tracks.added.map(p => p.name))
     this.dispatch('syncedPlaylistsRefreshed', {}, {root: true})
 
     SAVE_TO_DISK()

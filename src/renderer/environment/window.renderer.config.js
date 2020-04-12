@@ -36,7 +36,7 @@ function handleWindowKey (e) {
   if (isAscii(keyCode) || (keyCode === 8 && thisVue().$root.searchInputElement && thisVue().$root.searchInputElement.value.length)) return focusSearchbar()
 }
 function focusSearchbar () {
-  this.$root.searchInputElement && this.$root.searchInputElement.focus()
+  thisVue().$root.searchInputElement && thisVue().$root.searchInputElement.focus()
 }
 function handleMouseKey ({button}) {
   switch (button) {

@@ -1,11 +1,12 @@
 import FSControler from '../FileSystem/index'
-import { logme } from '../../../UTILS'
 import customGetters from '../../../renderer/store/customGetters'
-import * as sbFetch from '../../sbFetch'
+import * as sbFetch from './sbFetch'
 import GLOBAL from '../../Global/VARIABLES'
 import IpcController from './ipc.controller'
 import youtubeDl from '../DownloadPhase/youtube-dl'
 import connectionController from './connection.controller'
+
+import core from './core.controller'
 
 const openBrowser = require('open')
 const ipcSend = IpcController.send
@@ -15,9 +16,9 @@ let SESSION
 let DIALOG
 
 export function init ({ app, BrowserWindow, session, dialog }) {
-  BROWSER_WINDOW = BrowserWindow
-  SESSION = session
-  DIALOG = dialog
+  GLOBAL.BROWSER_WINDOW = BROWSER_WINDOW = BrowserWindow
+  GLOBAL.SESSION = SESSION = session
+  GLOBAL.DIALOG = DIALOG = dialog
   app.on('ready', () => {
     connectionController.init({
       connectionChangeCallback: (value) => {
@@ -64,9 +65,7 @@ export function getYtTrackDetails (event, ytId) {
       console.error('EROR AT YTTRACKDETAILS:: ipc"ytTrackDetails"', err)
       event.sender.send('error')
     })
-    .finally(() => {
-      LOADING()
-    })
+    .finally(LOADING)
 }
 
 export function openInBrowser (event, id) {
@@ -87,23 +86,8 @@ export function isEverythingReady () {
 }
 
 export function createWindow () {
-  let width = 1000
-  let height = 500
-  GLOBAL.MAIN_WINDOW = new BROWSER_WINDOW({
-    width,
-    height,
-    frame: false,
-    minWidth: width,
-    minHeight: height,
-    backgroundColor: '#151515',
-    useContentSize: true,
-    webPreferences: {
-      nodeIntegration: true
-    }
-  })
-
+  GLOBAL.MAIN_WINDOW = new BROWSER_WINDOW(GLOBAL.MAIN_WINDOW_CONFIG)
   GLOBAL.MAIN_WINDOW.loadURL(process.env.NODE_ENV === 'development' ? `http://localhost:9080` : `file://${__dirname}/index.html`)
-
   GLOBAL.MAIN_WINDOW.on('closed', () => GLOBAL.MAIN_WINDOW = null)
 }
 
@@ -114,7 +98,6 @@ export async function setHomeFolder () {
   if (canceled) return
   await GLOBAL.VUEX.dispatch('addHomeFolder', filePaths[0])
   try {
-    console.log('pass')
     // if songbasket exists in file specified it will load data automatically
     await retrieveAndStoreState(filePaths[0])
     console.log('from sethomefolder handler')
@@ -126,36 +109,13 @@ export async function setHomeFolder () {
 }
 
 export function createLoginWindow () {
-  if (!GLOBAL.LOGIN_WINDOW) { // Prevents creating multiple GLOBAL.LOGIN_WINDOWS
-    GLOBAL.LOGIN_WINDOW = new BROWSER_WINDOW({
-      frame: false,
-      width: 550,
-      height: 830,
-      useContentSize: true
-    })
+  if (GLOBAL.LOGIN_WINDOW) return
 
-    // user logs into spotify and backend retrieves access tokens
-    GLOBAL.LOGIN_WINDOW.loadURL(`${GLOBAL.BACKEND}/init`, { 'extraHeaders': 'pragma: no-cache\n' })
+  const loginWindow = GLOBAL.LOGIN_WINDOW = new BROWSER_WINDOW(GLOBAL.POPUP_WINDOW_CONFIG)
 
-    GLOBAL.LOGIN_WINDOW.on('closed', function () { GLOBAL.LOGIN_WINDOW = null })
-    // Then, Backend retrieves user data and sends it back with a unique SBID
-    SESSION.defaultSession.webRequest.onHeadersReceived({urls: [GLOBAL.BACKEND + '/*']}, (details, callbackFunc) => {
-      if (details.responseHeaders.SBID !== undefined) {
-        let userId = details.responseHeaders.user_id[0]
-        let SBID = details.responseHeaders.SBID[0]
-        let success = details.responseHeaders.success[0] // if true close window and continue
-
-        logme(SBID)
-        logme(success)
-
-        // Gets playlist list from backend and stores them in vuex
-        sbFetch.fetchPlaylists({ userId: userId, logged: true, SBID: SBID, control: { offset: 0 } })
-          .then((resolve) => storePlaylists(resolve, true))
-      } else logme('FAILED TO AUTHORIZE')
-
-      callbackFunc({ requestHeaders: details.requestHeaders })
-    })
-  }
+  loginWindow.loadURL(`${GLOBAL.BACKEND}/init`, { 'extraHeaders': 'pragma: no-cache\n' })
+  loginWindow.on('closed', () => GLOBAL.LOGIN_WINDOW = null)
+  SESSION.defaultSession.webRequest.onHeadersReceived({urls: [GLOBAL.BACKEND + '/*']}, core.onLogin)
 };
 
 export function storePlaylists (response, redirect) {

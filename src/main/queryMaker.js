@@ -1,5 +1,5 @@
 import store from '../renderer/store'
-import * as sbFetch from './sbFetch'
+import * as sbFetch from './controllers/InitializationAndHandlers/sbFetch'
 import customGetters from '../renderer/store/customGetters'
 import * as utils from '../MAIN_PROCESS_UTILS'
 

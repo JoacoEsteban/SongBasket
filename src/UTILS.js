@@ -1,4 +1,4 @@
-exports.logme = (log) => log && console.log(...log)
+exports.logme = (...log) => log && console.log(...log)
 
 exports.dateFormatter = (dateParam) => {
   const now = new Date()

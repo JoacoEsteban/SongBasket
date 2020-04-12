@@ -1,6 +1,6 @@
 // import GLOBAL from '../../Global/VARIABLES'
 import * as handlers from './handlers'
-import * as sbFetch from '../../sbFetch'
+import * as sbFetch from './sbFetch'
 import store from '../../../renderer/store'
 import * as youtubeHandler from '../../queryMaker'
 import FileWatchers from '../FileSystem/FileWatchers'
@@ -25,21 +25,20 @@ export function init (ipc) {
   ipc.on('guestSignIn', function (event, { mode, query }) {
     console.log('Guest:: Type:', mode, query)
     if (mode === 'user') {
-      if (query !== null && query !== undefined) {
-        sbFetch.guestLogin(query)
-          .then(resolve => {
-            if (resolve.status === 404) {
-              ipcSend('not-found')
-            }
-            if (resolve.status === 400) {
-              ipcSend('invalid')
-            }
-            if (resolve.status === 200) {
-              ipcSend('user-found', resolve)
-            }
-          })
-          .catch(err => console.log(err))
-      }
+      if (!query) return
+      sbFetch.guestCheck(query)
+        .then(resolve => {
+          if (resolve.status === 404) {
+            ipcSend('not-found')
+          }
+          if (resolve.status === 400) {
+            ipcSend('invalid')
+          }
+          if (resolve.status === 200) {
+            ipcSend('user-found', resolve)
+          }
+        })
+        .catch(err => console.log(err))
     }
     if (mode === 'playlist') {
       // TODO delete this

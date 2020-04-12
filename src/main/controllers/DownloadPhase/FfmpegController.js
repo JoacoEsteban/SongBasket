@@ -45,6 +45,7 @@ export function extractMp3 (pathmp3, pathmp4, inputFormat, progressCb) {
 export function applyTags (pathmp3, data, ytSelection) {
   let tags = {
     title: data.name,
+    // artist: data.artists.map(a => a.name).join(';'), // TODO Try multiple artists
     artist: data.artists[0].name,
     album: data.album.name,
     userDefinedText: [{

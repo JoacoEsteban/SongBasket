@@ -1,9 +1,10 @@
 import store from './index'
 
+const CurrentUser = () => store.state.CurrentUser
 export default {
   // Gives spotify object
   SyncedPlaylistsSp () {
-    let state = store.state.CurrentUser
+    let state = CurrentUser()
     let all = []
     let pls = [...state.playlists]
     for (let i = 0; i < state.syncedPlaylists.length; i++) {
@@ -19,10 +20,21 @@ export default {
     }
     return all
   },
+  syncedPlaylistsSnapshots () {
+    return CurrentUser().syncedPlaylists.map(plid => {
+      const { id, snapshot_id } = CurrentUser().playlists.find(pl => pl.id === plid)
+      return {
+        id, snapshot_id
+      }
+    })
+  },
   giveMePlFolderName (id) {
-    let state = store.state.CurrentUser
+    let state = CurrentUser()
     const pl = state.playlists.find(pl => pl.id === id)
     if (!pl) console.log(id, pl, pl && pl.folderName, pl && pl.name)
     return pl && (pl.folderName || pl.name)
+  },
+  currentUserId () {
+    return CurrentUser().user && CurrentUser().user.id
   }
 }
