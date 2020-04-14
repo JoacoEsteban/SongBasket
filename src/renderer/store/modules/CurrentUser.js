@@ -116,8 +116,12 @@ const actions = {
   },
   youtubizeResult ({ commit }, convertedTracks) {
     return new Promise((resolve, reject) => {
-      commit('YOUTUBIZE_RESULT', convertedTracks)
-      resolve()
+      try {
+        commit('YOUTUBIZE_RESULT', convertedTracks)
+        resolve()
+      } catch (error) {
+        reject(error)
+      }
     })
   },
   setConvertedTracksProcessedFlag ({ commit }, val) {
@@ -434,12 +438,12 @@ const mutations = {
       state.queuedPlaylists = state.queuedPlaylists.filter(p => p !== pl)
       state.cachedPlaylists = state.cachedPlaylists.filter(p => p.id !== pl)
     })
-    console.log(state.convertedTracks.length)
+    console.log('Total converted tracks', state.convertedTracks.length)
 
     state.syncedPlaylists.forEach(async pl => this.dispatch('commitTrackChanges', pl))
 
     this.dispatch('syncedPlaylistsRefreshed', {}, {root: true})
-    console.log(state.convertedTracks.some(t => t) && state.convertedTracks.some(t => t.flags))
+    // console.log(state.convertedTracks.some(t => t) && state.convertedTracks.some(t => t.flags))
     // setTimeout(((env) => {
     //   return () => env.dispatch('setConvertedTracksProcessedFlag')
     // })(this), 100)

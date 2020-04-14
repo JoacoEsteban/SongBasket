@@ -1,14 +1,12 @@
 import store from '../renderer/store'
-import * as sbFetch from './controllers/InitializationAndHandlers/sbFetch'
 import customGetters from '../renderer/store/customGetters'
 import * as utils from '../MAIN_PROCESS_UTILS'
 
 let ALL_PLAYLISTS = []
 let ALL_TRACKS = []
 
-export function youtubizeAll () {
-  if (store.state.Events.GLOBAL_LOADING_STATE.value) return console.log('STILL LOADING')
-  store.dispatch('globalLoadingState', {value: true, target: 'converting'})
+export function makeConversionQueries () {
+  if (store.state.Events.GLOBAL_LOADING_STATE.value) throw new Error('STILL LOADING')
   let syncedPlaylists = customGetters.SyncedPlaylistsSp().map(pl => {
     return {
       ...pl,
@@ -29,16 +27,7 @@ export function youtubizeAll () {
 
   makeQueries()
 
-  sbFetch.youtubizeAll(ALL_TRACKS)
-    .then(tracksWithConversion => {
-      store.dispatch('youtubizeResult', tracksWithConversion)
-    })
-    .catch(err => {
-      console.error(err) // TODO handle error
-    })
-    .finally(() => {
-      store.dispatch('globalLoadingState', {value: false})
-    })
+  return ALL_TRACKS
 }
 
 function findDuplicatedTracks () {
@@ -82,7 +71,7 @@ function findDuplicatedTracks () {
       if (found !== false) {
         if (!ALL_TRACKS[found].playlists.some(pl => pl.id === plTrackModel.id)) ALL_TRACKS[found].playlists.push(plTrackModel) // Adding new added playlists to local conversion of track
       } else {
-        console.log('new track', dirtyTrack.name, dirtyTrack.id)
+        console.log('new track', Object.keys(dirtyTrack).map(key => dirtyTrack[key]), dirtyTrack.name, dirtyTrack.id)
         // Create new track entry if not found
         ALL_TRACKS.push({ // TODO centralize models
           id: dirtyTrack.id,

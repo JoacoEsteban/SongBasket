@@ -91,11 +91,12 @@ export function youtubizeAll (tracks) {
   let failed = 0
   return new Promise((resolve, reject) => {
     LOADING(true, 'Converting')
+    if (!tracks) return reject(new Error('TRACK OBJECT UNDEFINED'))
     for (let i = 0; i < tracks.length; i++) {
       if (((tracks[i].flags = (tracks[i].flags || {})) && tracks[i].flags.converted) || (tracks[i].conversion && (tracks[i].flags.converted = true))) { console.log('nono skipping'); continue }
       totalTracks++
       console.log('before post')
-      axios.post(`${Backend}/youtubize`, {
+      Api.post(PATHS.YOUTUBIZE, {
         track: JSON.stringify(tracks[i].query)
       })
         .then(res => {
@@ -112,7 +113,7 @@ export function youtubizeAll (tracks) {
           tracks[i].flags.converted = false
           tracks[i].flags.conversionError = true
           // Failed tracks will remain with 'conversion' object NULL
-          console.log('Error when converting', err)
+          console.log('Error when converting', err.response.status, err.response.statusText)
           failed++
           // TODO Emit fail event
         })
@@ -121,7 +122,7 @@ export function youtubizeAll (tracks) {
           areAllFinished(resolve)
         })
     }
-    if (totalTracks === 0) areAllFinished(resolve)
+    if (!totalTracks) areAllFinished(resolve)
   })
 
   function areAllFinished (resolve) {

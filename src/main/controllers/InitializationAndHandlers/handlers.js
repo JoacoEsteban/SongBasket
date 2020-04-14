@@ -5,6 +5,7 @@ import GLOBAL from '../../Global/VARIABLES'
 import IpcController from './ipc.controller'
 import youtubeDl from '../DownloadPhase/youtube-dl'
 import connectionController from './connection.controller'
+// import * as youtubeHandler from '../../queryMaker'
 
 import core from './core.controller'
 
@@ -271,4 +272,29 @@ export async function refresh () {
   LOADING(true, 'Refreshing')
   await core.updateAll()
   LOADING()
+}
+
+// if (handlers.globalLoadingState().value) return console.log('loading', handlers.globalLoadingState())
+export async function youtubize () {
+  // if (!customGetters.anythingToConvert()) return
+  console.log('ABOUT TO FETCH YT')
+  await core.youtubize()
+  console.log('doneee C:')
+
+  // if (unCached.length) {
+  //   // handlers.LOADING(true, 'fetchPlaylists')
+  //   handlers.fetchMultiple(unCached.map(pl => {
+  //     return { id: pl }
+  //   }), false)
+  //     .finally(() => {
+  //       handlers.LOADING()
+  //     })
+  //     .then(() => {
+  //       console.log('done')
+  //       youtubeHandler.youtubizeAll()
+  //     })
+  //     .catch(err => {
+  //       console.error('ERROR AT YoutubeConvert:: fetchMultiple', err)
+  //     })
+  // } else youtubeHandler.youtubizeAll()
 }

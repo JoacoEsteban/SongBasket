@@ -2,7 +2,6 @@
 import * as handlers from './handlers'
 import * as sbFetch from './sbFetch'
 import store from '../../../renderer/store'
-import * as youtubeHandler from '../../queryMaker'
 import FileWatchers from '../FileSystem/FileWatchers'
 import IpcController from './ipc.controller'
 
@@ -105,30 +104,7 @@ export function init (ipc) {
     } else ipcSend('open playlist', id)
   })
 
-  ipc.on('Youtube Convert', function () {
-    if (handlers.globalLoadingState().value) return console.log('loading', handlers.globalLoadingState())
-    if (store.state.CurrentUser.queuedPlaylists.length + store.state.CurrentUser.syncedPlaylists.length === 0) return
-
-    console.log('ABOUT TO FETCH YT')
-    let unCached = store.getters.UnCachedPlaylists
-    console.log('unCached', unCached)
-    if (unCached.length > 0) {
-      handlers.LOADING(true, 'fetchPlaylists')
-      handlers.fetchMultiple(unCached.map(pl => {
-        return { id: pl }
-      }), false)
-        .finally(() => {
-          handlers.LOADING()
-        })
-        .then(() => {
-          console.log('done')
-          youtubeHandler.youtubizeAll()
-        })
-        .catch(err => {
-          console.error('ERROR AT YoutubeConvert:: fetchMultiple', err)
-        })
-    } else youtubeHandler.youtubizeAll()
-  })
+  ipc.on('Youtube Convert', handlers.youtubize)
 
   // FileWatchers
 

@@ -4,6 +4,7 @@ const API = require('./sbFetch')
 const GLOBAL = require('../../Global/VARIABLES')
 const GETTERS = require('../../../renderer/store/customGetters').default
 const HANDLERS = require('./handlers')
+const QUERY_MAKER = require('../../queryMaker')
 const { VUEX } = GLOBAL
 
 const core = {
@@ -83,10 +84,27 @@ const core = {
   },
   updateSelf: async () => {
     try {
-      VUEX.dispatch('setUserData', await API.getMe())
+      VUEX.dispatch('setUser', await API.getMe())
     } catch (error) {
       throw error
     }
+  },
+  getAndStorePlaylists: playlists => {
+    return new Promise((resolve, reject) => {
+      let requestsLeft = playlists.length
+      if (!requestsLeft) resolve()
+      playlists = playlists.map(pl => typeof pl === 'string' ? { id: pl } : pl)
+      playlists.forEach(pl => {
+        console.log('playlist', pl)
+        API.getPlaylist(pl)
+          .then(playlist => playlist && VUEX.dispatch('playlistStoreTracks', playlist))
+          .catch(err => {
+            // TODO handle this
+            console.error('ERROR WHEN FETCHING PLAYLIST', err)
+          })
+          .finally(() => !--requestsLeft && resolve())
+      })
+    })
   },
   updatePlaylists: async () => {
     return new Promise((resolve, reject) => {
@@ -110,6 +128,25 @@ const core = {
         })
         .finally(() => !--requestsLeft && resolve())
     })
+  },
+  populateQueuedPlaylists: async () => {
+    try {
+      const ids = GETTERS.uncachedPlaylists()
+      console.log('aber', ids)
+      await core.getAndStorePlaylists(ids)
+    } catch (error) {
+      throw error
+    }
+  },
+  youtubize: async () => {
+    try {
+      await core.populateQueuedPlaylists()
+      const queries = QUERY_MAKER.makeConversionQueries()
+      await VUEX.dispatch('youtubizeResult', await API.youtubizeAll(queries))
+      console.log('done from core')
+    } catch (error) {
+      console.error(error) // TODO handle error
+    }
   }
 }
 

@@ -36,5 +36,11 @@ export default {
   },
   currentUserId () {
     return CurrentUser().user && CurrentUser().user.id
+  },
+  uncachedPlaylists () {
+    return CurrentUser().queuedPlaylists.filter(q => !CurrentUser().cachedPlaylists.some(c => c === q))
+  },
+  anythingToConvert () {
+
   }
 }
