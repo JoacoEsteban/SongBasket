@@ -85,6 +85,7 @@ export default {
       }
     },
     openPlaylist (id) {
+      console.log(id, this.syncedPlaylists.length, this.playlistSynced(id))
       if (this.playlistSynced(id)) return this.setPlaylistNPush(id)
       this.$IPC.send('get tracks from', id)
     },
@@ -97,7 +98,7 @@ export default {
       this.$store.dispatch('logout')
     },
     playlistSynced (id) {
-      return this.syncedPlaylists.some(p => p.id === id)
+      return this.syncedPlaylists.some(p => p === id)
     },
     addPlaylistToSyncQueue (id) {
       this.$store.dispatch('queuePlaylist', id)

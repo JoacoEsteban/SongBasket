@@ -3,7 +3,7 @@ import he from 'he'
 export default {
   calculateBestMatch (track, force) {
     // TODO Handle conversion errors
-    if (!force && track.flags.processed) return track
+    if ((!force && track.flags.processed) || track.flags.conversionError) return track
     track = cloneObject(track)
     track.conversion.nameTokens = [...track.data.name.split(' ').map(str => makeValidRegex(str)).filter(str => str.str.length > 2 && !isInvalidWord(str.str)), ...track.data.artists.map(a => makeValidRegex(a.name))] // All words from trackname & artist split into array
 

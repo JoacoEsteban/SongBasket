@@ -11,6 +11,9 @@ export default function (Vue) {
   ipc.on('FileWatchers:ADDED', onAddedTrack)
   ipc.on('FileWatchers:REMOVED', onRemovedTrack)
   ipc.on('FileWatchers:RETRIEVED_TRACKS', onRetrievedTracks)
+  ipc.on('VUEX:STORE', (e, state) => {
+    thisVue().$store.dispatch('setState', state)
+  })
   ipc.on('initializeSetup', () => {
     redirect('setup')
   })
@@ -41,7 +44,6 @@ function onRetrievedTracks (e, tracks) {
   }
   thisVue().$root.DOWNLOADED_TRACKS = tracks
 }
-
 function getPlaylistIdFromFoldername (name) {
   const pl = thisVue().$store.state.CurrentUser.playlists.find(p => p.folderName === name || p.name === name)
   return pl && pl.id

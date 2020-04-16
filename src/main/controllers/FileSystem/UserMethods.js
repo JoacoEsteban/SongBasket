@@ -1,5 +1,5 @@
 /* eslint-disable new-cap */
-import customGetters from '../../../renderer/store/customGetters'
+import customGetters from '../Store/Helpers/customGetters'
 import * as utils from '../../../MAIN_PROCESS_UTILS'
 import Helpers from './Helpers'
 import REGEX from '../../Global/REGEX'

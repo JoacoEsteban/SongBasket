@@ -1,10 +1,10 @@
-import store from './index'
+import VUEX_MAIN from '../mainProcessStore'
 
-const CurrentUser = () => store.state.CurrentUser
+const CurrentUser = () => VUEX_MAIN.STATE()
 export default {
   // Gives spotify object
   SyncedPlaylistsSp () {
-    let state = CurrentUser()
+    const state = CurrentUser()
     let all = []
     let pls = [...state.playlists]
     for (let i = 0; i < state.syncedPlaylists.length; i++) {
@@ -29,7 +29,7 @@ export default {
     })
   },
   giveMePlFolderName (id) {
-    let state = CurrentUser()
+    const state = CurrentUser()
     const pl = state.playlists.find(pl => pl.id === id)
     if (!pl) console.log(id, pl, pl && pl.folderName, pl && pl.name)
     return pl && (pl.folderName || pl.name)

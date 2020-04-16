@@ -5,15 +5,18 @@ import axios from 'axios'
 import PATHS from '../../Global/PATHS'
 const URL = PATHS.makeUrl
 
+console.log('BACKEND: ', PATHS.BASE)
+
 let Api
 export function createAxiosInstance () {
   Api = axios.create({
     baseURL: PATHS.BASE,
-    timeout: 2000,
+    timeout: 10000,
     headers: {
       'Authorization': 'Bearer ' + global.SONGBASKET_ID,
       'user_id': global.USER_ID
-    }
+    },
+    validateStatus: st => (st >= 200 && st < 300) || st === 304
   })
 }
 
@@ -95,7 +98,6 @@ export function youtubizeAll (tracks) {
     for (let i = 0; i < tracks.length; i++) {
       if (((tracks[i].flags = (tracks[i].flags || {})) && tracks[i].flags.converted) || (tracks[i].conversion && (tracks[i].flags.converted = true))) { console.log('nono skipping'); continue }
       totalTracks++
-      console.log('before post')
       Api.post(PATHS.YOUTUBIZE, {
         track: JSON.stringify(tracks[i].query)
       })
@@ -113,7 +115,7 @@ export function youtubizeAll (tracks) {
           tracks[i].flags.converted = false
           tracks[i].flags.conversionError = true
           // Failed tracks will remain with 'conversion' object NULL
-          console.log('Error when converting', err.response.status, err.response.statusText)
+          console.log('Error when converting', err)
           failed++
           // TODO Emit fail event
         })

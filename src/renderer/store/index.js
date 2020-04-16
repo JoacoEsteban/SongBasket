@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 
 // import { createPersistedState, createSharedMutations } from 'vuex-electron'
-import { createSharedMutations } from 'vuex-electron'
+// import { createSharedMutations } from 'vuex-electron'
 
 import modules from './modules'
 
@@ -12,7 +12,7 @@ export default new Vuex.Store({
   modules,
   plugins: [
     // createPersistedState({blacklist: ['playlistUpdateSynced', 'youtubizeResult']}),
-    createSharedMutations()
+    // createSharedMutations()
   ],
   strict: process.env.NODE_ENV !== 'production'
 })

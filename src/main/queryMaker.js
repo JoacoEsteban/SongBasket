@@ -1,5 +1,5 @@
 import store from '../renderer/store'
-import customGetters from '../renderer/store/customGetters'
+import customGetters from './controllers/Store/Helpers/customGetters'
 import * as utils from '../MAIN_PROCESS_UTILS'
 
 let ALL_PLAYLISTS = []

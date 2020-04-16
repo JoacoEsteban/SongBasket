@@ -15,7 +15,7 @@ export function init (ipc) {
 
   ipc.on('download', handlers.download)
 
-  ipc.on('openYtVideo', handlers.openInBrowser)
+  ipc.on('openYtVideo', handlers.openYtVideo)
 
   ipc.on('setHomeFolder', handlers.setHomeFolder)
 
@@ -88,20 +88,7 @@ export function init (ipc) {
   })
 
   ipc.on('get tracks from', function (event, id) {
-    if (handlers.globalLoadingState().value) return
-    if (store.getters.PlaylistIsCached(id) === false && store.getters.PlaylistIsSynced(id) === false) {
-      handlers.LOADING(true, 'playlistTracks')
-      console.log('LOADING FROM ', id)
-      handlers.fetchMultiple([{ id }], false)
-        .then(() => {
-          ipcSend('open playlist', id)
-        })
-        .catch(err => {
-          console.error(222222222222222) // TODO Handle error
-          console.error(err) // TODO Handle error
-        })
-        .finally(handlers.LOADING)
-    } else ipcSend('open playlist', id)
+    console.log('wtf')
   })
 
   ipc.on('Youtube Convert', handlers.youtubize)

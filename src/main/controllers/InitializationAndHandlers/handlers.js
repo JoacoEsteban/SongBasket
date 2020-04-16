@@ -1,10 +1,11 @@
 import FSControler from '../FileSystem/index'
-import customGetters from '../../../renderer/store/customGetters'
+import customGetters from '../Store/Helpers/customGetters'
 import * as sbFetch from './sbFetch'
 import GLOBAL from '../../Global/VARIABLES'
 import IpcController from './ipc.controller'
 import youtubeDl from '../DownloadPhase/youtube-dl'
 import connectionController from './connection.controller'
+import VUEX_MAIN from '../Store/mainProcessStore'
 // import * as youtubeHandler from '../../queryMaker'
 
 import core from './core.controller'
@@ -15,6 +16,10 @@ const ipcSend = IpcController.send
 let BROWSER_WINDOW
 let SESSION
 let DIALOG
+
+export function REFLECT_RENDERER () {
+  ipcSend('VUEX:STORE', VUEX_MAIN.STATE_SAFE())
+}
 
 export function init ({ app, BrowserWindow, session, dialog }) {
   GLOBAL.BROWSER_WINDOW = BROWSER_WINDOW = BrowserWindow
@@ -55,6 +60,7 @@ export const rendererMethods = {
 }
 
 export function getYtTrackDetails (event, ytId) {
+  // TODO refactor
   if (globalLoadingState().value) return
   LOADING(true, 'ytDetails')
   sbFetch.ytDetails(ytId)
@@ -69,16 +75,8 @@ export function getYtTrackDetails (event, ytId) {
     .finally(LOADING)
 }
 
-export function openInBrowser (event, id) {
+export function openYtVideo (event, id) {
   openBrowser('https://www.youtube.com/watch?v=' + id)
-}
-
-export function download (e, plFilter) {
-  console.log('About to download')
-  FSControler.UserMethods.retrieveLocalTracks()
-    .then(tracks => {
-      youtubeDl.downloadSyncedPlaylists(tracks, plFilter)
-    })
 }
 
 export function isEverythingReady () {
@@ -116,7 +114,10 @@ export function createLoginWindow () {
 
   loginWindow.loadURL(`${GLOBAL.BACKEND}/init`, { 'extraHeaders': 'pragma: no-cache\n' })
   loginWindow.on('closed', () => GLOBAL.LOGIN_WINDOW = null)
-  SESSION.defaultSession.webRequest.onHeadersReceived({urls: [GLOBAL.BACKEND + '/*']}, core.onLogin)
+  SESSION.defaultSession.webRequest.onHeadersReceived({urls: [GLOBAL.BACKEND + '/*']}, async () => {
+    await core.onLogin()
+    REFLECT_RENDERER()
+  })
 };
 
 export function storePlaylists (response, redirect) {
@@ -134,7 +135,8 @@ export async function retrieveAndStoreState (path) {
   try {
     data = await FSControler.UserMethods.retrieveState(path)
     try {
-      await GLOBAL.VUEX.dispatch('storeDataFromDisk', data)
+      VUEX_MAIN.COMMIT.STORE_DATA_FROM_DISK(data)
+      REFLECT_RENDERER()
       // Check if folder has synced playlists to setup watchers
       await FSControler.UserMethods.setFolderIcons()
       await FSControler.FileWatchers.createPlaylistWatchers()
@@ -189,6 +191,7 @@ export function pushToHome () {
 }
 
 export function guestFetch (query, isFirstTime) {
+  // TODO Deprecate
   console.log('loading?', globalLoadingState().value, globalLoadingState().target)
   if (globalLoadingState().value) return
   console.log('fetchin')
@@ -240,6 +243,7 @@ export function guestFetch (query, isFirstTime) {
 }
 
 export function fetchMultiple (playlists, checkVersion) {
+  // TODO Deprecate
   return new Promise((resolve, reject) => {
     let count = playlists.length
     let failed = []
@@ -271,6 +275,7 @@ export function fetchMultiple (playlists, checkVersion) {
 export async function refresh () {
   LOADING(true, 'Refreshing')
   await core.updateAll()
+  REFLECT_RENDERER()
   LOADING()
 }
 
@@ -279,22 +284,16 @@ export async function youtubize () {
   // if (!customGetters.anythingToConvert()) return
   console.log('ABOUT TO FETCH YT')
   await core.youtubize()
+  REFLECT_RENDERER()
   console.log('doneee C:')
+}
 
-  // if (unCached.length) {
-  //   // handlers.LOADING(true, 'fetchPlaylists')
-  //   handlers.fetchMultiple(unCached.map(pl => {
-  //     return { id: pl }
-  //   }), false)
-  //     .finally(() => {
-  //       handlers.LOADING()
-  //     })
-  //     .then(() => {
-  //       console.log('done')
-  //       youtubeHandler.youtubizeAll()
-  //     })
-  //     .catch(err => {
-  //       console.error('ERROR AT YoutubeConvert:: fetchMultiple', err)
-  //     })
-  // } else youtubeHandler.youtubizeAll()
+export async function download (e, plFilter) {
+  console.log('About to download')
+  try {
+    const tracks = await FSControler.UserMethods.retrieveLocalTracks()
+    await youtubeDl.downloadSyncedPlaylists(tracks, plFilter)
+  } catch (error) {
+    throw error
+  }
 }

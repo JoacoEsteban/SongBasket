@@ -2,11 +2,11 @@ const keytar = require('keytar')
 
 const API = require('./sbFetch')
 const GLOBAL = require('../../Global/VARIABLES')
-const GETTERS = require('../../../renderer/store/customGetters').default
+const GETTERS = require('../Store/Helpers/customGetters').default
 const HANDLERS = require('./handlers')
 const QUERY_MAKER = require('../../queryMaker')
-const { VUEX } = GLOBAL
-
+const VUEX_MAIN = require('../Store/mainProcessStore').default
+console.log(VUEX_MAIN)
 const core = {
   onLogin: async (details, CB) => {
     const next = () => CB({ requestHeaders: details.requestHeaders })
@@ -66,7 +66,7 @@ const core = {
     }
   },
   setUser: async userData => {
-    await VUEX.dispatch('setUser', userData)
+    await VUEX_MAIN.COMMIT.SET_USER(userData)
   },
   updateAll: async () => {
     return new Promise((resolve, reject) => {
@@ -84,49 +84,49 @@ const core = {
   },
   updateSelf: async () => {
     try {
-      VUEX.dispatch('setUser', await API.getMe())
+      VUEX_MAIN.COMMIT.SET_USER(await API.getMe())
     } catch (error) {
       throw error
     }
   },
   getAndStorePlaylists: playlists => {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       let requestsLeft = playlists.length
       if (!requestsLeft) resolve()
       playlists = playlists.map(pl => typeof pl === 'string' ? { id: pl } : pl)
-      playlists.forEach(pl => {
-        console.log('playlist', pl)
-        API.getPlaylist(pl)
-          .then(playlist => playlist && VUEX.dispatch('playlistStoreTracks', playlist))
-          .catch(err => {
-            // TODO handle this
-            console.error('ERROR WHEN FETCHING PLAYLIST', err)
-          })
-          .finally(() => !--requestsLeft && resolve())
+      await playlists.forEach(async pl => {
+        try {
+          console.log('playlist', pl)
+          const playlist = await API.getPlaylist(pl)
+          console.log('Playlist has changes?', playlist ? 'YES' : 'NO')
+          playlist && await VUEX_MAIN.COMMIT.PLAYLIST_STORE_TRACKS(playlist)
+          !--requestsLeft && resolve()
+        } catch (error) {
+          // TODO handle this
+          console.error('ERROR WHEN FETCHING PLAYLIST', error)
+        }
       })
     })
   },
   updatePlaylists: async () => {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       const playlists = GETTERS.syncedPlaylistsSnapshots()
-      let requestsLeft = 1 + playlists.length // 1 for unsynced playlists
-      playlists.forEach(pl => {
-        API.getPlaylist(pl)
-          .then(playlist => playlist && VUEX.dispatch('playlistStoreTracks', pl))
-          .catch(err => {
-            console.error(err)
-          })
-          .finally(() => !--requestsLeft && resolve())
-      })
+      let requestsLeft = 2
 
-      API.getUserPlaylists(global.USER_ID)
-        .then(playlists => {
-          if (playlists) VUEX.dispatch('updateUserEntities', playlists)
-        })
-        .catch(error => {
-          console.error(error)
-        })
-        .finally(() => !--requestsLeft && resolve())
+      try {
+        await core.getAndStorePlaylists(playlists)
+        !--requestsLeft && resolve()
+      } catch (error) {
+        return reject(error)
+      }
+
+      try {
+        const playlists = await API.getUserPlaylists(global.USER_ID)
+        playlists && VUEX_MAIN.COMMIT.UPDATE_USER_ENTITIES(playlists)
+        !--requestsLeft && resolve()
+      } catch (error) {
+        return reject(error)
+      }
     })
   },
   populateQueuedPlaylists: async () => {
@@ -142,7 +142,7 @@ const core = {
     try {
       await core.populateQueuedPlaylists()
       const queries = QUERY_MAKER.makeConversionQueries()
-      await VUEX.dispatch('youtubizeResult', await API.youtubizeAll(queries))
+      await VUEX_MAIN.COMMIT.YOUTUBIZE_RESULT(await API.youtubizeAll(queries))
       console.log('done from core')
     } catch (error) {
       console.error(error) // TODO handle error
