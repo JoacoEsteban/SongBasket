@@ -1,4 +1,4 @@
-import store from '../renderer/store'
+import VUEX_MAIN from './controllers/Store/mainProcessStore'
 import customGetters from './controllers/Store/Helpers/customGetters'
 import * as utils from '../MAIN_PROCESS_UTILS'
 
@@ -6,24 +6,22 @@ let ALL_PLAYLISTS = []
 let ALL_TRACKS = []
 
 export function makeConversionQueries () {
-  if (store.state.Events.GLOBAL_LOADING_STATE.value) throw new Error('STILL LOADING')
+  // if (store.state.Events.GLOBAL_LOADING_STATE.value) throw new Error('STILL LOADING')
   let syncedPlaylists = customGetters.SyncedPlaylistsSp().map(pl => {
     return {
       ...pl,
       synced: true
     }
   })
-  let queuedPlaylists = store.getters.QueuedPlaylists.map(pl => {
-    return {
-      ...pl,
-      synced: false
-    }
+  let queuedPlaylists = customGetters.queuedPlaylistsObj().map(pl => {
+    pl.synced = false
+    return pl
   })
-  if (queuedPlaylists.length + syncedPlaylists.length === 0) return
+  if (!(queuedPlaylists.length + syncedPlaylists.length)) return
 
   ALL_PLAYLISTS = [...syncedPlaylists, ...queuedPlaylists]
-  ALL_TRACKS = utils.cloneObject(store.state.CurrentUser.convertedTracks)
-  findDuplicatedTracks()
+  ALL_TRACKS = utils.cloneObject(VUEX_MAIN.STATE_SAFE().convertedTracks)
+  if (!findDuplicatedTracks()) throw new Error('NOTHING')
 
   makeQueries()
 
@@ -59,6 +57,7 @@ function findDuplicatedTracks () {
         let cleanTrack = ALL_TRACKS[u]
         if (dirtyTrack.id === cleanTrack.id) {
           // Foud duplicated
+          console.log('found dou')
           found = u
           break
         }
@@ -69,6 +68,7 @@ function findDuplicatedTracks () {
       }
       // Pushing to playlist register if found
       if (found !== false) {
+        console.log('dicantanari')
         if (!ALL_TRACKS[found].playlists.some(pl => pl.id === plTrackModel.id)) ALL_TRACKS[found].playlists.push(plTrackModel) // Adding new added playlists to local conversion of track
       } else {
         console.log('new track', Object.keys(dirtyTrack).map(key => dirtyTrack[key]), dirtyTrack.name, dirtyTrack.id)
@@ -90,8 +90,7 @@ function findDuplicatedTracks () {
       }
     }
   }
-  // Finished sorting all tracks
-  // console.log('Finished', newTracks)
+  return true
 }
 
 function makeQueries () {

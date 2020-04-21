@@ -36,14 +36,15 @@ import Card from './Generic/Card'
 
 export default {
   props: {
-    playlist: Object
-  },
-  data () {
-    return {
-      playlistName: this.$props.playlist.name
-    }
+    playlistId: String
   },
   computed: {
+    playlist () {
+      return this.playlistId && (this.$store.state.CurrentUser.playlists.find(pl => pl.id === this.playlistId) || {})
+    },
+    playlistName () {
+      return this.playlist.name
+    },
     playlistFormatted () {
       return (this.playlist && {
         ...this.playlist,

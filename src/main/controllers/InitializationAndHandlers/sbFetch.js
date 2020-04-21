@@ -88,7 +88,7 @@ export async function getTracks ({userId, logged, SBID, control}, {id, snapshot_
   }
 }
 
-export function youtubizeAll (tracks) {
+export function youtubizeAllOld (tracks) {
   let totalTracks = 0
   let succeded = 0
   let failed = 0
@@ -180,5 +180,59 @@ export const getPlaylist = async ({ id, snapshot_id }) => {
     return res && res.data
   } catch (error) {
     throw error
+  }
+}
+
+export async function youtubizeAll (tracks) {
+  let totalTracks = 0
+  let succeded = 0
+  let failed = 0
+
+  // try {
+
+  // } catch (error) {
+    
+  // }
+
+  return new Promise((resolve, reject) => {
+    LOADING(true, 'Converting')
+    if (!tracks) return reject(new Error('TRACK OBJECT UNDEFINED'))
+    for (let i = 0; i < tracks.length; i++) {
+      if (((tracks[i].flags = (tracks[i].flags || {})) && tracks[i].flags.converted) || (tracks[i].conversion && (tracks[i].flags.converted = true))) { console.log('nono skipping'); continue }
+      totalTracks++
+      Api.post(PATHS.YOUTUBIZE, {
+        track: JSON.stringify(tracks[i].query)
+      })
+        .then(res => {
+          console.log('on .then => conversion successful?', !!(res && res.data))
+          if (!res || !res.data) throw new Error('Conversion doesn\'t exist')
+          tracks[i].conversion = res.data
+          tracks[i].flags.converted = true
+          tracks[i].flags.conversionError = false
+          succeded++
+          // TODO Emit success event
+        })
+        .catch(err => {
+          tracks[i].conversion = null
+          tracks[i].flags.converted = false
+          tracks[i].flags.conversionError = true
+          // Failed tracks will remain with 'conversion' object NULL
+          console.log('Error when converting', err)
+          failed++
+          // TODO Emit fail event
+        })
+        .finally(() => {
+          tracks[i].flags.processed = false
+          areAllFinished(resolve)
+        })
+    }
+    if (!totalTracks) areAllFinished(resolve)
+  })
+
+  function areAllFinished (resolve) {
+    if (succeded + failed === totalTracks) {
+      LOADING()
+      resolve(tracks)
+    }
   }
 }

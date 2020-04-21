@@ -21,7 +21,7 @@ const core = {
       await core.setCredentials(user.id, user.songbasket_id)
       await core.setSongbasketIdGlobally(user.id)
       user.songbasket_id = null
-      await core.setUser(user)
+      core.setUser(user)
       await core.updateAll()
 
       // TODO test unattachment
@@ -65,21 +65,23 @@ const core = {
       throw error
     }
   },
-  setUser: async userData => {
-    await VUEX_MAIN.COMMIT.SET_USER(userData)
+  setUser: userData => {
+    VUEX_MAIN.COMMIT.SET_USER(userData)
   },
   updateAll: async () => {
     return new Promise((resolve, reject) => {
       let remainingReqs = 2
       core.updateSelf()
-        .then()
-        .catch(err => console.error(err))
-        .finally(() => !--remainingReqs && resolve())
+        .then(() => !--remainingReqs && resolve())
+        .catch(err => {
+          throw err
+        })
 
       core.updatePlaylists()
-        .then()
-        .catch(err => console.error(err))
-        .finally(() => !--remainingReqs && resolve())
+        .then(() => !--remainingReqs && resolve())
+        .catch(err => {
+          throw err
+        })
     })
   },
   updateSelf: async () => {
@@ -93,40 +95,43 @@ const core = {
     return new Promise(async (resolve, reject) => {
       let requestsLeft = playlists.length
       if (!requestsLeft) resolve()
+      const errors = []
       playlists = playlists.map(pl => typeof pl === 'string' ? { id: pl } : pl)
       await playlists.forEach(async pl => {
         try {
           console.log('playlist', pl)
           const playlist = await API.getPlaylist(pl)
           console.log('Playlist has changes?', playlist ? 'YES' : 'NO')
-          playlist && await VUEX_MAIN.COMMIT.PLAYLIST_STORE_TRACKS(playlist)
-          !--requestsLeft && resolve()
+          playlist && VUEX_MAIN.COMMIT.PLAYLIST_STORE_TRACKS(playlist)
         } catch (error) {
           // TODO handle this
           console.error('ERROR WHEN FETCHING PLAYLIST', error)
+          errors.push(error)
         }
+        !--requestsLeft && (errors.length ? reject(errors) : resolve())
       })
     })
   },
   updatePlaylists: async () => {
     return new Promise(async (resolve, reject) => {
       const playlists = GETTERS.syncedPlaylistsSnapshots()
-      let requestsLeft = 2
 
       try {
         await core.getAndStorePlaylists(playlists)
-        !--requestsLeft && resolve()
-      } catch (error) {
-        return reject(error)
+        resolve()
+      } catch (errors) {
+        return reject(errors)
       }
 
       try {
         const playlists = await API.getUserPlaylists(global.USER_ID)
+        global.log('salame con queso quonda1111', playlists)
+        global.log('salame con queso quonda', playlists && playlists.find(pl => pl.name === 'test'))
         playlists && VUEX_MAIN.COMMIT.UPDATE_USER_ENTITIES(playlists)
-        !--requestsLeft && resolve()
       } catch (error) {
         return reject(error)
       }
+      resolve()
     })
   },
   populateQueuedPlaylists: async () => {
@@ -141,8 +146,14 @@ const core = {
   youtubize: async () => {
     try {
       await core.populateQueuedPlaylists()
-      const queries = QUERY_MAKER.makeConversionQueries()
-      await VUEX_MAIN.COMMIT.YOUTUBIZE_RESULT(await API.youtubizeAll(queries))
+      const queries = []
+      try {
+        queries.concat(QUERY_MAKER.makeConversionQueries())
+      } catch (error) {
+        if (error.message === 'NOTHING') return
+      }
+      console.log('queries', queries.length)
+      VUEX_MAIN.COMMIT.YOUTUBIZE_RESULT(await API.youtubizeAll(queries))
       console.log('done from core')
     } catch (error) {
       console.error(error) // TODO handle error

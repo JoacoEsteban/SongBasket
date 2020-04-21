@@ -11,10 +11,10 @@ const axios = require('axios')
 const basePath = GLOBAL.APP_CWD
 const binPath = basePath + '/bin/ffmpeg';
 
-(() => {
-  if (!fs.existsSync(basePath + '/bin')) fs.mkdirSync(basePath + '/bin')
-  if (!fs.existsSync(basePath + '/bin/ffmpeg')) fs.mkdirSync(basePath + '/bin/ffmpeg')
-  ffbinaries.downloadBinaries(['ffmpeg', 'ffprobe'], {destination: binPath}, function () {
+(async () => {
+  await utils.createDirRecursive(binPath)
+  console.log('done')
+  ffbinaries.downloadBinaries(['ffmpeg', 'ffprobe'], {destination: binPath}, () => {
     GLOBAL.FFMPEG_BINS_DOWNLOADED = true
     handlers.isEverythingReady()
     ffmpeg.setFfmpegPath(binPath + '/ffmpeg')

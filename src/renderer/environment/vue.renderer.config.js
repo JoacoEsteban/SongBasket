@@ -5,6 +5,7 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
+import * as utils from '../utils'
 import SbRouter from './sbRouter'
 
 library.add(faArrowRight, faArrowLeft)
@@ -17,7 +18,7 @@ export default function (Vue) {
 
   Vue.component('font-awesome-icon', FontAwesomeIcon)
   Vue.prototype.$ = $
-  Vue.prototype.$sleep = (time) => new Promise((resolve, reject) => setTimeout(resolve, time))
+  Vue.prototype.$sleep = utils.sleep
   Vue.prototype.$setRootVar = (keys, val, valJs) => {
     $(':root')[0].style.setProperty('--' + keys.kebab, val)
     window.ROOT_VARS[keys.camel] = valJs || val

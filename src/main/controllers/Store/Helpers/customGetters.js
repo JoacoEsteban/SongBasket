@@ -42,5 +42,9 @@ export default {
   },
   anythingToConvert () {
 
+  },
+  queuedPlaylistsObj: () => {
+    const state = CurrentUser()
+    return state.queuedPlaylists.map(id => state.playlists.find(pl => pl.id === id))
   }
 }

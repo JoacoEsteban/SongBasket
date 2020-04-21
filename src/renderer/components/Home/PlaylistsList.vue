@@ -12,20 +12,20 @@
         </div>
       </div>
     </div>
-    <div ref="actual-list" class="actual-list row" :class="listAnimationClass">
+    <div ref="actual-list" class="actual-list row" :class="listAnimationClass" v-if="showList">
       <div v-if="noPlaylists" class="no-playlists">
         No Playlists found{{allLoaded ? '' : ', try loading some more'}}
       </div>
       <div class="horizontal-scroller">
         <playlist v-for="playlist in syncedPlaylistsFiltered ? syncedPlaylistsFiltered : syncedPlaylists"
-        :playlist="playlist"
+        :playlist-id="playlist.id"
         :key="playlist.id"
         @addPlaylistToSyncQueue="$emit('addPlaylistToSyncQueue', playlist.id)"
         @openPlaylist="$emit('openPlaylist', playlist.id)" />
       </div>
       <div class="list">
         <playlist v-for="playlist in unSyncedPlaylistsFiltered ? unSyncedPlaylistsFiltered : unSyncedPlaylists"
-        :playlist="playlist"
+        :playlist-id="playlist.id"
         :key="playlist.id"
         @addPlaylistToSyncQueue="$emit('addPlaylistToSyncQueue', playlist.id)"
         @openPlaylist="$emit('openPlaylist', playlist.id)" />
@@ -59,6 +59,8 @@ export default {
       syncedPlaylists: [],
       syncedPlaylistsFiltered: null,
       unSyncedPlaylistsFiltered: null,
+      playlists: [],
+      showList: true,
       scrollOpKeys: {
         kebab: 'scroll-opacity',
         camel: this.$camelcase('scroll-opacity')
@@ -71,9 +73,6 @@ export default {
   computed: {
     allLoaded () {
       return this.control.total - this.control.offset <= 0
-    },
-    playlists () {
-      return this.$store.state.CurrentUser.playlists
     },
     unSyncedPlaylists () {
       return this.playlists.filter(pl => !this.$store.getters.PlaylistIsSynced(pl.id))
@@ -127,13 +126,13 @@ export default {
           .catch(err => reject(err))
       })
     },
-    async refreshSynced () {
-      // TODO FIX THIS
-      if (!this.$root.notFistTime) await this.$sleep(5000)
-      this.$root.notFistTime = true // is set in root not to be resetted when instance is destroyed
+    refreshAll () {
+      this.playlists = this.$store.state.CurrentUser.playlists
+      this.refreshSynced()
+    },
+    refreshSynced () {
       let all = []
-      let pls = [...this.$store.state.CurrentUser.playlists]
-      // console.log(pls)
+      let pls = [...this.playlists]
       this.$store.state.CurrentUser.syncedPlaylists.forEach(syncPl => {
         for (const i in pls) {
           let pl = pls[i]
@@ -187,7 +186,7 @@ export default {
     this.$IPC.on('done loading', () => {
       this.loading = false
     })
-    this.refreshSynced()
+    this.refreshAll()
     this.$refs['actual-list'].style.setProperty('--list-transition-time', this.listAnimationTime + 'ms')
     this.$root.plListEnv = this
     this.$root.onComponentLoaderMount = function () {

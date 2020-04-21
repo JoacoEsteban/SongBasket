@@ -1,4 +1,5 @@
 import $ from 'jquery'
+import { sleep } from '../utils'
 
 let ipc
 let VueInstance
@@ -19,7 +20,7 @@ export default function (Vue) {
   })
   ipc.on('dataStored', async () => {
     await thisVue().$store.dispatch('SET_LOADING_STATE', 'found')
-    redirect('home')
+    await redirect('home')
   })
 
   $(document).ready(onDocumentReady)
@@ -89,7 +90,9 @@ function propagateFileChange (track) {
   }
 }
 
-function redirect (path, payload) {
+async function redirect (path, payload) {
+  console.log('dale', sleep)
+  await sleep(1000)
   path = (path[0] === '/' ? '' : '/') + path
   if (path === thisVue().$route.fullPath) return console.error('ERROR Trying to navigate to same path')
   thisVue().$router.push(path)
