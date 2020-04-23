@@ -13,8 +13,8 @@ const core = {
     try {
       const responseHeaders = (details && details.responseHeaders) || {}
 
+      console.log('authorized', responseHeaders.spotify_authorization_success)
       if (!(responseHeaders.spotify_authorization_success && responseHeaders.spotify_authorization_success[0])) return next()
-
       GLOBAL.LOGIN_WINDOW.close()
 
       const user = JSON.parse(details.responseHeaders.user_data[0])
@@ -23,6 +23,7 @@ const core = {
       user.songbasket_id = null
       core.setUser(user)
       await core.updateAll()
+      console.log('data retrieved')
 
       // TODO test unattachment
       GLOBAL.SESSION.defaultSession.webRequest.onHeadersReceived({urls: [GLOBAL.BACKEND + '/*']}, null)
@@ -71,14 +72,15 @@ const core = {
   updateAll: async () => {
     return new Promise((resolve, reject) => {
       let remainingReqs = 2
+      const tryResolve = () => !--remainingReqs && (console.log('ALL UPTDATED') + resolve())
       core.updateSelf()
-        .then(() => !--remainingReqs && resolve())
+        .then(tryResolve)
         .catch(err => {
           throw err
         })
 
       core.updatePlaylists()
-        .then(() => !--remainingReqs && resolve())
+        .then(tryResolve)
         .catch(err => {
           throw err
         })
@@ -125,8 +127,6 @@ const core = {
 
       try {
         const playlists = await API.getUserPlaylists(global.USER_ID)
-        global.log('salame con queso quonda1111', playlists)
-        global.log('salame con queso quonda', playlists && playlists.find(pl => pl.name === 'test'))
         playlists && VUEX_MAIN.COMMIT.UPDATE_USER_ENTITIES(playlists)
       } catch (error) {
         return reject(error)
@@ -138,23 +138,24 @@ const core = {
     try {
       const ids = GETTERS.uncachedPlaylists()
       console.log('aber', ids)
-      await core.getAndStorePlaylists(ids)
+      if (ids.length) await core.getAndStorePlaylists(ids)
+      else return true
     } catch (error) {
       throw error
     }
   },
   youtubize: async () => {
     try {
-      await core.populateQueuedPlaylists()
+      const empty = await core.populateQueuedPlaylists()
       const queries = []
       try {
-        queries.concat(QUERY_MAKER.makeConversionQueries())
+        queries.push(...QUERY_MAKER.makeConversionQueries())
       } catch (error) {
         if (error.message === 'NOTHING') return
       }
-      console.log('queries', queries.length)
-      VUEX_MAIN.COMMIT.YOUTUBIZE_RESULT(await API.youtubizeAll(queries))
-      console.log('done from core')
+      if (empty && !queries.length) return console.log('nothing to do')
+      if (queries.length) VUEX_MAIN.COMMIT.YOUTUBIZE_RESULT(await API.youtubizeAll(queries))
+      console.log('Youtubize done from core')
     } catch (error) {
       console.error(error) // TODO handle error
     }

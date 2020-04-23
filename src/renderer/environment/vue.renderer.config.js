@@ -33,6 +33,7 @@ export default function (Vue) {
 
 function setControllers (Vue) {
   Vue.prototype.$controllers = {
+    core: require('../controllers/Core.controller').default,
     track: require('../controllers/Track.controller').default
   }
 }

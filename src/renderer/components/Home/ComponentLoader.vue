@@ -3,7 +3,6 @@
     <playlists-list
       v-show="showPlList"
       @openPlaylist="$emit('openPlaylist', $event)"
-      @addPlaylistToSyncQueue="$emit('addPlaylistToSyncQueue', $event)"
     ></playlists-list>
     <playlist-view
       v-show="componentBeingShown === 'playlist-view'"

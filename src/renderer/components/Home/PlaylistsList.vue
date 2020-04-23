@@ -20,14 +20,12 @@
         <playlist v-for="playlist in syncedPlaylistsFiltered ? syncedPlaylistsFiltered : syncedPlaylists"
         :playlist-id="playlist.id"
         :key="playlist.id"
-        @addPlaylistToSyncQueue="$emit('addPlaylistToSyncQueue', playlist.id)"
         @openPlaylist="$emit('openPlaylist', playlist.id)" />
       </div>
       <div class="list">
         <playlist v-for="playlist in unSyncedPlaylistsFiltered ? unSyncedPlaylistsFiltered : unSyncedPlaylists"
         :playlist-id="playlist.id"
         :key="playlist.id"
-        @addPlaylistToSyncQueue="$emit('addPlaylistToSyncQueue', playlist.id)"
         @openPlaylist="$emit('openPlaylist', playlist.id)" />
       </div>
 

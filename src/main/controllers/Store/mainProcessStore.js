@@ -303,9 +303,8 @@ const mutations = {
     // this.dispatch('syncedPlaylistsRefreshed', {}, {root: true})
   },
   async YOUTUBIZE_RESULT (convertedTracks) {
-    state.convertedTracks = convertedTracks.map(convertedTrack => trackUtils.calculateBestMatch(convertedTrack)).filter(t => t);
-
-    ([...state.queuedPlaylists]).forEach(pl => {
+    state.convertedTracks = convertedTracks.map(convertedTrack => trackUtils.calculateBestMatch(convertedTrack)).filter(t => t)
+    ;([...state.queuedPlaylists]).forEach(pl => {
       state.syncedPlaylists.push(pl)
       state.queuedPlaylists = state.queuedPlaylists.filter(p => p !== pl)
       state.cachedPlaylists = state.cachedPlaylists.filter(p => p.id !== pl)

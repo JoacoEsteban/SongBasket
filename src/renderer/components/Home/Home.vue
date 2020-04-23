@@ -9,7 +9,6 @@
 
         <component-loader class="home-router"
         @openPlaylist="openPlaylist($event)"
-        @addPlaylistToSyncQueue="addPlaylistToSyncQueue($event)"
         @openYtVideo="openYtVideo($event)"
         ></component-loader>
         <!-- <router-view
@@ -99,9 +98,6 @@ export default {
     },
     playlistSynced (id) {
       return this.syncedPlaylists.some(p => p === id)
-    },
-    addPlaylistToSyncQueue (id) {
-      this.$store.dispatch('queuePlaylist', id)
     },
     youtubeConvert () {
       this.$IPC.send('Youtube Convert')

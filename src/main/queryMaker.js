@@ -1,6 +1,5 @@
 import VUEX_MAIN from './controllers/Store/mainProcessStore'
 import customGetters from './controllers/Store/Helpers/customGetters'
-import * as utils from '../MAIN_PROCESS_UTILS'
 
 let ALL_PLAYLISTS = []
 let ALL_TRACKS = []
@@ -20,7 +19,7 @@ export function makeConversionQueries () {
   if (!(queuedPlaylists.length + syncedPlaylists.length)) return
 
   ALL_PLAYLISTS = [...syncedPlaylists, ...queuedPlaylists]
-  ALL_TRACKS = utils.cloneObject(VUEX_MAIN.STATE_SAFE().convertedTracks)
+  ALL_TRACKS = VUEX_MAIN.STATE_SAFE().convertedTracks
   if (!findDuplicatedTracks()) throw new Error('NOTHING')
 
   makeQueries()
@@ -71,7 +70,7 @@ function findDuplicatedTracks () {
         console.log('dicantanari')
         if (!ALL_TRACKS[found].playlists.some(pl => pl.id === plTrackModel.id)) ALL_TRACKS[found].playlists.push(plTrackModel) // Adding new added playlists to local conversion of track
       } else {
-        console.log('new track', Object.keys(dirtyTrack).map(key => dirtyTrack[key]), dirtyTrack.name, dirtyTrack.id)
+        console.log('new track', dirtyTrack.name, dirtyTrack.id)
         // Create new track entry if not found
         ALL_TRACKS.push({ // TODO centralize models
           id: dirtyTrack.id,

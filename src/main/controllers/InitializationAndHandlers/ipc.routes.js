@@ -93,6 +93,9 @@ export function init (ipc) {
 
   ipc.on('Youtube Convert', handlers.youtubize)
 
+  ipc.on('PLAYLISTS:QUEUE', function (event, id) {
+    handlers.queuePlaylist(id)
+  })
   // FileWatchers
 
   ipc.on('FileWatchers:ASK_TRACKS', function () {

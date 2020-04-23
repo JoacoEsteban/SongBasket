@@ -1,4 +1,4 @@
-import FSControler from '../FileSystem/index'
+import FSController from '../FileSystem/index'
 import customGetters from '../Store/Helpers/customGetters'
 import * as sbFetch from './sbFetch'
 import GLOBAL from '../../Global/VARIABLES'
@@ -19,6 +19,9 @@ let DIALOG
 
 export function REFLECT_RENDERER () {
   ipcSend('VUEX:STORE', VUEX_MAIN.STATE_SAFE())
+}
+export function REFLECT_RENDERER_KEY (key) {
+  ipcSend('VUEX:SET', {key, value: VUEX_MAIN.STATE_SAFE()[key]})
 }
 
 export function init ({ app, BrowserWindow, session, dialog }) {
@@ -91,14 +94,14 @@ export function createWindow () {
 }
 
 export async function setHomeFolder () {
-  let { canceled, filePaths } = await DIALOG.showOpenDialog(GLOBAL.MAIN_WINDOW, {
+  const { canceled, filePaths } = await DIALOG.showOpenDialog(GLOBAL.MAIN_WINDOW, {
     properties: ['openDirectory']
   })
   if (canceled) return
-  await GLOBAL.VUEX.dispatch('addHomeFolder', filePaths[0])
   try {
+    await FSController.UserMethods.addFolder(filePaths[0])
     // if songbasket exists in file specified it will load data automatically
-    await retrieveAndStoreState(filePaths[0])
+    await retrieveAndStoreState(global.HOME_FOLDER)
     console.log('from sethomefolder handler')
     pushToHome()
   } catch (err) {
@@ -114,8 +117,8 @@ export function createLoginWindow () {
 
   loginWindow.loadURL(`${GLOBAL.BACKEND}/init`, { 'extraHeaders': 'pragma: no-cache\n' })
   loginWindow.on('closed', () => GLOBAL.LOGIN_WINDOW = null)
-  SESSION.defaultSession.webRequest.onHeadersReceived({urls: [GLOBAL.BACKEND + '/*']}, async () => {
-    await core.onLogin()
+  SESSION.defaultSession.webRequest.onHeadersReceived({urls: [GLOBAL.BACKEND + '/*']}, async (details, cb) => {
+    await core.onLogin(details, cb)
     REFLECT_RENDERER()
   })
 };
@@ -130,43 +133,42 @@ export function storePlaylists (response, redirect) {
     })
 }
 
-export async function retrieveAndStoreState (path) {
+export async function retrieveAndStoreState (path = global.HOME_FOLDER) {
   let data
   try {
-    data = await FSControler.UserMethods.retrieveState(path)
+    data = await FSController.UserMethods.retrieveState(path)
     try {
       VUEX_MAIN.COMMIT.STORE_DATA_FROM_DISK(data)
       REFLECT_RENDERER()
       // Check if folder has synced playlists to setup watchers
-      await FSControler.UserMethods.setFolderIcons()
-      await FSControler.FileWatchers.createPlaylistWatchers()
+      await FSController.UserMethods.setFolderIcons()
+      await FSController.FileWatchers.createPlaylistWatchers()
     } catch (err) { throw err }
   } catch (err) { throw err }
 }
 
 export async function verifyFileSystem () {
   console.log('Checking for existing home folders')
-  let FOLDERS = await FSControler.UserMethods.checkForUser()
-  await GLOBAL.VUEX.dispatch('setFolderPaths', FOLDERS)
-  if (FOLDERS.paths.length === 0) {
+  let FOLDERS = await FSController.UserMethods.retrieveFolders()
+  if (!FOLDERS.paths.length) {
     console.log('no user')
     return setTimeout(() => {
       ipcSend('initializeSetup')
     }, 1000)
   }
 
-  if (FOLDERS.selected === null) {
+  if (!FOLDERS.selected) {
     // TODO redirect to folders view
     return ipcSend('chooseFolder')
   }
 
   try {
-    await retrieveAndStoreState(FOLDERS.selected)
+    await retrieveAndStoreState()
     await core.setSongbasketIdGlobally()
     pushToHome()
   } catch (err) {
     // TODO Handle errors when retrieving and setting data
-    console.error('NOT FOOUND', err)
+    console.error('NOT FOOUND', FOLDERS, err)
     return setTimeout(() => {
       ipcSend('initializeSetup')
     }, 1000)
@@ -291,9 +293,14 @@ export async function youtubize () {
 export async function download (e, plFilter) {
   console.log('About to download')
   try {
-    const tracks = await FSControler.UserMethods.retrieveLocalTracks()
+    const tracks = await FSController.UserMethods.retrieveLocalTracks()
     await youtubeDl.downloadSyncedPlaylists(tracks, plFilter)
   } catch (error) {
     throw error
   }
+}
+
+export function queuePlaylist (id) {
+  VUEX_MAIN.COMMIT.QUEUE_PLAYLIST(id)
+  REFLECT_RENDERER_KEY('queuedPlaylists')
 }

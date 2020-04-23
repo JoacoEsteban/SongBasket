@@ -15,6 +15,9 @@ export default function (Vue) {
   ipc.on('VUEX:STORE', (e, state) => {
     thisVue().$store.dispatch('setState', state)
   })
+  ipc.on('VUEX:SET', (e, {key, value}) => {
+    thisVue().$store.dispatch('set', {key, value})
+  })
   ipc.on('initializeSetup', () => {
     redirect('setup')
   })

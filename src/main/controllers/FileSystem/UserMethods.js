@@ -10,35 +10,87 @@ const rimraf = require('rimraf')
 // const NodeID3 = require('node-id3')
 const iconv = require('iconv-lite')
 
-const userDataPath = (electron.app || electron.remote.app).getPath('userData') + '/'
-const foldersJsonPath = userDataPath + '.songbasket-folders'
-const stateFileName = '/.songbasket'
-console.log('Folder Path: ', foldersJsonPath)
+const PATHS = {
+  userDataPath: (electron.app || electron.remote.app).getPath('userData') + '/',
+  get foldersJsonPath () { return this.userDataPath + '.songbasket-folders' },
+  stateFileName: '/.songbasket'
+}
 
+let SESSION_FOLDER_PATHS = {
+  paths: [],
+  selected: null
+}
+
+Object.defineProperties(global, {
+  SESSION_FOLDER_PATHS: {
+    get: function () {
+      return SESSION_FOLDER_PATHS
+    }
+  },
+  HOME_FOLDER: {
+    get: function () {
+      return SESSION_FOLDER_PATHS.selected
+    }
+  }
+})
+
+console.log('Folder Path: ', PATHS.foldersJsonPath)
 const homeFolderPath = () => global.HOME_FOLDER
 
 const UserMethods = {
-  existsPromise: function (path) {
-    return new Promise(async (resolve, reject) => {
-      let exists = await utils.promisify(fs.stat, path)
-      resolve(!exists[0] && exists[1])
-    })
-  },
-  checkForUser: async function () {
+  async getFolders () {
     try {
-      if (await utils.pathDoesExist(foldersJsonPath)) return JSON.parse((await utils.promisify(fs.readFile, [foldersJsonPath, 'utf8']))[1])
+      if (await utils.pathDoesExist(PATHS.foldersJsonPath)) return SESSION_FOLDER_PATHS = JSON.parse((await utils.promisify(fs.readFile, [PATHS.foldersJsonPath, 'utf8']))[1])
     } catch (error) {
-      console.error('ERROR WHEN FOLDER PATHS JSON FILE::: FileSystem/index.js', foldersJsonPath, error)
+      throw error
     }
-
-    console.log('Folder paths file missing, Creating')
-    let emptyFolders = {paths: [], selected: null}
-    await utils.promisify(fs.writeFile, [foldersJsonPath, JSON.stringify(emptyFolders), 'utf8'])
-    return (emptyFolders)
   },
-  writeHomeFolders: async function (folders) {
+  async setCurrentFolder (path) {
+    if (!path) path = null
+    SESSION_FOLDER_PATHS.selected = path
+    await this.writeHomeFolders()
+  },
+  async addFolder (path, params = { set: true }) {
+    console.log('path', path)
+    const folders = await this.getFolders()
+    if (!folders.paths.find(p => p === path)) folders.paths.push(path)
+    SESSION_FOLDER_PATHS = folders
+
+    if (params.set) await this.setCurrentFolder(path)
+    else this.writeHomeFolders()
+  },
+  async removeFolder (path) {
+    const folders = await this.getFolders()
+    folders.paths = folders.paths.filter(p => p !== path)
+    if (path === folders.selected) folders.selected = null
+    SESSION_FOLDER_PATHS = folders
+    this.writeHomeFolders()
+  },
+  async retrieveFolders () {
     try {
-      await utils.promisify(fs.writeFile, [foldersJsonPath, JSON.stringify(folders), 'utf8'])
+      let folders = await this.getFolders()
+      if (!folders) {
+        console.log('Folder paths file missing, Creating')
+        folders = await this.resetFolderPaths()
+      }
+      return folders
+    } catch (error) {
+      console.error('ERROR WHEN FOLDER PATHS JSON FILE::: FileSystem/index.js', PATHS.foldersJsonPath, error)
+    }
+  },
+  async resetFolderPaths () {
+    try {
+      const emptyFolders = {paths: [], selected: null}
+      await this.writeHomeFolders(emptyFolders)
+      return emptyFolders
+    } catch (error) {
+      throw error
+    }
+  },
+  writeHomeFolders: async function (folders = SESSION_FOLDER_PATHS) {
+    try {
+      await utils.promisify(fs.writeFile, [PATHS.foldersJsonPath, JSON.stringify(folders), 'utf8'])
+      SESSION_FOLDER_PATHS = folders
       return 'success'
     } catch (err) {
       throw err
@@ -52,7 +104,7 @@ const UserMethods = {
       } else {
         let jsonState = JSON.stringify(state)
         try {
-          let err = await (utils.promisify(fs.writeFile, [path + stateFileName, jsonState, 'utf8']))[0]
+          let err = await (utils.promisify(fs.writeFile, [path + PATHS.stateFileName, jsonState, 'utf8']))[0]
           err ? reject(err) : resolve()
         } catch (error) {
           reject(error)
@@ -61,7 +113,7 @@ const UserMethods = {
     })
   },
   retrieveState: function (path) {
-    let filePath = path + stateFileName
+    let filePath = path + PATHS.stateFileName
     console.log('retrieving from ', path)
     return new Promise((resolve, reject) => {
       fs.access(filePath, (err) => {

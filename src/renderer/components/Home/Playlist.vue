@@ -133,7 +133,7 @@ export default {
     },
     addPlaylistToSyncQueue () {
       // if (!this.isQueued) this.restoreTransformation(true)
-      this.$store.dispatch('queuePlaylist', this.playlist.id)
+      this.$controllers.core.queuePlaylist(this.playlist.id)
     },
     unsync () {
       this.$root.OPEN_MODAL({
