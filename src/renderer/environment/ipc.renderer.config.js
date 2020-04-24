@@ -12,8 +12,9 @@ export default function (Vue) {
   ipc.on('FileWatchers:ADDED', onAddedTrack)
   ipc.on('FileWatchers:REMOVED', onRemovedTrack)
   ipc.on('FileWatchers:RETRIEVED_TRACKS', onRetrievedTracks)
-  ipc.on('VUEX:STORE', (e, state) => {
-    thisVue().$store.dispatch('setState', state)
+  ipc.on('VUEX:STORE', async (e, {state, listenerId}) => {
+    await thisVue().$store.dispatch('setState', state)
+    ipc.send(listenerId)
   })
   ipc.on('VUEX:SET', (e, {key, value}) => {
     thisVue().$store.dispatch('set', {key, value})

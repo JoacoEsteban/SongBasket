@@ -9,7 +9,7 @@
     </div>
 
     <div class="data">
-      <div class="title bold">
+      <div class="title bold window-nodrag">
         <span>
           {{playlist.name}}
         </span>

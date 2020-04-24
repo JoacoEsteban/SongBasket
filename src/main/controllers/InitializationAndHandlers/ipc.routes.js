@@ -8,7 +8,9 @@ import IpcController from './ipc.controller'
 const ipcSend = IpcController.send
 
 // :::::::::::::::::::::::::::::::::IPC:::::::::::::::::::::::::::::::::
-export function init (ipc) {
+export function init (ipc = global.ipc) {
+  if (!ipc) throw new Error('IPC OBJECT NOT PROVIDED @ ipc.routes.init')
+
   ipc.on('DOCUMENT_READY_CALLBACK', handlers.rendererMethods.documentReadyCallback)
 
   ipc.on('ytTrackDetails', handlers.getYtTrackDetails)
@@ -95,6 +97,15 @@ export function init (ipc) {
 
   ipc.on('PLAYLISTS:QUEUE', function (event, id) {
     handlers.queuePlaylist(id)
+  })
+  ipc.on('PLAYLISTS:UNSYNC', async function (event, {id, listenerId}) {
+    let error
+    try {
+      await handlers.unsyncPlaylist(id)
+    } catch (err) {
+      error = err
+    }
+    event.sender.send(listenerId, error)
   })
   // FileWatchers
 

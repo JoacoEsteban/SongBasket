@@ -6,7 +6,7 @@ console.log(dotenvConfig) // logging for linter not to complain
 global.log = (...aa) => aa.forEach(a => console.log(require('util').inspect(a, {showHidden: false, depth: null})))
 
 require('./controllers/InitializationAndHandlers/handlers').init(electron)
-require('./controllers/InitializationAndHandlers/ipc.routes').init(electron.ipcMain)
+require('./controllers/InitializationAndHandlers/ipc.routes').init(global.ipc = electron.ipcMain)
 
 let a = true
 if (process.env.NODE_ENV === 'production' || a) {

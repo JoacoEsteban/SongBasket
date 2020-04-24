@@ -151,9 +151,10 @@ const core = {
       try {
         queries.push(...QUERY_MAKER.makeConversionQueries())
       } catch (error) {
-        if (error.message === 'NOTHING') return
+        if (error.message === 'NOTHING') return console.log('no queries')
       }
       if (empty && !queries.length) return console.log('nothing to do')
+      console.log('query amm', queries.length)
       if (queries.length) VUEX_MAIN.COMMIT.YOUTUBIZE_RESULT(await API.youtubizeAll(queries))
       console.log('Youtubize done from core')
     } catch (error) {

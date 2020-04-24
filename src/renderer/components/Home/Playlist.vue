@@ -77,6 +77,7 @@ export default {
       this.isSynced && this.$store.state.CurrentUser.convertedTracks.forEach(t => {
         // filter to just undownloaded tracks
         if (!(t.playlists.some(pl => pl.id === this.playlist.id))) return false
+        if (t.flags.conversionError) return false
         if (t.flags.selectionIsApplied) return false
         let selectionId = t.selection
 

@@ -177,10 +177,13 @@ const UserMethods = {
     })
   },
   deletePlaylist (playlistName, callback) {
-    playlistName = utils.encodeIntoFilename(playlistName)
-    rimraf(homeFolderPath() + '/' + playlistName, function () {
-      console.log('Playlist ' + playlistName + ' Deleted')
-      callback()
+    return new Promise((resolve, reject) => {
+      playlistName = utils.encodeIntoFilename(playlistName)
+      rimraf(homeFolderPath() + '/' + playlistName, function (err) {
+        if (err) return reject(err)
+        console.log('Playlist ' + playlistName + ' Deleted')
+        resolve()
+      })
     })
   },
   async renameFolder ({oldName, newName}) {

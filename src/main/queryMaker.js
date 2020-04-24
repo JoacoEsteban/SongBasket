@@ -20,7 +20,7 @@ export function makeConversionQueries () {
 
   ALL_PLAYLISTS = [...syncedPlaylists, ...queuedPlaylists]
   ALL_TRACKS = VUEX_MAIN.STATE_SAFE().convertedTracks
-  if (!findDuplicatedTracks()) throw new Error('NOTHING')
+  if (!findDuplicatedTracks() && !ALL_TRACKS.some(track => track.flags.conversionError)) throw new Error('NOTHING')
 
   makeQueries()
 
@@ -97,17 +97,14 @@ function makeQueries () {
   for (let o = 0; o < ALL_TRACKS.length; o++) {
     if (ALL_TRACKS[o].query) continue
     console.log('queries', o)
-    let track = ALL_TRACKS[o].data
+    const track = ALL_TRACKS[o].data
 
-    let query = `${track.name} ${track.artists[0].name}`
+    const query = `${track.name} ${track.artists[0].name}`
     let duration = track.duration_ms / 1000 / 60
     if (duration > 20) duration = 'long'
     if (duration <= 20 && duration >= 4) duration = 'medium'
     if (duration < 4) duration = 'short'
 
-    ALL_TRACKS[o] = {
-      ...ALL_TRACKS[o],
-      query: {query, duration, duration_s: track.duration_ms / 1000, id: track.id}
-    }
+    ALL_TRACKS.query = {query, duration, duration_s: track.duration_ms / 1000, id: track.id}
   }
 }

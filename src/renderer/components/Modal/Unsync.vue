@@ -29,8 +29,8 @@ export default {
     }
   },
   methods: {
-    accept () {
-      this.$store.dispatch('unsyncPlaylist', this.id)
+    async accept () {
+      await this.$controllers.core.unsyncPlaylist(this.id)
       this.$emit('close')
     }
   }

@@ -6,19 +6,26 @@ import IpcController from './ipc.controller'
 import youtubeDl from '../DownloadPhase/youtube-dl'
 import connectionController from './connection.controller'
 import VUEX_MAIN from '../Store/mainProcessStore'
+import { v4 as uuid } from 'uuid'
 // import * as youtubeHandler from '../../queryMaker'
 
 import core from './core.controller'
 
 const openBrowser = require('open')
 const ipcSend = IpcController.send
+const ipcOnce = IpcController.once
 
 let BROWSER_WINDOW
 let SESSION
 let DIALOG
 
 export function REFLECT_RENDERER () {
-  ipcSend('VUEX:STORE', VUEX_MAIN.STATE_SAFE())
+  return new Promise((resolve, reject) => {
+    console.log('onreflect')
+    const listenerId = uuid()
+    ipcOnce(listenerId, () => { console.log('ateronreflect'); resolve() })
+    ipcSend('VUEX:STORE', {state: VUEX_MAIN.STATE_SAFE(), listenerId})
+  })
 }
 export function REFLECT_RENDERER_KEY (key) {
   ipcSend('VUEX:SET', {key, value: VUEX_MAIN.STATE_SAFE()[key]})
@@ -303,4 +310,16 @@ export async function download (e, plFilter) {
 export function queuePlaylist (id) {
   VUEX_MAIN.COMMIT.QUEUE_PLAYLIST(id)
   REFLECT_RENDERER_KEY('queuedPlaylists')
+}
+
+export async function unsyncPlaylist (id) {
+  let error
+  try {
+    await VUEX_MAIN.COMMIT.UNSYNC_PLAYLIST(id)
+  } catch (err) {
+    console.error('Error unsyncing @ handlers.unsyncPlaylist', err)
+    error = err
+  }
+  await REFLECT_RENDERER()
+  if (error) throw error
 }

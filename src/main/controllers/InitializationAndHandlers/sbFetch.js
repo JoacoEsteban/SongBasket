@@ -198,7 +198,7 @@ export async function youtubizeAll (tracks) {
     LOADING(true, 'Converting')
     if (!tracks) return reject(new Error('TRACK OBJECT UNDEFINED'))
     for (let i = 0; i < tracks.length; i++) {
-      if (((tracks[i].flags = (tracks[i].flags || {})) && tracks[i].flags.converted) || (tracks[i].conversion && (tracks[i].flags.converted = true))) { console.log('nono skipping'); continue }
+      if (tracks[i].flags.converted && !tracks[i].conversionError) { console.log('nono skipping'); continue }
       totalTracks++
       Api.post(PATHS.YOUTUBIZE, {
         track: JSON.stringify(tracks[i].query)

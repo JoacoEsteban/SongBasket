@@ -372,32 +372,24 @@ const mutations = {
     return (retorno.succeeded = true) && retorno
   },
   async UNSYNC_PLAYLIST (id) {
-    // Removes tracks from conversion
-    console.log('UNSYNCING ', id)
-    let index = findById(id, state.syncedPlaylists)
-    let success = false
-    if (index !== -1) {
-      state.syncedPlaylists.splice(index, 1)
-      index = findById(id, state.playlists)
-      if (index !== -1) {
-        success = true
-        state.playlists[index].tracks = {
-          ...state.playlists[index].tracks,
-          removed: state.playlists[index].tracks.items,
-          items: [],
-          added: []
-        }
+    try {
+      console.log('UNSYNCING ', id)
+      if (!state.syncedPlaylists.find(pl => pl && pl === id)) throw new Error('Playlist not found inside SyncedPlaylists list')
+      state.syncedPlaylists = state.syncedPlaylists.filter(pl => pl && pl !== id)
+      const playlist = state.playlists.find(pl => pl && pl.id === id)
+      if (!playlist) throw new Error('Playlists not found inside playlists list')
 
-        await this.dispatch('commitTrackChanges', id)
-      }
+      playlist.tracks.removed = playlist.tracks.items
+      playlist.tracks.items = []
+      playlist.tracks.added = []
+
+      this.COMMIT_TRACK_CHANGES(id)
+
+      await FSController.UserMethods.deletePlaylist(playlist.folderName || playlist.name)
+      await SAVE_TO_DISK()
+    } catch (error) {
+      throw error
     }
-    if (success) {
-      FSController.UserMethods.deletePlaylist(state.playlists[index].name, () => {
-        this.dispatch('syncedPlaylistsRefreshed', {}, {root: true})
-        this.dispatch('playlistUnsynced', {}, {root: true})
-        SAVE_TO_DISK()
-      })
-    } else console.error('Playlist not found when unsyncing :: UNSYNC_PLAYLIST')
   },
   CUSTOM_TRACK_URL ({details, trackId}) {
     const track = state.convertedTracks[findById(trackId, state.convertedTracks)]

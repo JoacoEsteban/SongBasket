@@ -4,6 +4,7 @@ import axios from 'axios'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { v4 as uuidv4 } from 'uuid'
 
 import * as utils from '../utils'
 import SbRouter from './sbRouter'
@@ -18,6 +19,7 @@ export default function (Vue) {
 
   Vue.component('font-awesome-icon', FontAwesomeIcon)
   Vue.prototype.$ = $
+  Vue.prototype.$uuid = uuidv4
   Vue.prototype.$sleep = utils.sleep
   Vue.prototype.$setRootVar = (keys, val, valJs) => {
     $(':root')[0].style.setProperty('--' + keys.kebab, val)

@@ -4,6 +4,7 @@ const TrackController = {
   getArtistsString: (item) => (item.artists || item.data.artists).map(({name}) => name).join(', '),
   getPlaylistsString: (item) => item.playlists.map(({id}) => getVueInstance().$store.getters.PlaylistById(id)).map(({name}) => name).join(', '),
   populateTrackSelection: (track) => {
+    if (track.flags.conversionError) return null
     let selectionId = track.selection
 
     if (selectionId === false) return track.selectionObj = track.custom
@@ -15,8 +16,8 @@ const TrackController = {
     const slug = (() => {
       const f = t.flags || {converted: false}
       if (f.paused) return 'paused'
-      if (!f.converted) return 'awaiting-conversion'
       if (f.conversionError) return 'error'
+      if (!f.converted) return 'awaiting-conversion'
       if (this.isDownloaded(t)) return 'downloaded'
       // check selected doubtly conversion
       if (t.selectionObj.isCustomTrack) return 'custom:awaiting-download'
@@ -31,11 +32,14 @@ const TrackController = {
     }
   },
   sort (a, b) {
-    if (a.status.slug === 'downloaded') return 1
-    if (b.status.slug === 'downloaded') return -1
-
     if (a.status.slug === 'review-conversion') return -1
     if (b.status.slug === 'review-conversion') return 1
+
+    if (a.status.slug === 'error') return -1
+    if (b.status.slug === 'error') return 1
+
+    if (a.status.slug === 'downloaded') return 1
+    if (b.status.slug === 'downloaded') return -1
     return 0
   },
   isDownloaded: function ({id, selectionObj}) {

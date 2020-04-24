@@ -120,6 +120,7 @@ export default {
       this.computeTracks()
     },
     playlistUnsynced () {
+      console.log('unsynced from event')
       this.$sbRouter.push({name: 'home', params: {which: 'playlists-list'}})
     },
     resetSelection () {
