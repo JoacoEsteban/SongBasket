@@ -1,4 +1,4 @@
-import GLOBAL from '../../Global/VARIABLES'
+
 import * as handlers from '../InitializationAndHandlers/handlers'
 import * as utils from '../../../MAIN_PROCESS_UTILS'
 const fs = require('fs')
@@ -8,14 +8,14 @@ const ffmpeg = require('fluent-ffmpeg')
 const NodeID3 = require('node-id3')
 const axios = require('axios')
 
-const basePath = GLOBAL.APP_CWD
+const basePath = global.CONSTANTS.APP_CWD
 const binPath = basePath + '/bin/ffmpeg';
 
 (async () => {
   await utils.createDirRecursive(binPath)
   console.log('done')
   ffbinaries.downloadBinaries(['ffmpeg', 'ffprobe'], {destination: binPath}, () => {
-    GLOBAL.FFMPEG_BINS_DOWNLOADED = true
+    global.CONSTANTS.FFMPEG_BINS_DOWNLOADED = true
     handlers.isEverythingReady()
     ffmpeg.setFfmpegPath(binPath + '/ffmpeg')
     ffmpeg.setFfprobePath(binPath + '/ffprobe')

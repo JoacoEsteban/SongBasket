@@ -1,6 +1,4 @@
-import GLOBAL from '../../Global/VARIABLES'
-
-const w = () => GLOBAL.MAIN_WINDOW
+const w = () => global.CONSTANTS.MAIN_WINDOW
 
 const IpcController = {
   send (...args) {

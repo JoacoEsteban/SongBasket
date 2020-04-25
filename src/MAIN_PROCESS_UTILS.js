@@ -1,6 +1,5 @@
 const fs = require('fs')
 const PATH = require('path')
-const GLOBAL = require('./main/Global/VARIABLES')
 
 export function cloneObject (aObject) {
   return clone(aObject)
@@ -45,7 +44,7 @@ export async function createDirRecursive (path) {
   let pathArray = path.split(/\/|\\/)
   if (await pathDoesExist(path)) return
 
-  let subPath = (GLOBAL.PLATFORM === 'windows' ? pathArray.splice(0, 1) : '') + '/'
+  let subPath = (global.CONSTANTS.PLATFORM === 'windows' ? pathArray.splice(0, 1) : '') + '/'
   for (let i = 0; i < pathArray.length; i++) {
     subPath = PATH.join(subPath, pathArray[i])
     if (!await pathDoesExist(subPath)) {
@@ -111,7 +110,7 @@ export function copyNRemove (path1, path2) {
 export function isSameDisk (path1, path2) {
   path1 = path1.toLowerCase()
   path2 = path2.toLowerCase()
-  switch (GLOBAL.PLATFORM) {
+  switch (global.CONSTANTS.PLATFORM) {
     case 'mac':
       if (path1.indexOf('/volumes') === 0) {
         if (path2.indexOf('/volumes') === 0) {

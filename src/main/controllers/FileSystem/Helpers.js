@@ -6,8 +6,9 @@ import toIco from 'to-ico'
 import Jimp from 'Jimp'
 import { exec } from 'child_process'
 
-import { PLATFORM, APP_CWD } from '../../Global/VARIABLES'
 import * as utils from '../../../MAIN_PROCESS_UTILS'
+
+const { PLATFORM, APP_CWD } = global.CONSTANTS
 const tempPath = APP_CWD + '/temp/'
 const computed = {
   folderIconFnc: null

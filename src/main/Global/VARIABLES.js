@@ -3,7 +3,7 @@
 // })()
 const height = 500
 const width = 1000
-module.exports = {
+module.exports = global.CONSTANTS = {
   // STATES
   FFMPEG_BINS_DOWNLOADED: false,
   HOME_PUSHED: false,

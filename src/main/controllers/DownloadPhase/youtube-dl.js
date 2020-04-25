@@ -6,10 +6,10 @@ import {extractMp3, applyTags} from './FfmpegController'
 import store from '../../../renderer/store'
 import customGetters from '../Store/Helpers/customGetters'
 import * as utils from '../../../MAIN_PROCESS_UTILS'
-import GLOBAL from '../../Global/VARIABLES'
+
 import {downloadLinkRemove} from './StoredTracksChecker'
 
-const tempDownloadsFolderPath = () => PATH.join(GLOBAL.APP_CWD, 'temp', 'downloads')
+const tempDownloadsFolderPath = () => PATH.join(global.CONSTANTS.APP_CWD, 'temp', 'downloads')
 
 const emitEvent = {
   lastEvent: null,

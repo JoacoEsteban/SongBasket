@@ -1,7 +1,7 @@
 const keytar = require('keytar')
 
 const API = require('./sbFetch')
-const GLOBAL = require('../../Global/VARIABLES')
+
 const GETTERS = require('../Store/Helpers/customGetters').default
 const HANDLERS = require('./handlers')
 const QUERY_MAKER = require('../../queryMaker')
@@ -15,7 +15,7 @@ const core = {
 
       console.log('authorized', responseHeaders.spotify_authorization_success)
       if (!(responseHeaders.spotify_authorization_success && responseHeaders.spotify_authorization_success[0])) return next()
-      GLOBAL.LOGIN_WINDOW.close()
+      global.CONSTANTS.LOGIN_WINDOW.close()
 
       const user = JSON.parse(details.responseHeaders.user_data[0])
       await core.setCredentials(user.id, user.songbasket_id)
@@ -26,7 +26,7 @@ const core = {
       console.log('data retrieved')
 
       // TODO test unattachment
-      GLOBAL.SESSION.defaultSession.webRequest.onHeadersReceived({urls: [GLOBAL.BACKEND + '/*']}, null)
+      global.CONSTANTS.SESSION.defaultSession.webRequest.onHeadersReceived({urls: [global.CONSTANTS.BACKEND + '/*']}, null)
 
       HANDLERS.pushToHome()
       next()

@@ -1,7 +1,7 @@
 import FSController from '../FileSystem/index'
 import customGetters from '../Store/Helpers/customGetters'
 import * as sbFetch from './sbFetch'
-import GLOBAL from '../../Global/VARIABLES'
+
 import IpcController from './ipc.controller'
 import youtubeDl from '../DownloadPhase/youtube-dl'
 import connectionController from './connection.controller'
@@ -31,9 +31,9 @@ export function REFLECT_RENDERER_KEY (key) {
 }
 
 export function init ({ app, BrowserWindow, session, dialog }) {
-  GLOBAL.BROWSER_WINDOW = BROWSER_WINDOW = BrowserWindow
-  GLOBAL.SESSION = SESSION = session
-  GLOBAL.DIALOG = DIALOG = dialog
+  global.CONSTANTS.BROWSER_WINDOW = BROWSER_WINDOW = BrowserWindow
+  global.CONSTANTS.SESSION = SESSION = session
+  global.CONSTANTS.DIALOG = DIALOG = dialog
   app.on('ready', () => {
     connectionController.init({
       connectionChangeCallback: (value) => {
@@ -41,9 +41,9 @@ export function init ({ app, BrowserWindow, session, dialog }) {
       }
     })
     createWindow()
-    GLOBAL.MAIN_WINDOW.webContents.on('did-finish-load', () => {
+    global.CONSTANTS.MAIN_WINDOW.webContents.on('did-finish-load', () => {
       console.log('webcontents')
-      GLOBAL.WINDOW_FINISHED_LOADING = true
+      global.CONSTANTS.WINDOW_FINISHED_LOADING = true
       isEverythingReady()
     })
   })
@@ -55,7 +55,7 @@ export function init ({ app, BrowserWindow, session, dialog }) {
   })
 
   app.on('activate', () => {
-    if (GLOBAL.MAIN_WINDOW === null) {
+    if (global.CONSTANTS.MAIN_WINDOW === null) {
       createWindow()
     }
   })
@@ -63,7 +63,7 @@ export function init ({ app, BrowserWindow, session, dialog }) {
 
 export const rendererMethods = {
   documentReadyCallback: () => {
-    GLOBAL.DOCUMENT_FINISHED_LOADING = true
+    global.CONSTANTS.DOCUMENT_FINISHED_LOADING = true
     isEverythingReady()
   }
 }
@@ -89,18 +89,18 @@ export function openYtVideo (event, id) {
 }
 
 export function isEverythingReady () {
-  console.log(GLOBAL.FFMPEG_BINS_DOWNLOADED, GLOBAL.WINDOW_FINISHED_LOADING, GLOBAL.DOCUMENT_FINISHED_LOADING)
-  GLOBAL.FFMPEG_BINS_DOWNLOADED && GLOBAL.WINDOW_FINISHED_LOADING && GLOBAL.DOCUMENT_FINISHED_LOADING && verifyFileSystem()
+  console.log(global.CONSTANTS.FFMPEG_BINS_DOWNLOADED, global.CONSTANTS.WINDOW_FINISHED_LOADING, global.CONSTANTS.DOCUMENT_FINISHED_LOADING)
+  global.CONSTANTS.FFMPEG_BINS_DOWNLOADED && global.CONSTANTS.WINDOW_FINISHED_LOADING && global.CONSTANTS.DOCUMENT_FINISHED_LOADING && verifyFileSystem()
 }
 
 export function createWindow () {
-  GLOBAL.MAIN_WINDOW = new BROWSER_WINDOW(GLOBAL.MAIN_WINDOW_CONFIG)
-  GLOBAL.MAIN_WINDOW.loadURL(process.env.NODE_ENV === 'development' ? `http://localhost:9080` : `file://${__dirname}/index.html`)
-  GLOBAL.MAIN_WINDOW.on('closed', () => GLOBAL.MAIN_WINDOW = null)
+  global.CONSTANTS.MAIN_WINDOW = new BROWSER_WINDOW(global.CONSTANTS.MAIN_WINDOW_CONFIG)
+  global.CONSTANTS.MAIN_WINDOW.loadURL(process.env.NODE_ENV === 'development' ? `http://localhost:9080` : `file://${__dirname}/index.html`)
+  global.CONSTANTS.MAIN_WINDOW.on('closed', () => global.CONSTANTS.MAIN_WINDOW = null)
 }
 
 export async function setHomeFolder () {
-  const { canceled, filePaths } = await DIALOG.showOpenDialog(GLOBAL.MAIN_WINDOW, {
+  const { canceled, filePaths } = await DIALOG.showOpenDialog(global.CONSTANTS.MAIN_WINDOW, {
     properties: ['openDirectory']
   })
   if (canceled) return
@@ -116,24 +116,24 @@ export async function setHomeFolder () {
 }
 
 export function createLoginWindow () {
-  if (GLOBAL.LOGIN_WINDOW) return
+  if (global.CONSTANTS.LOGIN_WINDOW) return
 
-  const loginWindow = GLOBAL.LOGIN_WINDOW = new BROWSER_WINDOW(GLOBAL.POPUP_WINDOW_CONFIG)
+  const loginWindow = global.CONSTANTS.LOGIN_WINDOW = new BROWSER_WINDOW(global.CONSTANTS.POPUP_WINDOW_CONFIG)
 
-  loginWindow.loadURL(`${GLOBAL.BACKEND}/init`, { 'extraHeaders': 'pragma: no-cache\n' })
-  loginWindow.on('closed', () => GLOBAL.LOGIN_WINDOW = null)
-  SESSION.defaultSession.webRequest.onHeadersReceived({urls: [GLOBAL.BACKEND + '/*']}, async (details, cb) => {
+  loginWindow.loadURL(`${global.CONSTANTS.BACKEND}/init`, { 'extraHeaders': 'pragma: no-cache\n' })
+  loginWindow.on('closed', () => global.CONSTANTS.LOGIN_WINDOW = null)
+  SESSION.defaultSession.webRequest.onHeadersReceived({urls: [global.CONSTANTS.BACKEND + '/*']}, async (details, cb) => {
     await core.onLogin(details, cb)
     REFLECT_RENDERER()
   })
 };
 
 export function storePlaylists (response, redirect) {
-  GLOBAL.VUEX.dispatch('updateUserEntities', response)
+  global.CONSTANTS.VUEX.dispatch('updateUserEntities', response)
     .then(() => {
       if (redirect) {
         ipcSend('playlists done')
-        if (GLOBAL.LOGIN_WINDOW) GLOBAL.LOGIN_WINDOW.close()
+        if (global.CONSTANTS.LOGIN_WINDOW) global.CONSTANTS.LOGIN_WINDOW.close()
       }
     })
 }
@@ -182,14 +182,14 @@ export async function verifyFileSystem () {
 }
 
 export function globalLoadingState () {
-  return GLOBAL.VUEX.state.Events.GLOBAL_LOADING_STATE
+  return global.CONSTANTS.VUEX.state.Events.GLOBAL_LOADING_STATE
 }
 
 let loadingCount = 0
 export function LOADING (value, target) {
   value ? loadingCount++ : loadingCount--
   console.log({value: loadingCount > 0, target})
-  GLOBAL.VUEX.dispatch('globalLoadingState', {value: loadingCount > 0, target})
+  global.CONSTANTS.VUEX.dispatch('globalLoadingState', {value: loadingCount > 0, target})
 }
 
 export function pushToHome () {
@@ -256,9 +256,9 @@ export function fetchMultiple (playlists, checkVersion) {
     let failed = []
     for (let i = 0; i < count; i++) {
       let playlist = playlists[i]
-      sbFetch.getTracks(GLOBAL.VUEX.getters.RequestParams, playlist, checkVersion)
+      sbFetch.getTracks(global.CONSTANTS.VUEX.getters.RequestParams, playlist, checkVersion)
         .then(response => {
-          GLOBAL.VUEX.dispatch('playlistStoreTracks', response.playlist).then(() => {
+          global.CONSTANTS.VUEX.dispatch('playlistStoreTracks', response.playlist).then(() => {
             if (--count === 0) {
               console.log('fetch done')
               if (!(failed.length)) resolve()
