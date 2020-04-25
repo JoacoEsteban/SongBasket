@@ -64,6 +64,16 @@ export function pathDoesExist (path) {
     fs.stat(path, err => resolve(!err))
   })
 }
+export function readFile (path) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(path, (err, data) => err ? reject(err) : resolve(data))
+  })
+}
+export function writeFile (...args) {
+  return new Promise((resolve, reject) => {
+    fs.writeFile(...args, err => err ? reject(err) : resolve())
+  })
+}
 export function link (path, path2) {
   return new Promise((resolve, reject) => {
     fs.link(path, path2, err => err ? reject(err) : resolve())
@@ -73,6 +83,9 @@ export function unlink (path) {
   return new Promise((resolve, reject) => {
     fs.unlink(path, err => err ? reject(err) : resolve())
   })
+}
+export async function unlinkSafe (path) {
+  if (await pathDoesExist(path)) await unlink(path)
 }
 export function createDir (path) {
   return new Promise((resolve, reject) => {

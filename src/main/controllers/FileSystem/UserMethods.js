@@ -141,7 +141,7 @@ const UserMethods = {
       if (!syncedPlaylists.length) --processedPls && checkNResolve()
 
       for (let pl of syncedPlaylists) {
-        if (!await checkPathThenCreate(pl.path)) checkNResolve()
+        if (!await this.checkPathThenCreate(pl.path)) checkNResolve()
         else {
           // Get all files from playlist dir
           fs.readdir(pl.path, function (err, filenames) {
@@ -257,7 +257,6 @@ const UserMethods = {
       }
     })
   },
-  checkPathThenCreate,
   async setFolderIcons (plFilter, params = { force: false }) {
     if (typeof plFilter === 'string') plFilter = [plFilter]
     if (!Array.isArray(plFilter)) plFilter = null
@@ -271,13 +270,12 @@ const UserMethods = {
       const downloader = new Helpers.plIconDownloader(pl, iconSetter)
       downloader.exec()
     })
+  },
+  async checkPathThenCreate (path) {
+    let pathExists = await utils.pathDoesExist(path)
+    if (!pathExists) await utils.promisify(fs.mkdir, path)
+    return pathExists
   }
-}
-
-async function checkPathThenCreate (path) {
-  let pathExists = await utils.pathDoesExist(path)
-  if (!pathExists) await utils.promisify(fs.mkdir, path)
-  return pathExists
 }
 
 export default UserMethods

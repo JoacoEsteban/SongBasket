@@ -2,11 +2,13 @@ import fs from 'fs'
 import PATH from 'path'
 import axios from 'axios'
 import uuid from 'uuid'
+import toIco from 'to-ico'
+import Jimp from 'Jimp'
 import { exec } from 'child_process'
 
 import { PLATFORM, APP_CWD } from '../../Global/VARIABLES'
 import * as utils from '../../../MAIN_PROCESS_UTILS'
-
+console.log('VAMOOOOOOOOOOOOOO', utils.readFile, Object.keys(utils))
 const tempPath = APP_CWD + '/temp/'
 const computed = {
   folderIconFnc: null
@@ -26,7 +28,7 @@ export default {
       path,
       imageTempPath,
       iconSetterHelper,
-      writer: fs.createWriteStream(imageTempPath)
+      writer: () => fs.createWriteStream(imageTempPath)
     }
     instance.exec = function () {
       const { imageUrl, iconSetterHelper, path, writer } = this
@@ -36,10 +38,10 @@ export default {
           url: imageUrl,
           responseType: 'stream'
         })
+        const writerIns = writer()
+        response.data.pipe(writerIns)
 
-        response.data.pipe(writer)
-
-        writer.on('finish', async () => {
+        writerIns.on('finish', async () => {
           try {
             await iconSetterHelper.set(path, imageTempPath)
             await utils.promisify(fs.unlink, imageTempPath)
@@ -86,6 +88,90 @@ const folderFns = {
           else resolve()
         })
       })
+    }
+  },
+  windows: {
+    guidelines: {
+      iconName: 'foldericon.ico',
+      iniName: 'desktop.ini',
+      get iconInIniTest () {
+        return `IconResource=${this.iconName},0`
+      },
+      get iniContents () {
+        return `[.ShellClassInfo]\r\n${this.iconInIniTest}\r\n[ViewState]\r\nMode=\r\nVid=\r\nFolderType=Pictures\r\n`
+      },
+      setSysProtectedCmd: path => `attrib +s +h ${path} /S /D`
+    },
+    validateIcon (imagePath) {
+      return new Promise(async (resolve, reject) => {
+        const img = await Jimp.read(imagePath)
+        img.cover(256, 256, async (err, img) => {
+          if (err) return reject(err)
+          resolve(await img.getBufferAsync(Jimp.MIME_PNG))
+        })
+      })
+    },
+    async convertIcon (path) {
+      const buff = await this.validateIcon(path)
+      return toIco(buff)
+    },
+    hideFile (path) {
+      return new Promise((resolve, reject) => {
+        exec(this.guidelines.setSysProtectedCmd(path), err => err ? reject(err) : resolve())
+      })
+      // ... TODO MAKE THIS GLOBALLY AVAILABLE
+    },
+    async makeIcon (path, buff) {
+      try {
+        await utils.writeFile(path, buff)
+        await this.hideFile(path)
+      } catch (error) {
+        throw error
+      }
+    },
+    async createIniFile (path) {
+      const inipath = PATH.join(path, this.guidelines.iniName)
+      try {
+        if (await utils.pathDoesExist(inipath))
+          if (await (utils.readFile(inipath)).includes(this.guidelines.iconInIniTest)) return
+        await utils.writeFile(inipath, this.guidelines.iniContents, 'utf16le')
+        // await utils.link('C:/Users/Temp/Music/SB/template.ini', inipath)
+        await this.hideFile(inipath)
+      } catch (error) {
+        throw error
+      }
+    },
+    async set (folderPath, imagePath) {
+      if (!folderPath) throw new Error('NO FOLDER PATH')
+      if (!imagePath) throw new Error('NO ICON PATH')
+      const finalIconPath = PATH.join(folderPath, this.guidelines.iconName)
+      try {
+        await this.remove(folderPath)
+        const buff = await this.convertIcon(imagePath)
+        await this.makeIcon(finalIconPath, buff)
+        await this.createIniFile(folderPath)
+      } catch (error) {
+        throw error
+      }
+    },
+    async test (path) {
+      if (!path) throw new Error('NO PATH')
+      try {
+        const {iconName, iniName, iconInIniTest} = this.guidelines
+        const join = p => PATH.join(path, p)
+        const exists = async p => utils.pathDoesExist(join(p))
+
+        if (!await exists(iconName)) return false
+        if (!await exists(iniName)) return false
+
+        return (await utils.readFile(join(iniName))).includes(iconInIniTest)
+      } catch (error) {
+        throw error
+      }
+    },
+    async remove (path) {
+      await utils.unlinkSafe(PATH.join(path, this.guidelines.iniName))
+      await utils.unlinkSafe(PATH.join(path, this.guidelines.iconName))
     }
   }
 }
