@@ -3,6 +3,7 @@ dist/electron/*
 dist/web/*
 build/*
 temp/*
+logs/*
 !build/icons
 node_modules/
 npm-debug.log

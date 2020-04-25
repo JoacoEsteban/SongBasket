@@ -8,7 +8,6 @@ import { exec } from 'child_process'
 
 import { PLATFORM, APP_CWD } from '../../Global/VARIABLES'
 import * as utils from '../../../MAIN_PROCESS_UTILS'
-console.log('VAMOOOOOOOOOOOOOO', utils.readFile, Object.keys(utils))
 const tempPath = APP_CWD + '/temp/'
 const computed = {
   folderIconFnc: null

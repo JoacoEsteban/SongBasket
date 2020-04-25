@@ -21,9 +21,8 @@ let DIALOG
 
 export function REFLECT_RENDERER () {
   return new Promise((resolve, reject) => {
-    console.log('onreflect')
     const listenerId = uuid()
-    ipcOnce(listenerId, () => { console.log('ateronreflect'); resolve() })
+    ipcOnce(listenerId, resolve)
     ipcSend('VUEX:STORE', {state: VUEX_MAIN.STATE_SAFE(), listenerId})
   })
 }
@@ -109,7 +108,6 @@ export async function setHomeFolder () {
     await FSController.UserMethods.addFolder(filePaths[0])
     // if songbasket exists in file specified it will load data automatically
     await retrieveAndStoreState(global.HOME_FOLDER)
-    console.log('from sethomefolder handler')
     pushToHome()
   } catch (err) {
     // Else ask to login and start a folder from 0

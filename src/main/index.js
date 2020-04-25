@@ -1,22 +1,33 @@
 import electron from 'electron'
-import log from 'electron-log'
-import dotenvConfig from './dotenvConfig'
-console.log(dotenvConfig) // logging for linter not to complain
+const logFile = require('electron-log')
+require('./dotenvConfig')
 
 global.log = (...aa) => aa.forEach(a => console.log(require('util').inspect(a, {showHidden: false, depth: null})))
 
-require('./controllers/InitializationAndHandlers/handlers').init(electron)
-require('./controllers/InitializationAndHandlers/ipc.routes').init(global.ipc = electron.ipcMain)
+const debug = false
+if (process.env.NODE_ENV === 'production' || debug) {
+  const toLogFile = error => {
+    console.error('----------UNCAUGHT----------\n', error)
+    logFile.error(error)
+  }
+  process.on('uncaughtException', toLogFile)
+  process.on('unhandledRejection:', toLogFile)
 
-let a = true
-if (process.env.NODE_ENV === 'production' || a) {
-  process.on('uncaughtException', function (error) {
-    log.warn(error)
-  })
+  const stdoutToFile = true
+  if (stdoutToFile) {
+    const fs = require('fs')
+    const path = require('path')
+
+    const logsPath = path.join((process.env.NODE_ENV === 'production' ? require('electron').app.getPath('userData') : process.cwd()), 'logs')
+    if (!fs.existsSync(logsPath)) fs.mkdirSync(logsPath)
+    const access = fs.createWriteStream(path.join(logsPath, 'SONGBASKET RUNTIME LOG - ' + new Date()))
+    process.stdout.write = process.stderr.write = access.write.bind(access)
+  }
 }
-
-console.log('Home folder: ', global.HOME_FOLDER)
 
 if (process.env.NODE_ENV !== 'development') {
   global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
+
+require('./controllers/InitializationAndHandlers/handlers').init(electron)
+require('./controllers/InitializationAndHandlers/ipc.routes').init(global.ipc = electron.ipcMain)
