@@ -4,6 +4,7 @@ import youtubedl from 'youtube-dl'
 
 import {extractMp3, applyTags} from './FfmpegController'
 import store from '../../../renderer/store'
+import VUEX_MAIN from '../Store/mainProcessStore'
 import customGetters from '../Store/Helpers/customGetters'
 import * as utils from '../../../MAIN_PROCESS_UTILS'
 
@@ -42,9 +43,10 @@ const emitEvent = {
 export default {
   async downloadSyncedPlaylists (localTracks, plFilter) {
     console.log('Stored tracks: ', localTracks.length)
-    let tracksToDownload = store.state.CurrentUser.convertedTracks
+    let tracksToDownload = VUEX_MAIN.STATE().convertedTracks
     if (plFilter) tracksToDownload = tracksToDownload.filter(t => t.playlists.some(pl => plFilter.includes(pl.id)))
 
+    console.log('todownload', tracksToDownload)
     const allTracks = constructDownloads(await downloadLinkRemove(localTracks, utils.cloneObject(tracksToDownload), plFilter))
 
     emitEvent.downloadStarted(allTracks)

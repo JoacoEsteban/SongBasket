@@ -8,6 +8,7 @@ const PATHS = {
   USER_PLAYLISTS: user_id => makeUrl(PATHS.USER(user_id), 'playlists'), // back/user/:id/playlists
   PLAYLIST: playlist_id => makeUrl('playlists', playlist_id),
   YOUTUBIZE: makeUrl('youtubize'),
+  VIDEO: id => makeUrl('video', id),
   ME: makeUrl('me')
 }
 module.exports = PATHS

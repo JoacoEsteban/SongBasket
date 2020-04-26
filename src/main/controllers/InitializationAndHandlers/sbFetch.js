@@ -3,6 +3,7 @@ import store from '../../../renderer/store'
 import axios from 'axios'
 
 import PATHS from '../../Global/PATHS'
+import REGEX from '../../Global/REGEX'
 const URL = PATHS.makeUrl
 
 console.log('BACKEND: ', PATHS.BASE)
@@ -135,18 +136,20 @@ export function youtubizeAllOld (tracks) {
   }
 }
 
-export function ytDetails (id) {
-  return new Promise((resolve, reject) => {
+export async function ytDetails (id) {
+  try {
+    let reg = REGEX.videoUrl.exec(id)
+    if (!reg && !REGEX.videoId.test(id)) throw new Error('INVALID YOUTUBE VIDEO ID')
+    if (reg) id = reg[1]
     LOADING(true, 'Getting Video Details')
-    axios.get(`${Backend}/yt_details`, {params: {ytId: id}})
-      .then(resp => {
-        resolve(resp.data)
-      })
-      .catch(err => reject(err))
-      .finally(() => {
-        LOADING()
-      })
-  })
+    console.log('gettin', PATHS.VIDEO(id))
+    const resp = await Api.get(PATHS.VIDEO(id))
+    return resp && resp.data
+  } catch (error) {
+    throw error
+  } finally {
+    LOADING()
+  }
 }
 
 // ------------ revision 2 ------------

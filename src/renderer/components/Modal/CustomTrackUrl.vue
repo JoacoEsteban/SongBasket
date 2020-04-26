@@ -25,7 +25,11 @@ export default {
       valid: null,
       hide: true,
       hideControls: false,
-      loadingText: 'Loading'
+      loadingText: 'Loading',
+      regex: {
+        url: /(^(https:\/\/www.youtube.com.watch\?v=([a-zA-Z0-9-_]{11}))$)/,
+        id: /^[a-zA-Z0-9-_]{11}$/
+      }
     }
   },
   computed: {
@@ -39,7 +43,7 @@ export default {
   watch: {
     url (val) {
       if (val === '') return (this.hide = true)
-      this.valid = (/(https:\/\/www.youtube.com.watch\?v=)?([a-zA-Z0-9-_]{11})/).test(val)
+      this.valid = this.regex.url.test(val) || this.regex.id.test(val)
       this.hide = false
     },
     show (val) {
@@ -61,7 +65,7 @@ export default {
       this.hide = true
       this.hideControls = true
       return new Promise(resolve => {
-        this.$IPC.send('ytTrackDetails', this.url)
+        this.$IPC.send('ytTrackDetails', {url: this.url, trackId: this.payload.trackId})
         this.$IPC.on('done', (event, details) => {
           let {trackId} = this.payload
           this.$store.dispatch('customTrackUrl', {details, trackId})

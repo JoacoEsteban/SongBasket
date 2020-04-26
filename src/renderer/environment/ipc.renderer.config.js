@@ -16,8 +16,9 @@ export default function (Vue) {
     await thisVue().$store.dispatch('setState', state)
     ipc.send(listenerId)
   })
-  ipc.on('VUEX:SET', (e, {key, value}) => {
-    thisVue().$store.dispatch('set', {key, value})
+  ipc.on('VUEX:SET', async (e, {key, value, listenerId}) => {
+    await thisVue().$store.dispatch('set', {key, value})
+    ipc.send(listenerId)
   })
   ipc.on('initializeSetup', () => {
     redirect('setup')

@@ -27,7 +27,11 @@ export function REFLECT_RENDERER () {
   })
 }
 export function REFLECT_RENDERER_KEY (key) {
-  ipcSend('VUEX:SET', {key, value: VUEX_MAIN.STATE_SAFE()[key]})
+  return new Promise((resolve, reject) => {
+    const listenerId = uuid()
+    ipcOnce(listenerId, resolve)
+    ipcSend('VUEX:SET', {key, value: VUEX_MAIN.STATE_SAFE()[key], listenerId})
+  })
 }
 
 export function init ({ app, BrowserWindow, session, dialog }) {
@@ -68,14 +72,16 @@ export const rendererMethods = {
   }
 }
 
-export function getYtTrackDetails (event, ytId) {
+export function getYtTrackDetails (event, {url, trackId}) {
   // TODO refactor
   if (globalLoadingState().value) return
   LOADING(true, 'ytDetails')
-  sbFetch.ytDetails(ytId)
-    .then(resp => {
-      console.log('YT Details retrieved', resp)
-      event.sender.send('done', resp)
+  sbFetch.ytDetails(url)
+    .then(async details => {
+      console.log('YT Details retrieved', details)
+      VUEX_MAIN.COMMIT.CUSTOM_TRACK_URL({details, trackId})
+      await REFLECT_RENDERER_KEY('convertedTracks')
+      event.sender.send('done')
     })
     .catch(err => {
       console.error('EROR AT YTTRACKDETAILS:: ipc"ytTrackDetails"', err)
