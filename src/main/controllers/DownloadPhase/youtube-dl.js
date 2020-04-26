@@ -3,16 +3,17 @@ import PATH from 'path'
 import youtubedl from 'youtube-dl'
 
 import {extractMp3, applyTags} from './FfmpegController'
-import store from '../../../renderer/store'
 import VUEX_MAIN from '../Store/mainProcessStore'
 import customGetters from '../Store/Helpers/customGetters'
 import * as utils from '../../../MAIN_PROCESS_UTILS'
+import ipc from '../InitializationAndHandlers/ipc.controller'
 
 import {downloadLinkRemove} from './StoredTracksChecker'
 
 const tempDownloadsFolderPath = () => PATH.join(global.CONSTANTS.APP_CWD, 'temp', 'downloads')
 
 const emitEvent = {
+  send: ipc.send,
   lastEvent: null,
   timeoutInProgress: false,
   makeTimeout: (params, key) => {
@@ -22,12 +23,12 @@ const emitEvent = {
     if (emitEvent.timeoutInProgress) return
     emitEvent.timeoutInProgress = true
     setTimeout(() => {
-      store.dispatch('downloadEvent', emitEvent.lastEvent)
+      emitEvent.send('DOWNLOAD:EVENT', emitEvent.lastEvent)
       emitEvent.timeoutInProgress = false
     }, 200)
   },
   downloadStarted: (tracks) => {
-    store.dispatch('downloadStarted', tracks.map(t => t.id))
+    emitEvent.send('DOWNLOAD:START', tracks.map(t => t.id))
   },
   download: (params) => {
     emitEvent.makeTimeout(params, 'download')

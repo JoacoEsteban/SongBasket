@@ -28,6 +28,9 @@ export default function (Vue) {
     await redirect('home')
   })
 
+  ipc.on('DOWNLOAD:START', (e, payload) => thisVue().$store.dispatch('downloadStarted', payload))
+  ipc.on('DOWNLOAD:EVENT', (e, payload) => thisVue().$store.dispatch('downloadEvent', payload))
+
   $(document).ready(onDocumentReady)
 }
 
