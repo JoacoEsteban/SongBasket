@@ -4,7 +4,7 @@ const USE_PROD_BACKEND = true
 const USE_HEROKU = true
 ;(() => {
   const subDomain = USE_HEROKU ? 'heroku' : 'api'
-  process.env.BACKEND = process.env.NODE_ENV === 'production' || USE_PROD_BACKEND ? 'https://' + subDomain + '.songbasket.com' : 'localhost:5000'
+  process.env.BACKEND = process.env.NODE_ENV === 'production' || USE_PROD_BACKEND ? ('https://' + subDomain + '.songbasket.com') : 'http://localhost:5000'
   global.log = (...aa) => aa.forEach(a => console.log(require('util').inspect(a, {showHidden: false, depth: null})))
 })()
 

@@ -95,7 +95,10 @@ function findDuplicatedTracks () {
 function makeQueries () {
   console.log('queries', ALL_TRACKS.length)
   for (let o = 0; o < ALL_TRACKS.length; o++) {
-    if (ALL_TRACKS[o].query) continue
+    if (ALL_TRACKS[o].query) {
+      console.log('hasquery', ALL_TRACKS[o].query)
+      continue
+    }
     console.log('queries', o)
     const track = ALL_TRACKS[o].data
 
@@ -105,6 +108,6 @@ function makeQueries () {
     if (duration <= 20 && duration >= 4) duration = 'medium'
     if (duration < 4) duration = 'short'
 
-    ALL_TRACKS.query = {query, duration, duration_s: track.duration_ms / 1000, id: track.id}
+    ALL_TRACKS[o].query = {query, duration, duration_s: track.duration_ms / 1000, id: track.id}
   }
 }
