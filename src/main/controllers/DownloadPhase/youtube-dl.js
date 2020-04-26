@@ -3,7 +3,6 @@ import PATH from 'path'
 import youtubedl from 'youtube-dl'
 
 import {extractMp3, applyTags} from './FfmpegController'
-import VUEX_MAIN from '../Store/mainProcessStore'
 import customGetters from '../Store/Helpers/customGetters'
 import * as utils from '../../../MAIN_PROCESS_UTILS'
 import ipc from '../InitializationAndHandlers/ipc.controller'
@@ -44,11 +43,10 @@ const emitEvent = {
 export default {
   async downloadSyncedPlaylists (localTracks, plFilter) {
     console.log('Stored tracks: ', localTracks.length)
-    let tracksToDownload = VUEX_MAIN.STATE().convertedTracks
+    let tracksToDownload = customGetters.convertedTracks()
     if (plFilter) tracksToDownload = tracksToDownload.filter(t => t.playlists.some(pl => plFilter.includes(pl.id)))
 
-    console.log('todownload', tracksToDownload)
-    const allTracks = constructDownloads(await downloadLinkRemove(localTracks, utils.cloneObject(tracksToDownload), plFilter))
+    const allTracks = constructDownloads((await downloadLinkRemove(localTracks, utils.cloneObject(tracksToDownload), plFilter)).filter(track => track.playlists.length)) // TODO Prevent this filter from ever happening
 
     emitEvent.downloadStarted(allTracks)
 
@@ -68,10 +66,10 @@ export default {
 }
 
 function constructDownloads (tracks) {
-  const exec = () => tracks.map(generateDownladObject).filter(track => track)
+  const exec = () => tracks.map(generateDownloadObject).filter(track => track)
 
   // CONSTRUCTOR FUNCTIONS
-  const generateDownladObject = (track) => {
+  const generateDownloadObject = (track) => {
     /*
       {
         id: spid,
@@ -110,6 +108,7 @@ function constructDownloads (tracks) {
     const paths = instance.paths = {}
     const fileName = paths.fileName = utils.encodeIntoFilename(data.name) // colons turnt into hyphens & etc
     const fileNameAlt = paths.fileNameAlt = `${fileName} - ${id}`
+    if (!instance.playlists.length) global.log(instance, 'passed?')
     paths.downloadCWD = PATH.join(tempDownloadsFolderPath(), instance.playlists[0].id)
     paths.mp4FilePath = PATH.join(paths.downloadCWD, id + '.songbasket_preprocessed_file')
     paths.mp3FilePath = PATH.join(paths.downloadCWD, id + '.mp3')
@@ -162,6 +161,7 @@ function constructDownloads (tracks) {
           download.on('info', info => {
             instance.download.info.size = info.size
             instance.download.info.downloadStarted = true
+            console.log(instance && instance.id, 'ins passed?')
             emitEvent.download({type: 'start', id: instance.id})
           })
 

@@ -51,13 +51,13 @@ export default {
       this.$root.OPEN_MODAL({wich: 'custom-track-url', payload: {trackId: this.item.id, playlistId: this.options.playlistId}})
     },
     async setSelection (item) {
-      if (item.id === this.item.selectionObj.id) return
-      let newId = item.id
+      if (item.youtube_id === this.item.selectionObj.youtube_id && this.item.flags.selectionIsApplied) return
+      let newId = item.youtube_id
       if (item.isCustomTrack) newId = false
       if (item.isBestMatch) newId = null
 
       try {
-        await this.$store.dispatch('changeYtTrackSelection', {trackId: this.item.id, newId})
+        await this.$controllers.core.changeYtTrackSelection({trackId: this.item.id, newId})
         this.$controllers.track.populateTrackSelection(this.item)
       } catch (error) {
         console.error(error)

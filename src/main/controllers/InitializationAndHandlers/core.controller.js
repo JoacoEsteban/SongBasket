@@ -6,7 +6,6 @@ const GETTERS = require('../Store/Helpers/customGetters').default
 const HANDLERS = require('./handlers')
 const QUERY_MAKER = require('../../queryMaker')
 const VUEX_MAIN = require('../Store/mainProcessStore').default
-console.log(VUEX_MAIN)
 const core = {
   onLogin: async (details, CB) => {
     const next = () => CB({ requestHeaders: details.requestHeaders })

@@ -8,6 +8,10 @@ const USE_HEROKU = true
   global.log = (...aa) => aa.forEach(a => console.log(require('util').inspect(a, {showHidden: false, depth: null})))
 })()
 
+;(function flushYtDlCache () {
+  require('child_process').exec(require('youtube-dl').getYtdlBinary() + ' --rm-cache-dir', (err, a) => console[(err ? 'error' : 'log')](err, a))
+})()
+
 const CATCH_TO_FILE = false
 const logFile = require('electron-log')
 ;(function setErrorHandling () {

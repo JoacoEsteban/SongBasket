@@ -5,7 +5,7 @@ export default {
     // TODO Handle conversion errors
     if ((!force && track.flags.processed) || track.flags.conversionError) return track
     track = cloneObject(track)
-    track.conversion.nameTokens = [...track.data.name.split(' ').map(str => makeValidRegex(str)).filter(str => str.str.length > 2 && !isInvalidWord(str.str)), ...track.data.artists.map(a => makeValidRegex(a.name))] // All words from trackname & artist split into array
+    track.conversion.nameTokens = [...track.data.name.split(separators).map(str => makeValidRegex(str)).filter(str => str.str.length > 2 && !isInvalidWord(str.str)), ...track.data.artists.map(a => makeValidRegex(a.name))] // All words from trackname & artist split into array
 
     let nameTokens = track.conversion.nameTokens
     nameTokens = nameTokens.filter((a, index1) => { // Removes dupes
@@ -25,6 +25,7 @@ export default {
     return track
   }
 }
+const separators = /, | |\(|\)/
 
 const invalidWords = [
   'the'
@@ -64,7 +65,7 @@ const calcBestMatch = (track) => {
     if (!a.wordScore && b.wordScore) return 1
     if (!b.wordScore && a.wordScore) return -1
     return (a.durationScore + a.wordScore * 1.5) > (b.durationScore + b.wordScore * 1.5) ? -1 : 1 // Wordscore gets boosted because of priority of name match over duration
-  }))[0].id
+  }))[0].youtube_id
   track.conversion.yt[0].isBestMatch = true
 }
 

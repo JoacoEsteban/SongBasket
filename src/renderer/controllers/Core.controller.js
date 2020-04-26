@@ -15,6 +15,15 @@ const CoreController = {
       })
       ipc().send('PLAYLISTS:UNSYNC', {id, listenerId})
     })
+  },
+  changeYtTrackSelection ({trackId, newId}) {
+    return new Promise((resolve, reject) => {
+      const listenerId = uuid()
+      ipc().once(listenerId, async (e, error) => {
+        error ? reject(error) : resolve()
+      })
+      ipc().send('TRACK:CHANGE_SELECTION', {trackId, newId, listenerId})
+    })
   }
 }
 

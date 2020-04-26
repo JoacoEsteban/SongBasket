@@ -327,3 +327,14 @@ export async function unsyncPlaylist (id) {
   await REFLECT_RENDERER()
   if (error) throw error
 }
+
+export async function changeYtTrackSelection ({trackId, newId}) {
+  try {
+    VUEX_MAIN.COMMIT.CHANGE_YT_TRACK_SELECTION({trackId, newId})
+  } catch (err) {
+    console.error('Error changing track selection', err)
+    throw err
+  } finally {
+    await REFLECT_RENDERER_KEY('convertedTracks')
+  }
+}

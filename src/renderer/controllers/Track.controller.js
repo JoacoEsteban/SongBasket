@@ -10,7 +10,7 @@ const TrackController = {
     if (selectionId === false) return track.selectionObj = track.custom
     if (selectionId === null) selectionId = track.conversion.bestMatch
 
-    track.selectionObj = track.conversion.yt.find(yt => yt && yt.id === selectionId)
+    track.selectionObj = track.conversion.yt.find(yt => yt && yt.youtube_id === selectionId)
   },
   getStatus: function (t) {
     const slug = (() => {
@@ -44,7 +44,7 @@ const TrackController = {
   },
   isDownloaded: function ({id, selectionObj}) {
     const dlTrack = getVueInstance().DOWNLOADED_TRACKS[id]
-    return !!(dlTrack && dlTrack[selectionObj.id])
+    return !!(dlTrack && dlTrack[selectionObj.youtube_id])
   }
 }
 

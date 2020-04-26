@@ -107,6 +107,15 @@ export function init (ipc = global.ipc) {
     }
     event.sender.send(listenerId, error)
   })
+  ipc.on('TRACK:CHANGE_SELECTION', async function (event, {trackId, newId, listenerId}) {
+    let error
+    try {
+      await handlers.changeYtTrackSelection({trackId, newId})
+    } catch (err) {
+      error = err
+    }
+    event.sender.send(listenerId, error)
+  })
   // FileWatchers
 
   ipc.on('FileWatchers:ASK_TRACKS', function () {

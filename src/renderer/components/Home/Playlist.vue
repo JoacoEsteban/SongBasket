@@ -86,7 +86,7 @@ export default {
 
         if (this.isTrackDownloaded(t.id, selectionId)) return false
 
-        const selection = t.conversion && t.conversion.yt.find(yt => yt.id === selectionId)
+        const selection = t.conversion && t.conversion.yt.find(yt => yt.youtube_id === selectionId)
         selection.isDoubtlyConversion && ++count
       })
       return count

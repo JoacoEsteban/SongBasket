@@ -40,6 +40,9 @@ export default {
   uncachedPlaylists () {
     return CurrentUser().queuedPlaylists.filter(q => !CurrentUser().cachedPlaylists.some(c => c === q))
   },
+  convertedTracks () {
+    return VUEX_MAIN.STATE().convertedTracks
+  },
   anythingToConvert () {
 
   },

@@ -9,7 +9,9 @@ const FSController = {
 
 let saveQueue = 0
 
+const block = false
 function SAVE_TO_DISK (check) {
+  if (block) return
   if (!check) {
     saveQueue++
     return setTimeout(() => SAVE_TO_DISK(true), 1000)
@@ -58,6 +60,8 @@ const mutations = {
 
     console.log('DATA STORED. ', playlists.length, 'playlists')
 
+    const initialMutation = false
+    if (initialMutation) this.REPROCESS_ALL_TRACKS()
     // this.INVALIDATE_SYNCED_SNAPSHOT_IDS()
     // SAVE_TO_DISK()
   },
@@ -290,7 +294,11 @@ const mutations = {
       if (convertedTrack.custom) {
         convertedTrack.custom.isCustomTrack = true
         if (params.forceCustom) convertedTrack.selection = false
+        if (!convertedTrack.custom.youtube_id) convertedTrack.custom.youtube_id = convertedTrack.custom.id
       }
+      convertedTrack.conversion.yt.forEach(t => {
+        if (!t.youtube_id) t.youtube_id = t.id
+      })
       if (!convertedTrack.flags) {
         convertedTrack.flags = {
           converted: !!convertedTrack.conversion,
@@ -356,20 +364,20 @@ const mutations = {
     state.playlists[index].tracks.removed = []
   },
   CHANGE_YT_TRACK_SELECTION ({trackId, newId}) {
-    const retorno = {
-      succeeded: false,
-      error: null
+    try {
+      if (newId === undefined) throw new Error('New selection id does not exist:: @ mainProcessStore :: CHANGE_YT_TRACK_SELECTION')
+      if (trackId === undefined) throw new Error('SP Track id does not exist:: @ mainProcessStore :: CHANGE_YT_TRACK_SELECTION')
+
+      const track = state.convertedTracks.find(t => t.id === trackId)
+      if (!track) throw new Error('Converted Track not found:: @ mainProcessStore :: CHANGE_YT_TRACK_SELECTION')
+
+      track.selection = newId
+      track.flags.selectionIsApplied = true
+
+      SAVE_TO_DISK()
+    } catch (error) {
+      throw error
     }
-    if (newId === undefined) return (retorno.error = new Error('New selection id does not exist:: CurrentUser.js :: CHANGE_YT_TRACK_SELECTION')) && retorno
-
-    const track = state.convertedTracks.find(t => t.id === trackId)
-    if (!track) return (retorno.error = new Error('Converted Track not found:: CurrentUser.js :: CHANGE_YT_TRACK_SELECTION')) && retorno
-
-    track.selection = newId
-    track.flags.selectionIsApplied = true
-
-    SAVE_TO_DISK()
-    return (retorno.succeeded = true) && retorno
   },
   async UNSYNC_PLAYLIST (id) {
     try {

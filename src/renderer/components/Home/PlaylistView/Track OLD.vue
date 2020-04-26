@@ -195,11 +195,11 @@ export default {
       this.$emit('customTrackUrl')
     },
     isSelected (id) {
-      return id === (this.selected === null ? this.conversion.conversion.bestMatch : this.selected === false ? this.conversion.custom.id : this.selected)
+      return id === (this.selected === null ? this.conversion.conversion.bestMatch : this.selected === false ? this.conversion.custom.youtube_id : this.selected)
     },
     select (id) {
       if (this.isSelected(id)) return
-      id = id === this.conversion.conversion.bestMatch ? null : this.customTrack && id === this.conversion.custom.id ? false : id
+      id = id === this.conversion.conversion.bestMatch ? null : this.customTrack && id === this.conversion.custom.youtube_id ? false : id
       this.$emit('selectTrack', id)
     },
     timeFilter (ms) {
