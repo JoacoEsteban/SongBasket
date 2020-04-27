@@ -5,7 +5,6 @@ let ALL_PLAYLISTS = []
 let ALL_TRACKS = []
 
 export function makeConversionQueries () {
-  // if (store.state.Events.GLOBAL_LOADING_STATE.value) throw new Error('STILL LOADING')
   let syncedPlaylists = customGetters.SyncedPlaylistsSp().map(pl => {
     return {
       ...pl,

@@ -49,7 +49,7 @@
       </div>
     </div>
 
-    <div class="bar-slider-container h-fc rel-full df" :style="{'--position-ptg': sliderPosition + '%'}">
+    <div class="bar-slider-container h-fc rel-full df" :style="{'--position-ptg': sliderPosition + '%', '--animation-duration': loadingBar.animationDuration + 'ms'}">
       <div class="df fldc aliend bar-slide h-fc">
         <div class="section-switcher-container">
           <div class="section-switcher-list">
@@ -66,7 +66,11 @@
     </div>
 
 
-    <div class="loading-bar" ref="loadingbar">
+    <div class="loading-bar"
+      ref="loadingbar"
+      :style="{'--ptg': loadingBar.ptg}"
+      :class="loadingBar.classList"
+    >
       <div class="actual-loading-bar gradient-background-cycle-less">
       </div>
     </div>
@@ -101,8 +105,12 @@ export default {
       loadingBar: {
         loading: false,
         staticLoading: false,
-        percentage: 0,
-        animationDuration: 750
+        ptg: '0%',
+        animationDuration: 750,
+        classList: {
+          show: false,
+          static: true
+        }
       },
       currentPath: null,
       activeSection: null,
@@ -123,7 +131,6 @@ export default {
   mounted () {
     window.bar = this
     // document.documentElement.style.setProperty('--loading-bar-animation-duration', (this.loadingBar.animationDuration / 100) + 's')
-    this.$refs.loadingbar.style.setProperty('--animation-duration', this.loadingBar.animationDuration + 'ms')
     this.activeSection = this.sections.find(s => s.title === 'Playlists').id
 
     this.$sbRouter.beforeTransition(this.handleRouterNavigation)
@@ -147,7 +154,8 @@ export default {
     // },
     now () {
       let separator = ' / '
-      let thisDate = dateFormatter(this.$store.state.CurrentUser.lastSync)
+      console.log('vamos javier', this.$store.state.CurrentUser.lastSync)
+      let thisDate = dateFormatter(this.$store.state.CurrentUser.lastSync) || new Date()
       let hours = thisDate.time.hours + ':' + thisDate.time.minutes
       let date = ''
       if (thisDate.date.today) date = 'Today'
@@ -162,10 +170,10 @@ export default {
       return { date, hours }
     },
     loadingState () {
-      return this.$store.state.Events.FETCH_LOADING_STATE
+      return this.$store.state.Events.LOADING_STATE
     },
     status () {
-      return !this.loadingState.value ? `Last Sync: ${this.now.date} @ ${this.now.hours}` : this.loadingState.target
+      return !this.loadingState.value ? `Last Sync: ${this.now.date} @ ${this.now.hours}` : this.loadingState.message
     }
   },
   watch: {
@@ -209,13 +217,19 @@ export default {
       this.removeBarClass('hide', 'dynamic')
     },
     handleLoadingState (val) {
-      // console.log('Loading', JSON.parse(JSON.stringify(val)))
-      this.loadingBar.loading = val.value
-      if (!val.value) {
-        this.hideLoadingBar()
-      } else {
-        this.showLoadingBar()
-      }
+      console.log('Loading', val)
+
+      this.loadingBar.ptg = (val.ptg * 100).toFixed(2) + '%'
+      const classes = {}
+      classes[val.value ? 'show' : 'hide'] = true
+      classes[val.showPtg ? 'dynamic' : 'static'] = true
+      this.loadingBar.classList = classes
+
+      // if (!val.value) {
+      //   this.hideLoadingBar()
+      // } else {
+      //   this.showLoadingBar()
+      // }
     },
     maximize (e) {
       if (!this.isMac || e.target.classList.contains('window-nodrag')) return
@@ -327,24 +341,33 @@ $loading-bar-height: 3px;
   left: 0;
   right: 100%;
   pointer-events: none;
-  $transition: var(--animation-duration) var(--bezier-chill);
-  transition: left $transition, right $transition;
+  // $transition: var(--animation-duration) var(--bezier-chill);
+  $transition: var(--transition-global);
+  transition: left $transition, right $transition, width $transition;
   .actual-loading-bar {
     height: $loading-bar-height;
     width: 100%;
   }
-  &.hide {
-    right: 0;
-    left: 100%;
-  }
-  &.static {
-    left:0;
-    right: 0;
-  }
-  &.dynamic {
-    .actual-loading-bar {
-      background-color: var(--green-loading);
+  --ptg: 0%;
+  width: var(--ptg);
+  &.show {
+    &.static {
+      left:0;
+      width: 100%;
     }
+    &.dynamic {
+      .actual-loading-bar {
+        animation: none;
+        background-color: var(--green-accept);
+      }
+    }
+  }
+  &.hide {
+    left: 100%;
+    width: 100%;
+  }
+  &.kill {
+    opacity: 0;
   }
 }
 

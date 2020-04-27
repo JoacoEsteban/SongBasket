@@ -23,13 +23,19 @@ export function createAxiosInstance () {
 
 const Backend = process.env.BACKEND
 
+const logError = err => {
+  return [err.response.data, err.response.status, err.response.headers]
+}
+
 let loadingCount = 0
 function LOADING (value, target) {
+  // TODO Deprecate
+  const a = true
+  if (a) return
   if (!value) value = false
   if (value) loadingCount++
   else loadingCount && loadingCount--
-  console.log('loadingcount', loadingCount)
-  store.dispatch('fetchLoadingState', {value: loadingCount > 0, target})
+  store.dispatch('loadingEvent', {value: loadingCount > 0, target})
 }
 
 // Brings back user information
@@ -186,7 +192,7 @@ export const getPlaylist = async ({ id, snapshot_id }) => {
   }
 }
 
-export async function youtubizeAll (tracks) {
+export async function youtubizeAll (tracks, completionCallback) {
   let totalTracks = 0
   let succeded = 0
   let failed = 0
@@ -220,12 +226,13 @@ export async function youtubizeAll (tracks) {
           tracks[i].flags.converted = false
           tracks[i].flags.conversionError = true
           // Failed tracks will remain with 'conversion' object NULL
-          console.log('Error when converting', Object.keys(err))
+          console.log('Error when converting', ...logError(err))
           failed++
           // TODO Emit fail event
         })
         .finally(() => {
           tracks[i].flags.processed = false
+          completionCallback && completionCallback(totalTracks)
           areAllFinished(resolve)
         })
     }

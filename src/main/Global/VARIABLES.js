@@ -19,7 +19,9 @@ module.exports = global.CONSTANTS = {
   // -------------
 
   // PATHS
-  BACKEND: process.env.BACKEND,
+  get BACKEND () {
+    return process.env.BACKEND
+  },
   APP_CWD: (process.env.NODE_ENV === 'production' ? require('electron').app.getPath('userData') : process.cwd()),
   // -------------
 

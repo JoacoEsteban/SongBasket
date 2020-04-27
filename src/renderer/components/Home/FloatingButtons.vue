@@ -47,7 +47,7 @@ export default {
       return this.route === 'home'
     },
     loadingState () {
-      return this.$store.state.Events.FETCH_LOADING_STATE
+      return this.$store.state.Events.LOADING_STATE
     },
     loading () {
       return this.loadingState && this.loadingState.value

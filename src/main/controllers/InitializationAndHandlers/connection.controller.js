@@ -12,6 +12,6 @@ const checkInternet = () => {
       global.CONNECTED_TO_INTERNET = connected
       CB(connected)
     }
-    setTimeout(checkInternet, connected ? 5000 : 1000)
+    setTimeout(checkInternet, connected ? 10000 : 5000)
   })
 }

@@ -17,11 +17,6 @@ function SAVE_TO_DISK (check) {
   // FSController.UserMethods.saveState({state, path: global.HOME_FOLDER})
 }
 
-function LOADING (store, value, target) {
-  if (!value) value = false
-  store.dispatch('globalLoadingState', {value, target}, {root: true})
-}
-
 const getDefaultState = () => {
   return {
     user: {}, // Includes name, number of playlists, image url
@@ -190,94 +185,6 @@ const mutations = {
   },
   SET_USER (state, userData) {
     state.user = userData
-  },
-  UPDATE_USER_ENTITIES (state, playlists) {
-    LOADING(this, true, 'Computing Changes')
-
-    function isCachedOrSynced (id) {
-      // If it's cached I want to compare the version with the currently stored one.
-      // If they match I will keep the tracks (currently stored version)
-      // If they don't I will keep the new version without tracks and the playlist will be uncached
-      let c = findById(id, state.cachedPlaylists)
-      if (c >= 0) c = state.cachedPlaylists[c].snapshot_id
-      else c = false
-
-      // I dont care about the version controlling synced ones in here because version control has been handled elsewhere
-      let s = findById(id, state.syncedPlaylists) >= 0
-
-      return {c, s}
-    }
-
-    if (state.cachedPlaylists.length > 0 || state.syncedPlaylists.length > 0) {
-      for (let i = 0; i < playlists.items.length; i++) {
-        let currentPlaylist = playlists.items[i]
-        let cachedOrSynced = isCachedOrSynced(currentPlaylist.id)
-        if (!cachedOrSynced.c && !cachedOrSynced.s) {
-          playlists.items[i].items = []
-          playlists.items[i].added = []
-          playlists.items[i].removed = []
-        }
-
-        if (cachedOrSynced.c !== false) {
-          // console.log('IS CACHED::')
-          if (cachedOrSynced.c === currentPlaylist.snapshot_id) {
-            playlists.items.splice(i, 1, state.playlists[findById(currentPlaylist.id, state.playlists)])
-          } else {
-            this.dispatch('findAndUncache', currentPlaylist.id)
-          }
-          continue
-        }
-        if (cachedOrSynced.s) {
-          // If playlist is synced, it will have already been processed, so im just replacing it
-          let index = findById(currentPlaylist.id, state.playlists)
-          playlists.items.splice(i, 1, state.playlists[index])
-          continue
-        }
-      }
-    } else {
-      // console.log('NO CACHED OR SYNCED PLS')
-      for (let i = 0; i < playlists.items.length; i++) {
-        playlists.items[i].tracks = {
-          ...playlists.items[i].tracks,
-          items: [],
-          added: [],
-          removed: []
-        }
-      }
-    }
-
-    for (let i = 0; i < state.syncedPlaylists.length; i++) {
-      let pl = state.syncedPlaylists[i]
-      let index = findById(pl, playlists.items)
-      if (index === -1) {
-        if (!state.deletedPlaylists) state.deletedPlaylists = []
-        state.deletedPlaylists.push(state.playlists[findById(pl, state.playlists)])
-        state.syncedPlaylists.splice(i, 1)
-        i--
-      }
-    }
-
-    Vue.set(state, 'playlists', playlists.items)
-
-    state.control = {
-      total: playlists.total,
-      offset: state.playlists.length
-    }
-
-    state.lastSync = new Date()
-    LOADING(this)
-    this.dispatch('syncedPlaylistsRefreshed', {}, {root: true})
-    SAVE_TO_DISK()
-  },
-  UPDATE_PLAYLISTS (state, playlists) {
-    for (let i = 0; i < playlists.items.length; i++) {
-      Vue.set(state.playlists, state.playlists.length, playlists.items[i])
-    }
-
-    Vue.set(state.control, 'offset', state.playlists.length)
-
-    console.log('PLAYLISTS UPDATE::::::')
-    SAVE_TO_DISK()
   },
 
   LOGOUT (state) {

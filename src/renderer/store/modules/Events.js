@@ -1,6 +1,6 @@
 import Vue from 'vue'
 
-const state = {
+const getDefaultState = () => ({
   CURRENT_PLAYLIST_SET: false,
   SYNCED_PLAYLISTS_REFRESHED: false,
   PLAYLIST_UNSYNCED: false,
@@ -10,13 +10,10 @@ const state = {
     value: false,
     target: ''
   },
-  FETCH_LOADING_STATE: {
-    value: false,
-    target: ''
-  },
+  LOADING_STATE: loadingEventTypes.default,
   DOWNLOAD_QUEUE: [],
   CURRENT_DOWNLOAD: null // id from current download
-}
+})
 
 const actions = {
   currentPlaylistSet ({commit}) {
@@ -40,21 +37,23 @@ const actions = {
   downloadEvent ({commit}, params) {
     commit('DOWNLOAD_EVENT', params)
   },
-  globalLoadingState ({commit}, value) {
+  globalLoadingStateDEPRECATED ({commit}, value) {
     value.target = value.target || ''
     commit('SET', { key: 'GLOBAL_LOADING_STATE', value })
   },
-  fetchLoadingState ({commit}, value) {
-    commit('SET', { key: 'FETCH_LOADING_STATE', value })
+  loadingEvent ({commit}, payload) {
+    console.log('averga', payload)
+    commit('LOADING_EVENT', payload)
   }
 }
 
+const SET = (key, value) => Vue.set(state, key, value)
 const mutations = {
   TRIGGER (state, key) {
     state[key] = !state[key]
   },
   SET (state, {key, value}) {
-    Vue.set(state, key, value)
+    SET(key, value)
   },
   DOWNLOAD_STARTED (state, tracks) {
     state.DOWNLOAD_QUEUE = tracks.map(id => ({
@@ -62,6 +61,13 @@ const mutations = {
       state: 'awaiting', // eg: downloading, extracting, applying tags
       ptg: 0 // eg: 36%
     }))
+  },
+  LOADING_EVENT (state, {target, value, ptg}) {
+    const formatted = getLoadingEvent(target)
+    formatted.target = target
+    formatted.value = value
+    formatted.ptg = ptg || 0
+    SET('LOADING_STATE', formatted)
   },
   DOWNLOAD_EVENT (state, {id, ptg, type}) {
     const track = state.DOWNLOAD_QUEUE.find(t => t.id === id)
@@ -126,6 +132,62 @@ const mutations = {
     }
   }
 }
+
+const loadingEventTypes = {
+  messages: {
+    'PLAYLISTS:REFRESH': 'Updating Playlists',
+    'YOUTUBIZE': 'Converting Tracks',
+    'DOWNLOAD': 'Downloading Tracks',
+    'PLAYLIST:UNSYNC': 'Unsyncing Playlist',
+    default: 'Loading'
+  },
+  getMessage (target) {
+    return this.messages[target] || this.messages.default
+  },
+  defaultMessage (env) {
+    return this.getMessage(env.target)
+  },
+  // -----------------------
+  get default () {
+    return {
+      value: false,
+      target: '',
+      showPtg: false,
+      ptg: null,
+      get message () {
+        return loadingEventTypes.defaultMessage(this)
+      }
+    }
+  },
+  get percentable () {
+    return {
+      value: false,
+      target: '',
+      showPtg: true,
+      ptg: 0,
+      get message () {
+        return loadingEventTypes.defaultMessage(this) + ' ' + (this.ptg * 100).toFixed(1) + '%'
+      }
+    }
+  }
+}
+
+function getLoadingEvent (target) {
+  switch (target) {
+    case 'PLAYLISTS:REFRESH':
+      return loadingEventTypes.percentable
+    case 'YOUTUBIZE':
+      return loadingEventTypes.percentable
+    case 'DOWNLOAD':
+      return loadingEventTypes.default
+    case 'PLAYLIST:UNSYNC':
+      return loadingEventTypes.default
+    default:
+      return loadingEventTypes.default
+  }
+}
+
+const state = getDefaultState()
 
 export default {
   state,

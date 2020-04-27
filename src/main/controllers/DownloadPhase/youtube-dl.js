@@ -55,8 +55,10 @@ export default {
       try {
         await track.controller.execute()
       } catch (error) {
-        if (global.CONNECTED_TO_INTERNET) continue
-        else { hasErrors = true; break }
+        if (global.CONNECTED_TO_INTERNET) {
+          await global.flushYtDlCache()
+          continue
+        } else { hasErrors = true; break }
       }
     }
 

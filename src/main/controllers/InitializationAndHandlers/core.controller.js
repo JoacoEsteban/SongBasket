@@ -28,10 +28,10 @@ const core = {
       global.CONSTANTS.SESSION.defaultSession.webRequest.onHeadersReceived({urls: [global.CONSTANTS.BACKEND + '/*']}, null)
 
       HANDLERS.pushToHome()
-      next()
     } catch (error) {
-      next()
       throw error
+    } finally {
+      next()
     }
   },
   setCredentials: async (id, songbasket_id) => {
@@ -68,7 +68,9 @@ const core = {
   setUser: userData => {
     VUEX_MAIN.COMMIT.SET_USER(userData)
   },
-  updateAll: async () => {
+  updateAll: async (params = {
+    playlistCompletionCallback: null
+  }) => {
     return new Promise((resolve, reject) => {
       let remainingReqs = 2
       const tryResolve = () => !--remainingReqs && (console.log('ALL UPTDATED') + resolve())
@@ -78,7 +80,7 @@ const core = {
           throw err
         })
 
-      core.updatePlaylists()
+      core.updatePlaylists(params.playlistCompletionCallback)
         .then(tryResolve)
         .catch(err => {
           throw err
@@ -92,33 +94,12 @@ const core = {
       throw error
     }
   },
-  getAndStorePlaylists: playlists => {
-    return new Promise(async (resolve, reject) => {
-      let requestsLeft = playlists.length
-      if (!requestsLeft) resolve()
-      const errors = []
-      playlists = playlists.map(pl => typeof pl === 'string' ? { id: pl } : pl)
-      await playlists.forEach(async pl => {
-        try {
-          console.log('playlist', pl)
-          const playlist = await API.getPlaylist(pl)
-          console.log('Playlist has changes?', playlist ? 'YES' : 'NO')
-          playlist && VUEX_MAIN.COMMIT.PLAYLIST_STORE_TRACKS(playlist)
-        } catch (error) {
-          // TODO handle this
-          console.error('ERROR WHEN FETCHING PLAYLIST', error)
-          errors.push(error)
-        }
-        !--requestsLeft && (errors.length ? reject(errors) : resolve())
-      })
-    })
-  },
-  updatePlaylists: async () => {
+  updatePlaylists: async completionCb => {
     return new Promise(async (resolve, reject) => {
       const playlists = GETTERS.syncedPlaylistsSnapshots()
 
       try {
-        await core.getAndStorePlaylists(playlists)
+        await core.getAndStorePlaylists(playlists, completionCb)
         resolve()
       } catch (errors) {
         return reject(errors)
@@ -133,6 +114,31 @@ const core = {
       resolve()
     })
   },
+  getAndStorePlaylists: (playlists, completionCb) => {
+    return new Promise(async (resolve, reject) => {
+      let requestsLeft = playlists.length
+      if (!requestsLeft) resolve()
+      const errors = []
+      playlists = playlists.map(pl => typeof pl === 'string' ? { id: pl } : pl)
+
+      for (const pl of playlists) {
+        let err = null
+        try {
+          console.log('playlist', pl)
+          const playlist = await API.getPlaylist(pl)
+          console.log('Playlist has changes?', playlist ? 'YES' : 'NO')
+          playlist && VUEX_MAIN.COMMIT.PLAYLIST_STORE_TRACKS(playlist)
+        } catch (error) {
+          // TODO handle this
+          console.error('ERROR WHEN FETCHING PLAYLIST', error)
+          throw error
+        } finally {
+          completionCb && completionCb(err, pl, playlists)
+        }
+        !--requestsLeft && (errors.length ? reject(errors) : resolve())
+      }
+    })
+  },
   populateQueuedPlaylists: async () => {
     try {
       const ids = GETTERS.uncachedPlaylists()
@@ -143,7 +149,7 @@ const core = {
       throw error
     }
   },
-  youtubize: async () => {
+  youtubize: async (params = { trackCompletionCallback: null }) => {
     try {
       const empty = await core.populateQueuedPlaylists()
       const queries = []
@@ -154,7 +160,7 @@ const core = {
       }
       if (empty && !queries.length) return console.log('nothing to do')
       console.log('query amm', queries.length)
-      if (queries.length) VUEX_MAIN.COMMIT.YOUTUBIZE_RESULT(await API.youtubizeAll(queries))
+      if (queries.length) VUEX_MAIN.COMMIT.YOUTUBIZE_RESULT(await API.youtubizeAll(queries, params.trackCompletionCallback))
       console.log('Youtubize done from core')
     } catch (error) {
       console.error(error) // TODO handle error

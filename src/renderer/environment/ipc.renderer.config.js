@@ -8,6 +8,7 @@ const env = {}
 export default function (Vue) {
   ipc = Vue.prototype.$IPC = require('electron').ipcRenderer
 
+  ipc.on('LOADING_EVENT', onLoadingEvent)
   ipc.on('Connection:CHANGE', onConnectionChange)
   ipc.on('FileWatchers:ADDED', onAddedTrack)
   ipc.on('FileWatchers:REMOVED', onRemovedTrack)
@@ -24,7 +25,7 @@ export default function (Vue) {
     redirect('setup')
   })
   ipc.on('dataStored', async () => {
-    await thisVue().$store.dispatch('SET_LOADING_STATE', 'found')
+    await thisVue().$store.dispatch('SETUP_LOADING_STATE', 'found')
     await redirect('home')
   })
 
@@ -36,6 +37,9 @@ export default function (Vue) {
 
 function onConnectionChange (e, val) {
   thisVue().$store.dispatch('connectionChange', val)
+}
+function onLoadingEvent (e, payload) {
+  thisVue().$store.dispatch('loadingEvent', payload)
 }
 function onDocumentReady () {
   setTimeout(() => {

@@ -13,9 +13,13 @@ export function logme (...log) { return log && console.log(...log) }
 export const sleep = (time) => new Promise((resolve, reject) => setTimeout(resolve, time))
 
 export function dateFormatter (dateParam) {
-  if (!dateParam) return ''
+  if (!dateParam) return null
+
   const now = new Date()
   dateParam = new Date(dateParam)
+  // eslint-disable-next-line eqeqeq
+  if (dateParam == 'Invalid Date') return null
+
   const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
   const date = {

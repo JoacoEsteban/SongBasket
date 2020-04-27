@@ -1,6 +1,7 @@
+require('./controllers/Prototype/Array')
 require('./Global/VARIABLES')
 
-const USE_PROD_BACKEND = false
+const USE_PROD_BACKEND = true
 const USE_HEROKU = true
 ;(() => {
   const subDomain = USE_HEROKU ? 'heroku' : 'api'
@@ -8,9 +9,16 @@ const USE_HEROKU = true
   global.log = (...aa) => aa.forEach(a => console.log(require('util').inspect(a, {showHidden: false, depth: null})))
 })()
 
-;(function flushYtDlCache () {
-  require('child_process').exec(require('youtube-dl').getYtdlBinary() + ' --rm-cache-dir', (err, a) => console[(err ? 'error' : 'log')](err, a))
-})()
+global.flushYtDlCache = async () => {
+  return new Promise((resolve, reject) => {
+    require('child_process').exec(require('youtube-dl').getYtdlBinary() + ' --rm-cache-dir', (err, out) => {
+      if (err) return reject(err)
+      resolve(out)
+    })
+  })
+}
+
+global.flushYtDlCache()
 
 const CATCH_TO_FILE = false
 const logFile = require('electron-log')

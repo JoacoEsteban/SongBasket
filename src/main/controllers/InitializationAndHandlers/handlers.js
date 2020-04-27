@@ -1,5 +1,5 @@
 import FSController from '../FileSystem/index'
-import customGetters from '../Store/Helpers/customGetters'
+// import customGetters from '../Store/Helpers/customGetters'
 import * as sbFetch from './sbFetch'
 
 import IpcController from './ipc.controller'
@@ -7,7 +7,6 @@ import youtubeDl from '../DownloadPhase/youtube-dl'
 import connectionController from './connection.controller'
 import VUEX_MAIN from '../Store/mainProcessStore'
 import { v4 as uuid } from 'uuid'
-// import * as youtubeHandler from '../../queryMaker'
 
 import core from './core.controller'
 
@@ -18,6 +17,53 @@ const ipcOnce = IpcController.once
 let BROWSER_WINDOW
 let SESSION
 let DIALOG
+
+export const load = {
+  target: [],
+  count: 0,
+  // -----------------------
+  set (target, value) {
+    this.count += value
+
+    if (value > 0) this.target.push(target)
+    else this.target.splice(this.target.indexOf(target), 1)
+
+    this.reflect({value: this.isLoading, target})
+    return this.isLoading
+  },
+  reflect (payload = this.instance) {
+    console.log('current', this.instance)
+    ipcSend('LOADING_EVENT', payload)
+  },
+  // -----------------------
+  get instance () {
+    return {value: this.isLoading, target: this.which}
+  },
+  get isLoading () {
+    return this.count > 0
+  },
+  get which () {
+    return this.target.last
+  },
+  get canRequest () {
+    return !this.isLoading && global.CONNECTED_TO_INTERNET
+  },
+  // -----------------------
+  get on () {
+    return this.fn(1)
+  },
+  get off () {
+    return this.fn(-1)
+  },
+  ptg (target, ptg) {
+    this.reflect({target: target, value: this.isLoading, ptg})
+  },
+  fn (val) {
+    return function (target) {
+      return this.set(target, val)
+    }
+  }
+}
 
 export function REFLECT_RENDERER () {
   return new Promise((resolve, reject) => {
@@ -74,8 +120,7 @@ export const rendererMethods = {
 
 export function getYtTrackDetails (event, {url, trackId}) {
   // TODO refactor
-  if (globalLoadingState().value) return
-  LOADING(true, 'ytDetails')
+  if (globalLoadingStateDEPRECATED().value) return
   sbFetch.ytDetails(url)
     .then(async details => {
       console.log('YT Details retrieved', details)
@@ -87,7 +132,7 @@ export function getYtTrackDetails (event, {url, trackId}) {
       console.error('EROR AT YTTRACKDETAILS:: ipc"ytTrackDetails"', err)
       event.sender.send('error')
     })
-    .finally(LOADING)
+    .finally()
 }
 
 export function openYtVideo (event, id) {
@@ -132,16 +177,6 @@ export function createLoginWindow () {
     await core.onLogin(details, cb)
     REFLECT_RENDERER()
   })
-};
-
-export function storePlaylists (response, redirect) {
-  global.CONSTANTS.VUEX.dispatch('updateUserEntities', response)
-    .then(() => {
-      if (redirect) {
-        ipcSend('playlists done')
-        if (global.CONSTANTS.LOGIN_WINDOW) global.CONSTANTS.LOGIN_WINDOW.close()
-      }
-    })
 }
 
 export async function retrieveAndStoreState (path = global.HOME_FOLDER) {
@@ -187,72 +222,13 @@ export async function verifyFileSystem () {
   // guestFetch(FOLDERS.user, true)
 }
 
-export function globalLoadingState () {
+export function globalLoadingStateDEPRECATED () {
   return global.CONSTANTS.VUEX.state.Events.GLOBAL_LOADING_STATE
-}
-
-let loadingCount = 0
-export function LOADING (value, target) {
-  value ? loadingCount++ : loadingCount--
-  console.log({value: loadingCount > 0, target})
-  global.CONSTANTS.VUEX.dispatch('globalLoadingState', {value: loadingCount > 0, target})
 }
 
 export function pushToHome () {
   console.log('pushnient')
   ipcSend('dataStored')
-}
-
-export function guestFetch (query, isFirstTime) {
-  // TODO Deprecate
-  console.log('loading?', globalLoadingState().value, globalLoadingState().target)
-  if (globalLoadingState().value) return
-  console.log('fetchin')
-  LOADING(true, 'PLAYLIST_REFRESH')
-  let allData = []
-
-  let list = false // List of playlists Retrieved (just metadata)
-  let synced = false // List of synced and cached Retrieved (all tracks)
-
-  // Are there Synced playlist to check new version
-  let syncedPls = customGetters.SyncedPlaylistsSp()
-  let areThereSynced = syncedPls.length > 0
-
-  // No synced playlists
-  if (!areThereSynced) synced = true
-  else {
-    let ids = syncedPls.map(pl => {
-      return {
-        id: pl.id,
-        snapshot_id: pl.snapshot_id
-      }
-    })
-
-    fetchMultiple(ids, true)
-      .then(() => {
-        synced = true
-        if (list && synced) storePlaylists(allData, isFirstTime)
-      })
-      .catch(err => {
-        // TODO Properly handle error
-        console.log(111111111111)
-        console.error(err.Error)
-      })
-      .finally(LOADING)
-  }
-
-  sbFetch.fetchPlaylists({ userId: query, logged: false, SBID: null, control: { offset: 0 } })
-    .then(resolve => {
-      if (resolve.status === 200) {
-        allData = resolve
-        list = true
-        if (list && synced) storePlaylists(allData, isFirstTime)
-      }
-    })
-    .catch(error => {
-      // TODO handle error
-      console.error(error)
-    })
 }
 
 export function fetchMultiple (playlists, checkVersion) {
@@ -284,28 +260,52 @@ export function fetchMultiple (playlists, checkVersion) {
 }
 
 // ------- revision v2 -------
-
 export async function refresh () {
-  LOADING(true, 'Refreshing')
-  await core.updateAll()
-  REFLECT_RENDERER()
-  LOADING()
+  try {
+    let completed = 0
+    if (!load.canRequest) return
+    load.on('PLAYLISTS:REFRESH')
+    await core.updateAll({
+      playlistCompletionCallback: (err, pl, playlists) => {
+        if (err) {
+        }
+        load.ptg('PLAYLISTS:REFRESH', (++completed / playlists.length))
+      }
+    })
+    load.off('PLAYLISTS:REFRESH')
+  } catch (error) {
+    throw error
+  } finally {
+    await REFLECT_RENDERER()
+  }
 }
 
-// if (handlers.globalLoadingState().value) return console.log('loading', handlers.globalLoadingState())
+// if (handlers.globalLoadingStateDEPRECATED().value) return console.log('loading', handlers.globalLoadingStateDEPRECATED())
 export async function youtubize () {
-  // if (!customGetters.anythingToConvert()) return
-  console.log('ABOUT TO FETCH YT')
-  await core.youtubize()
-  REFLECT_RENDERER()
-  console.log('doneee C:')
+  try {
+    let completed = 0
+    if (!load.canRequest) return
+    load.on('YOUTUBIZE')
+    await core.youtubize({
+      trackCompletionCallback: total => {
+        load.ptg('YOUTUBIZE', (++completed / total))
+      }
+    })
+    load.off('YOUTUBIZE')
+  } catch (error) {
+    throw error
+  } finally {
+    await REFLECT_RENDERER()
+  }
 }
 
 export async function download (e, plFilter) {
   console.log('About to download')
   try {
+    load.on('DOWNLOAD')
     const tracks = await FSController.UserMethods.retrieveLocalTracks()
     await youtubeDl.downloadSyncedPlaylists(tracks, plFilter)
+    load.off('DOWNLOAD')
   } catch (error) {
     throw error
   }
@@ -317,19 +317,22 @@ export function queuePlaylist (id) {
 }
 
 export async function unsyncPlaylist (id) {
-  let error
   try {
+    if (load.isLoading) return
+    load.on('PLAYLIST:UNSYNC')
     await VUEX_MAIN.COMMIT.UNSYNC_PLAYLIST(id)
-  } catch (err) {
-    console.error('Error unsyncing @ handlers.unsyncPlaylist', err)
-    error = err
+    load.off('PLAYLIST:UNSYNC')
+  } catch (error) {
+    console.error('Error unsyncing @ handlers.unsyncPlaylist', error)
+    throw error
+  } finally {
+    await REFLECT_RENDERER()
   }
-  await REFLECT_RENDERER()
-  if (error) throw error
 }
 
 export async function changeYtTrackSelection ({trackId, newId}) {
   try {
+    if (load.isLoading) return
     VUEX_MAIN.COMMIT.CHANGE_YT_TRACK_SELECTION({trackId, newId})
   } catch (err) {
     console.error('Error changing track selection', err)

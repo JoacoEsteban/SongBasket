@@ -40,7 +40,7 @@ export default {
     },
     guestSearch (request) {
       if (this.loadingState !== 'Loading' && request.query !== '' && request.query !== undefined && request.query !== null) {
-        this.$store.dispatch('SET_LOADING_STATE', 'loading')
+        this.$store.dispatch('SETUP_LOADING_STATE', 'loading')
         this.$IPC.send('guestSignIn', request)
       }
     },
@@ -78,20 +78,20 @@ export default {
     })
 
     this.$IPC.on('not-found', () => {
-      this.$store.dispatch('SET_LOADING_STATE', 'not found')
+      this.$store.dispatch('SETUP_LOADING_STATE', 'not found')
     })
     this.$IPC.on('invalid', () => {
-      this.$store.dispatch('SET_LOADING_STATE', 'invalid id')
+      this.$store.dispatch('SETUP_LOADING_STATE', 'invalid id')
     })
 
     this.$IPC.on('user-found', (event, user) => {
-      this.$store.dispatch('SET_LOADING_STATE', 'found')
+      this.$store.dispatch('SETUP_LOADING_STATE', 'found')
       this.userOnHold = user
       this.redirect('guest-verify', user)
     })
 
     this.$IPC.on('playlists done', () => {
-      this.$store.dispatch('SET_LOADING_STATE', 'found')
+      this.$store.dispatch('SETUP_LOADING_STATE', 'found')
       this.redirect('home')
     })
   }

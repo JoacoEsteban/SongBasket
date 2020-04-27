@@ -1,6 +1,4 @@
 import Vue from 'vue'
-// import FSController from '../../../main/controllers/FileSystem/index'
-// import Vue from 'vue'
 
 const getDefaultState = () => {
   return {
@@ -29,21 +27,9 @@ function defaultModal () {
 const state = getDefaultState()
 
 const actions = {
-  addHomeFolder ({ commit }, path) {
+  SETUP_LOADING_STATE ({ commit }, loadingState) {
     return new Promise((resolve, reject) => {
-      commit('ADD_HOME_FOLDER', path)
-      resolve()
-    })
-  },
-  setFolderPaths ({commit}, paths) {
-    return new Promise((resolve, reject) => {
-      commit('SET_FOLDER_PATHS', paths)
-      resolve()
-    })
-  },
-  SET_LOADING_STATE ({ commit }, loadingState) {
-    return new Promise((resolve, reject) => {
-      commit('SET_LOADING_STATE', loadingState)
+      commit('SETUP_LOADING_STATE', loadingState)
       resolve()
     })
   },
@@ -82,21 +68,7 @@ const mutations = {
   SET (state, {key, value}) {
     Vue.set(state, key, value)
   },
-  ADD_HOME_FOLDER (state, path) {
-    console.log('goldys', state.fileSystem.homeFolders)
-    if (!state.fileSystem.homeFolders.paths.some(p => p === path)) state.fileSystem.homeFolders.paths.push(path)
-    state.fileSystem.homeFolders.selected = path
-    global.HOME_FOLDER = path
-    console.log('HOME FOLDER ADDED', global.HOME_FOLDER)
-    // FSController.UserMethods.writeHomeFolders(state.fileSystem.homeFolders)
-  },
-  SET_FOLDER_PATHS (state, FOLDERS) {
-    console.log('SETTIN', FOLDERS)
-    state.fileSystem.homeFolders = FOLDERS
-    global.HOME_FOLDER = FOLDERS.selected
-    // FSController.UserMethods.writeHomeFolders(state.fileSystem.homeFolders)
-  },
-  SET_LOADING_STATE (state, loadingState) {
+  SETUP_LOADING_STATE (state, loadingState) {
     state.loadingState = loadingState
   },
   OPEN_MODAL (state, {wich, payload}) {

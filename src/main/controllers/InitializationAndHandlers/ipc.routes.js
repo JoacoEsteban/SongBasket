@@ -73,7 +73,7 @@ export function init (ipc = global.ipc) {
   ipc.on('refreshPlaylists', handlers.refresh)
 
   ipc.on('loadMore', function (event) {
-    if (handlers.globalLoadingState().value) return
+    if (handlers.globalLoadingStateDEPRECATED().value) return
     console.log('LOADING MORE PLAYLISTS:::::::::')
     handlers.LOADING(true, 'morePlaylists')
     // gets user_id, SBID and Control object
