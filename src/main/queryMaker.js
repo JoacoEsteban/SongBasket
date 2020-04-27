@@ -95,7 +95,6 @@ function makeQueries () {
   console.log('queries', ALL_TRACKS.length)
   for (let o = 0; o < ALL_TRACKS.length; o++) {
     if (ALL_TRACKS[o].query) {
-      console.log('hasquery', ALL_TRACKS[o].query)
       continue
     }
     console.log('queries', o)

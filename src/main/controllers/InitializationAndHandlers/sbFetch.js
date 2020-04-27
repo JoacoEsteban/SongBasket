@@ -24,7 +24,8 @@ export function createAxiosInstance () {
 const Backend = process.env.BACKEND
 
 const logError = err => {
-  return [err.response.data, err.response.status, err.response.headers]
+  // return [err.response && err.response.data, err.response && err.response.status, err.response && err.response.headers]
+  return [err]
 }
 
 let loadingCount = 0

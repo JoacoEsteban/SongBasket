@@ -24,10 +24,13 @@ const emitEvent = {
     setTimeout(() => {
       emitEvent.send('DOWNLOAD:EVENT', emitEvent.lastEvent)
       emitEvent.timeoutInProgress = false
-    }, 200)
+    }, 300)
   },
   downloadStarted: (tracks) => {
     emitEvent.send('DOWNLOAD:START', tracks.map(t => t.id))
+  },
+  downloadFinished: (tracks) => {
+    emitEvent.send('DOWNLOAD:END')
   },
   download: (params) => {
     emitEvent.makeTimeout(params, 'download')
@@ -64,6 +67,7 @@ export default {
 
     if (hasErrors) console.error('ERRORS DURING DOWNLOAD')
     else console.log('ALL TRACKS DOWNLOADED')
+    emitEvent.downloadFinished()
   }
 }
 

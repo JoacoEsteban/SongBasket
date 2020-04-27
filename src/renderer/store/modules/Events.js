@@ -11,6 +11,7 @@ const getDefaultState = () => ({
     target: ''
   },
   LOADING_STATE: loadingEventTypes.default,
+  DOWNLOADED_TRACKS: 0,
   DOWNLOAD_QUEUE: [],
   CURRENT_DOWNLOAD: null // id from current download
 })
@@ -34,6 +35,9 @@ const actions = {
   downloadStarted ({commit}, tracks) {
     commit('DOWNLOAD_STARTED', tracks)
   },
+  downloadFinished ({commit}, tracks) {
+    commit('DOWNLOAD_FINISHED', tracks)
+  },
   downloadEvent ({commit}, params) {
     commit('DOWNLOAD_EVENT', params)
   },
@@ -56,13 +60,18 @@ const mutations = {
     SET(key, value)
   },
   DOWNLOAD_STARTED (state, tracks) {
+    state.DOWNLOADED_TRACKS = 0
     state.DOWNLOAD_QUEUE = tracks.map(id => ({
       id, // song id
       state: 'awaiting', // eg: downloading, extracting, applying tags
       ptg: 0 // eg: 36%
     }))
   },
+  DOWNLOAD_FINISHED (state, tracks) {
+    onDownloadEnd()
+  },
   LOADING_EVENT (state, {target, value, ptg}) {
+    console.log('EVENT', target, value, ptg)
     const formatted = getLoadingEvent(target)
     formatted.target = target
     formatted.value = value
@@ -75,18 +84,15 @@ const mutations = {
     type = type.split(':')
     switch (type[0]) {
       case 'download':
+        track.state = 'downloading'
         switch (type[1]) {
           case 'start':
             state.CURRENT_DOWNLOAD = id
-            track.state = 'downloading'
             track.ptg = 0
-            break
-          case 'progress':
-            track.state = 'downloading'
-            track.ptg = ptg
             break
           case 'error':
             // TODO Handle error
+            onTrackFinished()
             track.state = 'download_error'
             break
           case 'end':
@@ -95,16 +101,14 @@ const mutations = {
         }
         break
       case 'extraction':
+        track.state = 'extracting'
         switch (type[1]) {
           case 'start':
-            track.state = 'extracting'
             track.ptg = 0
-            break
-          case 'progress':
-            track.ptg = ptg
             break
           case 'error':
             // TODO Handle error
+            onTrackFinished()
             track.state = 'extraction_error'
             break
           case 'end':
@@ -113,24 +117,42 @@ const mutations = {
         }
         break
       case 'tags':
+        track.state = 'tags'
         switch (type[1]) {
           case 'start':
-            track.state = 'tags'
             break
-          // case 'progress':
-          //   track.ptg = ptg
-          //   break
           case 'error':
             // TODO Handle error
             track.state = 'tags_error'
+            onTrackFinished()
             break
           case 'end':
+            onTrackFinished()
             track.state = 'tags_end'
             break
         }
         break
     }
+    if (type[1] === 'progress') {
+      track.ptg = ptg
+      onTrackProgress(ptg / 2 + (type[0] === 'extraction' ? 50 : 0))
+    }
   }
+}
+
+const onTrackProgress = ptg => {
+  ptg = ptg / 100
+  // TODO check this func
+  const perc = state.LOADING_STATE.ptg + (1 / state.DOWNLOAD_QUEUE.length * ptg) / 100
+  console.log(ptg)
+  console.log(perc)
+  mutations.LOADING_EVENT(null, {target: 'DOWNLOAD', value: true, ptg: perc})
+}
+const onTrackFinished = () => {
+  mutations.LOADING_EVENT(null, {target: 'DOWNLOAD', value: true, ptg: ++state.DOWNLOADED_TRACKS / state.DOWNLOAD_QUEUE.length})
+}
+const onDownloadEnd = () => {
+  mutations.LOADING_EVENT(null, {target: 'DOWNLOAD', value: false, ptg: 1})
 }
 
 const loadingEventTypes = {
@@ -179,7 +201,7 @@ function getLoadingEvent (target) {
     case 'YOUTUBIZE':
       return loadingEventTypes.percentable
     case 'DOWNLOAD':
-      return loadingEventTypes.default
+      return loadingEventTypes.percentable
     case 'PLAYLIST:UNSYNC':
       return loadingEventTypes.default
     default:

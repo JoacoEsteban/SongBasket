@@ -47,10 +47,13 @@ export default {
       return this.route === 'home'
     },
     loadingState () {
-      return this.$store.state.Events.LOADING_STATE
+      return this.$store.state.Events.LOADING_STATE || {}
+    },
+    loadingTarget () {
+      return this.loadingState.target
     },
     loading () {
-      return this.loadingState && this.loadingState.value
+      return this.loadingState.value
     },
     showRefresh () {
       return !(this.loading)
@@ -59,7 +62,7 @@ export default {
       return !this.loading && (!this.queueIsEmpty || this.syncedPls.length)
     },
     showDl () {
-      return !this.loading && this.syncedPls.length
+      return (!this.loading || this.loadingTarget === 'DOWNLOAD') && this.syncedPls.length
     },
     queue () {
       return this.$store.state.CurrentUser.queuedPlaylists
@@ -89,6 +92,7 @@ export default {
       this.$emit('youtubeConvert')
     },
     download () {
+      if (this.loading && this.loadingTarget === 'DOWNLOAD') return this.$sbRouter.push({name: 'downloads-view'})
       this.$emit('download')
     }
   }

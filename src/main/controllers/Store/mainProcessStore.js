@@ -296,7 +296,7 @@ const mutations = {
         if (params.forceCustom) convertedTrack.selection = false
         if (!convertedTrack.custom.youtube_id) convertedTrack.custom.youtube_id = convertedTrack.custom.id
       }
-      convertedTrack.conversion.yt.forEach(t => {
+      if (convertedTrack.conversion) convertedTrack.conversion.yt.forEach(t => {
         if (!t.youtube_id) t.youtube_id = t.id
       })
       if (!convertedTrack.flags) {
