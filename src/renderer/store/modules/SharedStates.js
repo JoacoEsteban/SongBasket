@@ -36,6 +36,9 @@ const actions = {
   connectionChange ({commit}, value) {
     commit('SET', {key: 'CONNECTED_TO_INTERNET', value})
   },
+  apiConnectionChange ({commit}, value) {
+    commit('SET', {key: 'CONNECTED_TO_API', value})
+  },
   openModal ({commit}, options) {
     return new Promise((resolve, reject) => {
       commit('OPEN_MODAL', options)

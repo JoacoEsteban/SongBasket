@@ -21,6 +21,7 @@ module.exports = {
     'camelcase': 0,
     'no-return-assign': 0,
     'no-extend-native': 0,
+    'no-unused-expressions': 0,
     // allow async-await
     'generator-star-spacing': 0,
     'curly': 0,

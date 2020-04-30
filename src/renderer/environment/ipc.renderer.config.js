@@ -10,6 +10,7 @@ export default function (Vue) {
 
   ipc.on('LOADING_EVENT', onLoadingEvent)
   ipc.on('Connection:CHANGE', onConnectionChange)
+  ipc.on('apiConnection:CHANGE', onApiConnectionChange)
   ipc.on('FileWatchers:ADDED', onAddedTrack)
   ipc.on('FileWatchers:REMOVED', onRemovedTrack)
   ipc.on('FileWatchers:RETRIEVED_TRACKS', onRetrievedTracks)
@@ -37,6 +38,9 @@ export default function (Vue) {
 
 function onConnectionChange (e, val) {
   thisVue().$store.dispatch('connectionChange', val)
+}
+function onApiConnectionChange (e, val) {
+  thisVue().$store.dispatch('apiConnectionChange', val)
 }
 function onLoadingEvent (e, payload) {
   thisVue().$store.dispatch('loadingEvent', payload)

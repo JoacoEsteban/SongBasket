@@ -88,6 +88,9 @@ export function init ({ app, BrowserWindow, session, dialog }) {
     connectionController.init({
       connectionChangeCallback: (value) => {
         ipcSend('Connection:CHANGE', value)
+      },
+      apiConnectionChangeCallback: (value) => {
+        ipcSend('ApiConnection:CHANGE', value)
       }
     })
     createWindow()

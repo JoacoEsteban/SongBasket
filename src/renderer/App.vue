@@ -23,6 +23,9 @@ export default {
   computed: {
     isConnected () {
       return this.$store.state.SharedStates.CONNECTED_TO_INTERNET
+    },
+    isConnectedToApi () {
+      return this.$store.state.SharedStates.CONNECTED_TO_API
     }
   },
   beforeCreate () {

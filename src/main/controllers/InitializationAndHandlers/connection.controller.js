@@ -1,8 +1,11 @@
 let CB
+let API_CB
 export default {
-  init ({connectionChangeCallback}) {
-    CB = connectionChangeCallback
+  init ({connectionChangeCallback, apiConnectionChangeCallback}) {
+    CB = connectionChangeCallback || (() => {})
+    API_CB = apiConnectionChangeCallback || (() => {})
     checkInternet()
+    pingApi()
   }
 }
 const checkInternet = () => {
@@ -14,4 +17,15 @@ const checkInternet = () => {
     }
     setTimeout(checkInternet, connected ? 10000 : 5000)
   })
+}
+const pingApi = async () => {
+  let connected
+  try {
+    await require('axios').get(process.env.BACKEND + '/ping')
+    connected = true
+  } catch (err) {
+    connected = false
+  }
+  if (global.CONNECTED_TO_API !== connected) (global.CONNECTED_TO_API = connected) + API_CB(connected)
+  setTimeout(pingApi, 1000 * 60)
 }

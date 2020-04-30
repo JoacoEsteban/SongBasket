@@ -31,7 +31,6 @@ module.exports = global.CONSTANTS = {
   VUEX: require('../../renderer/store').default,
   SAVE_TO_DISK: null,
   // -------------
-
   PLATFORM: (() => {
     switch (process.platform) {
       case 'darwin':
@@ -59,5 +58,9 @@ module.exports = global.CONSTANTS = {
     height: 830,
     useContentSize: true
     // icon: require('path').join(__dirname, 'assets/icons/png/icon_128@1x.png')
-  }
+  },
+  // MISC
+  HEROKU_PING_INTERVAL: 1000 * 60 * 15
+  // -------------
+
 }

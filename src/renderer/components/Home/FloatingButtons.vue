@@ -18,6 +18,7 @@
       </div>
     </div>
   </div>
+  <!-- TODO connection pill -->
 </div>
 </template>
 
@@ -49,6 +50,15 @@ export default {
     loadingState () {
       return this.$store.state.Events.LOADING_STATE || {}
     },
+    connectedToInternet () {
+      return this.$store.state.SharedStates.CONNECTED_TO_INTERNET
+    },
+    connectedToApi () {
+      return this.$store.state.SharedStates.CONNECTED_TO_API
+    },
+    fullConnection () {
+      return this.connectedToInternet && this.connectedToApi
+    },
     loadingTarget () {
       return this.loadingState.target
     },
@@ -56,13 +66,13 @@ export default {
       return this.loadingState.value
     },
     showRefresh () {
-      return !(this.loading)
+      return !(this.loading) && this.fullConnection
     },
     showSync () {
-      return !this.loading && (!this.queueIsEmpty || this.syncedPls.length)
+      return !this.loading && (!this.queueIsEmpty || this.syncedPls.length) && this.fullConnection
     },
     showDl () {
-      return (!this.loading || this.loadingTarget === 'DOWNLOAD') && this.syncedPls.length
+      return (!this.loading || this.loadingTarget === 'DOWNLOAD') && this.syncedPls.length && this.connectedToInternet
     },
     queue () {
       return this.$store.state.CurrentUser.queuedPlaylists
