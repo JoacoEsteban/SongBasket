@@ -33,11 +33,16 @@ const invalidWords = [
 
 const isInvalidWord = str => invalidWords.includes(str.toLowerCase())
 
+const normalizeConversion = conv => {
+  if (!conv.youtube_id) conv.youtube_id = conv.id
+}
+
 const exec = ({
   track,
   conv,
   nameTokens
 }) => {
+  normalizeConversion(conv)
   findTokens(conv, nameTokens)
   conv.durationDiff = round(conv.duration - (track.duration || (track.duration = track.data.duration_ms / 1000)))
   conv.durationScore = round(1 / (1.1 ** (Math.abs(conv.durationDiff) / 10))) // 1 === same duration, difference makes it go down

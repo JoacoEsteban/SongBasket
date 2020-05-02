@@ -27,6 +27,7 @@ async function VTWO (localTracks, queryTracks = [], plFilter = []) {
 
     if (qTrack.selection === null) qTrack.selection = qTrack.conversion.bestMatch
     if (qTrack.selection === false) qTrack.selection = qTrack.custom.youtube_id
+    console.log('abeigar', qTrack.selection)
 
     qTrack.downloadFlags = {
       download: true

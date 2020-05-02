@@ -60,6 +60,7 @@ export default {
         case 'downloaded':
         case 'custom:awaiting-download':
         case 'review-conversion':
+        case 'no-conversion':
           return this.openReviewModal
         default:
           return null

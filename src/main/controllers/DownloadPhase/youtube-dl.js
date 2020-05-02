@@ -48,9 +48,7 @@ export default {
     console.log('Stored tracks: ', localTracks.length)
     let tracksToDownload = customGetters.convertedTracks()
     if (plFilter) tracksToDownload = tracksToDownload.filter(t => t.playlists.some(pl => plFilter.includes(pl.id)))
-
     const allTracks = constructDownloads((await downloadLinkRemove(localTracks, utils.cloneObject(tracksToDownload), plFilter)).filter(track => track.playlists.length)) // TODO Prevent this filter from ever happening
-
     emitEvent.downloadStarted(allTracks)
 
     let hasErrors = false
@@ -157,6 +155,7 @@ function constructDownloads (tracks) {
       downloader: null,
       downloadVideo: () => {
         return new Promise(async (resolve, reject) => {
+          if (!instance.yt) return reject(new Error('NO TRACK SELECTION'))
           console.log('about to download', instance.yt)
           const download = instance.download.downloader = youtubedl(instance.yt,
             ['--format=' + getDownloadFormatId(instance.downloadFormat)],
@@ -257,7 +256,7 @@ function constructDownloads (tracks) {
       await instance.download.downloadVideo()
     } catch (err) {
       // TODO Handle error
-      console.error('ERROR DOWNLOADING VIDEO')
+      console.error('ERROR DOWNLOADING VIDEO', err)
       throw err
     }
 
