@@ -20,6 +20,7 @@ const TrackController = {
       if (!f.converted) return 'awaiting-conversion'
       if (this.isDownloaded(t)) return 'downloaded'
       // check selected doubtly conversion
+      if (!t.selectionObj) return 'no-conversion'
       if (t.selectionObj.isCustomTrack) return 'custom:awaiting-download'
       if (f.selectionIsApplied || !t.selectionObj.isDoubtlyConversion) return 'awaiting-download'
       return 'review-conversion'
@@ -56,7 +57,8 @@ const Colors = {
   'custom-selection': 'var(--custom-selection-color)',
   'awaiting-download': 'var(--button-purple)',
   'custom:awaiting-download': 'var(--custom-selection-color)',
-  'review-conversion': 'var(--orange-warning)'
+  'review-conversion': 'var(--orange-warning)',
+  'no-conversion': 'var(--global-grey)'
 }
 const Strings = {
   'paused': 'paused',
@@ -66,7 +68,8 @@ const Strings = {
   'custom-selection': 'paused',
   'awaiting-download': 'awaiting download',
   'custom:awaiting-download': 'awaiting download | custom',
-  'review-conversion': 'review conversion'
+  'review-conversion': 'review conversion',
+  'no-conversion': 'no conversion found'
 }
 
 export default TrackController

@@ -65,19 +65,20 @@ export default {
       this.hide = true
       this.hideControls = true
       return new Promise(resolve => {
-        this.$IPC.send('ytTrackDetails', {url: this.url, trackId: this.payload.trackId})
-        this.$IPC.on('done', (event, details) => {
+        const listenerId = this.$uuid()
+        this.$IPC.once(listenerId, (event, details) => {
           let {trackId} = this.payload
           this.$store.dispatch('customTrackUrl', {details, trackId})
           this.$emit('close')
         })
-        this.$IPC.on('error', () => {
+        this.$IPC.once(listenerId + ':ERROR', () => {
           this.loadingText = 'Video not found'
           setTimeout(() => {
             this.hideControls = false
             this.loadingText = 'Loading'
-          }, 1500)
+          }, 200)
         })
+        this.$IPC.send('YOUTUBE_DETAILS:GET', {url: this.url, trackId: this.payload.trackId, listenerId})
       })
     }
   }

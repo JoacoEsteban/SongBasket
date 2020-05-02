@@ -311,22 +311,26 @@ const mutations = {
     // this.dispatch('syncedPlaylistsRefreshed', {}, {root: true})
   },
   async YOUTUBIZE_RESULT (convertedTracks) {
-    state.convertedTracks = convertedTracks.map(convertedTrack => trackUtils.calculateBestMatch(convertedTrack)).filter(t => t)
-    ;([...state.queuedPlaylists]).forEach(pl => {
-      state.syncedPlaylists.push(pl)
-      state.queuedPlaylists = state.queuedPlaylists.filter(p => p !== pl)
-      state.cachedPlaylists = state.cachedPlaylists.filter(p => p.id !== pl)
-    })
-    console.log('Total converted tracks', state.convertedTracks.length)
+    try {
+      state.convertedTracks = convertedTracks.map(convertedTrack => trackUtils.calculateBestMatch(convertedTrack)).filter(t => t)
+      ;([...state.queuedPlaylists]).forEach(pl => {
+        state.syncedPlaylists.push(pl)
+        state.queuedPlaylists = state.queuedPlaylists.filter(p => p !== pl)
+        state.cachedPlaylists = state.cachedPlaylists.filter(p => p.id !== pl)
+      })
+      console.log('Total converted tracks', state.convertedTracks.length)
 
-    state.syncedPlaylists.forEach(async pl => this.COMMIT_TRACK_CHANGES(pl))
+      state.syncedPlaylists.forEach(async pl => this.COMMIT_TRACK_CHANGES(pl))
 
-    // this.dispatch('syncedPlaylistsRefreshed', {}, {root: true})
-    // console.log(state.convertedTracks.some(t => t) && state.convertedTracks.some(t => t.flags))
-    // setTimeout(((env) => {
-    //   return () => env.dispatch('setConvertedTracksProcessedFlag')
-    // })(this), 100)
-    SAVE_TO_DISK()
+      // this.dispatch('syncedPlaylistsRefreshed', {}, {root: true})
+      // console.log(state.convertedTracks.some(t => t) && state.convertedTracks.some(t => t.flags))
+      // setTimeout(((env) => {
+      //   return () => env.dispatch('setConvertedTracksProcessedFlag')
+      // })(this), 100)
+      SAVE_TO_DISK()
+    } catch (error) {
+      throw error
+    }
   },
   INVALIDATE_SYNCED_SNAPSHOT_IDS () {
     state.syncedPlaylists.map(id => state.playlists.find(pl => pl.id === id)).forEach(pl => {

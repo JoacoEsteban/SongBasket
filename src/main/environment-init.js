@@ -1,7 +1,7 @@
 require('./controllers/Prototype/Array')
 require('./Global/VARIABLES')
 
-const USE_PROD_BACKEND = true
+const USE_PROD_BACKEND = false
 const USE_HEROKU = true
 ;(() => {
   const subDomain = USE_HEROKU ? 'heroku' : 'api'

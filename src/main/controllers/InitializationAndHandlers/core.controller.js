@@ -68,24 +68,13 @@ const core = {
   setUser: userData => {
     VUEX_MAIN.COMMIT.SET_USER(userData)
   },
-  updateAll: async (params = {
-    playlistCompletionCallback: null
-  }) => {
-    return new Promise((resolve, reject) => {
-      let remainingReqs = 2
-      const tryResolve = () => !--remainingReqs && (console.log('ALL UPTDATED') + resolve())
-      core.updateSelf()
-        .then(tryResolve)
-        .catch(err => {
-          throw err
-        })
-
-      core.updatePlaylists(params.playlistCompletionCallback)
-        .then(tryResolve)
-        .catch(err => {
-          throw err
-        })
-    })
+  updateAll: async (params = {playlistCompletionCallback: null}) => {
+    try {
+      await core.updateSelf()
+      await core.updatePlaylists(params.playlistCompletionCallback)
+    } catch (error) {
+      throw error
+    }
   },
   updateSelf: async () => {
     try {
@@ -114,30 +103,24 @@ const core = {
       resolve()
     })
   },
-  getAndStorePlaylists: (playlists, completionCb) => {
-    return new Promise(async (resolve, reject) => {
-      let requestsLeft = playlists.length
-      if (!requestsLeft) resolve()
-      const errors = []
-      playlists = playlists.map(pl => typeof pl === 'string' ? { id: pl } : pl)
+  getAndStorePlaylists: async (playlists, completionCb) => {
+    playlists = playlists.map(pl => typeof pl === 'string' ? { id: pl } : pl)
 
-      for (const pl of playlists) {
-        let err = null
-        try {
-          console.log('playlist', pl)
-          const playlist = await API.getPlaylist(pl)
-          console.log('Playlist has changes?', playlist ? 'YES' : 'NO')
-          playlist && VUEX_MAIN.COMMIT.PLAYLIST_STORE_TRACKS(playlist)
-        } catch (error) {
-          // TODO handle this
-          console.error('ERROR WHEN FETCHING PLAYLIST', error)
-          throw error
-        } finally {
-          completionCb && completionCb(err, pl, playlists)
-        }
-        !--requestsLeft && (errors.length ? reject(errors) : resolve())
+    for (const pl of playlists) {
+      let err = null
+      try {
+        console.log('playlist', pl)
+        const playlist = await API.getPlaylist(pl)
+        console.log('Playlist has changes?', playlist ? 'YES' : 'NO')
+        playlist && VUEX_MAIN.COMMIT.PLAYLIST_STORE_TRACKS(playlist)
+      } catch (error) {
+        // TODO handle this
+        console.error('ERROR WHEN FETCHING PLAYLIST')
+        throw error
+      } finally {
+        completionCb && completionCb(err, pl, playlists)
       }
-    })
+    }
   },
   populateQueuedPlaylists: async () => {
     try {
@@ -158,12 +141,17 @@ const core = {
       } catch (error) {
         if (error.message === 'NOTHING') return console.log('no queries')
       }
+
       if (empty && !queries.length) return console.log('nothing to do')
-      console.log('query amm', queries.length)
-      if (queries.length) VUEX_MAIN.COMMIT.YOUTUBIZE_RESULT(await API.youtubizeAll(queries, params.trackCompletionCallback))
+      if (queries.length) {
+        const {tracks, failed} = await API.youtubizeAll(queries, params.trackCompletionCallback)
+        VUEX_MAIN.COMMIT.YOUTUBIZE_RESULT(tracks)
+        if (failed) throw new Error()
+      }
       console.log('Youtubize done from core')
     } catch (error) {
       console.error(error) // TODO handle error
+      throw error
     }
   }
 }

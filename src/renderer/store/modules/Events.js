@@ -13,7 +13,8 @@ const getDefaultState = () => ({
   LOADING_STATE: loadingEventTypes.default,
   DOWNLOADED_TRACKS: 0,
   DOWNLOAD_QUEUE: [],
-  CURRENT_DOWNLOAD: null // id from current download
+  CURRENT_DOWNLOAD: null, // id from current download
+  GLOBAL_ERROR: null
 })
 
 const actions = {
@@ -48,6 +49,12 @@ const actions = {
   loadingEvent ({commit}, payload) {
     console.log('averga', payload)
     commit('LOADING_EVENT', payload)
+  },
+  catchGlobalError ({commit}, {type, error}) {
+    return new Promise((resolve, reject) => {
+      commit('CATCH_GLOBAL_ERROR', {type, error})
+      resolve()
+    })
   }
 }
 
@@ -137,6 +144,9 @@ const mutations = {
       track.ptg = ptg
       onTrackProgress(ptg / 2 + (type[0] === 'extraction' ? 50 : 0))
     }
+  },
+  CATCH_GLOBAL_ERROR (state, {type, error}) {
+    SET('GLOBAL_ERROR', getErrorType(type, error))
   }
 }
 
@@ -206,6 +216,16 @@ function getLoadingEvent (target) {
       return loadingEventTypes.default
     default:
       return loadingEventTypes.default
+  }
+}
+
+function getErrorType (type, error) {
+  switch (type) {
+    // case 'PLAYLISTS:REFRESH':
+    default:
+      return {
+        message: 'Something went wrong. Try again later or contact support at <a href="mailto:help@songbasket.com">help@songbasket.com</a>'
+      }
   }
 }
 

@@ -61,6 +61,7 @@ const findTokens = (conv, nameTokens) => {
 }
 
 const calcBestMatch = (track) => {
+  if (!track.conversion.yt.length) return
   track.conversion.bestMatch = (track.conversion.yt = track.conversion.yt.sort((a, b) => {
     if (!a.wordScore && b.wordScore) return 1
     if (!b.wordScore && a.wordScore) return -1

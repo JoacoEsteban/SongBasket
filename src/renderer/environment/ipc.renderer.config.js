@@ -4,46 +4,55 @@ import { sleep } from '../utils'
 let ipc
 let VueInstance
 const thisVue = () => (VueInstance || (VueInstance = require('../main').default))
+const store = {
+  get dispatch () {
+    return thisVue().$store.dispatch
+  }
+}
+
 const env = {}
 export default function (Vue) {
   ipc = Vue.prototype.$IPC = require('electron').ipcRenderer
 
   ipc.on('LOADING_EVENT', onLoadingEvent)
+  ipc.on('ERROR:CATCH', async ({type, error}) => {
+    await store.dispatch('catchGlobalError', {type, error})
+  })
   ipc.on('Connection:CHANGE', onConnectionChange)
   ipc.on('apiConnection:CHANGE', onApiConnectionChange)
   ipc.on('FileWatchers:ADDED', onAddedTrack)
   ipc.on('FileWatchers:REMOVED', onRemovedTrack)
   ipc.on('FileWatchers:RETRIEVED_TRACKS', onRetrievedTracks)
   ipc.on('VUEX:STORE', async (e, {state, listenerId}) => {
-    await thisVue().$store.dispatch('setState', state)
+    await store.dispatch('setState', state)
     ipc.send(listenerId)
   })
   ipc.on('VUEX:SET', async (e, {key, value, listenerId}) => {
-    await thisVue().$store.dispatch('set', {key, value})
+    await store.dispatch('set', {key, value})
     ipc.send(listenerId)
   })
   ipc.on('initializeSetup', () => {
     redirect('setup')
   })
   ipc.on('dataStored', async () => {
-    await thisVue().$store.dispatch('SETUP_LOADING_STATE', 'found')
+    await store.dispatch('SETUP_LOADING_STATE', 'found')
     await redirect('home')
   })
 
-  ipc.on('DOWNLOAD:START', (e, payload) => thisVue().$store.dispatch('downloadStarted', payload))
-  ipc.on('DOWNLOAD:EVENT', (e, payload) => thisVue().$store.dispatch('downloadEvent', payload))
+  ipc.on('DOWNLOAD:START', (e, payload) => store.dispatch('downloadStarted', payload))
+  ipc.on('DOWNLOAD:EVENT', (e, payload) => store.dispatch('downloadEvent', payload))
 
   $(document).ready(onDocumentReady)
 }
 
 function onConnectionChange (e, val) {
-  thisVue().$store.dispatch('connectionChange', val)
+  store.dispatch('connectionChange', val)
 }
 function onApiConnectionChange (e, val) {
-  thisVue().$store.dispatch('apiConnectionChange', val)
+  store.dispatch('apiConnectionChange', val)
 }
 function onLoadingEvent (e, payload) {
-  thisVue().$store.dispatch('loadingEvent', payload)
+  store.dispatch('loadingEvent', payload)
 }
 function onDocumentReady () {
   setTimeout(() => {

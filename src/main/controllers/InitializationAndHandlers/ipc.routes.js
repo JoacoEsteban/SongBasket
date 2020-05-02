@@ -13,7 +13,7 @@ export function init (ipc = global.ipc) {
 
   ipc.on('DOCUMENT_READY_CALLBACK', handlers.rendererMethods.documentReadyCallback)
 
-  ipc.on('ytTrackDetails', handlers.getYtTrackDetails)
+  ipc.on('YOUTUBE_DETAILS:GET', handlers.getYtTrackDetails)
 
   ipc.on('download', handlers.download)
 

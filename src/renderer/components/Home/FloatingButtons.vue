@@ -2,19 +2,26 @@
 <div class="floating-buttons-container" :class="{show: showComponent}">
   <div class="gradient"></div>
   <div class="df content">
-    <div class="floater">
+    <div class="floater" v-if="!forceKill.all && !forceKill.refresh">
       <div class="sb-fab" @click="refresh" :class="{show: showRefresh}">
         <sync-icon></sync-icon>
       </div>
     </div>
-    <div class="floater">
+    <div class="floater" v-if="!forceKill.all && !forceKill.sync">
       <div class="sb-fab" @click="sync" :class="{show: showSync}">
         <cloud-search-icon></cloud-search-icon>
       </div>
     </div>
-    <div class="floater">
+    <div class="floater" v-if="!forceKill.all && !forceKill.download">
       <div class="sb-fab" @click="download" :class="{show: showDl}">
         <download-icon></download-icon>
+      </div>
+    </div>
+    <div class="floater error-floater" v-if="!errorPill.kill">
+      <div class="sb-fab error-pill-container" :class="{show: showError}">
+        <span>
+          <span v-html="errorPill.message"></span>
+        </span>
       </div>
     </div>
   </div>
@@ -37,13 +44,33 @@ export default {
   },
   data () {
     return {
-      route: ''
+      route: '',
+      errorPill: {
+        show: false,
+        kill: true,
+        message: 'ERROR: dou not detected'
+      },
+      forceHide: {
+        all: false,
+        sync: false,
+        refresh: false,
+        download: false
+      },
+      forceKill: {
+        all: false,
+        sync: false,
+        refresh: false,
+        download: false
+      }
     }
   },
   computed: {
     // route () {
     //   return this.$route.name
     // },
+    globalError () {
+      return this.$store.state.Events.GLOBAL_ERROR
+    },
     showComponent () {
       return this.route === 'home'
     },
@@ -66,13 +93,16 @@ export default {
       return this.loadingState.value
     },
     showRefresh () {
-      return !(this.loading) && this.fullConnection
+      return !(this.loading) && this.fullConnection && !this.forceHide.all && !this.forceHide.refresh
     },
     showSync () {
-      return !this.loading && (!this.queueIsEmpty || this.syncedPls.length) && this.fullConnection
+      return !this.loading && (!this.queueIsEmpty || this.syncedPls.length) && this.fullConnection && !this.forceHide.all && !this.forceHide.sync
+    },
+    showError () {
+      return !this.showSync && this.errorPill.show
     },
     showDl () {
-      return (!this.loading || this.loadingTarget === 'DOWNLOAD') && this.syncedPls.length && this.connectedToInternet
+      return (!this.loading || this.loadingTarget === 'DOWNLOAD') && this.syncedPls.length && this.connectedToInternet && !this.forceHide.all && !this.forceHide.download
     },
     queue () {
       return this.$store.state.CurrentUser.queuedPlaylists
@@ -91,9 +121,35 @@ export default {
     await this.$sleep(1000)
     this.handleTransition()
   },
+  watch: {
+    globalError: function (val) {
+      this.handleError(val)
+    }
+  },
   methods: {
     handleTransition (to) {
       this.route = (to && to.name) || this.$sbRouter.path.name
+    },
+    async handleError (val) {
+      this.errorTimeout && clearTimeout(this.errorTimeout)
+      this.errorPill.message = val.message
+
+      this.forceHide.all = true
+      await this.$sleep(400)
+      this.forceKill.all = true
+      this.errorPill.kill = false
+      await this.$sleep(100)
+      this.errorPill.show = true
+
+      this.errorTimeout = setTimeout(async () => {
+        this.errorPill.show = false
+        await this.$sleep(400)
+        this.errorPill.kill = true
+        this.forceKill.all = false
+        await this.$sleep(100)
+        this.forceHide.all = false
+        await this.$sleep(400)
+      }, 4000)
     },
     refresh () {
       this.$emit('refreshPlaylists')
@@ -149,15 +205,15 @@ $whole-height: 5em;
   display: flex;
   align-items: center;
   width: 100%;
-  &:nth-child(1) {
-    justify-content: flex-start
-  }
-  &:nth-child(2) {
-    justify-content: center
-  }
-  &:nth-child(3) {
-    justify-content: flex-end
-  }
+    &:nth-child(1) {
+      justify-content: flex-start
+    }
+    &:nth-child(2), &.error-floater {
+      justify-content: center
+    }
+    &:nth-child(3) {
+      justify-content: flex-end
+    }
 }
 
 .sb-fab {
@@ -191,7 +247,7 @@ $whole-height: 5em;
 
   transition: transform $t, opacity $t, bottom $t;
 
-  &.show {
+  &.show, &.error-pill-container.show {
     bottom: 0;
   }
 
@@ -201,6 +257,36 @@ $whole-height: 5em;
   &:active {
     transform: scale(.95);
     opacity: .7;
+  }
+
+  &.error-pill-container {
+    &:hover {
+      transform: scale(1.03)
+    }
+    &:active {
+      transform: scale(.98);
+      opacity: .7;
+    }
+    width: initial;
+    height: initial;
+
+    min-width: initial;
+    max-width: initial;
+    min-height: initial;
+    max-height: initial;
+    bottom: -120%;
+
+    background-color: var(--red-cancel);
+
+    font-weight: 500;
+    // white-space: nowrap;
+    padding-left: 1em;
+    padding-right: 1em;
+
+    span {
+      font-size: .65;
+    }
+
   }
 }
 </style>

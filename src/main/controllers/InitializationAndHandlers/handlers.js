@@ -65,6 +65,11 @@ export const load = {
   }
 }
 
+export function normalizeError (error) {
+  if (error && error.response) return {status: error.response.status, data: error.response.data}
+  return error
+}
+
 export function REFLECT_RENDERER () {
   return new Promise((resolve, reject) => {
     const listenerId = uuid()
@@ -77,6 +82,11 @@ export function REFLECT_RENDERER_KEY (key) {
     const listenerId = uuid()
     ipcOnce(listenerId, resolve)
     ipcSend('VUEX:SET', {key, value: VUEX_MAIN.STATE_SAFE()[key], listenerId})
+  })
+}
+export function SEND_ERROR ({type, error}) {
+  return new Promise((resolve, reject) => {
+    ipcSend('ERROR:CATCH', {type, error: normalizeError(error)})
   })
 }
 
@@ -119,23 +129,6 @@ export const rendererMethods = {
     global.CONSTANTS.DOCUMENT_FINISHED_LOADING = true
     isEverythingReady()
   }
-}
-
-export function getYtTrackDetails (event, {url, trackId}) {
-  // TODO refactor
-  if (globalLoadingStateDEPRECATED().value) return
-  sbFetch.ytDetails(url)
-    .then(async details => {
-      console.log('YT Details retrieved', details)
-      VUEX_MAIN.COMMIT.CUSTOM_TRACK_URL({details, trackId})
-      await REFLECT_RENDERER_KEY('convertedTracks')
-      event.sender.send('done')
-    })
-    .catch(err => {
-      console.error('EROR AT YTTRACKDETAILS:: ipc"ytTrackDetails"', err)
-      event.sender.send('error')
-    })
-    .finally()
 }
 
 export function openYtVideo (event, id) {
@@ -225,41 +218,9 @@ export async function verifyFileSystem () {
   // guestFetch(FOLDERS.user, true)
 }
 
-export function globalLoadingStateDEPRECATED () {
-  return global.CONSTANTS.VUEX.state.Events.GLOBAL_LOADING_STATE
-}
-
 export function pushToHome () {
   console.log('pushnient')
   ipcSend('dataStored')
-}
-
-export function fetchMultiple (playlists, checkVersion) {
-  // TODO Deprecate
-  return new Promise((resolve, reject) => {
-    let count = playlists.length
-    let failed = []
-    for (let i = 0; i < count; i++) {
-      let playlist = playlists[i]
-      sbFetch.getTracks(global.CONSTANTS.VUEX.getters.RequestParams, playlist, checkVersion)
-        .then(response => {
-          global.CONSTANTS.VUEX.dispatch('playlistStoreTracks', response.playlist).then(() => {
-            if (--count === 0) {
-              console.log('fetch done')
-              if (!(failed.length)) resolve()
-              else reject(failed)
-            }
-          })
-        })
-        .catch(err => {
-          failed.push(err)
-          if (--count === 0) reject(failed)
-        })
-        .finally(() => {
-
-        })
-    }
-  })
 }
 
 // ------- revision v2 -------
@@ -275,10 +236,11 @@ export async function refresh () {
         load.ptg('PLAYLISTS:REFRESH', (++completed / playlists.length))
       }
     })
-    load.off('PLAYLISTS:REFRESH')
   } catch (error) {
-    throw error
+    SEND_ERROR({type: 'PLAYLISTS:REFRESH', error})
   } finally {
+    console.log('before loadoff')
+    load.off('PLAYLISTS:REFRESH')
     await REFLECT_RENDERER()
   }
 }
@@ -294,10 +256,11 @@ export async function youtubize () {
         load.ptg('YOUTUBIZE', (++completed / total))
       }
     })
-    load.off('YOUTUBIZE')
   } catch (error) {
+    SEND_ERROR({type: 'YOUTUBIZE', error})
     throw error
   } finally {
+    load.off('YOUTUBIZE')
     await REFLECT_RENDERER()
   }
 }
@@ -324,11 +287,12 @@ export async function unsyncPlaylist (id) {
     if (load.isLoading) return
     load.on('PLAYLIST:UNSYNC')
     await VUEX_MAIN.COMMIT.UNSYNC_PLAYLIST(id)
-    load.off('PLAYLIST:UNSYNC')
   } catch (error) {
     console.error('Error unsyncing @ handlers.unsyncPlaylist', error)
+    SEND_ERROR({type: 'PLAYLIST:UNSYNC', error})
     throw error
   } finally {
+    load.off('PLAYLIST:UNSYNC')
     await REFLECT_RENDERER()
   }
 }
@@ -342,5 +306,19 @@ export async function changeYtTrackSelection ({trackId, newId}) {
     throw err
   } finally {
     await REFLECT_RENDERER_KEY('convertedTracks')
+  }
+}
+
+export async function getYtTrackDetails (event, {url, trackId, listenerId}) {
+  if (!load.canRequest) return
+  try {
+    const details = await sbFetch.ytDetails(url)
+    console.log('YT Details retrieved', details)
+    VUEX_MAIN.COMMIT.CUSTOM_TRACK_URL({details, trackId})
+    await REFLECT_RENDERER_KEY('convertedTracks')
+    event.sender.send(listenerId)
+  } catch (err) {
+    console.error('EROR AT YTTRACKDETAILS:: ipc"ytTrackDetails"', err)
+    event.sender.send(listenerId + ':ERROR')
   }
 }

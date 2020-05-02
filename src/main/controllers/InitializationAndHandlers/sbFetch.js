@@ -23,11 +23,6 @@ export function createAxiosInstance () {
 
 const Backend = process.env.BACKEND
 
-const logError = err => {
-  // return [err.response && err.response.data, err.response && err.response.status, err.response && err.response.headers]
-  return [err]
-}
-
 let loadingCount = 0
 function LOADING (value, target) {
   // TODO Deprecate
@@ -222,14 +217,13 @@ export async function youtubizeAll (tracks, completionCallback) {
           succeded++
           // TODO Emit success event
         })
-        .catch(err => {
+        .catch(() => {
           tracks[i].conversion = null
           tracks[i].flags.converted = false
           tracks[i].flags.conversionError = true
           // Failed tracks will remain with 'conversion' object NULL
-          console.log('Error when converting', ...logError(err))
+          console.log('Error when converting')
           failed++
-          // TODO Emit fail event
         })
         .finally(() => {
           tracks[i].flags.processed = false
@@ -243,7 +237,7 @@ export async function youtubizeAll (tracks, completionCallback) {
   function areAllFinished (resolve) {
     if (succeded + failed === totalTracks) {
       LOADING()
-      resolve(tracks)
+      resolve({tracks, failed})
     }
   }
 }
