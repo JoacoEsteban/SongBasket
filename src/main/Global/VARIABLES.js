@@ -54,6 +54,9 @@ module.exports = global.CONSTANTS = {
   },
   POPUP_WINDOW_CONFIG: {
     // frame: false,
+    webPreferences: {
+      nodeIntegration: false
+    },
     width: 550,
     height: 830,
     useContentSize: true

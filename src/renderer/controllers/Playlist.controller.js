@@ -33,8 +33,8 @@ const PlaylistController = {
     let dirts = 0
     let toDownload = 0
     playlist.tracks.items.map(t => env.root.CONVERTED_TRACKS_FORMATTED.find(track => track.id === t.id)).forEach(({flags, selectionObj, status}) => {
-      // check has errors
-      switch (status.slug) {
+      switch (status && status.slug) {
+        case undefined:
         case 'error':
           ++errors
           break
@@ -50,7 +50,6 @@ const PlaylistController = {
           ++toDownload
           break
       }
-      // check is dirty
     })
     if (errors) {
       status = statuses.error

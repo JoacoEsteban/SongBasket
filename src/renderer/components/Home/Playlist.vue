@@ -54,8 +54,8 @@ export default {
     isSynced () {
       return this.statusObj.baseState === 'synced'
     },
-    reComputePlaylistTracks () {
-      return this.$store.state.Events.RE_COMPUTE_PLAYLIST_TRACKS
+    playlistTracksReComputed () {
+      return this.$store.state.Events.PLAYLIST_TRACKS_RE_COMPUTED
     },
     playlistName () {
       return this.playlist.name
@@ -83,8 +83,8 @@ export default {
     }
   },
   watch: {
-    reComputePlaylistTracks () {
-      this.setStatusObj()
+    playlistTracksReComputed () {
+      setTimeout(this.setStatusObj, 100)
     }
   },
   methods: {

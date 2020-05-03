@@ -112,7 +112,7 @@ function propagateFileChange (track) {
 
   if (env.propagationTimeout) clearTimeout(env.propagationTimeout)
   env.propagationTimeout = setTimeout(() => {
-    thisVue().$root.FORMAT_CONVERTED_TRACKS({trackFilter: (env.propagationTrackQueue.length && env.propagationTrackQueue) || null})
+    thisVue().$controllers.core.formatConvertedTracks({trackFilter: (env.propagationTrackQueue.length && env.propagationTrackQueue) || null})
     store.dispatch('reComputePlaylistTracks')
     env.propagationTrackQueue = []
     env.propagationTimeout = null

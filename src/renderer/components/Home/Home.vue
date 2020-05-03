@@ -79,7 +79,7 @@ export default {
       this.$router.push('/home/playlist-view')
     },
     reComputePlaylistTracks () {
-      this.formatConvertedTracks()
+      this.$controllers.core.formatConvertedTracks()
     }
   },
   methods: {
@@ -118,24 +118,8 @@ export default {
     download () {
       this.$IPC.send('download')
       this.$sbRouter.push({name: 'downloads-view'})
-    },
-    formatConvertedTracks (params = {plFilter: null, trackFilter: null}) {
-      const {plFilter, trackFilter} = params
-
-      this.$root.CONVERTED_TRACKS_FORMATTED = (this.$root.CONVERTED_TRACKS_FORMATTED || this.$store.state.CurrentUser.convertedTracks).map(track => {
-        if (trackFilter && !trackFilter.some(id => track.id === id)) return track
-        if (plFilter && !plFilter.some(id => track.playlists.some(pl => pl.id === id))) return track
-
-        const trackSafe = this.$jsonClone(track)
-
-        this.$controllers.track.populateTrackSelection(trackSafe)
-        trackSafe.status = this.$controllers.track.getStatus(trackSafe)
-
-        return trackSafe
-      })
     }
   },
-
   mounted () {
     // console.log('USER::::', this.user)
     this.$root.logOut = this.logOut
@@ -149,8 +133,6 @@ export default {
     this.$IPC.on('open playlist', (event, id) => {
       this.setPlaylistNPush(id)
     })
-
-    this.$root.FORMAT_CONVERTED_TRACKS = this.formatConvertedTracks
   }
 }
 </script>

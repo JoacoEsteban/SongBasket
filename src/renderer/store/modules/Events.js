@@ -6,6 +6,7 @@ const getDefaultState = () => ({
   PLAYLIST_UNSYNCED: false,
   RESET_SELECTION: false,
   RE_COMPUTE_PLAYLIST_TRACKS: false,
+  PLAYLIST_TRACKS_RE_COMPUTED: false,
   ROUTER_ANIMATION: '',
   GLOBAL_LOADING_STATE: {
     value: false,
@@ -33,6 +34,9 @@ const actions = {
   },
   reComputePlaylistTracks ({commit}) {
     commit('TRIGGER', 'RE_COMPUTE_PLAYLIST_TRACKS')
+  },
+  playlistTracksReComputed ({commit}) {
+    commit('TRIGGER', 'PLAYLIST_TRACKS_RE_COMPUTED')
   },
   routerAnimation ({commit}, animation) {
     commit('SET', {key: 'ROUTER_ANIMATION', value: animation})
