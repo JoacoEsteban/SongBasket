@@ -60,15 +60,15 @@ export default {
     image () {
       return this.playlist && this.playlist.images && this.playlist.images[0] && this.playlist.images[0].url
     },
-    reComputePlaylistTracks () {
-      return this.$store.state.Events.RE_COMPUTE_PLAYLIST_TRACKS
+    playlistTracksReComputed () {
+      return this.$store.state.Events.PLAYLIST_TRACKS_RE_COMPUTED
     }
   },
   created () {
     this.$sbRouter.beforeTransition(this.getPlaylist)
   },
   watch: {
-    reComputePlaylistTracks () {
+    playlistTracksReComputed () {
       this.setStatus()
     }
   },

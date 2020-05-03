@@ -96,7 +96,7 @@ $ex2: rgba(251, 0, 255, 0.75) 100%;
 $extraction-bg: linear-gradient(258.84deg, $ex1, $ex2);
   .track-banner-container {
     height: 7em;
-    transition: opacity var(--transition-global), background-color var(--transition-global);
+    transition: opacity var(--ts-g), background-color var(--ts-g);
     z-index: 0;
     position: relative;
     &.download {

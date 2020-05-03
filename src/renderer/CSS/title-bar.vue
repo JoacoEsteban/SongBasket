@@ -43,7 +43,7 @@
   mask-size: 100% !important;
 }
 #title-bar .title-bar-buttons-container .bar-btn, #title-bar .title-bar-buttons-container .bar-btn .mask {
-  transition: background-color var(--transition-global);
+  transition: background-color var(--ts-g);
 }
 
 #title-bar.mac .title-bar-buttons-container .bar-btn.inactive {

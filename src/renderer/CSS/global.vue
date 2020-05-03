@@ -26,7 +26,7 @@ html {
   background: #bbb;
   transition: background-color;
   // border-radius: 1em;
-  transition: background var(--transition-global);
+  transition: background var(--ts-g);
 }
 
 /* Handle on hover */

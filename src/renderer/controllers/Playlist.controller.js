@@ -65,9 +65,22 @@ const PlaylistController = {
       status.ammount = toDownload
     }
 
+    status.trackChanges = (playlist.tracks.added && playlist.tracks.added.length) || 0 + (playlist.tracks.removed && playlist.tracks.removed.length) || 0
     status.baseState = 'synced'
 
     return status
+  },
+  sort (a, b) {
+    const aOrd = a.status.sortOrder
+    const bOrd = b.status.sortOrder
+
+    if (!aOrd || !bOrd) return
+
+    if (aOrd === bOrd) {
+      if (a.status.trackChanges || b.status.trackChanges) return b.status.trackChanges - a.status.trackChanges
+      return b.status.ammount - a.status.ammount
+    }
+    return aOrd - bOrd
   }
 }
 
@@ -83,6 +96,7 @@ const statuses = {
     return {
       slug: 'paused',
       msg: 'Paused',
+      sortOrder: 100,
       color: 'var(--global-grey)'
     }
   },
@@ -90,6 +104,7 @@ const statuses = {
     return {
       slug: 'synced',
       ammount: 0,
+      sortOrder: 3,
       color: 'var(--green-accept)',
       get msg () {
         return !this.ammount ? 'Synced' : this.ammount + ' left to download'
@@ -100,6 +115,7 @@ const statuses = {
     return {
       slug: 'doubtly',
       ammount: 0,
+      sortOrder: 1,
       color: 'var(--orange-warning)',
       get msg () {
         return this.ammount + ' tracks to review'
@@ -110,6 +126,7 @@ const statuses = {
     return {
       slug: 'dirty',
       ammount: 0,
+      sortOrder: 2,
       color: 'var(--button-purple)',
       get msg () {
         return this.ammount + ' tracks to convert'
@@ -120,6 +137,7 @@ const statuses = {
     return {
       slug: 'error',
       ammount: 0,
+      sortOrder: 0,
       color: 'var(--red-cancel)',
       get msg () {
         return this.ammount + ' conversion errors'

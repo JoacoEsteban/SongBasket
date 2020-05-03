@@ -15,8 +15,8 @@
   /* TRANSITIONS */
   --bezier: cubic-bezier(0, 1, 0, 1);
   --bezier-chill: cubic-bezier(0, 1, .5, 1);
-  --transition-global: 0.5s var(--bezier-chill);
-  --transition-global-hard: 0.5s var(--bezier);
+  --ts-g: 0.5s var(--bezier-chill);
+  --ts-g-hard: 0.5s var(--bezier);
   // --home-transition: .3s cubic-bezier(.12,.82,0,.99);
   --home-transition: .5s var(--bezier-chill);
   /* VARIABLES */

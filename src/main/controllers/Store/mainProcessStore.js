@@ -417,7 +417,15 @@ const mutations = {
 const controller = {
   COMMIT: mutations,
   STATE: () => state,
-  STATE_SAFE: () => UTILS.cloneObject(state)
+  STATE_SAFE: filter => {
+    let toClone = {}
+    if (filter && !Array.isArray(filter)) filter = [filter]
+
+    if (!filter || !filter.length) toClone = controller.STATE()
+    else filter.forEach(key => toClone[key] = controller.STATE()[key])
+
+    return UTILS.cloneObject(toClone)
+  }
 }
 
 function findById (id, obj) {

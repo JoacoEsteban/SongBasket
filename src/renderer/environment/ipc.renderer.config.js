@@ -72,7 +72,7 @@ async function onRetrievedTracks (e, tracks) {
     }
   }
   thisVue().$root.DOWNLOADED_TRACKS = tracks
-  await store.dispatch('reComputePlaylistTracks')
+  thisVue().$controllers.core.formatConvertedTracks()
 }
 function getPlaylistIdFromFoldername (name) {
   const pl = thisVue().$store.state.CurrentUser.playlists.find(p => p.folderName === name || p.name === name)
@@ -113,7 +113,6 @@ function propagateFileChange (track) {
   if (env.propagationTimeout) clearTimeout(env.propagationTimeout)
   env.propagationTimeout = setTimeout(() => {
     thisVue().$controllers.core.formatConvertedTracks({trackFilter: (env.propagationTrackQueue.length && env.propagationTrackQueue) || null})
-    store.dispatch('reComputePlaylistTracks')
     env.propagationTrackQueue = []
     env.propagationTimeout = null
 

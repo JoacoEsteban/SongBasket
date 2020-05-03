@@ -20,9 +20,9 @@
             {{trackAmmountStr}}
           </span>
         </div>
-        <div class="playlist-status-indicator" :class="statusObj.slug" :style="{'--status-color': statusObj.color}">
+        <div class="playlist-status-indicator" :class="status.slug" :style="{'--status-color': status.color}">
           <span class="bold uppercase">
-            {{statusObj.msg}}
+            {{status.msg}}
           </span>
         </div>
     </div>
@@ -36,7 +36,8 @@ import Card from './Generic/Card'
 
 export default {
   props: {
-    playlistId: String
+    playlist: Object,
+    status: Object
   },
   data () {
     return {
@@ -45,17 +46,11 @@ export default {
     }
   },
   computed: {
-    playlist () {
-      return this.playlistId && (this.$store.state.CurrentUser.playlists.find(pl => pl.id === this.playlistId) || {})
-    },
     isQueued () {
       return this.$store.getters.PlaylistIsQueued(this.playlist.id) >= 0
     },
     isSynced () {
-      return this.statusObj.baseState === 'synced'
-    },
-    playlistTracksReComputed () {
-      return this.$store.state.Events.PLAYLIST_TRACKS_RE_COMPUTED
+      return this.status.baseState === 'synced'
     },
     playlistName () {
       return this.playlist.name
@@ -82,18 +77,7 @@ export default {
       } : {}
     }
   },
-  watch: {
-    playlistTracksReComputed () {
-      setTimeout(this.setStatusObj, 100)
-    }
-  },
   methods: {
-    isTrackDownloaded (sp, yt) {
-      // TODO Check if this is working and rethink track and plalylist status computing location
-      if (!sp || !yt) console.log('aber', sp, yt)
-      const track = this.$root.DOWNLOADED_TRACKS[sp]
-      return track && track[yt] && track[yt].playlists && track[yt].playlists.some(p => p === this.playlist.id)
-    },
     handleClick () {
       if (this.isSynced) {
         this.$emit('openPlaylist')
@@ -110,13 +94,7 @@ export default {
         wich: 'unsync',
         payload: { id: this.playlist.id }
       })
-    },
-    setStatusObj () {
-      this.statusObj = this.controller.getStatus(this.playlist)
     }
-  },
-  mounted () {
-    this.setStatusObj()
   },
   components: {
     Card

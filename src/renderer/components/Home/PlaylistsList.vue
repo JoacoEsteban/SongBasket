@@ -17,16 +17,18 @@
         No Playlists found{{allLoaded ? '' : ', try loading some more'}}
       </div>
       <div class="horizontal-scroller">
-        <playlist v-for="playlist in syncedPlaylistsFiltered ? syncedPlaylistsFiltered : syncedPlaylists"
-        :playlist-id="playlist.id"
-        :key="playlist.id"
-        @openPlaylist="$emit('openPlaylist', playlist.id)" />
+        <playlist v-for="pl in syncedPlaylistsFiltered ? syncedPlaylistsFiltered : syncedPlaylists"
+        :playlist="pl.playlist"
+        :status="pl.status"
+        :key="pl.playlist.id"
+        @openPlaylist="$emit('openPlaylist', pl.playlist.id)" />
       </div>
       <div class="list">
-        <playlist v-for="playlist in unSyncedPlaylistsFiltered ? unSyncedPlaylistsFiltered : unSyncedPlaylists"
-        :playlist-id="playlist.id"
-        :key="playlist.id"
-        @openPlaylist="$emit('openPlaylist', playlist.id)" />
+        <playlist v-for="pl in unSyncedPlaylistsFiltered ? unSyncedPlaylistsFiltered : unSyncedPlaylists"
+        :playlist="pl.playlist"
+        :status="pl.status"
+        :key="pl.playlist.id"
+        @openPlaylist="$emit('openPlaylist', pl.playlist.id)" />
       </div>
 
       <div class="df aliic jucc col-xs-12 p-0" v-if="!allLoaded">
@@ -73,14 +75,20 @@ export default {
       return this.control.total - this.control.offset <= 0
     },
     unSyncedPlaylists () {
-      return this.playlists.filter(pl => !this.$store.getters.PlaylistIsSynced(pl.id))
+      return this.playlists.filter(pl => !this.$store.getters.PlaylistIsSynced(pl.id)).map(this.formatPlaylist)
     },
     syncedPlaylistsRefreshed () {
       return this.$store.state.Events.SYNCED_PLAYLISTS_REFRESHED
+    },
+    playlistTracksReComputed () {
+      return this.$store.state.Events.PLAYLIST_TRACKS_RE_COMPUTED
     }
   },
   watch: {
     syncedPlaylistsRefreshed () {
+      this.refreshSynced()
+    },
+    playlistTracksReComputed () {
       this.refreshSynced()
     },
     searchInput (val) {
@@ -88,6 +96,12 @@ export default {
     }
   },
   methods: {
+    formatPlaylist (playlist) {
+      return ({
+        playlist,
+        status: this.$controllers.playlist.getStatus(playlist)
+      })
+    },
     loadMore () {
       if (!this.loading) {
         this.loading = true
@@ -135,28 +149,9 @@ export default {
       this.refreshSynced()
     },
     refreshSynced () {
-      let all = []
-      let pls = [...this.playlists]
-      this.$store.state.CurrentUser.syncedPlaylists.forEach(syncPl => {
-        for (const i in pls) {
-          let pl = pls[i]
-          if (pl.id === syncPl) {
-            all.push(pls.splice(i, 1)[0])
-            break
-          }
-        }
-      })
-      this.computePlaylistAttributes(all)
-      this.syncedPlaylists = all.sort(this.sortFn)
+      this.syncedPlaylists = this.$store.state.CurrentUser.syncedPlaylists.map(id => this.playlists.find(pl => pl.id === id)).filter(pl => pl).map(this.formatPlaylist).sort(this.$controllers.playlist.sort)
+
       this.filterPlaylists()
-    },
-    computePlaylistAttributes (pls) {
-      console.log(pls)
-    },
-    sortFn (a, b) {
-      const trackDiffs = ((b.tracks.added && b.tracks.added.length) || 0 + (b.tracks.removed && b.tracks.removed.length) || 0) - ((a.tracks.added && a.tracks.added.length) || 0 + (a.tracks.removed && a.tracks.removed.length) || 0)
-      // TODO sort by dirty conversions count
-      return trackDiffs
     },
     calcScrollOpacity () {
       let ratio = (this.getContainerElement().scrollTop / 100)
@@ -177,8 +172,8 @@ export default {
             this.syncedPlaylistsFiltered = null
           } else {
             noPlaylists = (
-              (this.syncedPlaylistsFiltered = this.syncedPlaylists.filter(pl => pl.name.toLowerCase().includes(txt))).length +
-              (this.unSyncedPlaylistsFiltered = this.unSyncedPlaylists.filter(pl => pl.name.toLowerCase().includes(txt))).length
+              (this.syncedPlaylistsFiltered = this.syncedPlaylists.filter(({playlist}) => playlist.name.toLowerCase().includes(txt))).length +
+              (this.unSyncedPlaylistsFiltered = this.unSyncedPlaylists.filter(({playlist}) => playlist.name.toLowerCase().includes(txt))).length
             ) === 0
           }
           this.noPlaylists = noPlaylists

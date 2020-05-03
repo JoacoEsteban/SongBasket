@@ -69,17 +69,11 @@ export default {
     },
     routerAnimation () {
       return this.$store.state.Events.ROUTER_ANIMATION
-    },
-    reComputePlaylistTracks () {
-      return this.$store.state.Events.RE_COMPUTE_PLAYLIST_TRACKS
     }
   },
   watch: {
     currentPlaylistSet () {
       this.$router.push('/home/playlist-view')
-    },
-    reComputePlaylistTracks () {
-      this.$controllers.core.formatConvertedTracks()
     }
   },
   methods: {
@@ -128,10 +122,6 @@ export default {
 
     this.$IPC.on('done loading', () => {
       this.loading = false
-    })
-
-    this.$IPC.on('open playlist', (event, id) => {
-      this.setPlaylistNPush(id)
     })
   }
 }

@@ -276,7 +276,7 @@ $loading-bar-height: 3px;
   position: relative;
 
   // height: $tb-height;
-  transition: height var(--transition-global);
+  transition: height var(--ts-g);
 }
 .title-bar-container {
   z-index: 1;
@@ -342,7 +342,7 @@ $loading-bar-height: 3px;
   right: 100%;
   pointer-events: none;
   // $transition: var(--animation-duration) var(--bezier-chill);
-  $transition: var(--transition-global);
+  $transition: var(--ts-g);
   transition: left $transition, right $transition, width $transition;
   .actual-loading-bar {
     height: $loading-bar-height;
@@ -403,7 +403,7 @@ $loading-bar-height: 3px;
   &.left {
     margin-right: $m;
   }
-  transition: opacity var(--transition-global), transform var(--transition-global);
+  transition: opacity var(--ts-g), transform var(--ts-g);
 
   opacity: .1;
   transform: scale(.8);

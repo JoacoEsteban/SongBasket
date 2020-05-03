@@ -167,7 +167,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-$t: var(--transition-global);
+$t: var(--ts-g);
 $offsetY: .5em;
 $gradient-height: 5em;
 $whole-height: 5em;

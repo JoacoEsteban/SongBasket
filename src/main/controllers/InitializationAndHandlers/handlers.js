@@ -81,7 +81,8 @@ export function REFLECT_RENDERER_KEY (key) {
   return new Promise((resolve, reject) => {
     const listenerId = uuid()
     ipcOnce(listenerId, resolve)
-    ipcSend('VUEX:SET', {key, value: VUEX_MAIN.STATE_SAFE()[key], listenerId})
+    const value = VUEX_MAIN.STATE_SAFE(key)[key]
+    ipcSend('VUEX:SET', {key, value, listenerId})
   })
 }
 export function SEND_ERROR ({type, error}) {
