@@ -108,20 +108,23 @@ function onRemovedTrack (e, track) {
 }
 function propagateFileChange (track) {
   const path = thisVue().$sbRouter.giveMeCurrent() || {}
-  switch (path.name) {
-    case 'playlist-view':
-      if (path.params.id !== track.playlistId) return
-      env.propagationTrackQueue.push(track.spotify_id)
+  env.propagationTrackQueue.push(track.spotify_id)
 
-      if (env.propagationTimeout) clearTimeout(env.propagationTimeout)
-      env.propagationTimeout = setTimeout(() => {
-        thisVue().$root.FORMAT_CONVERTED_TRACKS({trackFilter: (env.propagationTrackQueue.length && env.propagationTrackQueue) || null})
+  if (env.propagationTimeout) clearTimeout(env.propagationTimeout)
+  env.propagationTimeout = setTimeout(() => {
+    thisVue().$root.FORMAT_CONVERTED_TRACKS({trackFilter: (env.propagationTrackQueue.length && env.propagationTrackQueue) || null})
+    store.dispatch('reComputePlaylistTracks')
+    env.propagationTrackQueue = []
+    env.propagationTimeout = null
+
+    switch (path.name) {
+      case 'playlist-view':
+        if (path.params.id !== track.playlistId) break
         thisVue().$root.PlaylistViewInstance.computeTracks()
-        env.propagationTrackQueue = []
-        env.propagationTimeout = null
-      }, 200)
-      break
-  }
+        break
+      case 'home':
+    }
+  }, 200)
 }
 
 async function redirect (path, payload) {

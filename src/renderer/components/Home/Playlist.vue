@@ -84,7 +84,6 @@ export default {
   },
   watch: {
     reComputePlaylistTracks () {
-      console.log('RECOMPUTE')
       this.setStatusObj()
     }
   },

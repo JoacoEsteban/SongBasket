@@ -25,9 +25,9 @@
           {{trackAmmountStr}}
         </span>
       </div>
-      <div class="playlist-status-indicator" :class="statusObj.class">
+      <div class="playlist-status-indicator" :style="{'--status-color': statusObj.color}">
         <span class="bold uppercase">
-          {{statusObj.text}}
+          {{statusObj.msg}}
         </span>
       </div>
     </div>
@@ -39,7 +39,8 @@
 export default {
   data () {
     return {
-      playlist: null
+      playlist: null,
+      statusObj: {}
     }
   },
   computed: {
@@ -59,28 +60,28 @@ export default {
     image () {
       return this.playlist && this.playlist.images && this.playlist.images[0] && this.playlist.images[0].url
     },
-    statusObj () {
-      let devolvio = {
-        class: 'unsynced',
-        text: 'not synced'
-      }
-      switch (this.status) {
-        case 'synced':
-          devolvio.class = 'synced'
-          devolvio.text = 'synced'
-          break
-        case null:
-          break
-      }
-      return devolvio
+    reComputePlaylistTracks () {
+      return this.$store.state.Events.RE_COMPUTE_PLAYLIST_TRACKS
     }
   },
   created () {
     this.$sbRouter.beforeTransition(this.getPlaylist)
   },
+  watch: {
+    reComputePlaylistTracks () {
+      this.setStatus()
+    }
+  },
   methods: {
     getPlaylist ({params}) {
       this.playlist = params && this.$store.getters.PlaylistById(params.id)
+      this.setStatus()
+    },
+    setStatus () {
+      console.log('daleman1')
+      if (!this.playlist) return
+      console.log('daleman2')
+      this.statusObj = this.$controllers.playlist.getStatus(this.playlist)
     },
     downloadPlaylist () {
       if (!(this.playlist && this.playlist.id)) return
