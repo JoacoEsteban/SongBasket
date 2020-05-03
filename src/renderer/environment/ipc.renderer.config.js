@@ -10,7 +10,10 @@ const store = {
   }
 }
 
-const env = {}
+const env = {
+  propagationTimeout: null,
+  propagationTrackQueue: []
+}
 export default function (Vue) {
   ipc = Vue.prototype.$IPC = require('electron').ipcRenderer
 
@@ -62,13 +65,14 @@ function onDocumentReady () {
     ipc.send('FileWatchers:ASK_TRACKS')
   }, 5000)
 }
-function onRetrievedTracks (e, tracks) {
+async function onRetrievedTracks (e, tracks) {
   for (const primKey in tracks) {
     for (const secKey in tracks[primKey]) {
       tracks[primKey][secKey].playlists = tracks[primKey][secKey].playlists.map(p => getPlaylistIdFromFoldername(p))
     }
   }
   thisVue().$root.DOWNLOADED_TRACKS = tracks
+  await store.dispatch('reComputePlaylistTracks')
 }
 function getPlaylistIdFromFoldername (name) {
   const pl = thisVue().$store.state.CurrentUser.playlists.find(p => p.folderName === name || p.name === name)
@@ -76,6 +80,7 @@ function getPlaylistIdFromFoldername (name) {
 }
 
 function onAddedTrack (e, track) {
+  console.log('track added')
   const tracks = thisVue().$root.DOWNLOADED_TRACKS
 
   if (!tracks[track.spotify_id]) tracks[track.spotify_id] = {}
@@ -106,9 +111,13 @@ function propagateFileChange (track) {
   switch (path.name) {
     case 'playlist-view':
       if (path.params.id !== track.playlistId) return
+      env.propagationTrackQueue.push(track.spotify_id)
+
       if (env.propagationTimeout) clearTimeout(env.propagationTimeout)
       env.propagationTimeout = setTimeout(() => {
+        thisVue().$root.FORMAT_CONVERTED_TRACKS({trackFilter: (env.propagationTrackQueue.length && env.propagationTrackQueue) || null})
         thisVue().$root.PlaylistViewInstance.computeTracks()
+        env.propagationTrackQueue = []
         env.propagationTimeout = null
       }, 200)
       break

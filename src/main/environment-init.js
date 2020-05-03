@@ -1,17 +1,21 @@
 require('./controllers/Prototype/Array')
 require('./Global/VARIABLES')
 
-const USE_PROD_BACKEND = false
+const util = require('util')
+const child_process = require('child_process')
+const youtubeDl = require('youtube-dl')
+
+const USE_PROD_BACKEND = true
 const USE_HEROKU = true
 ;(() => {
   const subDomain = USE_HEROKU ? 'heroku' : 'api'
   process.env.BACKEND = process.env.NODE_ENV === 'production' || USE_PROD_BACKEND ? ('https://' + subDomain + '.songbasket.com') : 'http://localhost:5000'
-  global.log = (...aa) => aa.forEach(a => console.log(require('util').inspect(a, {showHidden: false, depth: null})))
+  global.log = (...aa) => aa.forEach(a => console.log(util.inspect(a, {showHidden: false, depth: null})))
 })()
 
 global.flushYtDlCache = async () => {
   return new Promise((resolve, reject) => {
-    require('child_process').exec(require('youtube-dl').getYtdlBinary() + ' --rm-cache-dir', (err, out) => {
+    child_process.exec(youtubeDl.getYtdlBinary() + ' --rm-cache-dir', (err, out) => {
       if (err) return reject(err)
       resolve(out)
     })

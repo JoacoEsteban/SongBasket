@@ -20,9 +20,9 @@
             {{trackAmmountStr}}
           </span>
         </div>
-        <div class="playlist-status-indicator" :class="statusObj.class">
+        <div class="playlist-status-indicator" :class="statusObj.slug" :style="{'--status-color': statusObj.color}">
           <span class="bold uppercase">
-            {{statusObj.text}}
+            {{statusObj.msg}}
           </span>
         </div>
     </div>
@@ -38,12 +38,30 @@ export default {
   props: {
     playlistId: String
   },
+  data () {
+    return {
+      controller: this.$controllers.playlist,
+      statusObj: {}
+    }
+  },
   computed: {
     playlist () {
       return this.playlistId && (this.$store.state.CurrentUser.playlists.find(pl => pl.id === this.playlistId) || {})
     },
+    isQueued () {
+      return this.$store.getters.PlaylistIsQueued(this.playlist.id) >= 0
+    },
+    isSynced () {
+      return this.statusObj.baseState === 'synced'
+    },
+    reComputePlaylistTracks () {
+      return this.$store.state.Events.RE_COMPUTE_PLAYLIST_TRACKS
+    },
     playlistName () {
       return this.playlist.name
+    },
+    playlistImage () {
+      return this.playlist && this.playlist.images && this.playlist.images[0] && this.playlist.images[0].url
     },
     playlistFormatted () {
       return (this.playlist && {
@@ -51,71 +69,23 @@ export default {
         backgroundImage: this.playlistImage
       }) || {}
     },
-    isQueued () {
-      return this.$store.getters.PlaylistIsQueued(this.playlist.id) >= 0
-    },
-    isSynced () {
-      return this.playlist && this.$store.getters.PlaylistIsSynced(this.playlist.id)
-    },
-    playlistImage () {
-      return this.playlist && this.playlist.images && this.playlist.images[0] && this.playlist.images[0].url
-    },
     trackAmmount () {
       return (this.playlist && this.playlist.tracks && this.playlist.tracks.total) || 0
     },
     trackAmmountStr () {
       return this.trackAmmount + ' Track' + (this.trackAmmount === 1 ? '' : 's')
     },
-    status () {
-      // if (this.isSynced) console.log('dirty', this.dirtyConversionsAmount)
-      if (this.isSynced) return (this.dirtyConversionsAmount ? 'synced:dirty' : 'synced')
-      // if (this.isSynced) return 'synced'
-      return null
-    },
-    dirtyConversionsAmount () {
-      let count = 0
-      this.isSynced && this.$store.state.CurrentUser.convertedTracks.forEach(t => {
-        // filter to just undownloaded tracks
-        if (!(t.playlists.some(pl => pl.id === this.playlist.id))) return false
-        if (t.flags.conversionError) return false
-        if (t.flags.selectionIsApplied) return false
-        let selectionId = t.selection
-
-        if (selectionId === false) return false
-        if (selectionId === null) selectionId = t.conversion.bestMatch
-
-        if (this.isTrackDownloaded(t.id, selectionId)) return false
-
-        const selection = t.conversion && t.conversion.yt.find(yt => yt.youtube_id === selectionId)
-        selection && selection.isDoubtlyConversion && ++count
-      })
-      return count
-    },
     cardOptions () {
       return this.isSynced ? {
         size: '.8em',
         height: '3.5em'
       } : {}
-    },
-    statusObj () {
-      let devolvio = {
-        class: 'unsynced',
-        text: 'click to sync'
-      }
-      switch (this.status) {
-        case 'synced':
-          devolvio.class = 'synced'
-          devolvio.text = 'synced'
-          break
-        case 'synced:dirty':
-          const num = this.dirtyConversionsAmount
-          devolvio.class = 'synced-dirty'
-          devolvio.text = `review ${num} conversion${(num - 1) ? 's' : ''}`
-          break
-        case null:
-          break
-      }
-      return devolvio
+    }
+  },
+  watch: {
+    reComputePlaylistTracks () {
+      console.log('RECOMPUTE')
+      this.setStatusObj()
     }
   },
   methods: {
@@ -141,7 +111,13 @@ export default {
         wich: 'unsync',
         payload: { id: this.playlist.id }
       })
+    },
+    setStatusObj () {
+      this.statusObj = this.controller.getStatus(this.playlist)
     }
+  },
+  mounted () {
+    this.setStatusObj()
   },
   components: {
     Card
@@ -221,15 +197,7 @@ $hovering-transition: .3s $bezier-tranka;
 <style lang="scss">
 $title-size: .8em;
   .playlist-status-indicator {
-    &.synced-dirty {
-      color: var(--orange-warning)
-    }
-    &.synced {
-      color: var(--green-accept)
-    }
-    &.unsynced {
-      color: var(--button-purple)
-    }
+    color: var(--status-color);
     > span {
       font-size: $title-size * .75;
     }

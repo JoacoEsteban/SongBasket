@@ -58,7 +58,9 @@ export default {
 
       try {
         await this.$controllers.core.changeYtTrackSelection({trackId: this.item.id, newId})
+        console.log('onTracreview', this.$jsonClone(this.item))
         this.$controllers.track.populateTrackSelection(this.item)
+        console.log('onTracreview then', this.$jsonClone(this.item))
       } catch (error) {
         console.error(error)
       }

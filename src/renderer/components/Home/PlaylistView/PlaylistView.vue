@@ -36,6 +36,9 @@
         />
       </div>
     </div>
+    <!-- <div class="track-review-container row">
+      track review xd
+    </div> -->
   </div>
 </template>
 
@@ -106,6 +109,9 @@ export default {
     resetSelection () {
       return this.$store.state.Events.RESET_SELECTION
     },
+    reComputePlaylistTracks () {
+      return this.$store.state.Events.RE_COMPUTE_PLAYLIST_TRACKS
+    },
     doubtfulTracks () {
       return this.conversion.filter(t => t.selectionObj && t.selectionObj.isDoubtlyConversion)
     }
@@ -117,6 +123,10 @@ export default {
     },
     syncedPlaylistsRefreshed () {
       this.refreshPlaylist()
+      this.computeTracks()
+    },
+    reComputePlaylistTracks () {
+      // this.refreshPlaylist()
       this.computeTracks()
     },
     playlistUnsynced () {
@@ -166,49 +176,8 @@ export default {
       }
     },
     computeTracks () {
-      this.conversion = this.$store.state.CurrentUser.convertedTracks.filter(t => t.playlists.some(pl => pl.id === this.currentPlaylist)).map(track => {
-        const cloned = {...track}
-        this.$controllers.track.populateTrackSelection(cloned)
-        if (!cloned.selectionObj) console.log(cloned)
-        cloned.status = this.$controllers.track.getStatus(cloned)
-        return cloned
-      }).sort(this.$controllers.track.sort)
-    },
-    youtubeId (id) {
-      let c = this.conversion.tracks
-      for (let i = 0; i < c.length; i++) {
-        if (c[i].id === id) return c[i].bestMatch
-      }
-      console.log('TRACK NOT FOUND')
-      return null
-    },
-    toggleConversion (id, intention) {
-      // Intention is what the toggle wants to do
-      // Prevents funky things from happening when the showingConversion array gets empty
-      for (let i = 0; i < this.showingConversion.length; i++) {
-        if (this.showingConversion[i] === id) {
-          this.showingConversion.splice(i, 1)
-          if (this.showingConversion.length === 0 && intention !== this.showingAll) {
-            this.toggleShowingAll()
-          }
-          return
-        }
-      }
-      this.showingConversion.push(id)
-      if (this.showingConversion.length === this.ammountOfTracksBeingShown && intention !== this.showingAll) {
-        this.toggleShowingAll()
-      }
-    },
-    toggleShowingAll () {
-      this.showingAll = !this.showingAll
-      this.showingConversion = []
-    },
-    convertionIsOpened (id) {
-      if (this.showingConversion.length === 0) return this.showingAll
-      for (let i = 0; i < this.showingConversion.length; i++) {
-        if (this.showingConversion[i] === id) return !this.showingAll
-      }
-      return this.showingAll
+      console.log('COMPUTING FROM PLVIEW')
+      this.conversion = (this.$root.CONVERTED_TRACKS_FORMATTED && this.$root.CONVERTED_TRACKS_FORMATTED.filter(t => t.playlists.some(pl => pl.id === this.currentPlaylist)).sort(this.$controllers.track.sort)) || []
     },
     resetAll (confirm) {
       if (!confirm) return this.$root.OPEN_MODAL({wich: 'reset-all-playlist-tracks', payload: {playlistId: this.playlist.id}})
@@ -217,7 +186,7 @@ export default {
       })
       setTimeout(() => {
         this.$forceUpdate()
-      }, 0)
+      })
     },
     selectTrack (trackId, newId) {
       this.$store.dispatch('changeYtTrackSelection', {playlist: this.playlist.id, trackId, newId})

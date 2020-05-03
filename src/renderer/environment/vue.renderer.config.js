@@ -21,6 +21,7 @@ export default function (Vue) {
   Vue.prototype.$ = $
   Vue.prototype.$uuid = uuidv4
   Vue.prototype.$sleep = utils.sleep
+  Vue.prototype.$jsonClone = utils.jsonClone
   Vue.prototype.$setRootVar = (keys, val, valJs) => {
     $(':root')[0].style.setProperty('--' + keys.kebab, val)
     window.ROOT_VARS[keys.camel] = valJs || val
@@ -36,6 +37,7 @@ export default function (Vue) {
 function setControllers (Vue) {
   Vue.prototype.$controllers = {
     core: require('../controllers/Core.controller').default,
-    track: require('../controllers/Track.controller').default
+    track: require('../controllers/Track.controller').default,
+    playlist: require('../controllers/Playlist.controller').default
   }
 }

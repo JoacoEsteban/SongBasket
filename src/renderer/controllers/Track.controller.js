@@ -3,7 +3,7 @@ const getVueInstance = () => (VueInstance || (VueInstance = require('../main').d
 const TrackController = {
   getArtistsString: (item) => (item.artists || item.data.artists).map(({name}) => name).join(', '),
   getPlaylistsString: (item) => item.playlists.map(({id}) => getVueInstance().$store.getters.PlaylistById(id)).map(({name}) => name).join(', '),
-  populateTrackSelection: (track) => {
+  populateTrackSelection: track => {
     if (track.flags.conversionError) return null
     let selectionId = track.selection
 

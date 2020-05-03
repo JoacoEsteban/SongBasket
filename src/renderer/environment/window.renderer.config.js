@@ -30,9 +30,13 @@ function handleMetaKeyCombo (keyCode) {
     default:
   }
 }
+function isCommandKey (meta, control) {
+  if (global.CONSTANTS.PLATFORM === 'mac') return meta
+  return control
+}
 function handleWindowKey (e) {
-  const {keyCode, metaKey} = e
-  if (metaKey && keyCode !== 8) return handleMetaKeyCombo(keyCode, e)
+  const {keyCode, metaKey, ctrlKey} = e
+  if (isCommandKey(metaKey, ctrlKey) && keyCode !== 8) return handleMetaKeyCombo(keyCode, e)
   if (isAscii(keyCode) || (keyCode === 8 && thisVue().$root.searchInputElement && thisVue().$root.searchInputElement.value.length)) return focusSearchbar()
 }
 function focusSearchbar () {

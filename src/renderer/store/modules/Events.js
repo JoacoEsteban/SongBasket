@@ -5,6 +5,7 @@ const getDefaultState = () => ({
   SYNCED_PLAYLISTS_REFRESHED: false,
   PLAYLIST_UNSYNCED: false,
   RESET_SELECTION: false,
+  RE_COMPUTE_PLAYLIST_TRACKS: false,
   ROUTER_ANIMATION: '',
   GLOBAL_LOADING_STATE: {
     value: false,
@@ -30,6 +31,9 @@ const actions = {
   resetSelection ({commit}) {
     commit('TRIGGER', 'RESET_SELECTION')
   },
+  reComputePlaylistTracks ({commit}) {
+    commit('TRIGGER', 'RE_COMPUTE_PLAYLIST_TRACKS')
+  },
   routerAnimation ({commit}, animation) {
     commit('SET', {key: 'ROUTER_ANIMATION', value: animation})
   },
@@ -47,7 +51,6 @@ const actions = {
     commit('SET', { key: 'GLOBAL_LOADING_STATE', value })
   },
   loadingEvent ({commit}, payload) {
-    console.log('averga', payload)
     commit('LOADING_EVENT', payload)
   },
   catchGlobalError ({commit}, {type, error}) {
@@ -78,7 +81,6 @@ const mutations = {
     onDownloadEnd()
   },
   LOADING_EVENT (state, {target, value, ptg}) {
-    console.log('EVENT', target, value, ptg)
     const formatted = getLoadingEvent(target)
     formatted.target = target
     formatted.value = value
@@ -154,8 +156,6 @@ const onTrackProgress = ptg => {
   ptg = ptg / 100
   // TODO check this func
   const perc = state.LOADING_STATE.ptg + (1 / state.DOWNLOAD_QUEUE.length * ptg) / 100
-  console.log(ptg)
-  console.log(perc)
   mutations.LOADING_EVENT(null, {target: 'DOWNLOAD', value: true, ptg: perc})
 }
 const onTrackFinished = () => {

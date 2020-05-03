@@ -5,7 +5,7 @@
         <div class="search-bar global-scroll-shadow">
           <div class="filters-background show-on-scroll">
           </div>
-          <input placeholder="Start Typing" autofocus @focus="searchInputOnFocus" @blur="searchInputOnBlur" v-model.trim="searchInput" ref="search-input" class="input-light semibold" type="text">
+          <input placeholder="Start Typing" autofocus @focus="searchInputOnFocus" @blur="searchInputOnBlur" v-model.trim="searchInput" ref="search-input" class="input-light semibold" type="text" @keydown.enter="handleInputConfirm">
         </div>
         <div class="filter-buttons">
 
@@ -100,6 +100,12 @@ export default {
     searchInputOnBlur () {
       this.$root.searchInputElement = this.$refs['search-input']
     },
+    handleInputConfirm () {
+      if (this.syncedPlaylistsFiltered && this.syncedPlaylistsFiltered.length === 1) {
+        const pl = this.$children.find(p => p.playlistId === this.syncedPlaylistsFiltered[0].id)
+        pl && pl.handleClick()
+      }
+    },
     transitionPlaylists (what) {
       return new Promise((resolve, reject) => {
         // if (this.transitioning) resolve(false)
@@ -140,11 +146,15 @@ export default {
           }
         }
       })
+      this.computePlaylistAttributes(all)
       this.syncedPlaylists = all.sort(this.sortFn)
       this.filterPlaylists()
     },
+    computePlaylistAttributes (pls) {
+      console.log(pls)
+    },
     sortFn (a, b) {
-      const trackDiffs = (b.tracks.added.length + b.tracks.removed.length) - (a.tracks.added.length + a.tracks.removed.length)
+      const trackDiffs = ((b.tracks.added && b.tracks.added.length) || 0 + (b.tracks.removed && b.tracks.removed.length) || 0) - ((a.tracks.added && a.tracks.added.length) || 0 + (a.tracks.removed && a.tracks.removed.length) || 0)
       // TODO sort by dirty conversions count
       return trackDiffs
     },
