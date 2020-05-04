@@ -28,6 +28,8 @@ export default function (Vue) {
   ipc.on('FileWatchers:RETRIEVED_TRACKS', onRetrievedTracks)
   ipc.on('VUEX:STORE', async (e, {state, listenerId}) => {
     await store.dispatch('setState', state)
+    thisVue().$controllers.core.formatConvertedTracks()
+    await store.dispatch('stateReplaced')
     ipc.send(listenerId)
   })
   ipc.on('VUEX:SET', async (e, {key, value, listenerId}) => {
@@ -127,7 +129,6 @@ function propagateFileChange (track) {
 }
 
 async function redirect (path, payload) {
-  console.log('dale', sleep)
   await sleep(1000)
   path = (path[0] === '/' ? '' : '/') + path
   if (path === thisVue().$route.fullPath) return console.error('ERROR Trying to navigate to same path')

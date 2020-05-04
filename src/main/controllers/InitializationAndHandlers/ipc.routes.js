@@ -72,21 +72,15 @@ export function init (ipc = global.ipc) {
 
   ipc.on('refreshPlaylists', handlers.refresh)
 
-  ipc.on('loadMore', function (event) {
-    if (handlers.globalLoadingStateDEPRECATED().value) return
-    console.log('LOADING MORE PLAYLISTS:::::::::')
-    handlers.LOADING(true, 'morePlaylists')
-    // gets user_id, SBID and Control object
-    sbFetch.fetchPlaylists(store.getters.RequestParams)
-      .then(resolve => {
-        store.dispatch('updatePlaylists', resolve.playlists).then(() => {
-          ipcSend('done loading')
-        })
-      })
-      .catch(err => {
-        console.error(err) // TODO Handle error
-      })
-      .finally(handlers.LOADING)
+  ipc.on('PLAYLISTS:LOAD_MORE', async (e, {listenerId}) => {
+    let err
+    try {
+      await handlers.loadMorePlaylists()
+    } catch (error) {
+      err = error
+    } finally {
+      e.sender.send(listenerId, err)
+    }
   })
 
   ipc.on('get tracks from', function (event, id) {
@@ -104,8 +98,9 @@ export function init (ipc = global.ipc) {
       await handlers.unsyncPlaylist(id)
     } catch (err) {
       error = err
+    } finally {
+      event.sender.send(listenerId, error)
     }
-    event.sender.send(listenerId, error)
   })
   ipc.on('TRACK:CHANGE_SELECTION', async function (event, {trackId, newId, listenerId}) {
     let error

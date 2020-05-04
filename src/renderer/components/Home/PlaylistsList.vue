@@ -77,16 +77,16 @@ export default {
     unSyncedPlaylists () {
       return this.playlists.filter(pl => !this.$store.getters.PlaylistIsSynced(pl.id)).map(this.formatPlaylist)
     },
-    syncedPlaylistsRefreshed () {
-      return this.$store.state.Events.SYNCED_PLAYLISTS_REFRESHED
+    stateReplaced () {
+      return this.$store.state.Events.STATE_REPLACED
     },
     playlistTracksReComputed () {
       return this.$store.state.Events.PLAYLIST_TRACKS_RE_COMPUTED
     }
   },
   watch: {
-    syncedPlaylistsRefreshed () {
-      this.refreshSynced()
+    stateReplaced () {
+      this.refreshAll()
     },
     playlistTracksReComputed () {
       this.refreshSynced()
@@ -103,10 +103,7 @@ export default {
       })
     },
     loadMore () {
-      if (!this.loading) {
-        this.loading = true
-        this.$IPC.send('loadMore')
-      }
+      this.$controllers.core.loadMorePlaylists()
     },
     searchInputOnFocus () {
       this.$root.searchInputElement = null

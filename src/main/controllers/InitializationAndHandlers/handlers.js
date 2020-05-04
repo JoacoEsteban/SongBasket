@@ -246,7 +246,20 @@ export async function refresh () {
   }
 }
 
-// if (handlers.globalLoadingStateDEPRECATED().value) return console.log('loading', handlers.globalLoadingStateDEPRECATED())
+export async function loadMorePlaylists () {
+  try {
+    if (!load.canRequest) return
+    load.on('PLAYLISTS:LOAD_MORE')
+    await core.loadMorePlaylists()
+  } catch (error) {
+    SEND_ERROR({type: 'PLAYLISTS:LOAD_MORE', error})
+    throw error
+  } finally {
+    load.off('PLAYLISTS:LOAD_MORE')
+    await REFLECT_RENDERER()
+  }
+}
+
 export async function youtubize () {
   try {
     let completed = 0

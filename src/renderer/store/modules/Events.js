@@ -2,7 +2,7 @@ import Vue from 'vue'
 
 const getDefaultState = () => ({
   CURRENT_PLAYLIST_SET: false,
-  SYNCED_PLAYLISTS_REFRESHED: false,
+  STATE_REPLACED: false,
   PLAYLIST_UNSYNCED: false,
   RESET_SELECTION: false,
   PLAYLIST_TRACKS_RE_COMPUTED: false,
@@ -22,8 +22,8 @@ const actions = {
   currentPlaylistSet ({commit}) {
     commit('TRIGGER', 'CURRENT_PLAYLIST_SET')
   },
-  syncedPlaylistsRefreshed ({commit}) {
-    commit('TRIGGER', 'SYNCED_PLAYLISTS_REFRESHED')
+  stateReplaced ({commit}) {
+    commit('TRIGGER', 'STATE_REPLACED')
   },
   playlistUnsynced ({commit}) {
     commit('TRIGGER', 'PLAYLIST_UNSYNCED')
@@ -173,11 +173,8 @@ const loadingEventTypes = {
     'PLAYLIST:UNSYNC': 'Unsyncing Playlist',
     default: 'Loading'
   },
-  getMessage (target) {
-    return this.messages[target] || this.messages.default
-  },
   defaultMessage (env) {
-    return this.getMessage(env.target)
+    return this.messages[env.target] || this.messages.default
   },
   // -----------------------
   get default () {

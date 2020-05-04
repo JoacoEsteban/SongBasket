@@ -32,10 +32,8 @@ export default (Vue) => {
 
   (function () {
     function init () {
-      let count = 0
       const window = electronWindow = BrowserWindow.getFocusedWindow()
       if (!window || !document.getElementById('min-btn') || !document.getElementById('max-btn') || !document.getElementById('close-btn')) return false
-      console.log('in', ++count)
       document.getElementById('min-btn').addEventListener('click', function (e) {
         window.minimize()
       })

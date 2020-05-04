@@ -83,25 +83,23 @@ const core = {
       throw error
     }
   },
+  loadMorePlaylists: async () => {
+    try {
+      const res = await API.getUserPlaylists(global.USER_ID, { offset: GETTERS.playlistsOffset })
+      res && VUEX_MAIN.COMMIT.UPDATE_USER_ENTITIES(res, { isLoadMore: true })
+    } catch (error) {
+      throw error
+    }
+  },
   updatePlaylists: async completionCb => {
-    return new Promise(async (resolve, reject) => {
+    try {
       const playlists = GETTERS.syncedPlaylistsSnapshots()
-
-      try {
-        await core.getAndStorePlaylists(playlists, completionCb)
-        resolve()
-      } catch (errors) {
-        return reject(errors)
-      }
-
-      try {
-        const playlists = await API.getUserPlaylists(global.USER_ID)
-        playlists && VUEX_MAIN.COMMIT.UPDATE_USER_ENTITIES(playlists)
-      } catch (error) {
-        return reject(error)
-      }
-      resolve()
-    })
+      await core.getAndStorePlaylists(playlists, completionCb)
+      const res = await API.getUserPlaylists(global.USER_ID)
+      res && VUEX_MAIN.COMMIT.UPDATE_USER_ENTITIES(res)
+    } catch (error) {
+      throw error
+    }
   },
   getAndStorePlaylists: async (playlists, completionCb) => {
     playlists = playlists.map(pl => typeof pl === 'string' ? { id: pl } : pl)
@@ -111,7 +109,6 @@ const core = {
       try {
         console.log('playlist', pl)
         const playlist = await API.getPlaylist(pl)
-        console.log('Playlist has changes?', playlist ? 'YES' : 'NO')
         playlist && VUEX_MAIN.COMMIT.PLAYLIST_STORE_TRACKS(playlist)
       } catch (error) {
         // TODO handle this

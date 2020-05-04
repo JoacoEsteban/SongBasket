@@ -22,6 +22,13 @@ const CoreController = {
   queuePlaylist (id) {
     vue.ipc.send('PLAYLISTS:QUEUE', id)
   },
+  loadMorePlaylists () {
+    return new Promise((resolve, reject) => {
+      const listenerId = uuid()
+      vue.ipc.once(listenerId, async (e, error) => error ? reject(error) : resolve())
+      vue.ipc.send('PLAYLISTS:LOAD_MORE', { listenerId })
+    })
+  },
   unsyncPlaylist (id) {
     return new Promise((resolve, reject) => {
       const listenerId = uuid()

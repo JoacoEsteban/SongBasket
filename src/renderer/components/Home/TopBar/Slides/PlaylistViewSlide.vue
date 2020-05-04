@@ -78,9 +78,7 @@ export default {
       this.setStatus()
     },
     setStatus () {
-      console.log('daleman1')
       if (!this.playlist) return
-      console.log('daleman2')
       this.statusObj = this.$controllers.playlist.getStatus(this.playlist)
     },
     downloadPlaylist () {

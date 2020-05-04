@@ -68,7 +68,7 @@ const mutations = {
   SET_USER (userData) {
     state.user = userData
   },
-  UPDATE_USER_ENTITIES (playlists) {
+  UPDATE_USER_ENTITIES (playlists, params = { isLoadMore: false }) {
     function isCachedOrSynced (id) {
       // If it's cached I want to compare the version with the currently stored one.
       // If they match I will keep the tracks (currently stored version)
@@ -82,72 +82,69 @@ const mutations = {
 
       return {c, s}
     }
+    function normalizePlaylist (pl) {
+      pl.tracks.items = []
+      pl.tracks.added = []
+      pl.tracks.removed = []
+      return pl
+    }
 
-    if (state.cachedPlaylists.length > 0 || state.syncedPlaylists.length > 0) {
-      for (let i = 0; i < playlists.items.length; i++) {
-        let currentPlaylist = playlists.items[i]
-        let cachedOrSynced = isCachedOrSynced(currentPlaylist.id)
-        if (!cachedOrSynced.c && !cachedOrSynced.s) {
-          playlists.items[i].items = []
-          playlists.items[i].added = []
-          playlists.items[i].removed = []
-        }
-
-        if (cachedOrSynced.c !== false) {
-          // console.log('IS CACHED::')
-          if (cachedOrSynced.c === currentPlaylist.snapshot_id) {
-            playlists.items.splice(i, 1, state.playlists[findById(currentPlaylist.id, state.playlists)])
-          } else {
-            this.FIND_AND_UNCACHE(currentPlaylist.id)
+    if (!params.isLoadMore) {
+      if (state.cachedPlaylists.length > 0 || state.syncedPlaylists.length > 0) {
+        for (let i = 0; i < playlists.items.length; i++) {
+          let currentPlaylist = playlists.items[i]
+          let cachedOrSynced = isCachedOrSynced(currentPlaylist.id)
+          if (!cachedOrSynced.c && !cachedOrSynced.s) {
+            normalizePlaylist(playlists.items[i])
           }
-          continue
+
+          if (cachedOrSynced.c !== false) {
+            // console.log('IS CACHED::')
+            if (cachedOrSynced.c === currentPlaylist.snapshot_id) {
+              playlists.items.splice(i, 1, state.playlists[findById(currentPlaylist.id, state.playlists)])
+            } else {
+              this.FIND_AND_UNCACHE(currentPlaylist.id)
+            }
+            continue
+          }
+          if (cachedOrSynced.s) {
+            // If playlist is synced, it will have already been processed, so im just replacing it
+            let index = findById(currentPlaylist.id, state.playlists)
+            playlists.items.splice(i, 1, state.playlists[index])
+            continue
+          }
         }
-        if (cachedOrSynced.s) {
-          // If playlist is synced, it will have already been processed, so im just replacing it
-          let index = findById(currentPlaylist.id, state.playlists)
-          playlists.items.splice(i, 1, state.playlists[index])
-          continue
+      } else {
+        // console.log('NO CACHED OR SYNCED PLS')
+        playlists.items.forEach(normalizePlaylist)
+      }
+
+      for (let i = 0; i < state.syncedPlaylists.length; i++) {
+        let pl = state.syncedPlaylists[i]
+        let index = findById(pl, playlists.items)
+        if (index === -1) {
+          state.deletedPlaylists.push(state.playlists[findById(pl, state.playlists)])
+          state.syncedPlaylists.splice(i--, 1)
         }
       }
+
+      state.playlists = playlists.items
     } else {
-      // console.log('NO CACHED OR SYNCED PLS')
-      for (let i = 0; i < playlists.items.length; i++) {
-        playlists.items[i].tracks = {
-          ...playlists.items[i].tracks,
-          items: [],
-          added: [],
-          removed: []
-        }
-      }
+      playlists.items.forEach(pl => state.playlists.every(local => local.id !== pl.id) && state.playlists.push(normalizePlaylist(pl)))
     }
-
-    for (let i = 0; i < state.syncedPlaylists.length; i++) {
-      let pl = state.syncedPlaylists[i]
-      let index = findById(pl, playlists.items)
-      if (index === -1) {
-        if (!state.deletedPlaylists) state.deletedPlaylists = []
-        state.deletedPlaylists.push(state.playlists[findById(pl, state.playlists)])
-        state.syncedPlaylists.splice(i, 1)
-        i--
-      }
-    }
-
-    state.playlists = playlists.items
 
     state.control = {
       total: playlists.total,
       offset: state.playlists.length
     }
 
-    state.lastSync = new Date()
-    // this.dispatch('syncedPlaylistsRefreshed', {}, {root: true})
+    if (!params.isLoadMore) state.lastSync = Date.now()
     SAVE_TO_DISK()
   },
 
   LOGOUT (state) {
     console.log('CLEARING::::::::')
     Object.assign(state, getDefaultState())
-    console.log(state)
   },
 
   PLAYLIST_STORE_TRACKS (playlist) {
@@ -202,7 +199,6 @@ const mutations = {
       FSController.UserMethods.setFolderIcons(playlist.id, {force: true}) // creates folder and sets icon
     }
     state.playlists[index] = playlist
-    // this.dispatch('syncedPlaylistsRefreshed', {}, {root: true})
 
     SAVE_TO_DISK()
   },
@@ -308,7 +304,6 @@ const mutations = {
       return trackUtils.calculateBestMatch(convertedTrack, true)
     }).filter(t => t)
     console.log('all tracks reprocessed')
-    // this.dispatch('syncedPlaylistsRefreshed', {}, {root: true})
   },
   async YOUTUBIZE_RESULT (convertedTracks) {
     try {
@@ -322,7 +317,6 @@ const mutations = {
 
       state.syncedPlaylists.forEach(async pl => this.COMMIT_TRACK_CHANGES(pl))
 
-      // this.dispatch('syncedPlaylistsRefreshed', {}, {root: true})
       // console.log(state.convertedTracks.some(t => t) && state.convertedTracks.some(t => t.flags))
       // setTimeout(((env) => {
       //   return () => env.dispatch('setConvertedTracksProcessedFlag')

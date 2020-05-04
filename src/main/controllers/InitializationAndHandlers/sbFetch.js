@@ -165,9 +165,11 @@ export const getMe = async () => {
   }
 }
 
-export const getUserPlaylists = async (user_id) => {
+export const getUserPlaylists = async (user_id, p = { offset: null }) => {
   try {
-    const res = await Api.get(PATHS.USER_PLAYLISTS(user_id))
+    const params = {}
+    p.offset && (params.offset = p.offset)
+    const res = await Api.get(PATHS.USER_PLAYLISTS(user_id), { params })
     return res && res.data
   } catch (error) {
     throw error

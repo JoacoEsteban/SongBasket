@@ -84,8 +84,8 @@ export default {
     removed () {
       return (this.playlist && this.playlist.tracks && this.playlist.tracks.removed) || 0
     },
-    syncedPlaylistsRefreshed () {
-      return this.$store.state.Events.SYNCED_PLAYLISTS_REFRESHED
+    stateReplaced () {
+      return this.$store.state.Events.STATE_REPLACED
     },
     playlistUnsynced () {
       return this.$store.state.Events.PLAYLIST_UNSYNCED
@@ -96,19 +96,16 @@ export default {
   },
   watch: {
     currentPlaylist () {
-      this.refreshPlaylist()
-      this.computeTracks()
+      this.refreshAll()
     },
-    syncedPlaylistsRefreshed () {
-      this.refreshPlaylist()
-      this.computeTracks()
+    stateReplaced () {
+      this.refreshAll()
     },
     playlistTracksReComputed () {
-      // this.refreshPlaylist()
-      console.log('EVENT FROM PLVIEW')
-      this.computeTracks()
+      this.refreshAll()
     },
     playlistUnsynced () {
+      console.log('seguro man??')
       this.$sbRouter.push({name: 'home', params: {which: 'playlists-list'}})
     }
   },
@@ -122,6 +119,10 @@ export default {
     console.log('exitexit')
   },
   methods: {
+    refreshAll () {
+      this.refreshPlaylist()
+      this.computeTracks()
+    },
     refreshPlaylist () {
       this.playlist = this.$store.getters.PlaylistById(this.currentPlaylist) || {}
     },

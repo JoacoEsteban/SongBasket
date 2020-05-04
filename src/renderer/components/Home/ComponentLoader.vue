@@ -47,8 +47,7 @@ export default {
   },
   mounted () {
     this.$root.$refs['home-router'] = this.$refs['home-router']
-    console.log(this.$root.$refs['home-router'], this.$refs['home-router'])
-    this.$root.onComponentLoaderMount() && this.$root.onComponentLoaderMount()
+    this.$root.onComponentLoaderMount && this.$root.onComponentLoaderMount()
   },
   methods: {
     async handleAnimation (to) {

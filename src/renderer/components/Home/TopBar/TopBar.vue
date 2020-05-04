@@ -154,7 +154,6 @@ export default {
     // },
     now () {
       let separator = ' / '
-      console.log('vamos javier', this.$store.state.CurrentUser.lastSync)
       let thisDate = dateFormatter(this.$store.state.CurrentUser.lastSync || new Date())
       let hours = thisDate.time.hours + ':' + thisDate.time.minutes
       let date = ''
