@@ -18,6 +18,7 @@ const FileWatchers = {
   tracks: {},
   watchers: [],
   async createPlaylistWatchers () {
+    // TODO Create watchers anyway
     if (!(await UserMethods.retrieveLocalTracks()).length) return
     let syncedPlaylists = customGetters.SyncedPlaylistsSp()
     syncedPlaylists.forEach(pl => {
@@ -106,7 +107,6 @@ const FileWatchers = {
       switch (event) {
         case 'add':
           let tags = await this.retrieveTags(path)
-          if (tags && tags.spotify_id === '1r0BHXwfQIGczvSFlSuACX') console.log('aber')
           if (tags) this.addTrack(path, tags)
           break
         case 'unlink':

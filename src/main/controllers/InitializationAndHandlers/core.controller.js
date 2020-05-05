@@ -6,7 +6,51 @@ const GETTERS = require('../Store/Helpers/customGetters').default
 const HANDLERS = require('./handlers')
 const QUERY_MAKER = require('../../queryMaker')
 const VUEX_MAIN = require('../Store/mainProcessStore').default
+const FSController = require('../FileSystem').default
+
 const core = {
+  // ---------------- FILESYSTEM ----------------
+  setAppStatus: async () => {
+    let folders
+    try {
+      const status = global.CONSTANTS.APP_STATUS
+      // Check Homefolders
+      folders = status.FOLDERS = await FSController.UserMethods.retrieveFolders()
+      if (!folders.paths.length || !folders.selected) return status.IS_LOGGED = false
+
+      await core.setHomeFolder(folders.selected)
+      try {
+        await core.setSongbasketIdGlobally()
+      } catch (error) {
+        // TODO ReAuthenticate
+        throw error
+      }
+      status.IS_LOGGED = true
+    } catch (err) {
+      await FSController.UserMethods.removeFolder(folders.selected)
+      core.setAppStatus()
+    }
+  },
+  setHomeFolder: async (path) => {
+    try {
+      await FSController.UserMethods.addFolder(path)
+      await core.retrieveAndStoreState()
+    } catch (err) {
+      throw err
+    }
+  },
+  retrieveAndStoreState: async (path = global.HOME_FOLDER) => {
+    try {
+      const data = await FSController.UserMethods.retrieveState(path)
+      VUEX_MAIN.COMMIT.STORE_DATA_FROM_DISK(data)
+      // Check if folder has synced playlists to setup watchers
+      await FSController.UserMethods.setFolderIcons()
+      await FSController.FileWatchers.createPlaylistWatchers()
+    } catch (err) {
+      throw err
+    }
+  },
+  // -----------------
   onLogin: async (details, CB) => {
     const next = () => CB({ requestHeaders: details.requestHeaders })
     try {

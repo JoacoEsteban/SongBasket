@@ -13,10 +13,9 @@ const binPath = basePath + '/bin/ffmpeg';
 
 (async () => {
   await utils.createDirRecursive(binPath)
-  console.log('done')
   ffbinaries.downloadBinaries(['ffmpeg', 'ffprobe'], {destination: binPath}, () => {
     global.CONSTANTS.FFMPEG_BINS_DOWNLOADED = true
-    handlers.isEverythingReady()
+    handlers.onFfmpegBinaries()
     ffmpeg.setFfmpegPath(binPath + '/ffmpeg')
     ffmpeg.setFfprobePath(binPath + '/ffprobe')
   })

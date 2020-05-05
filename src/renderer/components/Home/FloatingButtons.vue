@@ -68,6 +68,9 @@ export default {
     // route () {
     //   return this.$route.name
     // },
+    ffmpeg () {
+      return this.$store.state.Events.FFMPEG_BINS_DOWNLOADED
+    },
     globalError () {
       return this.$store.state.Events.GLOBAL_ERROR
     },
@@ -102,7 +105,7 @@ export default {
       return !this.showSync && this.errorPill.show
     },
     showDl () {
-      return (!this.loading || this.loadingTarget === 'DOWNLOAD') && this.syncedPls.length && this.connectedToInternet && !this.forceHide.all && !this.forceHide.download
+      return (!this.loading || this.loadingTarget === 'DOWNLOAD') && this.syncedPls.length && this.connectedToInternet && !this.forceHide.all && !this.forceHide.download && this.ffmpeg
     },
     queue () {
       return this.$store.state.CurrentUser.queuedPlaylists

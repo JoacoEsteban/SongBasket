@@ -2,6 +2,7 @@ import Vue from 'vue'
 
 const getDefaultState = () => ({
   CURRENT_PLAYLIST_SET: false,
+  FFMPEG_BINS_DOWNLOADED: false,
   STATE_REPLACED: false,
   PLAYLIST_UNSYNCED: false,
   RESET_SELECTION: false,
@@ -21,6 +22,9 @@ const getDefaultState = () => ({
 const actions = {
   currentPlaylistSet ({commit}) {
     commit('TRIGGER', 'CURRENT_PLAYLIST_SET')
+  },
+  ffmpegBinsDownloaded ({commit}, value) {
+    commit('SET', {key: 'FFMPEG_BINS_DOWNLOADED', value})
   },
   stateReplaced ({commit}) {
     commit('TRIGGER', 'STATE_REPLACED')

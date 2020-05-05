@@ -35,9 +35,12 @@ export default {
     window.VUEX_CURRENT_USER = this.$store.state.CurrentUser
     window.sbDebug = this
   },
-  mounted () {
+  async mounted () {
     this.$root.plTransformInvalidation = 0
     this.$root.OPEN_MODAL = this.$store._actions.openModal[0]
+    // TODO fix router push without timeout
+    await this.$sleep(1000)
+    window.VUE_HAS_MOUNTED = true
   }
 }
 </script>

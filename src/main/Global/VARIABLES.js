@@ -5,6 +5,13 @@ const height = 500
 const width = 1000
 module.exports = global.CONSTANTS = {
   // STATES
+  APP_STATUS: {
+    IS_LOGGED: false,
+    FOLDERS: {
+      paths: [],
+      selected: null
+    }
+  },
   FFMPEG_BINS_DOWNLOADED: false,
   HOME_PUSHED: false,
   WINDOW_FINISHED_LOADING: false,

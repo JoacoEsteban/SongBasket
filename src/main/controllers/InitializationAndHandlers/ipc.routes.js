@@ -11,7 +11,7 @@ const ipcSend = IpcController.send
 export function init (ipc = global.ipc) {
   if (!ipc) throw new Error('IPC OBJECT NOT PROVIDED @ ipc.routes.init')
 
-  ipc.on('DOCUMENT_READY_CALLBACK', handlers.rendererMethods.documentReadyCallback)
+  ipc.on('GET_STATUS', handlers.sendStatus)
 
   ipc.on('YOUTUBE_DETAILS:GET', handlers.getYtTrackDetails)
 
@@ -114,7 +114,6 @@ export function init (ipc = global.ipc) {
   // FileWatchers
 
   ipc.on('FileWatchers:ASK_TRACKS', function () {
-    console.log('beforeask')
     ipcSend('FileWatchers:RETRIEVED_TRACKS', FileWatchers.retrieveTracks())
   })
 

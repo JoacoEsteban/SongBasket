@@ -54,8 +54,9 @@ const CoreController = {
   formatConvertedTracks (params = {plFilter: null, trackFilter: null}) {
     const rootTracks = vue.root.CONVERTED_TRACKS_FORMATTED
     const vuexTracks = vue.store.state.CurrentUser.convertedTracks
-    if (!rootTracks) return (vue.root.CONVERTED_TRACKS_FORMATTED = vuexTracks.map(formatTrack)) + emitEvent()
     const {plFilter, trackFilter} = params
+
+    if (!rootTracks || !(trackFilter || plFilter)) return (vue.root.CONVERTED_TRACKS_FORMATTED = vuexTracks.map(formatTrack)) + emitEvent()
     if (trackFilter) {
       trackFilter.forEach(id => {
         rootTracks[rootTracks.indexOfSearch(t => t.id === id)] = formatTrack(vuexTracks.find(t => t.id === id))

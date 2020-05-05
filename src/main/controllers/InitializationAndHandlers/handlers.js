@@ -2,6 +2,7 @@ import FSController from '../FileSystem/index'
 // import customGetters from '../Store/Helpers/customGetters'
 import * as sbFetch from './sbFetch'
 
+import FileWatchers from '../FileSystem/FileWatchers'
 import IpcController from './ipc.controller'
 import youtubeDl from '../DownloadPhase/youtube-dl'
 import connectionController from './connection.controller'
@@ -11,7 +12,11 @@ import { v4 as uuid } from 'uuid'
 import core from './core.controller'
 
 const openBrowser = require('open')
-const ipcSend = IpcController.send
+const ipcSend = (...args) => {
+  if (!global.CONSTANTS.MAIN_WINDOW) return
+  return IpcController.send(...args)
+}
+
 const ipcOnce = IpcController.once
 
 let BROWSER_WINDOW
@@ -91,60 +96,12 @@ export function SEND_ERROR ({type, error}) {
   })
 }
 
-export function init ({ app, BrowserWindow, session, dialog }) {
+// ------------------------- FLOW -------------------------
+
+const setVars = ({ app, BrowserWindow, session, dialog }) => {
   global.CONSTANTS.BROWSER_WINDOW = BROWSER_WINDOW = BrowserWindow
   global.CONSTANTS.SESSION = SESSION = session
   global.CONSTANTS.DIALOG = DIALOG = dialog
-  app.on('ready', () => {
-    connectionController.init({
-      connectionChangeCallback: (value) => {
-        ipcSend('Connection:CHANGE', value)
-      },
-      apiConnectionChangeCallback: (value) => {
-        ipcSend('ApiConnection:CHANGE', value)
-      }
-    })
-    createWindow()
-    global.CONSTANTS.MAIN_WINDOW.webContents.on('did-finish-load', () => {
-      console.log('webcontents')
-      global.CONSTANTS.WINDOW_FINISHED_LOADING = true
-      isEverythingReady()
-    })
-  })
-
-  app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-      app.quit()
-    }
-  })
-
-  app.on('activate', () => {
-    if (global.CONSTANTS.MAIN_WINDOW === null) {
-      createWindow()
-    }
-  })
-}
-
-export const rendererMethods = {
-  documentReadyCallback: () => {
-    global.CONSTANTS.DOCUMENT_FINISHED_LOADING = true
-    isEverythingReady()
-  }
-}
-
-export function openYtVideo (event, id) {
-  openBrowser('https://www.youtube.com/watch?v=' + id)
-}
-
-export function isEverythingReady () {
-  console.log(global.CONSTANTS.FFMPEG_BINS_DOWNLOADED, global.CONSTANTS.WINDOW_FINISHED_LOADING, global.CONSTANTS.DOCUMENT_FINISHED_LOADING)
-  global.CONSTANTS.FFMPEG_BINS_DOWNLOADED && global.CONSTANTS.WINDOW_FINISHED_LOADING && global.CONSTANTS.DOCUMENT_FINISHED_LOADING && verifyFileSystem()
-}
-
-export function createWindow () {
-  global.CONSTANTS.MAIN_WINDOW = new BROWSER_WINDOW(global.CONSTANTS.MAIN_WINDOW_CONFIG)
-  global.CONSTANTS.MAIN_WINDOW.loadURL(process.env.NODE_ENV === 'development' ? `http://localhost:9080` : `file://${__dirname}/index.html`)
-  global.CONSTANTS.MAIN_WINDOW.on('closed', () => global.CONSTANTS.MAIN_WINDOW = null)
 }
 
 export async function setHomeFolder () {
@@ -153,14 +110,45 @@ export async function setHomeFolder () {
   })
   if (canceled) return
   try {
-    await FSController.UserMethods.addFolder(filePaths[0])
-    // if songbasket exists in file specified it will load data automatically
-    await retrieveAndStoreState(global.HOME_FOLDER)
-    pushToHome()
+    await core.setHomeFolder(filePaths[0])
+    await core.setAppStatus()
+    ipcSend('STATUS:SET')
   } catch (err) {
     // Else ask to login and start a folder from 0
     ipcSend('continueToLogin')
   }
+}
+export function init (electron) {
+  setVars(electron)
+  electron.app.on('ready', async () => {
+    connectionController.init({
+      connectionChangeCallback: (value) => {
+        ipcSend('Connection:CHANGE', value)
+      },
+      apiConnectionChangeCallback: (value) => {
+        ipcSend('ApiConnection:CHANGE', value)
+      }
+    })
+    await core.setAppStatus()
+    createWindow()
+  })
+
+  electron.app.on('window-all-closed', () => {
+    if (global.CONSTANTS.PLATFORM !== 'mac') {
+      // TODO Manage background processing on every platform
+      electron.app.quit()
+    }
+  })
+
+  electron.app.on('activate', () => {
+    if (global.CONSTANTS.MAIN_WINDOW === null) createWindow()
+  })
+}
+
+export function createWindow () {
+  const window = global.CONSTANTS.MAIN_WINDOW = new BROWSER_WINDOW(global.CONSTANTS.MAIN_WINDOW_CONFIG)
+  window.loadURL(process.env.NODE_ENV === 'development' ? `http://localhost:9080` : `file://${__dirname}/index.html`)
+  window.on('closed', () => global.CONSTANTS.MAIN_WINDOW = null)
 }
 
 export function createLoginWindow () {
@@ -176,55 +164,21 @@ export function createLoginWindow () {
   })
 }
 
-export async function retrieveAndStoreState (path = global.HOME_FOLDER) {
-  let data
-  try {
-    data = await FSController.UserMethods.retrieveState(path)
-    try {
-      VUEX_MAIN.COMMIT.STORE_DATA_FROM_DISK(data)
-      REFLECT_RENDERER()
-      // Check if folder has synced playlists to setup watchers
-      await FSController.UserMethods.setFolderIcons()
-      await FSController.FileWatchers.createPlaylistWatchers()
-    } catch (err) { throw err }
-  } catch (err) { throw err }
+export async function onFfmpegBinaries () {
+  ipcSend('FFMPEG_BINS_DOWNLOADED', { value: global.CONSTANTS.FFMPEG_BINS_DOWNLOADED })
 }
 
-export async function verifyFileSystem () {
-  console.log('Checking for existing home folders')
-  let FOLDERS = await FSController.UserMethods.retrieveFolders()
-  if (!FOLDERS.paths.length) {
-    console.log('no user')
-    return setTimeout(() => {
-      ipcSend('initializeSetup')
-    }, 1000)
-  }
-
-  if (!FOLDERS.selected) {
-    // TODO redirect to folders view
-    return ipcSend('chooseFolder')
-  }
-
-  try {
-    await retrieveAndStoreState()
-    await core.setSongbasketIdGlobally()
-    pushToHome()
-  } catch (err) {
-    // TODO Handle errors when retrieving and setting data
-    console.error('NOT FOOUND', FOLDERS, err)
-    return setTimeout(() => {
-      ipcSend('initializeSetup')
-    }, 1000)
-  }
-  // guestFetch(FOLDERS.user, true)
+export async function sendStatus (e, {listenerId}) {
+  const status = global.CONSTANTS.APP_STATUS
+  e.sender.send(listenerId, {
+    APP_STATUS: status,
+    state: status.IS_LOGGED ? VUEX_MAIN.STATE_SAFE() : null,
+    downloadedTracks: status.IS_LOGGED ? FileWatchers.retrieveTracks() : null,
+    FFMPEG_BINS_DOWNLOADED: global.CONSTANTS.FFMPEG_BINS_DOWNLOADED
+  })
 }
 
-export function pushToHome () {
-  console.log('pushnient')
-  ipcSend('dataStored')
-}
-
-// ------- revision v2 -------
+// ------- EXTERNAL SOURCES -------
 export async function refresh () {
   try {
     let completed = 0
@@ -335,4 +289,8 @@ export async function getYtTrackDetails (event, {url, trackId, listenerId}) {
     console.error('EROR AT YTTRACKDETAILS:: ipc"ytTrackDetails"', err)
     event.sender.send(listenerId + ':ERROR')
   }
+}
+
+export function openYtVideo (event, id) {
+  openBrowser('https://www.youtube.com/watch?v=' + id)
 }
