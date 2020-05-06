@@ -1,5 +1,5 @@
 <template>
-  <div  class="loading-container">
+  <div class="loading-container">
     Loading
   </div>
 </template>
@@ -18,5 +18,6 @@ export default {
   text-align: center;
   align-self: center;
   height: var(--max-container-height);
+  font-weight: bold;
 }
 </style>

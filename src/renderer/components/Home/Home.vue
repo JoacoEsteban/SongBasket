@@ -11,14 +11,7 @@
         @openPlaylist="openPlaylist($event)"
         @openYtVideo="openYtVideo($event)"
         ></component-loader>
-        <!-- <router-view
-        path="playlists-list"
-        ></router-view> -->
-      <!-- <home-background
-      :class="{transitioning: routerAnimation !== 'release'}"
-      ></home-background> -->
 
-      <!-- <user-data style="z-index: 1" @logOut="logOut"></user-data> -->
       <floating-buttons style="z-index: 1"
       @refreshPlaylists="refreshPlaylists"
       @youtubeConvert="youtubeConvert"
