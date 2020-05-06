@@ -50,7 +50,7 @@
     </div>
 
     <div class="bar-slider-container h-fc rel-full df" :style="{'--position-ptg': sliderPosition + '%', '--animation-duration': loadingBar.animationDuration + 'ms'}">
-      <div class="df fldc aliend bar-slide h-fc">
+      <div class="df fldc aliend bar-slide h-fc show">
         <div class="section-switcher-container">
           <div class="section-switcher-list">
             <div class="section-switch" v-for="(section, index) in sections" :key="index" :class="{active: activeSection === section.id}">
@@ -61,8 +61,8 @@
           </div>
         </div>
       </div>
-      <playlist-view-slide v-show="currentPath === 'playlist-view'" class="bar-slide"></playlist-view-slide>
-      <downloads-view-slide v-show="currentPath === 'downloads-view'" class="bar-slide"></downloads-view-slide>
+      <playlist-view-slide :class="{show: currentPath === 'playlist-view'}" class="bar-slide" style="--slide-height: 6em;"></playlist-view-slide>
+      <downloads-view-slide :class="{show: currentPath === 'downloads-view'}" class="bar-slide"></downloads-view-slide>
     </div>
 
 
@@ -276,6 +276,7 @@ $loading-bar-height: 3px;
 
   // height: $tb-height;
   transition: height var(--ts-g);
+  transition-timing-function: var(--bezier-symmetric);
 }
 .title-bar-container {
   z-index: 1;
@@ -322,14 +323,20 @@ $loading-bar-height: 3px;
 }
 
 .bar-slider-container {
-  transition: transform 1s var(--bezier-chill);
+  transition: transform var(--top-bar-slider-transition);
   transform: translateX(var(--position-ptg))
 }
 
 .bar-slide {
   // display: inline-block;
-  min-width: 100%;height: 100%;
+  min-width: 100%;
   box-sizing: border-box;
+  transition: height var(--top-bar-slider-transition);
+  height: var(--slide-height);
+  &:not(.show) {
+    --slide-height: 0 !important;
+  }
+
 }
 
 .loading-bar {

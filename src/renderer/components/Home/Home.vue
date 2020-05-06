@@ -162,6 +162,9 @@ export default {
   &.fast {
     transition: transform 0s
   }
+  &:not(.release) {
+    transition-timing-function: var(--bezier-out);
+  }
   &.push {
     transform: scale(.75);
     opacity: 0;

@@ -15,10 +15,15 @@
   /* TRANSITIONS */
   --bezier: cubic-bezier(0, 1, 0, 1);
   --bezier-chill: cubic-bezier(0, 1, .5, 1);
+  --bezier-chill-inverted: cubic-bezier(1, 0, 1, .5);
+  --bezier-out: cubic-bezier(.75, 0, 1, .5);
+  --bezier-symmetric: cubic-bezier(.1, .5, .9, .5);
   --ts-g: 0.5s var(--bezier-chill);
   --ts-g-hard: 0.5s var(--bezier);
+  --ts-g-symmetric: 0.5s var(--bezier-symmetric);
   // --home-transition: .3s cubic-bezier(.12,.82,0,.99);
-  --home-transition: .5s var(--bezier-chill);
+  --home-transition: .3s var(--bezier-chill);
+  --top-bar-slider-transition: 1s cubic-bezier(.2, 1, .5, 1);
   /* VARIABLES */
   --body-color: var(--body-dark);
   --body-color-disconnected: #903;

@@ -73,7 +73,9 @@ export default {
     }
   },
   methods: {
-    getPlaylist ({params}) {
+    getPlaylist (path) {
+      if (path && path.name === 'home') return
+      const {params} = path
       this.playlist = params && this.$store.getters.PlaylistById(params.id)
       this.setStatus()
     },
