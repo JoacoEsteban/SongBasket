@@ -51,14 +51,6 @@ export default function (Vue) {
     await store.dispatch('set', {key, value})
     ipc.send(listenerId)
   })
-  ipc.on('initializeSetup', () => {
-    redirect('setup')
-  })
-  ipc.on('dataStored', async () => {
-    await store.dispatch('SETUP_LOADING_STATE', 'found')
-    await redirect('home')
-  })
-
   ipc.on('DOWNLOAD:START', (e, payload) => store.dispatch('downloadStarted', payload))
   ipc.on('DOWNLOAD:EVENT', (e, payload) => store.dispatch('downloadEvent', payload))
 
@@ -99,7 +91,7 @@ function onDocumentReady () {
   })
   vue.ipc.send('GET_STATUS', { listenerId })
 }
-async function onRetrievedTracks (e, tracks) {
+async function onRetrievedTracks (e, tracks = {}) {
   console.log('RETRIEVED', Object.keys(tracks).length)
   for (const primKey in tracks) {
     for (const secKey in tracks[primKey]) {

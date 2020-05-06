@@ -19,7 +19,7 @@
       ></home-background> -->
 
       <!-- <user-data style="z-index: 1" @logOut="logOut"></user-data> -->
-      <floating-buttons style="z-index: 1" @logOut="logOut"
+      <floating-buttons style="z-index: 1"
       @refreshPlaylists="refreshPlaylists"
       @youtubeConvert="youtubeConvert"
       @download="download"
@@ -91,11 +91,6 @@ export default {
     setPlaylistNPush (id) {
       this.$sbRouter.push({name: 'playlist-view', params: {id}})
     },
-    logOut () {
-      console.log('Logging Out:::::')
-      this.$router.push('setup')
-      this.$store.dispatch('logout')
-    },
     playlistSynced (id) {
       return this.syncedPlaylists.some(p => p === id)
     },
@@ -116,7 +111,6 @@ export default {
   },
   mounted () {
     // console.log('USER::::', this.user)
-    this.$root.logOut = this.logOut
 
     if (this.$store.state.CurrentUser.playlists.length === 0) { this.$router.push('/empty') }
 

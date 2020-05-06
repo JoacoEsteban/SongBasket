@@ -50,7 +50,22 @@ const core = {
       throw err
     }
   },
-  // -----------------
+  clearUser: async () => {
+    if (global.CONSTANTS.CLEAN_CREDS_ON_LOGOUT) await core.removeCredentials()
+    global.USER_ID = null
+    global.CONSTANTS.APP_STATUS.IS_LOGGED = false
+  },
+  logout: async () => {
+    try {
+      await FSController.FileWatchers.clearAll()
+      await FSController.UserMethods.unsetCurrentFolder()
+      VUEX_MAIN.COMMIT.LOGOUT()
+      await core.clearUser()
+    } catch (error) {
+      throw error
+    }
+  },
+  // -------------
   onLogin: async (details, CB) => {
     const next = () => CB({ requestHeaders: details.requestHeaders })
     try {
@@ -87,6 +102,7 @@ const core = {
   },
   removeCredentials: async (id = global.USER_ID) => {
     try {
+      if (!id) throw new Error('CURRENT USER ID MISSING')
       await keytar.deletePassword('songbasket', id)
     } catch (error) {
       throw error
@@ -102,6 +118,7 @@ const core = {
   },
   setSongbasketIdGlobally: async (id = GETTERS.currentUserId()) => {
     try {
+      if (!id) throw new Error('USER ID DOESN\'T EXIST')
       global.USER_ID = id
       global.SONGBASKET_ID = await core.getCredentials()
       API.createAxiosInstance()

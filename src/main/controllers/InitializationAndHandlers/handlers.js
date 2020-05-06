@@ -164,18 +164,36 @@ export function createLoginWindow () {
   })
 }
 
+export async function logout (e, {listenerId}) {
+  let error
+  try {
+    await core.logout()
+  } catch (err) {
+    error = err
+    SEND_ERROR(err)
+  } finally {
+    const status = getAppStatus()
+    status.error = error
+    ipcSend(listenerId, status)
+  }
+}
+
+const getAppStatus = () => {
+  const status = global.CONSTANTS.APP_STATUS
+  return {
+    APP_STATUS: status,
+    state: status.IS_LOGGED ? VUEX_MAIN.STATE_SAFE() : null,
+    downloadedTracks: status.IS_LOGGED ? FileWatchers.retrieveTracks() : null,
+    FFMPEG_BINS_DOWNLOADED: global.CONSTANTS.FFMPEG_BINS_DOWNLOADED
+  }
+}
+
 export async function onFfmpegBinaries () {
   ipcSend('FFMPEG_BINS_DOWNLOADED', { value: global.CONSTANTS.FFMPEG_BINS_DOWNLOADED })
 }
 
 export async function sendStatus (e, {listenerId}) {
-  const status = global.CONSTANTS.APP_STATUS
-  e.sender.send(listenerId, {
-    APP_STATUS: status,
-    state: status.IS_LOGGED ? VUEX_MAIN.STATE_SAFE() : null,
-    downloadedTracks: status.IS_LOGGED ? FileWatchers.retrieveTracks() : null,
-    FFMPEG_BINS_DOWNLOADED: global.CONSTANTS.FFMPEG_BINS_DOWNLOADED
-  })
+  e.sender.send(listenerId, getAppStatus())
 }
 
 // ------- EXTERNAL SOURCES -------

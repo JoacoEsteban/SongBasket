@@ -21,7 +21,9 @@ export function init (ipc = global.ipc) {
 
   ipc.on('setHomeFolder', handlers.setHomeFolder)
 
-  ipc.on('login', handlers.createLoginWindow)
+  ipc.on('LOGIN', handlers.createLoginWindow)
+
+  ipc.on('LOGOUT', handlers.logout)
 
   ipc.on('guestSignIn', function (event, { mode, query }) {
     console.log('Guest:: Type:', mode, query)

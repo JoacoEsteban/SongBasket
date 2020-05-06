@@ -8,11 +8,16 @@ const PATH = require('path')
 
 const homeFolderPath = () => global.HOME_FOLDER
 
-const onReadyFns = []
-const onTrackAddedFns = []
-const onTrackRemovedFns = []
+let onReadyFns
+let onTrackAddedFns
+let onTrackRemovedFns
 
-// let READY = 0
+const resetFns = () => {
+  onReadyFns = []
+  onTrackAddedFns = []
+  onTrackRemovedFns = []
+}
+resetFns()
 
 const FileWatchers = {
   tracks: {},
@@ -46,6 +51,18 @@ const FileWatchers = {
         if (stats) console.log('File', path, 'changed size to', stats.size)
       })
     })
+  },
+  async clearAll () {
+    try {
+      for (const watcher of this.watchers) {
+        await watcher.close()
+      }
+      this.watchers = []
+      this.tracks = {}
+      resetFns()
+    } catch (error) {
+      throw error
+    }
   },
   async retrieveTags (path) {
     try {

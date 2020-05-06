@@ -66,6 +66,12 @@ const UserMethods = {
     SESSION_FOLDER_PATHS = folders
     this.writeHomeFolders()
   },
+  async unsetCurrentFolder (path) {
+    const folders = await this.getFolders()
+    folders.selected = null
+    SESSION_FOLDER_PATHS = folders
+    await this.writeHomeFolders()
+  },
   async retrieveFolders () {
     try {
       let folders = await this.getFolders()

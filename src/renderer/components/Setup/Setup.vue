@@ -36,7 +36,7 @@ export default {
       this.$IPC.send('setHomeFolder')
     },
     login () {
-      this.$IPC.send('login')
+      this.$IPC.send('LOGIN')
     },
     guestSearch (request) {
       if (this.loadingState !== 'Loading' && request.query !== '' && request.query !== undefined && request.query !== null) {

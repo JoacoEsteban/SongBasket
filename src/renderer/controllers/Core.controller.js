@@ -69,6 +69,27 @@ const CoreController = {
     }
 
     emitEvent()
+  },
+  async logOut () {
+    try {
+      console.log('Logging Out:::::')
+      const listenerId = uuid()
+      vue.ipc.once(listenerId, async (e, appStatus) => {
+        try {
+          if (appStatus.error) throw appStatus.error
+          await getVueInstance().$store.dispatch('logout')
+          vue.root.DOWNLOADED_TRACKS = {}
+          vue.root.CONVERTED_TRACKS_FORMATTED
+
+          getVueInstance().$router.push('setup')
+        } catch (error) {
+          throw error
+        }
+      })
+      vue.ipc.send('LOGOUT', {listenerId})
+    } catch (error) {
+      throw error
+    }
   }
 }
 

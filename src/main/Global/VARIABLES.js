@@ -13,10 +13,7 @@ module.exports = global.CONSTANTS = {
     }
   },
   FFMPEG_BINS_DOWNLOADED: false,
-  HOME_PUSHED: false,
-  WINDOW_FINISHED_LOADING: false,
-  DOCUMENT_FINISHED_LOADING: false,
-  ONLINE: false,
+  CLEAN_CREDS_ON_LOGOUT: false,
   // -------------
 
   // ELECTRON DEFAULTS

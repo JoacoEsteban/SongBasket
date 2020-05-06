@@ -142,7 +142,7 @@ const mutations = {
     SAVE_TO_DISK()
   },
 
-  LOGOUT (state) {
+  LOGOUT () {
     console.log('CLEARING::::::::')
     Object.assign(state, getDefaultState())
   },
