@@ -96,8 +96,8 @@ export default {
       this.hoverTransitionsTimeout = setTimeout(this.clearHoverTransitions, 1000)
     },
     applyHoverTransitions () {
-      this.getRotationElement().css('transition', 'transform var(--local-hover-transition)')
-      this.getLightShineElement().css('transition', 'all var(--local-hover-transition-fast)')
+      this.getRotationElement().css('transition', 'transform var(--card-hover-transition)')
+      this.getLightShineElement().css('transition', 'all var(--card-hover-transition-fast)')
     },
     clearHoverTransitions () {
       this.getRotationElement().css('transition', '')
@@ -172,18 +172,13 @@ export default {
 <style lang="scss" scoped>
 $q-false-color: #1b1b1b;
 $q-true-color: rgb(103, 214, 0);
-$bezier-tranka: cubic-bezier(0.12, 0.82, 0, 1);
 
 // $playlist-height: 4em;
 $title-size: .8em;
-$transition-soft:  var(--local-hover-transition);
-$transition-hard: .5s var(--bezier);
-$hovering-transition: .3s $bezier-tranka;
+$transition-soft: var(--card-hover-transition);
+$transition-hard: var(--ts-g-hard);
 
 .card-container {
-  // --local-hover-transition: 0.5s cubic-bezier(0.12, 0.82, 0, 1);
-  --local-hover-transition: 1s #{$bezier-tranka};
-  --local-hover-transition-fast: .5s #{$bezier-tranka};
   box-sizing: border-box;
   padding: var(--container-padding-x) calc(var(--container-padding-x) / 2);
   padding-top: 0;
@@ -224,7 +219,7 @@ $hovering-transition: .3s $bezier-tranka;
       cursor: pointer;
       position: relative;
       background: $q-false-color;
-      $transition: var(--local-hover-transition);
+      $transition: var(--card-hover-transition);
       transition: background-color $transition,
       box-shadow $transition;
       // transform $transition;
@@ -260,7 +255,7 @@ $hovering-transition: .3s $bezier-tranka;
       bottom: $offset*1px;
       right: $offset/2*1em;
       left: $offset/2*1em;
-      transition: opacity $hovering-transition;
+      transition: opacity var(--card-hover-transition-fast);
       // transition: opacity $transition-soft;
       opacity: .5;
       background: linear-gradient(31deg, transparent 50%, rgba(255,255,255,.045) 50%, transparent 100%);

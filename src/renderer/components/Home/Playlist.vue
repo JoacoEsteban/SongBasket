@@ -109,9 +109,6 @@ $bezier-tranka: cubic-bezier(0.12, 0.82, 0, 1);
 
 $playlist-height: 4em;
 $title-size: .8em;
-$transition-soft:  var(--local-hover-transition);
-$transition-hard: .5s var(--bezier);
-$hovering-transition: .3s $bezier-tranka;
 
 .playlist-data {
   text-align-last: left;

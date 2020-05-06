@@ -23,6 +23,7 @@ export default {
     return {
       showLocal: false,
       transitioning: false,
+      // TODO adapt to global transition scale factor
       transitionTime: 300
     }
   },

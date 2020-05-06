@@ -202,8 +202,6 @@ export default {
 <style lang="scss" scoped>
 $bezier: cubic-bezier(0, 1, 0, 1);
 $bezier-chill: cubic-bezier(0, 1, .5, 1);
-$transition-global: 0.5s $bezier-chill;
-$transition-global-hard: 0.5s $bezier;
 
 .pll-container {
   --padding-x: var(--container-padding-x);
@@ -216,6 +214,7 @@ $transition-global-hard: 0.5s $bezier;
   padding-top: 0;
 }
 .actual-list {
+  // TODO Adapt transition to global trasition scale factor
   --list-transition-time: .3s;
   $transition: var(--list-transition-time) $bezier-chill;
   transition: transform $transition, opacity $transition;

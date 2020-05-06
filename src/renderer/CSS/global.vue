@@ -51,7 +51,7 @@ body {
   user-select: none;
   overflow: hidden;
   height: 100%;
-  $t: 1s var(--bezier-chill);
+  $t: var(--body-colors-transition);
   transition: background-color $t, color $t;
 }
 body:hover {
@@ -62,7 +62,7 @@ body:hover {
   font-weight: normal;
 }
 .button {
-  $transition: 0.3s var(--bezier-chill);
+  $transition: var(--button-transition);
   outline: none;
   font-family: "made_tommy";
   font-weight: bold;
