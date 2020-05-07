@@ -163,22 +163,30 @@ const core = {
     }
   },
   getAndStorePlaylists: async (playlists, completionCb) => {
-    playlists = playlists.map(pl => typeof pl === 'string' ? { id: pl } : pl)
-
-    for (const pl of playlists) {
-      let err = null
+    return new Promise((resolve, reject) => {
       try {
-        console.log('playlist', pl)
-        const playlist = await API.getPlaylist(pl)
-        playlist && VUEX_MAIN.COMMIT.PLAYLIST_STORE_TRACKS(playlist)
+        playlists = playlists.map(pl => typeof pl === 'string' ? { id: pl } : pl)
+        // for (const pl of playlists) {
+        let remaining = playlists.length
+        playlists.forEach(async pl => {
+          let err = null
+          try {
+            console.log('playlist', pl)
+            const playlist = await API.getPlaylist(pl)
+            playlist && VUEX_MAIN.COMMIT.PLAYLIST_STORE_TRACKS(playlist)
+          } catch (error) {
+            // TODO handle this
+            console.error('ERROR WHEN FETCHING PLAYLIST')
+            throw error
+          } finally {
+            completionCb && completionCb(err, pl, playlists)
+            !--remaining && resolve()
+          }
+        })
       } catch (error) {
-        // TODO handle this
-        console.error('ERROR WHEN FETCHING PLAYLIST')
-        throw error
-      } finally {
-        completionCb && completionCb(err, pl, playlists)
+        return reject(error)
       }
-    }
+    })
   },
   populateQueuedPlaylists: async () => {
     try {
