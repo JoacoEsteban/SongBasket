@@ -75,11 +75,15 @@ const mutations = {
   },
   DOWNLOAD_STARTED (state, tracks) {
     state.DOWNLOADED_TRACKS = 0
-    state.DOWNLOAD_QUEUE = tracks.map(id => ({
-      id, // song id
-      state: 'awaiting', // eg: downloading, extracting, applying tags
-      ptg: 0 // eg: 36%
-    }))
+    state.DOWNLOAD_QUEUE = tracks.map(({id, info}) => {
+      (info.finished || info.currentStatus.includes('error')) && ++state.DOWNLOADED_TRACKS
+      return {
+        id, // song id
+        state: info.currentStatus,
+        ptg: (info.currentStatus.includes('ing') && info.ptg) || 0
+      }
+    })
+    state.LOADING_STATE.ptg = 1 / tracks.length * state.DOWNLOADED_TRACKS
   },
   DOWNLOAD_FINISHED (state, tracks) {
     onDownloadEnd()

@@ -70,6 +70,11 @@ const CoreController = {
 
     emitEvent()
   },
+  download () {
+    const loading = vue.store.state.Events.LOADING_STATE || {}
+    if (!loading.value) vue.ipc.send('download')
+    getVueInstance().$sbRouter.push({name: 'downloads-view'})
+  },
   async logOut () {
     try {
       console.log('Logging Out:::::')

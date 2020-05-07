@@ -27,7 +27,7 @@ const emitEvent = {
     }, 300)
   },
   downloadStarted: (tracks) => {
-    emitEvent.send('DOWNLOAD:START', tracks.map(t => t.id))
+    emitEvent.send('DOWNLOAD:START', tracks.map(({id, info}) => ({id, info})))
   },
   downloadFinished: (tracks) => {
     emitEvent.send('DOWNLOAD:END')
@@ -43,16 +43,21 @@ const emitEvent = {
   }
 }
 
+let ALL_TRACKS
 export default {
+  async onDowloadStart () {
+    console.log('--------------DOWNLOAD STARTED--------------')
+    ALL_TRACKS && emitEvent.downloadStarted(ALL_TRACKS)
+  },
   async downloadSyncedPlaylists (localTracks, plFilter) {
     console.log('Stored tracks: ', localTracks.length)
     let tracksToDownload = customGetters.convertedTracks()
     if (plFilter) tracksToDownload = tracksToDownload.filter(t => t.playlists.some(pl => plFilter.includes(pl.id)))
-    const allTracks = constructDownloads((await downloadLinkRemove(localTracks, utils.cloneObject(tracksToDownload), plFilter)).filter(track => track.playlists.length)) // TODO Prevent this filter from ever happening
-    emitEvent.downloadStarted(allTracks)
+    ALL_TRACKS = constructDownloads((await downloadLinkRemove(localTracks, utils.cloneObject(tracksToDownload), plFilter)).filter(track => track.conversion.yt.length && track.playlists.length)) // TODO Prevent this filter from ever happening
+    this.onDowloadStart()
 
     let hasErrors = false
-    for (const track of allTracks) {
+    for (const track of ALL_TRACKS) {
       try {
         await track.controller.execute()
       } catch (error) {
@@ -66,6 +71,7 @@ export default {
     if (hasErrors) console.error('ERRORS DURING DOWNLOAD')
     else console.log('ALL TRACKS DOWNLOADED')
     emitEvent.downloadFinished()
+    ALL_TRACKS = null
   }
 }
 
@@ -96,12 +102,51 @@ function constructDownloads (tracks) {
           constructDownload: () => {},
           constructExtraction: () => {},
           endCallback: () => {},
+        },
+        info: {
+          download: {
+            ptg: 0,
+            finished: false,
+            error: null
+          },
+          extraction: {
+            ptg: 0,
+            finished: false,
+            error: null
+          },
+          tags: {
+            finished: false,
+            error: null
+          },
+          currentStatus: 'awaiting',
+          finished: false
         }
       }
     */
     const {id, playlists, data, selection} = track
     const instance = {
       id,
+      info: {
+        download: {
+          ptg: 0,
+          finished: false,
+          error: null,
+          size: null,
+          currentSize: null
+        },
+        extraction: {
+          ptg: 0,
+          finished: false,
+          error: null
+        },
+        tags: {
+          finished: false,
+          error: null
+        },
+        currentStatus: 'awaiting',
+        ptg: 0,
+        finished: false
+      },
       yt: selection,
       data,
       playlists: playlists.map(({id}) => ({
@@ -146,9 +191,6 @@ function constructDownloads (tracks) {
   const constructVideoDownload = (instance) => {
     instance.download = {
       info: {
-        downloadStarted: false,
-        downloadFinished: false,
-        downloadError: null,
         size: null,
         currentSize: 0
       },
@@ -164,28 +206,32 @@ function constructDownloads (tracks) {
           // -------------EVENTS-------------
           // Will be called when the download starts.
           download.on('info', info => {
-            instance.download.info.size = info.size
-            instance.download.info.downloadStarted = true
-            console.log(instance && instance.id, 'ins passed?')
+            instance.info.download.size = info.size
+            instance.info.currentStatus = 'downloading'
             emitEvent.download({type: 'start', id: instance.id})
           })
 
           download.on('data', chunk => {
-            instance.download.info.currentSize += chunk.length
-            const ptg = Math.round(instance.download.info.currentSize / instance.download.info.size * 100)
+            instance.info.download.currentSize += chunk.length
+            const ptg = Math.round(instance.info.download.currentSize / instance.info.download.size * 100)
+            instance.info.ptg = instance.info.download.ptg = ptg
             emitEvent.download({type: 'progress', id: instance.id, ptg})
           })
 
           download.on('error', (error) => {
             // TODO HANDLE ERROR AND STOP ROUTINE
             console.error('Error when downloading video::::', error)
-            instance.download.info.downloadError = error
+            instance.info.download.error = error
+            instance.info.currentStatus = 'download_error'
             emitEvent.download({type: 'error', id: instance.id})
             return reject(error)
           })
 
           download.on('end', async () => {
-            if (instance.download.info.downloadError) return
+            instance.info.download.finished = true
+            if (instance.info.download.error) return
+            instance.info.download.ptg = 100
+            instance.info.currentStatus = 'download_end'
             console.log('video downloaded')
             emitEvent.download({type: 'end', id: instance.id})
             return resolve()
@@ -205,25 +251,41 @@ function constructDownloads (tracks) {
       converter: {
         convert: async () => {
           try {
+            instance.info.currentStatus = 'extracting'
             emitEvent.extraction({type: 'start', id: instance.id})
+            instance.info.ptg = 0
             await extractMp3(instance.paths.mp3FilePath, instance.paths.mp4FilePath, instance.downloadFormat, progress => {
-              emitEvent.extraction({type: 'progress', id: instance.id, ptg: Math.round(progress.percent)})
+              const ptg = Math.round(progress.percent)
+              instance.info.ptg = instance.info.extraction.ptg = ptg
+              emitEvent.extraction({type: 'progress', id: instance.id, ptg})
             })
           } catch (err) {
+            instance.info.extraction.error = err
+            instance.info.currentStatus = 'extraction_error'
             emitEvent.extraction({type: 'error', id: instance.id})
             throw err
+          } finally {
+            instance.info.extraction.finished = true
+            !instance.info.extraction.error && (instance.info.extraction.ptg = 100) + (instance.info.currentStatus = 'extraction_end')
+            emitEvent.extraction({type: 'end', id: instance.id})
           }
-          emitEvent.extraction({type: 'end', id: instance.id})
 
           try {
+            instance.info.currentStatus = 'tags'
             emitEvent.tags({type: 'start', id: instance.id})
             await applyTags(instance.paths.mp3FilePath, instance.data, instance.yt)
             console.log('finished tags')
           } catch (err) {
+            instance.info.tags.error = err
+            instance.info.currentStatus = 'tags_error'
             emitEvent.tags({type: 'error', id: instance.id})
             throw err
+          } finally {
+            !instance.info.tags.error && (instance.info.currentStatus = 'tags_end')
+            instance.info.tags.finished = true
+            instance.info.finished = true
+            emitEvent.tags({type: 'end', id: instance.id})
           }
-          emitEvent.tags({type: 'end', id: instance.id})
         },
         move: async () => {
           let moveFunction = utils.copyNRemove

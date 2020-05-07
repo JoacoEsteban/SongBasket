@@ -28,9 +28,9 @@ export default (Vue) => {
   function toggleMaximization () {
     electronWindow.isMaximized() ? electronWindow.unmaximize() : electronWindow.maximize()
   }
-  window.toggleMaximization = toggleMaximization;
+  window.toggleMaximization = toggleMaximization
 
-  (function () {
+  ;(function () {
     function init () {
       const window = electronWindow = BrowserWindow.getFocusedWindow()
       if (!window || !document.getElementById('min-btn') || !document.getElementById('max-btn') || !document.getElementById('close-btn')) return false

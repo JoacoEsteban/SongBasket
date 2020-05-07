@@ -180,12 +180,14 @@ export async function logout (e, {listenerId}) {
 
 const getAppStatus = () => {
   const status = global.CONSTANTS.APP_STATUS
-  return {
+  const all = {
     APP_STATUS: status,
     state: status.IS_LOGGED ? VUEX_MAIN.STATE_SAFE() : null,
     downloadedTracks: status.IS_LOGGED ? FileWatchers.retrieveTracks() : null,
     FFMPEG_BINS_DOWNLOADED: global.CONSTANTS.FFMPEG_BINS_DOWNLOADED
   }
+  if (load.instance.value && load.instance.target === 'DOWNLOAD') setTimeout(youtubeDl.onDowloadStart)
+  return all
 }
 
 export async function onFfmpegBinaries () {
@@ -252,6 +254,7 @@ export async function youtubize () {
 }
 
 export async function download (e, plFilter) {
+  if (!load.canRequest) return
   console.log('About to download')
   try {
     load.on('DOWNLOAD')

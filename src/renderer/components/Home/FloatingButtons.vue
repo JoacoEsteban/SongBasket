@@ -161,8 +161,7 @@ export default {
       this.$emit('youtubeConvert')
     },
     download () {
-      if (this.loading && this.loadingTarget === 'DOWNLOAD') return this.$sbRouter.push({name: 'downloads-view'})
-      this.$emit('download')
+      this.$controllers.core.download()
     }
   }
 

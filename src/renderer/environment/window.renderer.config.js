@@ -19,14 +19,17 @@ function invalidatePlTransformCache () {
   thisVue().$root.plTransformInvalidation = Date.now()
 }
 
-function handleMetaKeyCombo (keyCode) {
+function handleMetaKeyCombo (keyCode, {shiftKey}) {
   switch (keyCode) {
     case 219:
-      return thisVue().$sbRouter.goBack()
+      thisVue().$sbRouter.goBack()
+      break
     case 221:
-      return thisVue().$sbRouter.goForward()
+      thisVue().$sbRouter.goForward()
+      break
     case 68:
-      return thisVue().$sbRouter.push({name: 'downloads-view'})
+      (shiftKey && thisVue().$controllers.core.download()) + thisVue().$sbRouter.push({name: 'downloads-view'})
+      break
     default:
   }
 }

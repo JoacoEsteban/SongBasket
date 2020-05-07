@@ -4,7 +4,6 @@
       <top-bar
       @refreshPlaylists="refreshPlaylists"
       @youtubeConvert="youtubeConvert"
-      @download="download"
       />
 
         <component-loader class="home-router"
@@ -15,7 +14,6 @@
       <floating-buttons style="z-index: 1"
       @refreshPlaylists="refreshPlaylists"
       @youtubeConvert="youtubeConvert"
-      @download="download"
       ></floating-buttons>
     </div>
   </div>
@@ -96,10 +94,6 @@ export default {
     openYtVideo (id) {
       console.log('openYtVideo', id)
       this.$IPC.send('openYtVideo', id)
-    },
-    download () {
-      this.$IPC.send('download')
-      this.$sbRouter.push({name: 'downloads-view'})
     }
   },
   mounted () {
