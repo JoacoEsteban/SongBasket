@@ -39,6 +39,7 @@
   --body-colors-transition: #{tr(1s)} var(--bezier-chill);
 
   --button-transition: #{tr(0.3s)} var(--bezier-chill);
+  --banner-background-transition: width #{tr(1s)} var(--bezier-chill), opacity #{tr(.2s)} var(--bezier-chill);
 
   /* VARIABLES */
   --body-color: var(--body-dark);

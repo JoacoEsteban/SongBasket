@@ -138,7 +138,7 @@ $extraction-bg: linear-gradient(258.84deg, $ex1, $ex2);
     position: absolute;
     left: 0;top: 0;bottom: 0;
     width: var(--progress);
-    transition: width 1s var(--bezier-chill), opacity .2s var(--bezier-chill);
+    transition: var(--banner-background-transition);
     z-index: 0;
     display: flex;
     align-items: flex-start;
