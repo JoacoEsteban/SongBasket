@@ -5,7 +5,8 @@ let ALL_PLAYLISTS = []
 let ALL_TRACKS = []
 
 export function makeConversionQueries () {
-  let syncedPlaylists = customGetters.SyncedPlaylistsSp().map(pl => {
+  let syncedPlaylists = customGetters.SyncedPlaylistsSp_SAFE().map(pl => {
+    if (pl.isPaused) return null
     return {
       ...pl,
       synced: true
@@ -66,7 +67,6 @@ function findDuplicatedTracks () {
       }
       // Pushing to playlist register if found
       if (found !== false) {
-        console.log('dicantanari')
         if (!ALL_TRACKS[found].playlists.some(pl => pl.id === plTrackModel.id)) ALL_TRACKS[found].playlists.push(plTrackModel) // Adding new added playlists to local conversion of track
       } else {
         console.log('new track', dirtyTrack.name, dirtyTrack.id)

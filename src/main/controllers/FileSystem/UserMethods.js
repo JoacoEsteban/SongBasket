@@ -269,7 +269,7 @@ const UserMethods = {
 
     const iconSetter = Helpers.getIconSetterHelper()
     if (!iconSetter) return console.error('NO ICONSETTER FOR THIS PLATFORM')
-    const pls = customGetters.SyncedPlaylistsSp().filter(p => !plFilter || plFilter.includes(p.id)).map(({folderName, name, images}) => ({ path: PATH.join((homeFolderPath()), utils.encodeIntoFilename(folderName || name)).replace(/ /g, '\\ '), imageUrl: images && images[0] && images[0].url })).filter(pl => pl.path && pl.imageUrl)
+    const pls = customGetters.SyncedPlaylistsSp_SAFE().filter(p => !plFilter || plFilter.includes(p.id)).map(({folderName, name, images}) => ({ path: PATH.join((homeFolderPath()), utils.encodeIntoFilename(folderName || name)).replace(/ /g, '\\ '), imageUrl: images && images[0] && images[0].url })).filter(pl => pl.path && pl.imageUrl)
 
     pls.forEach(async pl => {
       if (!params.force && await iconSetter.test(pl.path)) return

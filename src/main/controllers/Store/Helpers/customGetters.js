@@ -30,6 +30,9 @@ export default {
     }
     return all
   },
+  SyncedPlaylistsSp_SAFE () {
+    return this.SyncedPlaylistsSp().filter(pl => !pl.isPaused)
+  },
   syncedPlaylistsSnapshots () {
     return store.state.syncedPlaylists.map(plid => {
       const { id, snapshot_id, isPaused } = store.state.playlists.find(pl => pl.id === plid)

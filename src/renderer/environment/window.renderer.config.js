@@ -19,7 +19,8 @@ function invalidatePlTransformCache () {
   thisVue().$root.plTransformInvalidation = Date.now()
 }
 
-function handleMetaKeyCombo (keyCode, {shiftKey}) {
+function handleMetaKeyCombo (keyCode, e) {
+  const {shiftKey} = e
   switch (keyCode) {
     case 219:
       thisVue().$sbRouter.goBack()
@@ -30,6 +31,10 @@ function handleMetaKeyCombo (keyCode, {shiftKey}) {
     case 68:
       (shiftKey && thisVue().$controllers.core.download()) + thisVue().$sbRouter.push({name: 'downloads-view'})
       break
+    case 82:
+      e.preventDefault()
+      shiftKey && (thisVue().$controllers.core.refresh() + (e && e.preventDefault()))
+      break
     default:
   }
 }
@@ -39,6 +44,7 @@ function isCommandKey (meta, control) {
 }
 function handleWindowKey (e) {
   const {keyCode, metaKey, ctrlKey} = e
+  // console.log(keyCode)
   if (isCommandKey(metaKey, ctrlKey) && keyCode !== 8) return handleMetaKeyCombo(keyCode, e)
   if (isAscii(keyCode) || (keyCode === 8 && thisVue().$root.searchInputElement && thisVue().$root.searchInputElement.value.length)) return focusSearchbar()
 }
