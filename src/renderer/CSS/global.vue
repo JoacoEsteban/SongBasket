@@ -45,6 +45,7 @@ html {
 body {
   background-color: var(--body-color);
   color: var(--text-white);
+  --icon-color: var(--text-white);
   font-family: "made_tommy", sans-serif;
   font-size: 1em;
   margin: 0;

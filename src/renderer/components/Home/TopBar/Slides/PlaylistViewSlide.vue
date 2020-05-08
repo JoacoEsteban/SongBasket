@@ -1,6 +1,5 @@
 <template>
   <div v-if="playlist" class="pl-view-slide-container">
-    <!-- FIXME container not adapting to this component height -->
     <div class="image" :style="{'background-image': `url(${image})`}">
       <div class="rel-full">
         <div class="gradient abs-full"></div>
@@ -9,15 +8,35 @@
     </div>
 
     <div class="data">
-      <div class="title bold window-nodrag">
+      <div class="title df alic bold window-nodrag">
         <span>
           {{playlist.name}}
         </span>
-        <div class="button" @click="downloadPlaylist">
-          Download TEMP
-        </div>
-        <div class="button" @click="unsyncPlaylist">
-          Unsync TEMP
+        <div class="controls-container">
+          <div class="icon-wrapper" :class="{show: showDownload}">
+            <button class="icon window-nodrag" @click="downloadPlaylist">
+              <download-icon>
+              </download-icon>
+            </button>
+          </div>
+          <div class="icon-wrapper" :class="{show: showUnsync}">
+            <button class="icon window-nodrag" @click="unsyncPlaylist">
+              <close-icon>
+              </close-icon>
+            </button>
+          </div>
+          <div class="icon-wrapper" :class="{show: showPause}">
+            <button class="icon window-nodrag" @click="pausePlaylist">
+              <pause-icon>
+              </pause-icon>
+            </button>
+          </div>
+          <div class="icon-wrapper" :class="{show: showUnPause}">
+            <button class="icon window-nodrag" @click="pausePlaylist">
+              <play-icon>
+              </play-icon>
+            </button>
+          </div>
         </div>
       </div>
       <div class="track-count regular">
@@ -36,7 +55,17 @@
 </template>
 
 <script>
+import DownloadIcon from '@/assets/icons/download-icon'
+import CloseIcon from '@/assets/icons/close-icon'
+import PauseIcon from '@/assets/icons/pause-icon'
+import PlayIcon from '@/assets/icons/play-icon'
 export default {
+  components: {
+    DownloadIcon,
+    CloseIcon,
+    PauseIcon,
+    PlayIcon
+  },
   data () {
     return {
       playlist: null,
@@ -44,24 +73,33 @@ export default {
     }
   },
   computed: {
-    // playlist () {
-    //   return this.$store.getters.CurrentPlaylist
-    // },
     trackAmmount () {
       return this.playlist && this.playlist.tracks && this.playlist.tracks.total
     },
     trackAmmountStr () {
       return this.trackAmmount + ' Track' + (this.trackAmmount === 1 ? '' : 's')
     },
-    status () {
-      if (this.playlist && this.$store.getters.PlaylistIsSynced(this.playlist.id)) return 'synced'
-      else return null
-    },
     image () {
       return this.playlist && this.playlist.images && this.playlist.images[0] && this.playlist.images[0].url
     },
     playlistTracksReComputed () {
       return this.$store.state.Events.PLAYLIST_TRACKS_RE_COMPUTED
+    },
+    playlistStateChanged () {
+      return this.$store.state.Events.PLAYLIST_STATE_CHANGED
+    },
+    // -----------------
+    showDownload () {
+      return this.showPause
+    },
+    showUnsync () {
+      return true
+    },
+    showPause () {
+      return this.statusObj && !this.statusObj.slug.includes('pause')
+    },
+    showUnPause () {
+      return !this.showPause
     }
   },
   created () {
@@ -70,10 +108,13 @@ export default {
   watch: {
     playlistTracksReComputed () {
       this.setStatus()
+    },
+    playlistStateChanged () {
+      this.getPlaylist()
     }
   },
   methods: {
-    getPlaylist (path) {
+    getPlaylist (path = this.$sbRouter.giveMeCurrent()) {
       if (path && path.name === 'home') return
       const {params} = path
       this.playlist = params && this.$store.getters.PlaylistById(params.id)
@@ -85,11 +126,14 @@ export default {
     },
     downloadPlaylist () {
       if (!(this.playlist && this.playlist.id)) return
-      this.$IPC.send('download', [this.playlist.id])
+      this.$controllers.core.download(this.playlist.id)
       this.$sbRouter.push({name: 'downloads-view'})
     },
     unsyncPlaylist () {
       this.$store.dispatch('openModal', {wich: 'unsync', payload: {id: this.playlist.id}})
+    },
+    pausePlaylist () {
+      this.$controllers.core.pausePlaylist(this.playlist.id)
     }
   }
 }
@@ -135,6 +179,49 @@ $tit-fz: 1.2em;
   }
   .playlist-status-indicator {
     margin-top: .5em;
+  }
+}
+.controls-container {
+  display: flex;
+  align-items: center;
+  padding-left: .25em;
+  $icon-size: 1.5em;
+  .icon-wrapper {
+    box-sizing: border-box;
+    width: 0;
+    padding: 0;
+    transition: var(--hover-n-active-transitions);
+    transform: scale(.7);
+    opacity: 0;
+    pointer-events: none;
+    &.show {
+      pointer-events: all;
+      transform: initial;
+      padding: 0 .2em;
+      opacity: 1;
+      width: $icon-size;
+    }
+  }
+  button.icon {
+    &:hover {
+      background-color: var(--button-purple)
+    }
+    box-shadow: none;
+    transition: box-shadow var(--ts-g), var(--hover-n-active-transitions);
+    &:active {
+      opacity: 0.7;
+      transform: scale(.95);
+    }
+    background-color: transparent;
+    border-radius: 50%;
+    padding: .3em;
+    width: $icon-size;
+    height: $icon-size;
+    outline: 0;
+    border: 0;
+    svg {
+      padding: 0;
+    }
   }
 }
 </style>

@@ -70,10 +70,19 @@ const CoreController = {
 
     emitEvent()
   },
-  download () {
+  download (playlistFilter) {
     const loading = vue.store.state.Events.LOADING_STATE || {}
-    if (!loading.value) vue.ipc.send('download')
+    if (!loading.value) vue.ipc.send('download', playlistFilter)
     getVueInstance().$sbRouter.push({name: 'downloads-view'})
+  },
+  pausePlaylist (id) {
+    return new Promise((resolve, reject) => {
+      const loading = vue.store.state.Events.LOADING_STATE || {}
+      if (loading.value) return
+      const listenerId = uuid()
+      vue.ipc.once(listenerId, (e, error) => error ? reject(error) : resolve())
+      vue.ipc.send('PLAYLISTS:PAUSE', {id, listenerId})
+    })
   },
   async logOut () {
     try {

@@ -104,8 +104,10 @@ export default {
     playlistTracksReComputed () {
       this.refreshAll()
     },
+    playlistStateChanged () {
+      this.refreshPlaylist()
+    },
     playlistUnsynced () {
-      console.log('seguro man??')
       this.$sbRouter.push({name: 'home', params: {which: 'playlists-list'}})
     }
   },

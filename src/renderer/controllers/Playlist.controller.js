@@ -97,7 +97,8 @@ const statuses = {
       slug: 'paused',
       msg: 'Paused',
       sortOrder: 100,
-      color: 'var(--global-grey)'
+      color: 'var(--global-grey)',
+      baseState: 'synced'
     }
   },
   get synced () {

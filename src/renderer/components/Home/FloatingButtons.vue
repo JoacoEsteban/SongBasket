@@ -217,8 +217,13 @@ $whole-height: 5em;
       justify-content: flex-end
     }
 }
+</style>
 
+<style lang="scss">
+$offsetY: .5em;
+$t: var(--ts-g);
 .sb-fab {
+  -webkit-app-region: no-drag;
   box-sizing: border-box;
   cursor: pointer;
   pointer-events: all;

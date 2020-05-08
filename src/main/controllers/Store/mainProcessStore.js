@@ -397,6 +397,20 @@ const mutations = {
       throw error
     }
   },
+  async PAUSE_PLAYLIST (id) {
+    try {
+      console.log('PAUSING ', id)
+      if (!state.syncedPlaylists.find(pl => pl && pl === id)) throw new Error('Playlist not found inside SyncedPlaylists list')
+      const playlist = state.playlists.find(pl => pl && pl.id === id)
+      if (!playlist) throw new Error('Playlists not found inside playlists list')
+
+      playlist.isPaused = !playlist.isPaused
+
+      // await SAVE_TO_DISK()
+    } catch (error) {
+      throw error
+    }
+  },
   CUSTOM_TRACK_URL ({details, trackId}) {
     const track = state.convertedTracks[findById(trackId, state.convertedTracks)]
     if (!track) return console.error('TRACK NOT FOUND IN CONVERTED TRACKS :: CUSTOM_TRACK_URL')

@@ -11,9 +11,9 @@ export default {
   },
   data () {
     return {
-      path: 'M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z',
+      path: 'M14,19H18V5H14M6,19H10V5H6V19Z',
       iconColor: 'var(--icon-color)',
-      className: 'icon download-icon'
+      className: 'icon close-icon'
     }
   }
 }

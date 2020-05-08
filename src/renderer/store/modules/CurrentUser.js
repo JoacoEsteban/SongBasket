@@ -18,10 +18,24 @@ const getDefaultState = () => {
 
 const state = getDefaultState()
 
+const dispatchAppropiateEvent = {
+  events: {
+    'playlistStateChanged': ['playlists', 'syncedPlaylists', 'deletedPlaylists']
+  },
+  getEvent (actualKey) {
+    return Object.keys(this.events).find(key => this.events[key].some(state => state === actualKey))
+  },
+  send (env, key) {
+    const event = this.getEvent(key)
+    if (event) env.dispatch(event, {}, {root: true})
+  }
+}
+
 const actions = {
   set ({commit}, {key, value}) {
     return new Promise((resolve, reject) => {
       commit('SET', {key, value})
+      dispatchAppropiateEvent.send(this, key)
       resolve()
     })
   },

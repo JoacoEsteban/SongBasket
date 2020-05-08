@@ -33,6 +33,8 @@
   --home-transition: #{tr(.3s)} var(--bezier-chill);
   --top-bar-slider-transition: #{tr(1s)} cubic-bezier(.2, 1, .5, 1);
 
+  $t: var(--ts-g);
+  --hover-n-active-transitions: opacity #{$t}, transform #{$t}, background-color #{$t};
   --card-hover-transition: #{tr(1s)} var(--bezier-chill-2);
   --card-hover-transition-fast: #{tr(.5s)} var(--bezier-chill-2);
 

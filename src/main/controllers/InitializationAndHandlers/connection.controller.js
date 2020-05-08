@@ -27,5 +27,5 @@ const pingApi = async () => {
     connected = false
   }
   if (global.CONNECTED_TO_API !== connected) (global.CONNECTED_TO_API = connected) + API_CB(connected)
-  setTimeout(pingApi, 1000 * 60)
+  setTimeout(pingApi, global.CONSTANTS.HEROKU_PING_INTERVAL)
 }

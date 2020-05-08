@@ -2,14 +2,19 @@ import $ from 'jquery'
 
 import axios from 'axios'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
+import * as FontAwesome from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { v4 as uuidv4 } from 'uuid'
 
 import * as utils from '../utils'
 import SbRouter from './sbRouter'
 
-library.add(faArrowRight, faArrowLeft)
+const icons = [
+  'faArrowRight',
+  'faArrowLeft'
+  // 'faLongArrowDown'
+]
+icons.forEach(icon => library.add(FontAwesome[icon]))
 
 export default function (Vue) {
   if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
@@ -26,6 +31,7 @@ export default function (Vue) {
     $(':root')[0].style.setProperty('--' + keys.kebab, val)
     window.ROOT_VARS[keys.camel] = valJs || val
   }
+  Vue.prototype.$constantcase = window.$constantcase = require('constant-case')
   Vue.prototype.$camelcase = require('camelcase')
   Vue.prototype.$pascalcase = require('pascalcase')
   setControllers(Vue)

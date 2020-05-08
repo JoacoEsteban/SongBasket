@@ -7,6 +7,7 @@ const getDefaultState = () => ({
   PLAYLIST_UNSYNCED: false,
   RESET_SELECTION: false,
   PLAYLIST_TRACKS_RE_COMPUTED: false,
+  PLAYLIST_STATE_CHANGED: false,
   ROUTER_ANIMATION: '',
   GLOBAL_LOADING_STATE: {
     value: false,
@@ -20,6 +21,9 @@ const getDefaultState = () => ({
 })
 
 const actions = {
+  trigger ({commit}, key) {
+    commit('TRIGGER', window.$constantcase(key))
+  },
   currentPlaylistSet ({commit}) {
     commit('TRIGGER', 'CURRENT_PLAYLIST_SET')
   },
@@ -38,6 +42,9 @@ const actions = {
   playlistTracksReComputed ({commit}) {
     commit('TRIGGER', 'PLAYLIST_TRACKS_RE_COMPUTED')
   },
+  playlistStateChanged ({commit}) {
+    commit('TRIGGER', 'PLAYLIST_STATE_CHANGED')
+  },
   routerAnimation ({commit}, animation) {
     commit('SET', {key: 'ROUTER_ANIMATION', value: animation})
   },
@@ -49,10 +56,6 @@ const actions = {
   },
   downloadEvent ({commit}, params) {
     commit('DOWNLOAD_EVENT', params)
-  },
-  globalLoadingStateDEPRECATED ({commit}, value) {
-    value.target = value.target || ''
-    commit('SET', { key: 'GLOBAL_LOADING_STATE', value })
   },
   loadingEvent ({commit}, payload) {
     commit('LOADING_EVENT', payload)

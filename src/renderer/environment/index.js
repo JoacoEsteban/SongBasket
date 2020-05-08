@@ -26,7 +26,7 @@ export default (Vue) => {
   window.toggleFullscreen = toggleFullscreen
 
   function toggleMaximization () {
-    electronWindow.isMaximized() ? electronWindow.unmaximize() : electronWindow.maximize()
+    electronWindow && (electronWindow.isMaximized() ? electronWindow.unmaximize() : electronWindow.maximize())
   }
   window.toggleMaximization = toggleMaximization
 

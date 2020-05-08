@@ -120,6 +120,7 @@ export async function setHomeFolder () {
 }
 export function init (electron) {
   setVars(electron)
+  electron.app.allowRendererProcessReuse = true
   electron.app.on('ready', async () => {
     connectionController.init({
       connectionChangeCallback: (value) => {
@@ -256,6 +257,7 @@ export async function youtubize () {
 export async function download (e, plFilter) {
   if (!load.canRequest) return
   console.log('About to download')
+  if (plFilter && !Array.isArray(plFilter)) plFilter = [ plFilter ]
   try {
     load.on('DOWNLOAD')
     const tracks = await FSController.UserMethods.retrieveLocalTracks()
@@ -283,6 +285,19 @@ export async function unsyncPlaylist (id) {
   } finally {
     load.off('PLAYLIST:UNSYNC')
     await REFLECT_RENDERER()
+  }
+}
+
+export async function pausePlaylist (id) {
+  try {
+    if (load.isLoading) return
+    VUEX_MAIN.COMMIT.PAUSE_PLAYLIST(id)
+  } catch (error) {
+    console.error('Error pausing playlist @ handlers.pausPlaylist', error)
+    SEND_ERROR({type: 'PLAYLIST:PAUSE', error})
+    throw error
+  } finally {
+    await REFLECT_RENDERER_KEY('playlists')
   }
 }
 

@@ -82,6 +82,9 @@ export default {
     },
     playlistTracksReComputed () {
       return this.$store.state.Events.PLAYLIST_TRACKS_RE_COMPUTED
+    },
+    playlistStateChanged () {
+      return this.$store.state.Events.PLAYLIST_STATE_CHANGED
     }
   },
   watch: {
@@ -93,6 +96,9 @@ export default {
     },
     searchInput (val) {
       this.filterPlaylists()
+    },
+    playlistStateChanged () {
+      this.refreshAll()
     }
   },
   methods: {
