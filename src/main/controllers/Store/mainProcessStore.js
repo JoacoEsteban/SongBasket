@@ -406,7 +406,7 @@ const mutations = {
 
       playlist.isPaused = !playlist.isPaused
 
-      // await SAVE_TO_DISK()
+      await SAVE_TO_DISK()
     } catch (error) {
       throw error
     }

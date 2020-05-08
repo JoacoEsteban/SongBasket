@@ -194,28 +194,6 @@ const getters = {
     } else removed = []
 
     return {added, removed}
-  },
-
-  SyncedPlaylistsWithNewTracks: (state, getters) => {
-    let syncedPls = getters.SyncedPlaylists
-    let devolver = []
-    for (let i = 0; i < syncedPls.length; i++) {
-      let pl = syncedPls[i]
-      let added = getters.PlaylistTrackChanges(pl.id).added
-
-      if (added.length === 0) continue
-
-      pl = getters.PlaylistById(pl.id)
-      devolver = [...devolver,
-        {
-          ...pl,
-          tracks: {
-            items: added
-          }
-        }]
-    }
-
-    return devolver
   }
 }
 

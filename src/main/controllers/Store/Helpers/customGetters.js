@@ -32,11 +32,12 @@ export default {
   },
   syncedPlaylistsSnapshots () {
     return store.state.syncedPlaylists.map(plid => {
-      const { id, snapshot_id } = store.state.playlists.find(pl => pl.id === plid)
+      const { id, snapshot_id, isPaused } = store.state.playlists.find(pl => pl.id === plid)
+      if (isPaused) return null
       return {
         id, snapshot_id
       }
-    })
+    }).filter(pl => pl)
   },
   giveMePlFolderName (id) {
     const state = store.state

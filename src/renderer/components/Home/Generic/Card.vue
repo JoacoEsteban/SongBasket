@@ -28,7 +28,7 @@ export default {
     item: Object,
     rowClasses: {
       type: String,
-      default: 'col-lg-4 col-md-6 col-xs-12'
+      required: false
     },
     options: {
       type: Object,
@@ -63,7 +63,7 @@ export default {
       const obj = {
         pressed: this.pressed
       }
-      obj[this.rowClasses] = true
+      obj[this.rowClasses || 'col-lg-4 col-md-6 col-xs-12'] = true
       return obj
     },
     styleObject () {

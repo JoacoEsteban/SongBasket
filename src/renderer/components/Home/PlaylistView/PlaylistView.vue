@@ -2,8 +2,8 @@
   <div class="plv-container w100">
     <div class="track-list row">
 
-      <div class="changes-container" v-if="isSynced">
-        <div class="mb-1" v-if="added.length">
+      <div class="changes-container" :class="{show: showingChanges}" :style="{'--changes-height': changesHeightFormmated}">
+        <div class="pb-1" v-if="added.length">
           <div class="list">
             <div class="label-container">
               <span class="point75-em">
@@ -16,7 +16,7 @@
           </div>
         </div>
 
-        <div class="mb-1" v-if="removed.length">
+        <div class="pb-1" v-if="removed.length">
           <div class="list">
             <div class="label-container">
               <span class="point75-em">
@@ -51,11 +51,13 @@ export default {
       conversion: [],
       showingConversion: [],
       showingAll: false,
+      changesHeight: null,
       showing: {
         added: false,
         removed: false
       },
-      playlist: {}
+      playlist: {},
+      statusObj: {}
     }
   },
   components: {
@@ -75,6 +77,15 @@ export default {
         return false
       }
     },
+    isPaused () {
+      return this.statusObj && this.statusObj.slug && this.statusObj.slug.includes('pause')
+    },
+    showingChanges () {
+      return this.isSynced && !this.isPaused
+    },
+    changesHeightFormmated () {
+      return ((this.showingChanges && this.changesHeight) || 0) + 'px'
+    },
     items () {
       return this.playlist.tracks && this.playlist.tracks.items
     },
@@ -92,6 +103,9 @@ export default {
     },
     playlistTracksReComputed () {
       return this.$store.state.Events.PLAYLIST_TRACKS_RE_COMPUTED
+    },
+    playlistStateChanged () {
+      return this.$store.state.Events.PLAYLIST_STATE_CHANGED
     }
   },
   watch: {
@@ -107,6 +121,9 @@ export default {
     playlistStateChanged () {
       this.refreshPlaylist()
     },
+    showingChanges () {
+      this.calcChangesHeight()
+    },
     playlistUnsynced () {
       this.$sbRouter.push({name: 'home', params: {which: 'playlists-list'}})
     }
@@ -114,6 +131,7 @@ export default {
   mounted () {
     this.refreshPlaylist()
     this.computeTracks()
+    this.calcChangesHeight()
     this.$root.PlaylistViewInstance = this
     window.plViewDebug = this
   },
@@ -127,6 +145,8 @@ export default {
     },
     refreshPlaylist () {
       this.playlist = this.$store.getters.PlaylistById(this.currentPlaylist) || {}
+      this.statusObj = this.$controllers.playlist.getStatus(this.playlist)
+      this.calcChangesHeight()
     },
     computeTracks () {
       this.conversion = (this.$root.CONVERTED_TRACKS_FORMATTED && this.$root.CONVERTED_TRACKS_FORMATTED.filter(t => t.playlists.some(pl => pl.id === this.currentPlaylist)).sort(this.$controllers.track.sort)) || []
@@ -135,6 +155,14 @@ export default {
       this.$root.OPEN_MODAL({
         wich: 'track-review',
         payload: { tracks: this.conversion, index: this.conversion.indexOf(track), playlistId: this.currentPlaylist }
+      })
+    },
+    calcChangesHeight () {
+      if (this.changesHeight !== null && !this.showingChanges) return
+      this.$nextTick(() => {
+        let height = 0
+        this.$('.changes-container').children().each((i, el) => height += parseInt(this.$(el).css('height')))
+        this.changesHeight = height
       })
     }
   }
@@ -161,6 +189,16 @@ export default {
     text-transform: uppercase;
     text-align: left;
     padding-left: calc(.3em + var(--card-padding-x));
+  }
+  --changes-height: 0px;
+  height: var(--changes-height);
+  opacity: 0;
+  &, * {
+    box-sizing: border-box;
+  }
+  transition: var(--hover-n-active-transitions), height var(--ts-g);
+  &.show {
+    opacity: 1;
   }
 }
 </style>

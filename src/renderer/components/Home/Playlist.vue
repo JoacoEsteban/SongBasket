@@ -1,5 +1,5 @@
 <template>
-  <Card @click="handleClick" :pressed="isQueued || isPaused" :item="playlistFormatted" :options="cardOptions">
+  <Card @click="handleClick" :pressed="isQueued" :item="playlistFormatted" :options="cardOptions" :row-classes="rowClasses">
     <div class="playlist-data">
       <div v-if="showChanges" class="track-changes-container">
         <div v-if="playlist.tracks.added && playlist.tracks.added.length" class="track-change added">
@@ -53,7 +53,7 @@ export default {
       return this.status.baseState === 'synced'
     },
     isPaused () {
-      return this.status.slug.includes('pause')
+      return this.status && this.status.slug && this.status.slug.includes('pause')
     },
     showChanges () {
       return this.isSynced && !this.isPaused
@@ -76,11 +76,15 @@ export default {
     trackAmmountStr () {
       return this.trackAmmount + ' Track' + (this.trackAmmount === 1 ? '' : 's')
     },
+    // -------------
     cardOptions () {
       return this.isSynced ? {
         size: '.8em',
         height: '3.5em'
       } : {}
+    },
+    rowClasses () {
+      return this.isPaused ? 'col-lg-3 col-md-5 col-xs-12' : null
     }
   },
   methods: {
