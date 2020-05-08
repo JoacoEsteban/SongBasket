@@ -48,6 +48,7 @@ async function VTWO (localTracks, queryTracks = [], plFilter = []) {
       }
     })
   })
+  // TODO dont dwnload paused playlists
   console.log('to download', queryTracks.filter(t => t.downloadFlags.download).map(t => t.data.name))
   console.log('to link', queryTracks.filter(t => !t.downloadFlags.download).map(t => t.data.name))
   console.log('to unlink', localTracks.filter(t => !t.dontUnlink).map(t => t.path))

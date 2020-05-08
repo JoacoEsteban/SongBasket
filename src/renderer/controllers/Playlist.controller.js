@@ -108,7 +108,7 @@ const statuses = {
       sortOrder: 3,
       color: 'var(--green-accept)',
       get msg () {
-        return !this.ammount ? 'Synced' : this.ammount + ' left to download'
+        return !this.ammount ? 'Synced' : this.ammount + ' to download'
       }
     }
   },
@@ -119,7 +119,7 @@ const statuses = {
       sortOrder: 1,
       color: 'var(--orange-warning)',
       get msg () {
-        return this.ammount + ' tracks to review'
+        return this.ammount + ' track' + (this.ammount === 1 ? '' : 's') + ' to review'
       }
     }
   },
@@ -130,7 +130,7 @@ const statuses = {
       sortOrder: 2,
       color: 'var(--button-purple)',
       get msg () {
-        return this.ammount + ' tracks to convert'
+        return this.ammount + ' track' + (this.ammount === 1 ? '' : 's') + ' to convert'
       }
     }
   },
@@ -141,7 +141,7 @@ const statuses = {
       sortOrder: 0,
       color: 'var(--red-cancel)',
       get msg () {
-        return this.ammount + ' conversion errors'
+        return this.ammount + ' conversion error' + this.ammount === 1 ? '' : 's'
       }
     }
   }
