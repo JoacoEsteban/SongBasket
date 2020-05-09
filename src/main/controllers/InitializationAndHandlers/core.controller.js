@@ -175,7 +175,6 @@ const core = {
             const playlist = await API.getPlaylist(pl)
             playlist && VUEX_MAIN.COMMIT.PLAYLIST_STORE_TRACKS(playlist)
           } catch (error) {
-            // TODO handle this
             console.error('ERROR WHEN FETCHING PLAYLIST')
             throw error
           } finally {

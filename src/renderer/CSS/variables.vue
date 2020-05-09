@@ -25,6 +25,7 @@
   --bezier-chill-inverted: cubic-bezier(1, 0, 1, .5);
   --bezier-out: cubic-bezier(.75, 0, 1, .5);
   --bezier-symmetric: cubic-bezier(.1, .5, .9, .5);
+  --bezier-symmetric-inverted: cubic-bezier(.5, .1, .5, .9);
 
   --global-transition-time: #{tr(.5s)};
   --ts-g: var(--global-transition-time) var(--bezier-chill);

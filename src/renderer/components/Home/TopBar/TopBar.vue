@@ -333,6 +333,7 @@ $loading-bar-height: 3px;
   box-sizing: border-box;
   transition: height var(--top-bar-slider-transition);
   height: var(--slide-height);
+  overflow: hidden;
   &:not(.show) {
     --slide-height: 0 !important;
   }

@@ -195,11 +195,12 @@ $tit-fz: 1.2em;
     opacity: 0;
     pointer-events: none;
     &.show {
+      $p: .2em;
       pointer-events: all;
       transform: initial;
-      padding: 0 .2em;
+      padding: 0 $p;
       opacity: 1;
-      width: $icon-size;
+      width: $icon-size + 2 * $p;
     }
   }
   button.icon {

@@ -23,17 +23,6 @@ export function createAxiosInstance () {
 
 const Backend = process.env.BACKEND
 
-let loadingCount = 0
-function LOADING (value, target) {
-  // TODO Deprecate
-  const a = true
-  if (a) return
-  if (!value) value = false
-  if (value) loadingCount++
-  else loadingCount && loadingCount--
-  store.dispatch('loadingEvent', {value: loadingCount > 0, target})
-}
-
 // Brings back user information
 export async function guestCheck (userId) {
   try {
@@ -44,30 +33,8 @@ export async function guestCheck (userId) {
   }
 }
 
-// Retrieves user's playlists
-export async function fetchPlaylists ({userId, logged, SBID, control}) {
-  LOADING(true, 'Getting Playlists')
-  let url = Backend + '/retrieve'
-  let params = {
-    user_id: userId,
-    logged,
-    SBID,
-    offset: control.offset,
-    retrieve: 'user_playlists',
-    retrieve_user_data: true
-  }
-  try {
-    let res = await axios.get(url, {params})
-    return res.data
-  } catch (err) {
-    throw err
-  } finally {
-    LOADING()
-  }
-}
-
 export async function getTracks ({userId, logged, SBID, control}, {id, snapshot_id}, checkVersion) {
-  LOADING(true, 'Getting Playlist Tracks')
+  // TODO Deprecate
   let url = Backend + '/retrieve'
   let params = {
     user_id: userId,
@@ -87,54 +54,6 @@ export async function getTracks ({userId, logged, SBID, control}, {id, snapshot_
     console.error('ERROR AT sbFetch, getTracks::::', err.data, err.data.reason.join(', '))
     throw err
   } finally {
-    LOADING()
-  }
-}
-
-export function youtubizeAllOld (tracks) {
-  let totalTracks = 0
-  let succeded = 0
-  let failed = 0
-  return new Promise((resolve, reject) => {
-    LOADING(true, 'Converting')
-    if (!tracks) return reject(new Error('TRACK OBJECT UNDEFINED'))
-    for (let i = 0; i < tracks.length; i++) {
-      if (((tracks[i].flags = (tracks[i].flags || {})) && tracks[i].flags.converted) || (tracks[i].conversion && (tracks[i].flags.converted = true))) { console.log('nono skipping'); continue }
-      totalTracks++
-      Api.post(PATHS.YOUTUBIZE, {
-        track: JSON.stringify(tracks[i].query)
-      })
-        .then(res => {
-          console.log('on .then => conversion successful?', !!(res && res.data))
-          if (!res || !res.data) throw new Error('Conversion doesn\'t exist')
-          tracks[i].conversion = res.data
-          tracks[i].flags.converted = true
-          tracks[i].flags.conversionError = false
-          succeded++
-          // TODO Emit success event
-        })
-        .catch(err => {
-          tracks[i].conversion = null
-          tracks[i].flags.converted = false
-          tracks[i].flags.conversionError = true
-          // Failed tracks will remain with 'conversion' object NULL
-          console.log('Error when converting', err)
-          failed++
-          // TODO Emit fail event
-        })
-        .finally(() => {
-          tracks[i].flags.processed = false
-          areAllFinished(resolve)
-        })
-    }
-    if (!totalTracks) areAllFinished(resolve)
-  })
-
-  function areAllFinished (resolve) {
-    if (succeded + failed === totalTracks) {
-      LOADING()
-      resolve(tracks)
-    }
   }
 }
 
@@ -143,14 +62,11 @@ export async function ytDetails (id) {
     let reg = REGEX.videoUrl.exec(id)
     if (!reg && !REGEX.videoId.test(id)) throw new Error('INVALID YOUTUBE VIDEO ID')
     if (reg) id = reg[1]
-    LOADING(true, 'Getting Video Details')
     console.log('gettin', PATHS.VIDEO(id))
     const resp = await Api.get(PATHS.VIDEO(id))
     return resp && resp.data
   } catch (error) {
     throw error
-  } finally {
-    LOADING()
   }
 }
 
@@ -202,7 +118,6 @@ export async function youtubizeAll (tracks, completionCallback) {
   // }
 
   return new Promise((resolve, reject) => {
-    LOADING(true, 'Converting')
     if (!tracks) return reject(new Error('TRACK OBJECT UNDEFINED'))
     for (let i = 0; i < tracks.length; i++) {
       if (tracks[i].flags.converted && !tracks[i].conversionError) continue
@@ -238,7 +153,6 @@ export async function youtubizeAll (tracks, completionCallback) {
 
   function areAllFinished (resolve) {
     if (succeded + failed === totalTracks) {
-      LOADING()
       resolve({tracks, failed})
     }
   }

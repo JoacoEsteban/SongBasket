@@ -28,7 +28,6 @@ export function extractMp3 (pathmp3, pathmp4, inputFormat, progressCb) {
             .inputFormat(inputFormat)
             .on('progress', progressCb)
             .on('end', async () => {
-              // TODO Emit convertion starting
               try {
                 await utils.promisify(fs.unlink, pathmp4)
               } catch (err) {
@@ -56,7 +55,6 @@ export function applyTags (pathmp3, data, ytSelection) {
     }]
   }
   return new Promise((resolve, reject) => {
-    // TODO Emit applying tags
     console.log('applying tags')
     getPhoto(data.album.images[0].url)
       .then(imageBuffer => {

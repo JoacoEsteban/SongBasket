@@ -25,7 +25,6 @@
       </div>
     </div>
   </div>
-  <!-- TODO connection pill -->
 </div>
 </template>
 

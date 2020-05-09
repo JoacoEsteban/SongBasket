@@ -7,7 +7,6 @@ export async function downloadLinkRemove (localTracks, queryTracks, plFilter = [
   return VTWO(localTracks, queryTracks, plFilter || [])
 }
 
-// TODO turn both of this as async
 export async function unlink (path) {
   if (await utils.pathDoesExist(path)) await utils.unlink(path)
 }

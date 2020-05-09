@@ -164,9 +164,11 @@ const mutations = {
 }
 
 const onTrackProgress = ptg => {
-  ptg = ptg / 100
+  ptg = ptg * 0.01
   // TODO check this func
-  const perc = state.LOADING_STATE.ptg + (1 / state.DOWNLOAD_QUEUE.length * ptg) / 100
+  const totaltracks = state.DOWNLOAD_QUEUE.length
+  console.log((state.DOWNLOADED_TRACKS / totaltracks), (1 / totaltracks) * ptg)
+  const perc = (state.DOWNLOADED_TRACKS / totaltracks) + (1 / totaltracks) * ptg
   mutations.LOADING_EVENT(null, {target: 'DOWNLOAD', value: true, ptg: perc})
 }
 const onTrackFinished = () => {

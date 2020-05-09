@@ -219,7 +219,6 @@ function constructDownloads (tracks) {
           })
 
           download.on('error', (error) => {
-            // TODO HANDLE ERROR AND STOP ROUTINE
             console.error('Error when downloading video::::', error)
             instance.info.download.error = error
             instance.info.currentStatus = 'download_error'
@@ -309,7 +308,6 @@ function constructDownloads (tracks) {
     try {
       await utils.createDirRecursive(instance.paths.downloadCWD)
     } catch (err) {
-      // TODO Handle error
       console.error('ERROR CREATING TEMP DOWNLOAD PATH')
       throw err
     }
@@ -317,7 +315,6 @@ function constructDownloads (tracks) {
     try {
       await instance.download.downloadVideo()
     } catch (err) {
-      // TODO Handle error
       console.error('ERROR DOWNLOADING VIDEO', err)
       throw err
     }
@@ -326,7 +323,6 @@ function constructDownloads (tracks) {
       await instance.extraction.converter.convert()
       console.log('finished extraction')
     } catch (error) {
-      // TODO Handle error
       console.error('ERROR EXTRACTING AUDIO')
       throw error
     }
@@ -335,7 +331,6 @@ function constructDownloads (tracks) {
       await instance.extraction.converter.move()
       console.log('track moved')
     } catch (error) {
-      // TODO Handle error
       console.error('ERROR MOVING TRACK')
       throw error
     }
@@ -350,7 +345,6 @@ function constructDownloads (tracks) {
       try {
         await utils.link(instance.paths.mp3FilePathFinal, fullPath)
       } catch (err) {
-        // TODO Handle error
         console.error('ERROR LINKING TRACK TO OTHER PLAYLISTS')
         throw err
       }

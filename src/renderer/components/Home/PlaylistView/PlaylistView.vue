@@ -52,6 +52,7 @@ export default {
       showingConversion: [],
       showingAll: false,
       changesHeight: null,
+      plId: this.$props.currentPlaylist,
       showing: {
         added: false,
         removed: false
@@ -72,7 +73,7 @@ export default {
     },
     isSynced () {
       if (this.playlist) {
-        return this.$store.getters.PlaylistIsSynced(this.currentPlaylist)
+        return this.$store.getters.PlaylistIsSynced(this.plId)
       } else {
         return false
       }
@@ -109,7 +110,9 @@ export default {
     }
   },
   watch: {
-    currentPlaylist () {
+    currentPlaylist (val) {
+      if (!val || val === this.plId) return
+      this.plId = val
       this.refreshAll()
     },
     stateReplaced () {
@@ -144,17 +147,17 @@ export default {
       this.computeTracks()
     },
     refreshPlaylist () {
-      this.playlist = this.$store.getters.PlaylistById(this.currentPlaylist) || {}
+      this.playlist = this.$store.getters.PlaylistById(this.plId) || {}
       this.statusObj = this.$controllers.playlist.getStatus(this.playlist)
       this.calcChangesHeight()
     },
     computeTracks () {
-      this.conversion = (this.$root.CONVERTED_TRACKS_FORMATTED && this.$root.CONVERTED_TRACKS_FORMATTED.filter(t => t.playlists.some(pl => pl.id === this.currentPlaylist)).sort(this.$controllers.track.sort)) || []
+      this.conversion = (this.$root.CONVERTED_TRACKS_FORMATTED && this.$root.CONVERTED_TRACKS_FORMATTED.filter(t => t.playlists.some(pl => pl.id === this.plId)).sort(this.$controllers.track.sort)) || []
     },
     reviewTrack (track) {
       this.$root.OPEN_MODAL({
         wich: 'track-review',
-        payload: { tracks: this.conversion, index: this.conversion.indexOf(track), playlistId: this.currentPlaylist }
+        payload: { tracks: this.conversion, index: this.conversion.indexOf(track), playlistId: this.plId }
       })
     },
     calcChangesHeight () {
