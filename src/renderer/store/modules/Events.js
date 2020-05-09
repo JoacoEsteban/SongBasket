@@ -9,10 +9,6 @@ const getDefaultState = () => ({
   PLAYLIST_TRACKS_RE_COMPUTED: false,
   PLAYLIST_STATE_CHANGED: false,
   ROUTER_ANIMATION: '',
-  GLOBAL_LOADING_STATE: {
-    value: false,
-    target: ''
-  },
   LOADING_STATE: loadingEventTypes.default,
   DOWNLOADED_TRACKS: 0,
   DOWNLOAD_QUEUE: [],
@@ -51,8 +47,12 @@ const actions = {
   downloadStarted ({commit}, tracks) {
     commit('DOWNLOAD_STARTED', tracks)
   },
-  downloadFinished ({commit}, tracks) {
-    commit('DOWNLOAD_FINISHED', tracks)
+  async downloadFinished ({commit}, tracks) {
+    try {
+      commit('DOWNLOAD_FINISHED', tracks)
+    } catch (error) {
+      throw error
+    }
   },
   downloadEvent ({commit}, params) {
     commit('DOWNLOAD_EVENT', params)
@@ -164,17 +164,18 @@ const mutations = {
 }
 
 const onTrackProgress = ptg => {
-  ptg = ptg * 0.01
   // TODO check this func
-  const totaltracks = state.DOWNLOAD_QUEUE.length
-  console.log((state.DOWNLOADED_TRACKS / totaltracks), (1 / totaltracks) * ptg)
-  const perc = (state.DOWNLOADED_TRACKS / totaltracks) + (1 / totaltracks) * ptg
-  mutations.LOADING_EVENT(null, {target: 'DOWNLOAD', value: true, ptg: perc})
+  console.log('progress')
+  mutations.LOADING_EVENT(null, {target: 'DOWNLOAD', value: true, ptg: (state.DOWNLOADED_TRACKS / state.DOWNLOAD_QUEUE.length) + (1 / state.DOWNLOAD_QUEUE.length) * (ptg * 0.01)})
 }
 const onTrackFinished = () => {
+  console.log('track finished')
+  // TODO better solution
+  if (!state.LOADING_STATE.value) return
   mutations.LOADING_EVENT(null, {target: 'DOWNLOAD', value: true, ptg: ++state.DOWNLOADED_TRACKS / state.DOWNLOAD_QUEUE.length})
 }
 const onDownloadEnd = () => {
+  console.log('download end')
   mutations.LOADING_EVENT(null, {target: 'DOWNLOAD', value: false, ptg: 1})
 }
 

@@ -216,8 +216,6 @@ export default {
       this.removeBarClass('hide', 'dynamic')
     },
     handleLoadingState (val) {
-      console.log('Loading', val)
-
       this.loadingBar.ptg = (val.ptg * 100).toFixed(2) + '%'
       const classes = {}
       classes[val.value ? 'show' : 'hide'] = true

@@ -1,5 +1,4 @@
 /* eslint-disable camelcase */
-import store from '../../../renderer/store'
 import axios from 'axios'
 
 import PATHS from '../../Global/PATHS'

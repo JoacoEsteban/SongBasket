@@ -29,7 +29,10 @@ function handleMetaKeyCombo (keyCode, e) {
       thisVue().$sbRouter.goForward()
       break
     case 68:
-      (shiftKey && thisVue().$controllers.core.download()) + thisVue().$sbRouter.push({name: 'downloads-view'})
+      (shiftKey && thisVue().$controllers.core.download((() => {
+        const path = thisVue().$sbRouter.giveMeCurrent()
+        return path.name === 'playlist-view' && path.params.id
+      })())) + thisVue().$sbRouter.push({name: 'downloads-view'})
       break
     case 82:
       e.preventDefault()

@@ -53,7 +53,7 @@ export default {
     console.log('Stored tracks: ', localTracks.length)
     let tracksToDownload = customGetters.convertedTracks()
     if (plFilter) tracksToDownload = tracksToDownload.filter(t => t.playlists.some(pl => plFilter.includes(pl.id)))
-    ALL_TRACKS = constructDownloads((await downloadLinkRemove(localTracks, utils.cloneObject(tracksToDownload), plFilter)).filter(track => track.conversion.yt.length && track.playlists.length)) // TODO Prevent this filter from ever happening
+    ALL_TRACKS = constructDownloads((await downloadLinkRemove(localTracks, utils.cloneObject(tracksToDownload), plFilter)).filter(track => (track.conversion.yt.length || track.custom) && track.playlists.length)) // TODO Prevent this filter from ever happening
     this.onDowloadStart()
 
     let hasErrors = false
@@ -274,6 +274,7 @@ function constructDownloads (tracks) {
             emitEvent.tags({type: 'start', id: instance.id})
             await applyTags(instance.paths.mp3FilePath, instance.data, instance.yt)
             console.log('finished tags')
+            emitEvent.tags({type: 'end', id: instance.id})
           } catch (err) {
             instance.info.tags.error = err
             instance.info.currentStatus = 'tags_error'
@@ -283,7 +284,6 @@ function constructDownloads (tracks) {
             !instance.info.tags.error && (instance.info.currentStatus = 'tags_end')
             instance.info.tags.finished = true
             instance.info.finished = true
-            emitEvent.tags({type: 'end', id: instance.id})
           }
         },
         move: async () => {
