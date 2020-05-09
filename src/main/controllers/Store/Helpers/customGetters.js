@@ -13,6 +13,9 @@ export default {
   get playlistsOffset () {
     return store.state.playlists.filter(pl => !store.state.syncedPlaylists.some(id => id === pl.id)).length
   },
+  playlistById (id) {
+    return store.safe.playlists.find(pl => pl.id === id)
+  },
   SyncedPlaylistsSp () {
     const state = store.state
     let all = []
@@ -32,6 +35,12 @@ export default {
   },
   SyncedPlaylistsSp_SAFE () {
     return this.SyncedPlaylistsSp().filter(pl => !pl.isPaused)
+  },
+  get pausedPlaylists () {
+    return store.state.syncedPlaylists.filter(id => {
+      const pl = this.playlistById(id)
+      return pl && pl.isPaused
+    })
   },
   syncedPlaylistsSnapshots () {
     return store.state.syncedPlaylists.map(plid => {
@@ -58,7 +67,7 @@ export default {
     return VUEX_MAIN.STATE().convertedTracks
   },
   convertedTracks_SAFE () {
-    return this.convertedTracks().filter(track => !track.flags.paused && (track.conversion.yt.length || track.custom) && track.playlists.length)// TODO Prevent this filter from ever happening
+    return this.convertedTracks().filter(track => (track.conversion.yt.length || track.custom) && track.playlists.length)// TODO Prevent this filter from ever happening
   },
   anythingToConvert () {
 

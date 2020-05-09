@@ -4,7 +4,11 @@ const PATH = require('path')
 const uuid = require('uuid')
 
 export async function downloadLinkRemove (localTracks, queryTracks, plFilter = []) {
-  return VTWO(localTracks, queryTracks, plFilter || [])
+  try {
+    return VTWO(localTracks, queryTracks, plFilter || [])
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function unlink (path) {
@@ -19,7 +23,10 @@ export async function link (path, newPath) {
 }
 
 async function VTWO (localTracks, queryTracks = [], plFilter = []) {
-  if (plFilter.length) localTracks.forEach(lTrack => lTrack.dontUnlink = !plFilter.includes(lTrack.playlist)) // prevents unlinking tracks when filtering playlist
+  const pausedPlaylists = customGetters.pausedPlaylists
+  const dontUnlinkFrom = [...plFilter, ...pausedPlaylists]
+
+  if (plFilter.length) localTracks.forEach(lTrack => lTrack.dontUnlink = !dontUnlinkFrom.includes(lTrack.playlist)) // prevents unlinking tracks when filtering playlist
 
   queryTracks = queryTracks.filter(qTrack => {
     if (!qTrack.conversion) return false
@@ -28,7 +35,7 @@ async function VTWO (localTracks, queryTracks = [], plFilter = []) {
     if (qTrack.selection === false) qTrack.selection = qTrack.custom.youtube_id
 
     qTrack.downloadFlags = {
-      download: true
+      download: !(qTrack.flags.paused || qTrack.playlists.every(({id}) => pausedPlaylists.includes(id)))
     }
 
     return !localTracks.some((lTrack, i) => { // some track (full conv) exists and is in every playlist
@@ -39,6 +46,7 @@ async function VTWO (localTracks, queryTracks = [], plFilter = []) {
         path: lTrack.path,
         file: lTrack.file
       }
+      if (qTrack.downloadFlags.linkData && !qTrack.downloadFlags.linkData.file) console.log('TRACL', lTrack)
 
       if (qTrack.playlists.some(pl => pl.id === lTrack.playlist)) lTrack.dontUnlink = true
       if (!(qTrack.playlists = qTrack.playlists.filter(pl => pl.id !== lTrack.playlist)).length) {
@@ -47,14 +55,14 @@ async function VTWO (localTracks, queryTracks = [], plFilter = []) {
       }
     })
   })
-  // TODO dont dwnload paused playlists
+
   console.log('to download', queryTracks.filter(t => t.downloadFlags.download).map(t => t.data.name))
-  console.log('to link', queryTracks.filter(t => !t.downloadFlags.download).map(t => t.data.name))
+  console.log('to link', queryTracks.filter(t => !t.downloadFlags.download && t.downloadFlags.linkData).map(t => t.data.name))
   console.log('to unlink', localTracks.filter(t => !t.dontUnlink).map(t => t.path))
 
-  queryTracks = queryTracks.filter(async qTrack => {
+  queryTracks = await queryTracks.asyncFilter(async qTrack => {
     if (qTrack.downloadFlags.download) return true
-    await linkTrackToPlaylists(qTrack)
+    if (qTrack.downloadFlags.linkData) await linkTrackToPlaylists(qTrack)
     return false
   })
 

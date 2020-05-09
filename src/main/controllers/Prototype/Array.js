@@ -42,3 +42,14 @@ Object.defineProperty(Array.prototype, 'asyncForEach', {
     }
   }
 })
+Object.defineProperty(Array.prototype, 'asyncFilter', {
+  get () {
+    return async function (cb) {
+      const cloned = [...this]
+      for (let i = 0; i < cloned.length; i++) {
+        if (!await cb(cloned[i], i, cloned)) cloned.splice(i--, 1)
+      }
+      return cloned
+    }
+  }
+})
