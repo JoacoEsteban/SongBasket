@@ -61,10 +61,10 @@ export default {
     return store.state.user && store.state.user.id
   },
   uncachedPlaylists () {
-    return store.state.queuedPlaylists.filter(q => !store.state.cachedPlaylists.some(c => c === q))
+    return store.state.queuedPlaylists.filter(q => !store.state.cachedPlaylists.some(c => c.id === q))
   },
   convertedTracks () {
-    return VUEX_MAIN.STATE().convertedTracks
+    return store.safe.convertedTracks
   },
   convertedTracks_SAFE () {
     return this.convertedTracks().filter(track => (track.conversion.yt.length || track.custom) && track.playlists.length)// TODO Prevent this filter from ever happening

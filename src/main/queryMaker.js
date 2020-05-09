@@ -1,17 +1,16 @@
-import VUEX_MAIN from './controllers/Store/mainProcessStore'
 import customGetters from './controllers/Store/Helpers/customGetters'
 
 let ALL_PLAYLISTS = []
 let ALL_TRACKS = []
 
 export function makeConversionQueries () {
-  let syncedPlaylists = customGetters.SyncedPlaylistsSp_SAFE().map(pl => {
+  let syncedPlaylists = customGetters.SyncedPlaylistsSp().map(pl => {
     if (pl.isPaused) return null
     return {
       ...pl,
       synced: true
     }
-  })
+  }).filter(pl => pl)
   let queuedPlaylists = customGetters.queuedPlaylistsObj().map(pl => {
     pl.synced = false
     return pl
@@ -19,7 +18,7 @@ export function makeConversionQueries () {
   if (!(queuedPlaylists.length + syncedPlaylists.length)) return
 
   ALL_PLAYLISTS = [...syncedPlaylists, ...queuedPlaylists]
-  ALL_TRACKS = VUEX_MAIN.STATE_SAFE().convertedTracks
+  ALL_TRACKS = customGetters.convertedTracks()
   if (!findDuplicatedTracks() && !ALL_TRACKS.some(track => track.flags.conversionError)) throw new Error('NOTHING')
 
   makeQueries()

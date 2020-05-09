@@ -319,8 +319,6 @@ const mutations = {
       })
       console.log('Total converted tracks', state.convertedTracks.length)
 
-      state.syncedPlaylists_safe.forEach(async pl => this.COMMIT_TRACK_CHANGES(pl))
-
       // console.log(state.convertedTracks.some(t => t) && state.convertedTracks.some(t => t.flags))
       // setTimeout(((env) => {
       //   return () => env.dispatch('setConvertedTracksProcessedFlag')
@@ -329,6 +327,10 @@ const mutations = {
     } catch (error) {
       throw error
     }
+  },
+  COMMIT_ALL_CHANGES () {
+    state.syncedPlaylists_safe.forEach(pl => this.COMMIT_TRACK_CHANGES(pl))
+    SAVE_TO_DISK()
   },
   INVALIDATE_SYNCED_SNAPSHOT_IDS () {
     state.syncedPlaylists_safe.map(id => state.playlists.find(pl => pl.id === id)).forEach(pl => {

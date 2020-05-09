@@ -154,7 +154,7 @@ export default {
       }, 4000)
     },
     refresh () {
-      this.$emit('refreshPlaylists')
+      this.$controllers.core.refresh()
     },
     sync () {
       this.$emit('youtubeConvert')

@@ -72,7 +72,7 @@ export function init (ipc = global.ipc) {
     } catch (err) { throw err }
   })
 
-  ipc.on('refreshPlaylists', handlers.refresh)
+  ipc.on('REFRESH', handlers.refresh)
 
   ipc.on('PLAYLISTS:LOAD_MORE', async (e, {listenerId}) => {
     let err

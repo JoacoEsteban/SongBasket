@@ -105,7 +105,7 @@ export const getPlaylist = async ({ id, snapshot_id }) => {
   }
 }
 
-export async function youtubizeAll (tracks, completionCallback) {
+export async function youtubizeAll (tracks, isConvertable, completionCallback) {
   let totalTracks = 0
   let succeded = 0
   let failed = 0
@@ -119,7 +119,7 @@ export async function youtubizeAll (tracks, completionCallback) {
   return new Promise((resolve, reject) => {
     if (!tracks) return reject(new Error('TRACK OBJECT UNDEFINED'))
     for (let i = 0; i < tracks.length; i++) {
-      if (tracks[i].flags.converted && !tracks[i].conversionError) continue
+      if (!isConvertable(tracks[i])) continue
       totalTracks++
       Api.post(PATHS.YOUTUBIZE, {
         track: JSON.stringify(tracks[i].query)

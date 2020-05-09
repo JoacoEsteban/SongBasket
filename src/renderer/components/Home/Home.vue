@@ -1,10 +1,7 @@
 <template>
   <div class="whole-container">
     <div class="home-container">
-      <top-bar
-      @refreshPlaylists="refreshPlaylists"
-      @youtubeConvert="youtubeConvert"
-      />
+      <top-bar/>
 
         <component-loader class="home-router"
         @openPlaylist="openPlaylist($event)"
@@ -12,7 +9,6 @@
         ></component-loader>
 
       <floating-buttons style="z-index: 1"
-      @refreshPlaylists="refreshPlaylists"
       @youtubeConvert="youtubeConvert"
       ></floating-buttons>
     </div>
@@ -87,9 +83,6 @@ export default {
     },
     youtubeConvert () {
       this.$IPC.send('Youtube Convert')
-    },
-    refreshPlaylists () {
-      this.$IPC.send('refreshPlaylists')
     },
     openYtVideo (id) {
       console.log('openYtVideo', id)

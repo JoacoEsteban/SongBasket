@@ -70,6 +70,12 @@ const CoreController = {
 
     emitEvent()
   },
+  async refresh () {
+    const loading = vue.store.state.Events.LOADING_STATE || {}
+    if (loading.value) return
+    vue.ipc.send('REFRESH')
+    getVueInstance().$sbRouter.push({name: 'home', params: {which: 'playlists-list'}})
+  },
   download (playlistFilter) {
     const loading = vue.store.state.Events.LOADING_STATE || {}
     if (!loading.value) vue.ipc.send('download', playlistFilter)

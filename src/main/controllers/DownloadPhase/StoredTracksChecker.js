@@ -46,10 +46,9 @@ async function VTWO (localTracks, queryTracks = [], plFilter = []) {
         path: lTrack.path,
         file: lTrack.file
       }
-      if (qTrack.downloadFlags.linkData && !qTrack.downloadFlags.linkData.file) console.log('TRACL', lTrack)
 
       if (qTrack.playlists.some(pl => pl.id === lTrack.playlist)) lTrack.dontUnlink = true
-      if (!(qTrack.playlists = qTrack.playlists.filter(pl => pl.id !== lTrack.playlist)).length) {
+      if (!(qTrack.playlists = qTrack.playlists.filter(pl => pl.id !== lTrack.playlist)).length) { // TODO prevent linking to paused playlists
         localTracks.splice(i, 1)
         return true
       }
@@ -78,11 +77,8 @@ const linkTrackToPlaylists = async (track) => {
     let plPath = customGetters.giveMePlFolderName(pl.id)
     console.log(plPath)
     if (!plPath) return
-    console.log(1)
     plPath = PATH.join(global.HOME_FOLDER, utils.encodeIntoFilename(plPath))
-    console.log(2)
     let fileName = track.downloadFlags.linkData.file.replace('.mp3', '')
-    console.log(3)
     let didLink = false
 
     for (let i = 0; !didLink && i < 10; i++) {
