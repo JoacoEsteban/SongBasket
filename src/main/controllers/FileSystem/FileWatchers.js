@@ -64,6 +64,14 @@ const FileWatchers = {
       throw error
     }
   },
+  async rebuildWatchers () {
+    try {
+      await this.clearAll()
+      await this.createPlaylistWatchers()
+    } catch (error) {
+      throw error
+    }
+  },
   async retrieveTags (path) {
     try {
       const tags = await UserMethods.retrieveMP3FileTags(path)

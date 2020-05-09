@@ -51,9 +51,9 @@ export default {
   },
   async downloadSyncedPlaylists (localTracks, plFilter) {
     console.log('Stored tracks: ', localTracks.length)
-    let tracksToDownload = customGetters.convertedTracks()
+    let tracksToDownload = customGetters.convertedTracks_SAFE()
     if (plFilter) tracksToDownload = tracksToDownload.filter(t => t.playlists.some(pl => plFilter.includes(pl.id)))
-    ALL_TRACKS = constructDownloads((await downloadLinkRemove(localTracks, utils.cloneObject(tracksToDownload), plFilter)).filter(track => (track.conversion.yt.length || track.custom) && track.playlists.length)) // TODO Prevent this filter from ever happening
+    ALL_TRACKS = constructDownloads((await downloadLinkRemove(localTracks, utils.cloneObject(tracksToDownload), plFilter)))
     this.onDowloadStart()
 
     let hasErrors = false

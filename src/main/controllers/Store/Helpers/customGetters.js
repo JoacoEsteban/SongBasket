@@ -57,6 +57,9 @@ export default {
   convertedTracks () {
     return VUEX_MAIN.STATE().convertedTracks
   },
+  convertedTracks_SAFE () {
+    return this.convertedTracks().filter(track => !track.flags.paused && (track.conversion.yt.length || track.custom) && track.playlists.length)// TODO Prevent this filter from ever happening
+  },
   anythingToConvert () {
 
   },

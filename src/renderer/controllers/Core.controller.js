@@ -84,6 +84,15 @@ const CoreController = {
       vue.ipc.send('PLAYLISTS:PAUSE', {id, listenerId})
     })
   },
+  pauseTrack (id) {
+    return new Promise((resolve, reject) => {
+      const loading = vue.store.state.Events.LOADING_STATE || {}
+      if (loading.value) return
+      const listenerId = uuid()
+      vue.ipc.once(listenerId, (e, error) => error ? reject(error) : resolve())
+      vue.ipc.send('TRACK:PAUSE', {id, listenerId})
+    })
+  },
   async logOut () {
     try {
       console.log('Logging Out:::::')

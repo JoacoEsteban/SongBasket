@@ -53,6 +53,7 @@ export default function (Vue) {
   })
   ipc.on('DOWNLOAD:START', (e, payload) => store.dispatch('downloadStarted', payload))
   ipc.on('DOWNLOAD:EVENT', (e, payload) => store.dispatch('downloadEvent', payload))
+  ipc.on('DOWNLOAD:END', async (e, payload) => store.dispatch('downloadFinished', payload))
 
   $(document).ready(onDocumentReady)
 }

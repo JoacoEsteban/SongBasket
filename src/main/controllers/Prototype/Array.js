@@ -33,3 +33,12 @@ Object.defineProperty(Array.prototype, 'lastIndexOfSearch', {
     }
   }
 })
+Object.defineProperty(Array.prototype, 'asyncForEach', {
+  get () {
+    return async function (cb) {
+      for (let i = 0; i < this.length; i++) {
+        await cb(this[i], i, this)
+      }
+    }
+  }
+})

@@ -116,6 +116,17 @@ export function init (ipc = global.ipc) {
     }
   })
 
+  ipc.on('TRACK:PAUSE', async function (event, {id, listenerId}) {
+    let error
+    try {
+      await handlers.pauseTrack(id)
+    } catch (err) {
+      error = err
+    } finally {
+      event.sender.send(listenerId, error)
+    }
+  })
+
   ipc.on('TRACK:CHANGE_SELECTION', async function (event, {trackId, newId, listenerId}) {
     let error
     try {

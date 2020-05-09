@@ -415,6 +415,20 @@ const mutations = {
       throw error
     }
   },
+  async PAUSE_TRACK (id) {
+    try {
+      if (!id) throw new Error('New selection id does not exist:: @ mainProcessStore :: CHANGE_YT_TRACK_SELECTION')
+
+      const track = state.convertedTracks.find(t => t.id === id)
+      if (!track) throw new Error('Converted Track not found:: @ mainProcessStore :: CHANGE_YT_TRACK_SELECTION')
+
+      track.flags.paused = !track.flags.paused
+
+      SAVE_TO_DISK()
+    } catch (error) {
+      throw error
+    }
+  },
   CUSTOM_TRACK_URL ({details, trackId}) {
     const track = state.convertedTracks[findById(trackId, state.convertedTracks)]
     if (!track) return console.error('TRACK NOT FOUND IN CONVERTED TRACKS :: CUSTOM_TRACK_URL')

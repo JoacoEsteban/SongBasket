@@ -20,14 +20,15 @@ const state = getDefaultState()
 
 const dispatchAppropiateEvent = {
   events: {
-    'playlistStateChanged': ['playlists', 'syncedPlaylists', 'deletedPlaylists']
+    'playlistStateChanged': ['playlists', 'syncedPlaylists', 'deletedPlaylists'],
+    'reComputeConvertedTracks': ['convertedTracks']
   },
   getEvent (actualKey) {
-    return Object.keys(this.events).find(key => this.events[key].some(state => state === actualKey))
+    return Object.keys(this.events).filter(key => this.events[key].some(state => state === actualKey))
   },
-  send (env, key) {
-    const event = this.getEvent(key)
-    if (event) env.dispatch(event, {}, {root: true})
+  async send (env, key) {
+    const events = this.getEvent(key)
+    if (events.length) events.asyncForEach(async event => env.dispatch(event, {}, {root: true}))
   }
 }
 

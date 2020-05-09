@@ -262,6 +262,7 @@ export async function download (e, plFilter) {
     load.on('DOWNLOAD')
     const tracks = await FSController.UserMethods.retrieveLocalTracks()
     await youtubeDl.downloadSyncedPlaylists(tracks, plFilter)
+    // await FileWatchers.rebuildWatchers()
     load.off('DOWNLOAD')
   } catch (error) {
     throw error
@@ -293,11 +294,24 @@ export async function pausePlaylist (id) {
     if (load.isLoading) return
     VUEX_MAIN.COMMIT.PAUSE_PLAYLIST(id)
   } catch (error) {
-    console.error('Error pausing playlist @ handlers.pausPlaylist', error)
+    console.error('Error pausing playlist @ handlers.pausePlaylist', error)
     SEND_ERROR({type: 'PLAYLIST:PAUSE', error})
     throw error
   } finally {
     await REFLECT_RENDERER_KEY('playlists')
+  }
+}
+
+export async function pauseTrack (id) {
+  try {
+    if (load.isLoading) return
+    VUEX_MAIN.COMMIT.PAUSE_TRACK(id)
+  } catch (error) {
+    console.error('Error pausing track @ handlers.pauseTrack', error)
+    SEND_ERROR({type: 'TRACKS:PAUSE', error})
+    throw error
+  } finally {
+    await REFLECT_RENDERER_KEY('convertedTracks')
   }
 }
 

@@ -7,6 +7,9 @@
     <div @click="selectCustomUrl" class="link-button">
       Use Custom URL
     </div>
+    <div @click="pauseTrack" class="link-button">
+      {{item.flags.paused ? 'Unpause' : 'Pause'}} Track
+    </div>
   </div>
 </template>
 
@@ -49,6 +52,15 @@ export default {
     },
     selectCustomUrl () {
       this.$root.OPEN_MODAL({wich: 'custom-track-url', payload: {trackId: this.item.id, playlistId: this.options.playlistId}})
+    },
+    async pauseTrack () {
+      const id = this.item && this.item.id
+      try {
+        if (!id) throw new Error('NO TRACK ID')
+        await this.$controllers.core.pauseTrack(id)
+      } catch (error) {
+        console.error(error)
+      }
     },
     async setSelection (item) {
       if (item.youtube_id === this.item.selectionObj.youtube_id && this.item.flags.selectionIsApplied) return

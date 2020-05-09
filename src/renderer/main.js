@@ -5,7 +5,7 @@ import store from './store'
 
 require('./environment').default(Vue)
 
-export default new Vue({
+export default global.VUE_ROOT = new Vue({
   components: {
     App
   },
