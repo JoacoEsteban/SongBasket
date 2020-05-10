@@ -1,5 +1,5 @@
 <template>
-  <div class="tb-container window-drag" @dblclick="maximize">
+  <div class="tb-container window-drag" @dblclick="maximize" :class="{'showing-loading-bar': showingLoadingBar}">
     <div class="drop-shadow abs-full show-on-scroll"></div>
     <div class="drop-gradient abs-full hide-on-scroll"></div>
 
@@ -53,8 +53,8 @@
       <div class="df fldc aliend bar-slide h-fc show">
         <div class="section-switcher-container">
           <div class="section-switcher-list">
-            <div class="section-switch" v-for="(section, index) in sections" :key="index" :class="{active: activeSection === section.id}">
-              <span class="section-title semibold">
+            <div class="section-switch window-nodrag" v-for="(section, index) in sections" :key="index" :class="{active: activeSection === section.id}">
+              <span class="section-title semibold" @click="section.cb">
                 {{section.title}}
               </span>
             </div>
@@ -102,6 +102,7 @@ export default {
       user: this.$store.state.CurrentUser.user,
       isMac: window.platform === 'mac',
       sliderPosition: 0,
+      showingLoadingBar: false,
       loadingBar: {
         loading: false,
         staticLoading: false,
@@ -119,11 +120,15 @@ export default {
       sections: [
         {
           id: ++sectionId,
-          title: 'Tracks'
+          title: 'Tracks',
+          slug: 'tracks-list',
+          cb: () => this.goTo('tracks-list')
         },
         {
           id: ++sectionId,
-          title: 'Playlists'
+          title: 'Playlists',
+          slug: 'playlists-list',
+          cb: () => this.goTo('playlists-list')
         }
       ]
     }
@@ -186,10 +191,10 @@ export default {
       this.showForwBtn = !this.$sbRouter.isLast()
     },
     navigationBack () {
-      if (!(this.$sbRouter.path.name === 'playlists-list')) this.$sbRouter.goBack()
+      this.$sbRouter.goBack()
     },
     navigationForw () {
-      if (!this.$sbRouter.isLast()) this.$sbRouter.goForward()
+      this.$sbRouter.goForward()
     },
     handleRouterNavigation (to, from) {
       this.currentPath = to.name
@@ -200,6 +205,8 @@ export default {
           break
         case 'home':
           this.slideTo(0)
+          const section = this.sections.find(s => s.slug === to.params.which)
+          section && (this.activeSection = section.id)
           break
       }
     },
@@ -218,6 +225,7 @@ export default {
     handleLoadingState (val) {
       this.loadingBar.ptg = (val.ptg * 100).toFixed(2) + '%'
       const classes = {}
+      this.showingLoadingBar = val.value
       classes[val.value ? 'show' : 'hide'] = true
       classes[val.showPtg ? 'dynamic' : 'static'] = true
       this.loadingBar.classList = classes
@@ -249,6 +257,12 @@ export default {
       className.forEach(name => {
         this.$refs.loadingbar.classList.remove(name)
       })
+    },
+    goTo (where) {
+      this.$sbRouter.push({name: 'home',
+        params: {
+          which: where
+        }})
     }
   }
 }
@@ -275,6 +289,11 @@ $loading-bar-height: 3px;
   // height: $tb-height;
   transition: height var(--ts-g);
   transition-timing-function: var(--bezier-symmetric);
+  &.showing-loading-bar {
+    .bar-slide {
+      overflow: hidden;
+    }
+  }
 }
 .title-bar-container {
   z-index: 1;
@@ -331,7 +350,6 @@ $loading-bar-height: 3px;
   box-sizing: border-box;
   transition: height var(--top-bar-slider-transition);
   height: var(--slide-height);
-  overflow: hidden;
   &:not(.show) {
     --slide-height: 0 !important;
   }
@@ -387,11 +405,24 @@ $loading-bar-height: 3px;
 .section-switch {
   margin-left: .3em;
   cursor: pointer;
+  opacity: 0.5;
   span.section-title {
     font-size: .75em;
     line-height: 1;
+    transition: font-size var(--ts-g);
+  }
+  transition: var(--hover-n-active-transitions);
+  &:not(.active) {
+    &:hover {
+      opacity: 0.8;
+    }
+    &:active {
+      opacity: 0.5;
+      transform: scale(.98);
+    }
   }
   &.active {
+    opacity: 1;
     span.section-title {
       font-size: 1.25em;
     }

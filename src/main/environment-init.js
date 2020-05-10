@@ -1,4 +1,5 @@
 require('./controllers/Prototype/Array')
+require('./controllers/Prototype/Object')
 require('./Global/VARIABLES')
 
 const util = require('util')

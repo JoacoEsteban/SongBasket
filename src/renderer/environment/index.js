@@ -4,6 +4,7 @@ const GLOBAL = require('../../main/Global/VARIABLES')
 export default (Vue) => {
   // -----------------PROTOTYPES-----------------
   require('../../main/controllers/Prototype/Array')
+  require('../../main/controllers/Prototype/Object')
   // -----------------VUE-----------------
   require('./vue.renderer.config').default(Vue)
   // -----------------WINDOW-----------------

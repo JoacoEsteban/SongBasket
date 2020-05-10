@@ -120,7 +120,7 @@ export default {
       return new Promise((resolve, reject) => this.$nextTick(resolve))
     },
     getBounds () {
-      return this.$root.plTransformInvalidation < this.bounds.timeStamp ? this.bounds.bounds : (this.bounds = {timeStamp: Date.now(),
+      return this.$root.cardTransformInvalidation < this.bounds.timeStamp ? this.bounds.bounds : (this.bounds = {timeStamp: Date.now(),
         bounds: (() => {
           let bounds = this.getRotationElement()[0].getBoundingClientRect();
           ['x', 'y', 'width', 'height'].forEach(k => bounds[k] = bounds[k].toFixed(2))

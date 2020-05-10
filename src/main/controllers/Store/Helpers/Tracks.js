@@ -83,6 +83,7 @@ const makeValidRegex = str => {
   // TODO Fix this replacing incorrectly
   regex = regex.replace(/\[/g, '\\[')
   regex = regex.replace(/\]/g, '\\]')
+  regex = regex.replace(/\?/g, '\\?')
 
   return {str, regex}
 }

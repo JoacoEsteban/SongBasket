@@ -1,5 +1,7 @@
 import $ from 'jquery'
 
+window.SHOW_KEYCODES = false
+
 let VueInstance
 const thisVue = () => (VueInstance || (VueInstance = require('../main').default))
 export default function (window) {
@@ -16,7 +18,7 @@ export default function (window) {
 }
 
 function invalidatePlTransformCache () {
-  thisVue().$root.plTransformInvalidation = Date.now()
+  thisVue().$root.cardTransformInvalidation = Date.now()
 }
 
 function handleMetaKeyCombo (keyCode, e) {
@@ -35,8 +37,13 @@ function handleMetaKeyCombo (keyCode, e) {
       })())) + thisVue().$sbRouter.push({name: 'downloads-view'})
       break
     case 82:
-      e.preventDefault()
       shiftKey && (thisVue().$controllers.core.refresh() + (e && e.preventDefault()))
+      break
+    case 80:
+      (thisVue().$sbRouter.push({name: 'home', params: {which: 'playlists-list'}}) + (e && e.preventDefault()))
+      break
+    case 84:
+      (thisVue().$sbRouter.push({name: 'home', params: {which: 'tracks-list'}}) + (e && e.preventDefault()))
       break
     default:
   }
@@ -47,7 +54,7 @@ function isCommandKey (meta, control) {
 }
 function handleWindowKey (e) {
   const {keyCode, metaKey, ctrlKey} = e
-  // console.log(keyCode)
+  if (window.SHOW_KEYCODES) console.log(keyCode)
   if (isCommandKey(metaKey, ctrlKey) && keyCode !== 8) return handleMetaKeyCombo(keyCode, e)
   if (isAscii(keyCode) || (keyCode === 8 && thisVue().$root.searchInputElement && thisVue().$root.searchInputElement.value.length)) return focusSearchbar()
 }

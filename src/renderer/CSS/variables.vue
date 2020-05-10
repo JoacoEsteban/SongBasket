@@ -1,6 +1,5 @@
 <style lang="scss">
 @function tr($dur) {
-  @debug $dur;
   @return calc(var(--transition-scale) * #{$dur})
 }
 :root {

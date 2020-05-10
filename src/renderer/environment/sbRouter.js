@@ -22,12 +22,15 @@ export default class {
   giveMeCurrent () {
     return this.history[this.pointer]
   }
+  giveMePrevious () {
+    return this.history[this.pointer - 1]
+  }
+  giveMeNext () {
+    return this.history[this.pointer + 1]
+  }
 
-  isSamePath (path) {
-    return path.name === this.path.name && Object.keys(this.path).length !== Object.keys(path).length && ((env) => {
-      for (const key in env.path) if (env.path[key] !== path[key]) return false
-      return true
-    })(this)
+  isSamePath (path1, path2 = this.path) {
+    return path1 && path2 && path1.isSameObject(path2)
   }
 
   isLast () {
@@ -42,6 +45,8 @@ export default class {
     if (this.transitioning) return
     if (typeof location === 'string') location = {name: location, params: {}}
     if (this.isSamePath(location)) return console.error('Same Path')
+    if (this.isSamePath(location, this.giveMePrevious())) return this.goBack()
+    if (this.isSamePath(location, this.giveMeNext())) return this.goForward()
 
     await this.onBeforeTransition(location) // To
     this.clearHistory()
@@ -71,10 +76,10 @@ export default class {
 
   async onBeforeTransition (to) {
     // (to, from)
-    this.beforeTransitionCallbacks.forEach(async f => f(to, this.path))
+    this.beforeTransitionCallbacks.forEach(f => f(to, this.path))
   }
   async onAfterTransition (from) {
     // (on, from)
-    this.afterTransitionCallbacks.forEach(async f => f(this.path, from))
+    this.afterTransitionCallbacks.forEach(f => f(this.path, from))
   }
 }

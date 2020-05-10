@@ -4,6 +4,10 @@
       v-show="showPlList"
       @openPlaylist="$emit('openPlaylist', $event)"
     ></playlists-list>
+    <tracks-list
+      v-show="showTracksList"
+      @openPlaylist="$emit('openPlaylist', $event)"
+    ></tracks-list>
     <playlist-view
       v-show="componentBeingShown === 'playlist-view'"
       :currentPlaylist="currentPath.params && currentPath.params.id"
@@ -17,6 +21,7 @@
 
 <script>
 import PlaylistsList from './PlaylistsList'
+import TracksList from './TracksList'
 import PlaylistView from './PlaylistView/PlaylistView'
 import DownloadsView from './DownloadsView/DownloadsView'
 let sleep
@@ -24,6 +29,7 @@ let sleep
 export default {
   components: {
     PlaylistsList,
+    TracksList,
     PlaylistView,
     DownloadsView
   },
@@ -38,12 +44,14 @@ export default {
   computed: {
     showPlList () {
       return this.currentPath.name === 'home' && this.currentPath.params.which === 'playlists-list'
+    },
+    showTracksList () {
+      return this.currentPath.name === 'home' && this.currentPath.params.which === 'tracks-list'
     }
   },
   created () {
     sleep = this.$sleep
     this.$sbRouter.beforeTransition(this.handleRouteChange)
-    this.$sbRouter.push({name: 'home', params: {which: 'playlists-list'}})
   },
   mounted () {
     this.$root.$refs['home-router'] = this.$refs['home-router']

@@ -62,16 +62,16 @@ export default {
         case 'review-conversion':
         case 'no-conversion':
         case 'paused':
-          return this.openReviewModal
+          return this.reviewTrack
         default:
           return null
       }
     },
     handleClick () {
       if (this.clickCB === undefined) this.clickCB = this.getCallback()
-      if (typeof this.clickCB === 'function') this.clickCB()
+      typeof this.clickCB === 'function' && this.clickCB()
     },
-    openReviewModal () {
+    reviewTrack () {
       this.$emit('review-track')
     }
   },

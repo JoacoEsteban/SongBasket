@@ -10,8 +10,8 @@ import Guest from '../components/Setup/Guest.vue'
 import GuestVerify from '../components/Setup/GuestVerify.vue'
 import Empty from '../components/Empty.vue'
 import Home from '../components/Home/Home.vue'
-import PlaylistsList from '../components/Home/PlaylistsList.vue'
-import PlaylistView from '../components/Home/PlaylistView/PlaylistView.vue'
+// import PlaylistsList from '../components/Home/PlaylistsList.vue'
+// import PlaylistView from '../components/Home/PlaylistView/PlaylistView.vue'
 
 Vue.use(Router)
 
@@ -60,19 +60,7 @@ let router = new Router({
     },
     {
       path: '/home',
-      component: Home,
-      children: [
-        {
-          path: '',
-          name: 'playlists-list',
-          component: PlaylistsList
-        },
-        {
-          path: 'playlist-view',
-          name: 'playlist-view',
-          component: PlaylistView
-        }
-      ]
+      component: Home
     }
   ]
 })

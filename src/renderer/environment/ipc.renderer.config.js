@@ -88,7 +88,9 @@ function onDocumentReady () {
       await redirect('home')
       return
     }
-    redirect('setup')
+    let path = 'setup'
+    // if (chooseFolder) path = 'folderView' // TODO
+    redirect(path)
   })
   vue.ipc.send('GET_STATUS', { listenerId })
 }

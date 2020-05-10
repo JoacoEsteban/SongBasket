@@ -255,7 +255,7 @@ export async function youtubize () {
 }
 
 export async function download (e, plFilter) {
-  if (!load.canRequest) return
+  if (!load.canRequest) return console.log('CANT REQUEST')
   console.log('About to download')
   if (plFilter && !Array.isArray(plFilter)) plFilter = [ plFilter ]
   try {
