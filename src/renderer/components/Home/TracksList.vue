@@ -1,17 +1,5 @@
 <template>
   <div ref="tracks-list" class="tkl-container">
-    <div class="filters-container">
-      <div class="filters-content">
-        <div class="search-bar global-scroll-shadow">
-          <div class="filters-background show-on-scroll">
-          </div>
-          <input placeholder="Start Typing" autofocus @focus="searchInputOnFocus" @blur="searchInputOnBlur" v-model.trim="searchInput" ref="tracks-search-input" class="input-light semibold" type="text" @keydown.enter="handleInputConfirm">
-        </div>
-        <div class="filter-buttons">
-
-        </div>
-      </div>
-    </div>
     <div ref="actual-list" class="actual-list row" :class="listAnimationClass" v-if="showList">
       <div v-if="noTracks" class="no-tracks">
         No Tracks found
@@ -42,7 +30,6 @@ export default {
       filterBackgroundOpacity: 0,
       listAnimationTime: 250,
       listAnimationClass: '',
-      searchInput: '',
       tracks: [],
       tracksFiltered: null,
       filterMap: {},
@@ -57,6 +44,9 @@ export default {
     Track
   },
   computed: {
+    searchInput () {
+      return this.$root.SEARCH_INPUT.value
+    },
     stateReplaced () {
       return this.$store.state.Events.STATE_REPLACED
     },
@@ -75,6 +65,8 @@ export default {
       this.refreshAll()
     },
     searchInput (val) {
+      if (!this.isMounted()) return
+      console.log('from tracklist')
       this.filterTracks()
     },
     playlistStateChanged () {
@@ -82,11 +74,9 @@ export default {
     }
   },
   methods: {
-    searchInputOnFocus () {
-      this.$root.searchInputElement = null
-    },
-    searchInputOnBlur () {
-      this.$root.searchInputElement = this.$refs['tracks-search-input']
+    isMounted () {
+      const path = this.$sbRouter.giveMeCurrent()
+      return path.name === 'home' && path.params.which === 'tracks-list'
     },
     handleInputConfirm () {
       if (this.tracksFiltered && this.tracksFiltered.length === 1) {
@@ -120,7 +110,6 @@ export default {
     },
     refreshAll () {
       this.tracks = this.$root.CONVERTED_TRACKS_FORMATTED
-      console.log('aber', this.tracks)
       this.filterTracks()
     },
     calcScrollOpacity () {
@@ -153,11 +142,7 @@ export default {
       return [name, ...artists.map(({name}) => name)].some(token => token.toLowerCase().includes(txt))
     }
   },
-  beforeDestroy () {
-    this.searchInputOnFocus()
-  },
   mounted () {
-    this.searchInputOnBlur()
     this.refreshAll()
     this.$refs['actual-list'].style.setProperty('--list-transition-time', this.listAnimationTime + 'ms')
     // this.$root.plListEnv = this

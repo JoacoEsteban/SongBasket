@@ -86,6 +86,10 @@ function onDocumentReady () {
       await onFfmpegBinaries(e, {value: status.FFMPEG_BINS_DOWNLOADED})
       await store.dispatch('SETUP_LOADING_STATE', 'found')
       await redirect('home')
+      setTimeout(() => {
+        onConnectionChange(null, status.CONNECTED_TO_INTERNET)
+        onApiConnectionChange(null, status.CONNECTED_TO_API)
+      }, 1000)
       return
     }
     let path = 'setup'

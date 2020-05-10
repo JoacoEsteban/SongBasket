@@ -45,12 +45,13 @@
 
   /* VARIABLES */
   --body-color: var(--body-dark);
-  --body-color-disconnected: #903;
+  --body-color-disconnected: #330000;
   --max-container-height: calc(100vh);
   --box-shadow-std: 5px 5px 15px 0 rgba(0, 0, 0, 0.4);
   --container-padding-x: 1.25em;
   --scroll-opacity: 1;
   --scroll-opacity-inverted: calc(1 - var(--scroll-opacity));
   --tb-title-height: 1em;
+  --filters-container-height: 3em;
 }
 </style>

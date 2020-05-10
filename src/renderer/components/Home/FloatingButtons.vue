@@ -124,15 +124,27 @@ export default {
     this.handleTransition()
   },
   watch: {
-    globalError: function (val) {
+    globalError (val) {
       this.handleError(val)
+    },
+    fullConnection (val) {
+      if (val) return this.hideErrorPill()
+      this.handleError({
+        message: this.connectedToInternet ? 'SongBasket servers are experiencing connection issues' : 'Check your connection'
+      }, {
+        val: true,
+        time: 10000
+      })
     }
   },
   methods: {
     handleTransition (to) {
       this.route = (to && to.name) || this.$sbRouter.path.name
     },
-    async handleError (val) {
+    async handleError (val, autoHide = {
+      val: true,
+      time: 400
+    }) {
       this.errorTimeout && clearTimeout(this.errorTimeout)
       this.errorPill.message = val.message
 
@@ -143,15 +155,16 @@ export default {
       await this.$sleep(100)
       this.errorPill.show = true
 
-      this.errorTimeout = setTimeout(async () => {
-        this.errorPill.show = false
-        await this.$sleep(400)
-        this.errorPill.kill = true
-        this.forceKill.all = false
-        await this.$sleep(100)
-        this.forceHide.all = false
-        await this.$sleep(400)
-      }, 4000)
+      if (autoHide.val) this.errorTimeout = setTimeout(this.hideErrorPill, autoHide.time)
+    },
+    async hideErrorPill () {
+      this.errorPill.show = false
+      await this.$sleep(400)
+      this.errorPill.kill = true
+      this.forceKill.all = false
+      await this.$sleep(100)
+      this.forceHide.all = false
+      await this.$sleep(400)
     },
     refresh () {
       this.$controllers.core.refresh()

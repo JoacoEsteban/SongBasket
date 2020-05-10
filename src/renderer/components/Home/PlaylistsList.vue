@@ -1,17 +1,5 @@
 <template>
   <div ref="playlists-list" class="pll-container">
-    <div class="filters-container">
-      <div class="filters-content">
-        <div class="search-bar global-scroll-shadow">
-          <div class="filters-background show-on-scroll">
-          </div>
-          <input placeholder="Start Typing" autofocus @focus="searchInputOnFocus" @blur="searchInputOnBlur" v-model.trim="searchInput" ref="search-input" class="input-light semibold" type="text" @keydown.enter="handleInputConfirm">
-        </div>
-        <div class="filter-buttons">
-
-        </div>
-      </div>
-    </div>
     <div ref="actual-list" class="actual-list row" :class="listAnimationClass" v-if="showList">
       <div v-if="noPlaylists" class="no-playlists">
         No Playlists found{{allLoaded ? '' : ', try loading some more'}}
@@ -55,7 +43,6 @@ export default {
       filterBackgroundOpacity: 0,
       listAnimationTime: 250,
       listAnimationClass: '',
-      searchInput: '',
       syncedPlaylists: [],
       syncedPlaylistsFiltered: null,
       unSyncedPlaylistsFiltered: null,
@@ -71,6 +58,9 @@ export default {
     Playlist
   },
   computed: {
+    searchInput () {
+      return this.$root.SEARCH_INPUT.value
+    },
     allLoaded () {
       return this.control.total - this.control.offset <= 0
     },
@@ -95,6 +85,8 @@ export default {
       this.refreshSynced()
     },
     searchInput (val) {
+      if (!this.isMounted()) return
+      console.log('from pllist')
       this.filterPlaylists()
     },
     playlistStateChanged () {
@@ -102,6 +94,10 @@ export default {
     }
   },
   methods: {
+    isMounted () {
+      const path = this.$sbRouter.giveMeCurrent()
+      return path.name === 'home' && path.params.which === 'playlists-list'
+    },
     formatPlaylist (playlist) {
       return ({
         playlist,
@@ -110,12 +106,6 @@ export default {
     },
     loadMore () {
       this.$controllers.core.loadMorePlaylists()
-    },
-    searchInputOnFocus () {
-      this.$root.searchInputElement = null
-    },
-    searchInputOnBlur () {
-      this.$root.searchInputElement = this.$refs['search-input']
     },
     handleInputConfirm () {
       if (this.syncedPlaylistsFiltered && this.syncedPlaylistsFiltered.length === 1) {
@@ -168,7 +158,7 @@ export default {
       if (this.lastType) clearTimeout(this.lastType)
       this.hidePlaylists()
         .then(() => {
-          let txt = this.searchInput.toLowerCase()
+          let txt = (this.searchInput && this.searchInput.toLowerCase()) || ''
           let noPlaylists = false
           if (!txt.length) {
             this.unSyncedPlaylistsFiltered = null
@@ -184,11 +174,7 @@ export default {
       this.lastType = setTimeout(this.showPlaylists, this.listAnimationTime + 10)
     }
   },
-  beforeDestroy () {
-    this.searchInputOnFocus()
-  },
   mounted () {
-    this.searchInputOnBlur()
     this.$IPC.on('done loading', () => {
       this.loading = false
     })

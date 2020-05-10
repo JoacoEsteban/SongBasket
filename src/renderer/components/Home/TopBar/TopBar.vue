@@ -449,4 +449,12 @@ $loading-bar-height: 3px;
     transform: scale(1);
   }
 }
+.global-search-bar-container {
+  position: absolute;
+  $h: 4em;
+  width: 100%;
+  height: $h;
+  bottom: -$h;
+  outline: 1px solid red;
+}
 </style>

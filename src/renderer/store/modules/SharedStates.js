@@ -51,11 +51,6 @@ const actions = {
       resolve()
     })
   },
-  initializeDownloadPool ({commit}) {
-    return new Promise((resolve, reject) => {
-      resolve()
-    })
-  },
   downloadChunk ({commit}, {id, current, size}) {
     return new Promise((resolve, reject) => {
       commit('DOWNLOAD_CHUNK', {id, current, size})

@@ -15,6 +15,7 @@ const checkInternet = () => {
       global.CONNECTED_TO_INTERNET = connected
       CB(connected)
     }
+    // TODO set api as disconnected
     setTimeout(checkInternet, connected ? 10000 : 5000)
   })
 }
@@ -27,5 +28,5 @@ const pingApi = async () => {
     connected = false
   }
   if (global.CONNECTED_TO_API !== connected) (global.CONNECTED_TO_API = connected) + API_CB(connected)
-  setTimeout(pingApi, global.CONSTANTS.HEROKU_PING_INTERVAL)
+  setTimeout(pingApi, global.CONNECTED_TO_API ? global.CONSTANTS.HEROKU_PING_INTERVAL : 5000)
 }

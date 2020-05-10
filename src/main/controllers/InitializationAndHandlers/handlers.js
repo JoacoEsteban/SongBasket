@@ -185,7 +185,9 @@ const getAppStatus = () => {
     APP_STATUS: status,
     state: status.IS_LOGGED ? VUEX_MAIN.STATE_SAFE() : null,
     downloadedTracks: status.IS_LOGGED ? FileWatchers.retrieveTracks() : null,
-    FFMPEG_BINS_DOWNLOADED: global.CONSTANTS.FFMPEG_BINS_DOWNLOADED
+    FFMPEG_BINS_DOWNLOADED: global.CONSTANTS.FFMPEG_BINS_DOWNLOADED,
+    CONNECTED_TO_INTERNET: global.CONNECTED_TO_INTERNET,
+    CONNECTED_TO_API: global.CONNECTED_TO_API
   }
   if (load.instance.value && load.instance.target === 'DOWNLOAD') setTimeout(youtubeDl.onDowloadStart)
   return all

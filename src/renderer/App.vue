@@ -22,7 +22,7 @@ export default {
   },
   computed: {
     isConnected () {
-      return this.$store.state.SharedStates.CONNECTED_TO_INTERNET
+      return this.$store.state.SharedStates.CONNECTED_TO_INTERNET && this.isConnectedToApi
     },
     isConnectedToApi () {
       return this.$store.state.SharedStates.CONNECTED_TO_API
@@ -30,6 +30,9 @@ export default {
   },
   beforeCreate () {
     this.$root.DOWNLOADED_TRACKS = {}
+    this.$root.SEARCH_INPUT = {
+      value: ''
+    }
     window.ROOT = this.$root
     window.VUEX = this.$store
     window.VUEX_CURRENT_USER = this.$store.state.CurrentUser

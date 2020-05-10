@@ -1,7 +1,10 @@
 <template>
   <div class="whole-container">
     <div class="home-container">
-      <top-bar/>
+      <div class="rel-full" style="height: initial">
+        <top-bar/>
+        <search-bar/>
+      </div>
 
         <component-loader class="home-router"
         @openPlaylist="openPlaylist($event)"
@@ -19,6 +22,7 @@
 import 'vuex'
 
 import TopBar from './TopBar/TopBar.vue'
+import SearchBar from './TopBar/SearchBar.vue'
 import ComponentLoader from './ComponentLoader.vue'
 import PlaylistsList from './PlaylistsList.vue'
 import Playlist from './Playlist.vue'
@@ -29,6 +33,7 @@ import HomeBackground from './HomeBackground.vue'
 export default {
   components: {
     TopBar,
+    SearchBar,
     ComponentLoader,
     PlaylistsList,
     Playlist,
@@ -117,7 +122,7 @@ export default {
 .home-router{
   z-index: 1;
   max-height: 100%;
-  /* padding-bottom: 1em; */
+  padding-top: var(--filters-container-height);
   display: flex;
   box-sizing: border-box;
   overflow: auto;
