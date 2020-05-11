@@ -1,6 +1,6 @@
 <template>
   <div class="plv-container w100">
-    <div class="track-list row">
+    <div class="track-list row hideable-container" :class="listAnimationClass">
 
       <div class="changes-container" :class="{show: showingChanges}" :style="{'--changes-height': changesHeightFormmated}">
         <div class="pb-1" v-if="added.length">
@@ -31,14 +31,11 @@
       </div>
 
       <div class="list">
-        <Track v-for="(item, index) in (isSynced ? conversion : items)" :item="item" :key="index"
+        <Track v-for="(item, index) in (iterableItemsFiltered || iterableItems)" :item="item" :key="index"
           @review-track="reviewTrack(item)"
         />
       </div>
     </div>
-    <!-- <div class="track-review-container row">
-      track review xd
-    </div> -->
   </div>
 </template>
 
@@ -53,6 +50,10 @@ export default {
       showingAll: false,
       changesHeight: null,
       plId: this.$props.currentPlaylist,
+      listAnimationClass: '',
+      listAnimationTime: 250,
+      iterableItems: [],
+      iterableItemsFiltered: null,
       showing: {
         added: false,
         removed: false
@@ -107,6 +108,9 @@ export default {
     },
     playlistStateChanged () {
       return this.$store.state.Events.PLAYLIST_STATE_CHANGED
+    },
+    searchInput () {
+      return this.$root.SEARCH_INPUT.value
     }
   },
   watch: {
@@ -129,11 +133,14 @@ export default {
     },
     playlistUnsynced () {
       this.$sbRouter.push({name: 'home', params: {which: 'playlists-list'}})
+    },
+    searchInput () {
+      if (!this.isMounted()) return
+      this.scheduleFilter()
     }
   },
   mounted () {
-    this.refreshPlaylist()
-    this.computeTracks()
+    this.refreshAll()
     this.calcChangesHeight()
     this.$root.PlaylistViewInstance = this
     window.plViewDebug = this
@@ -145,6 +152,7 @@ export default {
     refreshAll () {
       this.refreshPlaylist()
       this.computeTracks()
+      this.setIterable()
     },
     refreshPlaylist () {
       this.playlist = this.$store.getters.PlaylistById(this.plId) || {}
@@ -153,6 +161,10 @@ export default {
     },
     computeTracks () {
       this.conversion = (this.$root.CONVERTED_TRACKS_FORMATTED && this.$root.CONVERTED_TRACKS_FORMATTED.filter(t => t.playlists.some(pl => pl.id === this.plId)).sort(this.$controllers.track.sort)) || []
+    },
+    setIterable () {
+      this.iterableItems = this.isSynced ? this.conversion : this.items
+      console.log('dale', this.iterableItems, '\n', this.conversion)
     },
     reviewTrack (track) {
       this.$root.OPEN_MODAL({
@@ -167,6 +179,44 @@ export default {
         this.$('.changes-container').children().each((i, el) => height += parseInt(this.$(el).css('height')))
         this.changesHeight = height
       })
+    },
+    // --------
+    isMounted () {
+      const path = this.$sbRouter.giveMeCurrent()
+      return path.name === 'playlist-view'
+    },
+    async transitionTracks (what) {
+      // TODO encapsulate all this logic inside controller
+      this.listAnimationClass = what
+      await this.$sleep(this.listAnimationTime)
+      return (!(this.transitioning = false))
+    },
+    async hideTracks () {
+      await this.transitionTracks('hide')
+    },
+    async showTracks () {
+      await this.transitionTracks('show')
+    },
+    async scheduleFilter () {
+      this.lastType = Date.now()
+      await this.hideTracks()
+      if (Date.now() - this.lastType < this.listAnimationTime) return
+      this.filter()
+      this.showTracks()
+    },
+    filter () {
+      const txt = (this.searchInput && this.searchInput.toLowerCase()) || ''
+      let noTracks = false
+      if (!txt.length) {
+        this.iterableItemsFiltered = null
+      } else {
+        noTracks = (this.iterableItemsFiltered = this.iterableItems.filter((track) => this.filterFn(track, txt))).length === 0
+      }
+      this.noTracks = noTracks
+    },
+    filterFn (track, txt) {
+      const {name, artists} = track.data || track
+      return [name, ...artists.map(({name}) => name)].some(token => token.toLowerCase().includes(txt))
     }
   }
 }

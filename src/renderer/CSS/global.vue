@@ -207,6 +207,17 @@ body:hover {
     display: none;
   }
 }
+
+.hideable-container {
+  // TODO Adapt transition to global trasition scale factor
+  --list-transition-time: .3s;
+  transition: var(--hover-n-active-transitions);
+  transition-duration: var(--list-transition-time);
+  &.hide {
+    transform: translateX(-3em);
+    opacity: 0;
+  }
+}
 </style>
 
 <style lang="less">

@@ -11,7 +11,7 @@
           type="text"
           @focus="searchInputOnFocus"
           @blur="searchInputOnBlur"
-          v-model.trim="searchInput.value"
+          v-model.trim="searchInput"
           @keydown.enter="handleInputConfirm"
           >
         </div>
@@ -29,19 +29,21 @@ export default {
   },
   data () {
     return {
-      searchInput: this.$root.SEARCH_INPUT
+      searchInput: '',
+      model: this.$root.SEARCH_INPUT
     }
   },
   mounted () {
     this.searchInputOnBlur()
-    this.$sbRouter.beforeTransition(() => this.searchInput.value = '')
+    this.$sbRouter.beforeTransition(() => (this.searchInput = '') + (this.model.value = ''))
   },
   computed: {
   },
   watch: {
-    // searchInput (val) {
-    //   // this.$store.dispatch('searchValue', val)
-    // }
+    searchInput (val) {
+      this.model.writeEvent = !this.model.writeEvent
+      this.model.value = val
+    }
   },
   methods: {
     searchInputOnFocus () {

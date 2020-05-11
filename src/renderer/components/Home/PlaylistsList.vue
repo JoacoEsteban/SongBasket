@@ -1,6 +1,6 @@
 <template>
   <div ref="playlists-list" class="pll-container">
-    <div ref="actual-list" class="actual-list row" :class="listAnimationClass" v-if="showList">
+    <div ref="actual-list" class="actual-list row hideable-container" :class="listAnimationClass" v-if="showList">
       <div v-if="noPlaylists" class="no-playlists">
         No Playlists found{{allLoaded ? '' : ', try loading some more'}}
       </div>
@@ -84,10 +84,9 @@ export default {
     playlistTracksReComputed () {
       this.refreshSynced()
     },
-    searchInput (val) {
+    searchInput () {
       if (!this.isMounted()) return
-      console.log('from pllist')
-      this.filterPlaylists()
+      this.scheduleFilter()
     },
     playlistStateChanged () {
       this.refreshAll()
@@ -115,27 +114,17 @@ export default {
     },
     transitionPlaylists (what) {
       return new Promise((resolve, reject) => {
-        // if (this.transitioning) resolve(false)
-        this.transitioning = true
         this.listAnimationClass = what
         setTimeout(() => {
           resolve(!(this.transitioning = false))
         }, this.listAnimationTime)
       })
     },
-    hidePlaylists () {
-      return new Promise((resolve, reject) => {
-        this.transitionPlaylists('hide')
-          .then(res => resolve(res))
-          .catch(err => reject(err))
-      })
+    async hidePlaylists () {
+      await this.transitionPlaylists('hide')
     },
-    showPlaylists () {
-      return new Promise((resolve, reject) => {
-        this.transitionPlaylists('show')
-          .then(res => resolve(res))
-          .catch(err => reject(err))
-      })
+    async showPlaylists () {
+      await this.transitionPlaylists('show')
     },
     refreshAll () {
       this.playlists = this.$store.state.CurrentUser.playlists
@@ -143,8 +132,7 @@ export default {
     },
     refreshSynced () {
       this.syncedPlaylists = this.$store.state.CurrentUser.syncedPlaylists.map(id => this.playlists.find(pl => pl.id === id)).filter(pl => pl).map(this.formatPlaylist).sort(this.$controllers.playlist.sort)
-
-      this.filterPlaylists()
+      this.scheduleFilter()
     },
     calcScrollOpacity () {
       let ratio = (this.getContainerElement().scrollTop / 100)
@@ -154,27 +142,31 @@ export default {
     getContainerElement () {
       return (this.containerElement || (this.containerElement = this.$root.$refs['home-router']))
     },
-    filterPlaylists () {
-      if (this.lastType) clearTimeout(this.lastType)
-      this.hidePlaylists()
-        .then(() => {
-          let txt = (this.searchInput && this.searchInput.toLowerCase()) || ''
-          let noPlaylists = false
-          if (!txt.length) {
-            this.unSyncedPlaylistsFiltered = null
-            this.syncedPlaylistsFiltered = null
-          } else {
-            noPlaylists = (
-              (this.syncedPlaylistsFiltered = this.syncedPlaylists.filter(({playlist}) => playlist.name.toLowerCase().includes(txt))).length +
-              (this.unSyncedPlaylistsFiltered = this.unSyncedPlaylists.filter(({playlist}) => playlist.name.toLowerCase().includes(txt))).length
-            ) === 0
-          }
-          this.noPlaylists = noPlaylists
-        })
-      this.lastType = setTimeout(this.showPlaylists, this.listAnimationTime + 10)
+    async scheduleFilter () {
+      this.lastType = Date.now()
+      await this.hidePlaylists()
+      if (Date.now() - this.lastType < this.listAnimationTime) return
+      this.filter()
+      this.showPlaylists()
+    },
+    filter () {
+      console.log('insside filter')
+      const txt = (this.searchInput && this.searchInput.toLowerCase()) || ''
+      let noPlaylists = false
+      if (!txt.length) {
+        this.unSyncedPlaylistsFiltered = null
+        this.syncedPlaylistsFiltered = null
+      } else {
+        noPlaylists = (
+          (this.syncedPlaylistsFiltered = this.syncedPlaylists.filter(({playlist}) => playlist.name.toLowerCase().includes(txt))).length +
+          (this.unSyncedPlaylistsFiltered = this.unSyncedPlaylists.filter(({playlist}) => playlist.name.toLowerCase().includes(txt))).length
+        ) === 0
+      }
+      this.noPlaylists = noPlaylists
     }
   },
   mounted () {
+    console.log('from pllist rebefo', this.searchInput, this.$root.SEARCH_INPUT)
     this.$IPC.on('done loading', () => {
       this.loading = false
     })
@@ -207,13 +199,6 @@ $bezier-chill: cubic-bezier(0, 1, .5, 1);
 }
 .actual-list {
   // TODO Adapt transition to global trasition scale factor
-  --list-transition-time: .3s;
-  $transition: var(--list-transition-time) $bezier-chill;
-  transition: transform $transition, opacity $transition;
-  &.hide {
-    transform: translateX(-3em);
-    opacity: 0;
-  }
   > .list {
     padding: 0 var(--padding-x);
   }

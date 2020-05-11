@@ -31,6 +31,7 @@ export default {
   beforeCreate () {
     this.$root.DOWNLOADED_TRACKS = {}
     this.$root.SEARCH_INPUT = {
+      writeEvent: false,
       value: ''
     }
     window.ROOT = this.$root

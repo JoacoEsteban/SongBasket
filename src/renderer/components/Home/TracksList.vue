@@ -1,6 +1,6 @@
 <template>
   <div ref="tracks-list" class="tkl-container">
-    <div ref="actual-list" class="actual-list row" :class="listAnimationClass" v-if="showList">
+    <div ref="actual-list" class="actual-list row hideable-container" :class="listAnimationClass">
       <div v-if="noTracks" class="no-tracks">
         No Tracks found
       </div>
@@ -11,9 +11,6 @@
         />
       </div>
     </div>
-    <!-- <div class="background-container">
-      dalebro
-    </div> -->
   </div>
 </template>
 
@@ -33,7 +30,6 @@ export default {
       tracks: [],
       tracksFiltered: null,
       filterMap: {},
-      showList: true,
       scrollOpKeys: {
         kebab: 'scroll-opacity',
         camel: this.$camelcase('scroll-opacity')
@@ -64,10 +60,9 @@ export default {
     playlistTracksReComputed () {
       this.refreshAll()
     },
-    searchInput (val) {
+    searchInput () {
       if (!this.isMounted()) return
-      console.log('from tracklist')
-      this.filterTracks()
+      this.scheduleFilter()
     },
     playlistStateChanged () {
       this.refreshAll()
@@ -84,33 +79,20 @@ export default {
         track && track.handleClick()
       }
     },
-    transitionTracks (what) {
-      return new Promise((resolve, reject) => {
-        // if (this.transitioning) resolve(false)
-        this.transitioning = true
-        this.listAnimationClass = what
-        setTimeout(() => {
-          resolve(!(this.transitioning = false))
-        }, this.listAnimationTime)
-      })
+    async transitionTracks (what) {
+      this.listAnimationClass = what
+      await this.$sleep(this.listAnimationTime)
+      return (!(this.transitioning = false))
     },
-    hideTracks () {
-      return new Promise((resolve, reject) => {
-        this.transitionTracks('hide')
-          .then(res => resolve(res))
-          .catch(err => reject(err))
-      })
+    async hideTracks () {
+      await this.transitionTracks('hide')
     },
-    showTracks () {
-      return new Promise((resolve, reject) => {
-        this.transitionTracks('show')
-          .then(res => resolve(res))
-          .catch(err => reject(err))
-      })
+    async showTracks () {
+      await this.transitionTracks('show')
     },
     refreshAll () {
       this.tracks = this.$root.CONVERTED_TRACKS_FORMATTED
-      this.filterTracks()
+      this.scheduleFilter()
     },
     calcScrollOpacity () {
       let ratio = (this.getContainerElement().scrollTop / 100)
@@ -120,22 +102,22 @@ export default {
     getContainerElement () {
       return (this.containerElement || (this.containerElement = this.$root.$refs['home-router']))
     },
-    filterTracks () {
-      if (this.lastType) clearTimeout(this.lastType)
-      this.hideTracks()
-        .then(() => {
-          let txt = this.searchInput.toLowerCase()
-          let noTracks = false
-          if (!txt.length) {
-            this.tracksFiltered = null
-          } else {
-            console.log('gettin in')
-            // noTracks = (this.tracksFiltered = this.filterMap[txt] || (this.filterMap[txt] = this.tracks.filter((track) => this.filterFn(track, txt)))).length === 0
-            noTracks = (this.tracksFiltered = this.tracks.filter((track) => this.filterFn(track, txt))).length === 0
-          }
-          this.noTracks = noTracks
-        })
-      this.lastType = setTimeout(this.showTracks, this.listAnimationTime + 10)
+    async scheduleFilter () {
+      this.lastType = Date.now()
+      await this.hideTracks()
+      if (Date.now() - this.lastType < this.listAnimationTime) return
+      this.filter()
+      this.showTracks()
+    },
+    filter () {
+      const txt = (this.searchInput && this.searchInput.toLowerCase()) || ''
+      let noTracks = false
+      if (!txt.length) {
+        this.tracksFiltered = null
+      } else {
+        noTracks = (this.tracksFiltered = this.tracks.filter((track) => this.filterFn(track, txt))).length === 0
+      }
+      this.noTracks = noTracks
     },
     filterFn (track, txt) {
       const {name, artists} = track.data
@@ -172,15 +154,7 @@ $bezier-chill: cubic-bezier(0, 1, .5, 1);
   padding-top: 0;
 }
 .actual-list {
-  // TODO Adapt transition to global trasition scale factor
-  --list-transition-time: .3s;
-  $transition: var(--list-transition-time) $bezier-chill;
-  transition: transform $transition, opacity $transition;
-  &.hide {
-    transform: translateX(-3em);
-    opacity: 0;
-  }
-  > .list {
+   > .list {
     padding: 0 var(--padding-x);
   }
 }
