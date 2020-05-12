@@ -1,26 +1,38 @@
 <template>
-    <div  class="login-flex">
-      <div v-if="$route.name !== 'set-home-folder'" class="login-header">{{header.text}}</div>
-      <router-view
-      path="/set-home-folder"
-      @setHomeFolder="setHomeFolder" 
-      @login="login"
-      @guestSearch="guestSearch($event)" 
-      @not-user="redirect('guest')"
-      @confirm-user="confirmUser"
-      > </router-view>
+    <div class="login-container window-drag-recursive" :style="'--offset: ' + offsetPtg + '%'">
+      <set-home-folder @handleClick="setHomeFolder" />
+      <div class="user-login-container">
+        <div class="login-header">{{header.text}}</div>
+        <div class="components-wrapper">
+          <Login />
+          <Guest />
+          <guest-verify />
+        </div>
+      </div>
   </div>
 </template>
 
 <script>
+import SetHomeFolder from './SetHomeFolder'
+import Login from '../Login'
+import Guest from './Guest'
+import GuestVerify from './GuestVerify'
 export default {
+  components: {
+    SetHomeFolder,
+    Login,
+    Guest,
+    GuestVerify
+  },
   data () {
     return {
       header: {
         show: true,
         text: "Let's find your music",
-        userOnHold: null
-      }
+        userOnHold: null,
+        showHeader: false
+      },
+      currentSlide: 0
     }
   },
   computed: {
@@ -29,11 +41,23 @@ export default {
     },
     loadingState () {
       return this.$store.state.loadingState
+    },
+    offsetPtg () {
+      return (this.currentSlide || 0) * 100
     }
   },
   methods: {
     setHomeFolder () {
-      this.$IPC.send('setHomeFolder')
+      try {
+        // await this.$IPC.send('setHomeFolder')
+        this.next()
+      } catch (error) {
+      }
+    },
+    next () {
+      console.log('next', this.currentSlide)
+      this.currentSlide++
+      console.log('next', this.currentSlide)
     },
     login () {
       this.$IPC.send('LOGIN')
@@ -99,26 +123,39 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.display-whole-container {
-  text-align: center;
-  height: 100%;
+.login-container {
   display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.login-flex {
-  display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
   justify-content: space-between;
   height: var(--max-container-height);
+  position: relative;
+  --offset: 0px;
+  transition: bottom var(--ts-g);
+  bottom: calc(var(--offset) * -1);
+  > div {
+    min-height: 100%;
+  }
 }
 .login-header {
-  min-height: 20vmax;
+  $h: 20vmax;
+  min-height: $h;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 7vw;
   font-family: 'Poppins Bold';
   background: var(--global-grey)
+}
+
+.user-login-container {
+  display: flex;
+  flex-direction: column;
+  .components-wrapper {
+    display: flex;
+    height: 100%;
+    > div {
+      min-width: 100%;
+    }
+  }
 }
 </style>

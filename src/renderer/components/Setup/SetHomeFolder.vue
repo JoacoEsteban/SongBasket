@@ -1,10 +1,8 @@
 <template>
-<div class="display-whole-container">
-  <div class="home-folder-container">
-      <div class="login-sb-welcome">welcome to</div>
-      <div class="login-sb-title">SongBasket</div>
-      <button class="button" @click="$emit('setHomeFolder')">Set a Home Folder</button>
-  </div>
+<div class="home-folder-container">
+    <div class="login-sb-welcome">welcome to</div>
+    <div class="login-sb-title">SongBasket</div>
+    <button class="button" @click="$emit('handleClick')">Set a Home Folder</button>
 </div>
 </template>
 
@@ -14,10 +12,22 @@ export default {
 </script>
 
 <style scoped lang="scss">
-  .home-folder-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
+.home-folder-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.login-sb-welcome{
+  font-size: 1rem;
+  // font-family: 'Poppins thin'
+}
+.login-sb-title {
+  font-size: 4.2em;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+  line-height: 1
+}
+
 </style>

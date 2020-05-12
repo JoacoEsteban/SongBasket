@@ -4,10 +4,10 @@ import store from '../store'
 
 import LoadingScreen from '../components/LoadingScreen/LoadingScreen.vue'
 import Setup from '../components/Setup/Setup.vue'
-import SetHomeFolder from '../components/Setup/SetHomeFolder.vue'
-import Login from '../components/Login.vue'
-import Guest from '../components/Setup/Guest.vue'
-import GuestVerify from '../components/Setup/GuestVerify.vue'
+// import SetHomeFolder from '../components/Setup/SetHomeFolder.vue'
+// import Login from '../components/Login.vue'
+// import Guest from '../components/Setup/Guest.vue'
+// import GuestVerify from '../components/Setup/GuestVerify.vue'
 import Empty from '../components/Empty.vue'
 import Home from '../components/Home/Home.vue'
 // import PlaylistsList from '../components/Home/PlaylistsList.vue'
@@ -30,28 +30,7 @@ let router = new Router({
     },
     {
       path: '/setup',
-      component: Setup,
-      children: [{
-        path: '',
-        name: 'set-home-folder',
-        component: SetHomeFolder
-      },
-      {
-        path: 'login',
-        name: 'login',
-        component: Login
-      },
-      {
-        path: 'guest',
-        name: 'guest',
-        component: Guest
-      },
-      {
-        path: 'guest-verify',
-        name: 'guest-verify',
-        component: GuestVerify
-      }
-      ]
+      component: Setup
     },
     {
       path: '/empty',

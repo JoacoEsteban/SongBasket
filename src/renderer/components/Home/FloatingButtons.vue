@@ -218,7 +218,7 @@ $whole-height: 5em;
   z-index: 1;
   display: flex;
   align-items: center;
-  width: 100%;
+  min-width: 7%;
     &:nth-child(1) {
       justify-content: flex-start
     }

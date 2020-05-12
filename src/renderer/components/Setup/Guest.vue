@@ -3,7 +3,7 @@
      :class="loadingState === 'Loading' ? 'loading' : 'doneloading'"
      class="display-whole-container alt">
             <!-- <router-link to="/" tag="button" class="button"  >Log in</router-link> -->
-            <div class="top">
+            <!-- <div class="top">
               <div class="radio-label">
                 <span @click="changeMode(0)">Username</span>
               </div>
@@ -17,7 +17,7 @@
               <div class="radio-label">
                 <span @click="changeMode(1)">Playlist ID</span>
               </div>
-            </div>
+            </div> -->
 
             <div class="mid">
               <input ref="guestSearchInput" class="std-input guest-search-box" type="text" v-model.trim="userQuery" @keyup.enter.prevent="guestSearch" />

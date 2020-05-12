@@ -35,10 +35,15 @@ html {
 }
 
 .window-nodrag {
-  -webkit-app-region: no-drag;
+  -webkit-app-region: no-drag !important;
 }
 .window-drag {
   -webkit-app-region: drag;
+}
+.window-drag-recursive {
+  &, * {
+    @extend .window-drag;
+  }
 }
 
 
@@ -64,6 +69,7 @@ body:hover {
 }
 .button {
   $transition: var(--button-transition);
+  @extend .window-nodrag;
   outline: none;
   font-family: "made_tommy";
   font-weight: bold;

@@ -5,19 +5,19 @@
             <div class="half top">
               <div class="profile-container">
                 <div
-                :style="user.images[0] !== undefined ? `background-image: url(${user.images[0].url})` : null"
+                :style="`background-image: url(${user && user.images && user.images[0].url})`"
                 class="user-photo">
-                  <user-icon v-if="user.images[0] === undefined" />
+                  <user-icon v-if="user && user.images[0] === undefined" />
                 <!-- style="background-image: url(https://scontent.xx.fbcdn.net/v/t1.0-1/p200x200/60116715_10206126614682262_1328470269831938048_n.jpg?_nc_cat=105&_nc_oc=AQnX4sqJlkCfrfZvyYh3U-x53LgqLxhMQmhqewNeVh7hMFbaKGmvISb0k5DSvjicTQM&_nc_ht=scontent.xx&oh=1a52435535742e5191d0c0723b303c1b&oe=5DD8F07F)" -->
                 </div>
 
                 <div class="user-data">
                   <div class="name">
-                    {{user.display_name}}
+                    {{user && user.display_name}}
                     <!-- Joaco Esteban -->
                   </div>
                   <div class="followers">
-                    {{user.followers.total}} Followers
+                    {{user && user.followers.total}} Followers
                     <!-- 30 Followers -->
                   </div>
                 </div>

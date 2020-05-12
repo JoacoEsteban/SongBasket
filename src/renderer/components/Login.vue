@@ -1,11 +1,8 @@
 <template>
-
-    <div class="display-whole-container">
-      <div class="">
-        <button class="button" @click="login">Login to Spotify</button>
-        <div>or</div>
-        <router-link to="/setup/guest" tag="button" class="button">Continue without Logging in</router-link>
-      </div>
+    <div class="">
+      <button class="button" @click="login">Login to Spotify</button>
+      <div>or</div>
+      <router-link to="/setup/guest" tag="button" class="button">Continue without Logging in</router-link>
     </div>
 </template>
 
@@ -24,14 +21,4 @@ export default {
 </script>
 
 <style lang="scss">
-.login-sb-welcome{
-  font-size: 1rem;
-  font-family: 'Poppins thin'
-}
-.login-sb-title {
-  font-size: 4.2em;
-  font-weight: 500;
-  margin-bottom: 1.5rem;
-  line-height: 1
-}
 </style>

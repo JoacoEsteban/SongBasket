@@ -123,17 +123,16 @@ const UserMethods = {
     console.log('retrieving from ', path)
     return new Promise((resolve, reject) => {
       fs.access(filePath, (err) => {
-        if (err) reject(err)
-        else {
-          fs.readFile(filePath, (err, data) => {
-            if (err) reject(err)
-            try {
-              resolve(JSON.parse(data))
-            } catch (err) {
-              console.error('ERROR WHEN PARSING STATE JSON FILE::: FileSystem/index.js', err)
-            }
-          })
-        }
+        if (err) return reject(err)
+        fs.readFile(filePath, (err, data) => {
+          if (err) return reject(err)
+          try {
+            resolve(JSON.parse(data))
+          } catch (err) {
+            console.error('ERROR WHEN PARSING STATE JSON FILE::: FileSystem/index.js', err)
+            reject(err)
+          }
+        })
       })
     })
   },

@@ -27,10 +27,6 @@ const getDefaultState = () => {
     user: {}, // Includes name, number of playlists, image url
     playlists: [],
     syncedPlaylists: [],
-    get syncedPlaylists_safe () {
-      let aux
-      return this.syncedPlaylists.filter(id => (aux = this.playlists.find(pl => pl.id === id)) && !aux.isPaused)
-    },
     queuedPlaylists: [],
     cachedPlaylists: [],
     deletedPlaylists: [],
@@ -38,6 +34,13 @@ const getDefaultState = () => {
     currentPlaylist: '',
     control: {},
     lastSync: null
+  }
+}
+
+const getters = {
+  get syncedPlaylists_safe () {
+    let aux
+    return state.syncedPlaylists.filter(id => (aux = this.playlists.find(pl => pl.id === id)) && !aux.isPaused)
   }
 }
 
@@ -329,11 +332,11 @@ const mutations = {
     }
   },
   COMMIT_ALL_CHANGES () {
-    state.syncedPlaylists_safe.forEach(pl => this.COMMIT_TRACK_CHANGES(pl))
+    getters.syncedPlaylists_safe.forEach(pl => this.COMMIT_TRACK_CHANGES(pl))
     SAVE_TO_DISK()
   },
   INVALIDATE_SYNCED_SNAPSHOT_IDS () {
-    state.syncedPlaylists_safe.map(id => state.playlists.find(pl => pl.id === id)).forEach(pl => {
+    getters.syncedPlaylists_safe.map(id => state.playlists.find(pl => pl.id === id)).forEach(pl => {
       if (!pl) throw new Error('SYNCED PLAYLIST NOT FOUND IN PLAYLIST LIST')
       pl.snapshot_id = ''
     })
