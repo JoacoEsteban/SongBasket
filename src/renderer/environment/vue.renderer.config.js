@@ -42,6 +42,7 @@ export default function (Vue) {
 
 function setControllers (Vue) {
   Vue.prototype.$controllers = {
+    setup: require('../controllers/Setup.controller').default,
     core: require('../controllers/Core.controller').default,
     track: require('../controllers/Track.controller').default,
     playlist: require('../controllers/Playlist.controller').default

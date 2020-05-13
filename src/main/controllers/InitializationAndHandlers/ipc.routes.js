@@ -21,7 +21,7 @@ export function init (ipc = global.ipc) {
 
   ipc.on('setHomeFolder', handlers.setHomeFolder)
 
-  ipc.on('LOGIN', handlers.createLoginWindow)
+  ipc.on('LOGIN', handlers.login)
 
   ipc.on('LOGOUT', handlers.logout)
 

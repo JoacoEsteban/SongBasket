@@ -72,7 +72,7 @@ const core = {
       const responseHeaders = (details && details.responseHeaders) || {}
 
       console.log('authorized', responseHeaders.spotify_authorization_success)
-      if (!(responseHeaders.spotify_authorization_success && responseHeaders.spotify_authorization_success[0])) return next()
+      if (!(responseHeaders.spotify_authorization_success && responseHeaders.spotify_authorization_success[0])) return
       global.CONSTANTS.LOGIN_WINDOW.close()
 
       const user = JSON.parse(details.responseHeaders.user_data[0])

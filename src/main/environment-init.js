@@ -6,8 +6,8 @@ const util = require('util')
 const child_process = require('child_process')
 const youtubeDl = require('youtube-dl')
 
-const USE_PROD_BACKEND = true
-const USE_HEROKU = true
+const USE_PROD_BACKEND = false
+const USE_HEROKU = false
 ;(() => {
   const subDomain = USE_HEROKU ? 'heroku' : 'api'
   process.env.BACKEND = process.env.NODE_ENV === 'production' || USE_PROD_BACKEND ? ('https://' + subDomain + '.songbasket.com') : 'http://localhost:5000'

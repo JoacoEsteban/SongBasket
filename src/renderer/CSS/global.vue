@@ -82,11 +82,11 @@ body:hover {
   align-items: center;
   justify-content: center;
   border: none;
-  box-shadow: 0.1em 0.1em 0.3em 0 rgba(0, 0, 0, 0.4);
+  box-shadow: 0.1em 0.1em 0.3em 0 rgba(0, 0, 0, 0.4), var(--outline-shadow);
   border-radius: 2em;
   color: var(--text-black);
   background: var(--text-white);
-  transition: transform $transition, background $transition, opacity $transition;
+  transition: transform $transition, background $transition, opacity $transition, box-shadow $transition;
   cursor: pointer;
 
   &:hover {
@@ -94,6 +94,9 @@ body:hover {
     transform: scale(1.05);
     background: var(--button-purple);
     color: var(--text-white);
+  }
+  &:focus:not(:active) {
+    --outline-shadow: 0 0 0 4px var(--button-purple);
   }
   &:active {
     font-weight: 500;

@@ -27,6 +27,9 @@ module.exports = global.CONSTANTS = {
     return process.env.BACKEND
   },
   APP_CWD: (process.env.NODE_ENV === 'production' ? require('electron').app.getPath('userData') : process.cwd()),
+  PROTOCOL_PATHS: {
+    BASE: 'songbasket'
+  },
   // -------------
 
   // INSTANCES
@@ -63,6 +66,8 @@ module.exports = global.CONSTANTS = {
     },
     width: 550,
     height: 830,
+    minWidth: 550,
+    minHeight: 830,
     useContentSize: true
     // icon: require('path').join(__dirname, 'assets/icons/png/icon_128@1x.png')
   },

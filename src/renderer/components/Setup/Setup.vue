@@ -3,10 +3,12 @@
       <set-home-folder @handleClick="setHomeFolder" />
       <div class="user-login-container">
         <div class="login-header">{{header.text}}</div>
-        <div class="components-wrapper">
-          <Login />
-          <Guest />
-          <guest-verify />
+        <div class="slider-container">
+          <div class="slider" :style="{'--offset-x': offsetXPtg}">
+            <Login v-if="showLogin" @login="login" @guestLogin="nextSub" />
+            <Guest @backLogin="backLogin" v-if="showLogin" />
+            <guest-verify v-if="showLogin" />
+          </div>
         </div>
       </div>
   </div>
@@ -32,7 +34,9 @@ export default {
         userOnHold: null,
         showHeader: false
       },
-      currentSlide: 0
+      controller: this.$root.$controllers.setup,
+      currentSlide: 0,
+      currentSubSlide: 0
     }
   },
   computed: {
@@ -44,7 +48,22 @@ export default {
     },
     offsetPtg () {
       return (this.currentSlide || 0) * 100
+    },
+    offsetXPtg () {
+      return -((this.currentSubSlide || 0) * 100) + '%'
+    },
+    showLogin () {
+      return this.currentSlide === 1
     }
+    // showLogin () {
+    //   return this.currentSlide === 1 && this.currentSubSlide === 0
+    // },
+    // showGuest () {
+    //   return this.currentSlide === 1 && this.currentSubSlide === 1
+    // },
+    // showGuestVerify () {
+    //   return this.currentSlide === 1 && this.currentSubSlide === 2
+    // }
   },
   methods: {
     setHomeFolder () {
@@ -54,13 +73,35 @@ export default {
       } catch (error) {
       }
     },
-    next () {
-      console.log('next', this.currentSlide)
+    async transition () {
+      await this.$sleep(300)
+    },
+    async next () {
+      // if ()
       this.currentSlide++
-      console.log('next', this.currentSlide)
+      await this.transition()
+    },
+    async prev () {
+      if (this.currentSlide === 0) return
+      this.currentSlide++
+      await this.transition()
+    },
+    async nextSub () {
+      this.currentSubSlide++
+      await this.transition()
+    },
+    async prevSub () {
+      if (this.currentSubSlide === 0) return
+      this.currentSubSlide--
+      await this.transition()
+    },
+    async backLogin () {
+      this.prevSub()
+      await this.transition()
+      this.login()
     },
     login () {
-      this.$IPC.send('LOGIN')
+      this.controller.login()
     },
     guestSearch (request) {
       if (this.loadingState !== 'Loading' && request.query !== '' && request.query !== undefined && request.query !== null) {
@@ -134,11 +175,13 @@ export default {
   bottom: calc(var(--offset) * -1);
   > div {
     min-height: 100%;
+    min-width: 100vw;
   }
 }
 .login-header {
   $h: 20vmax;
   min-height: $h;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -150,12 +193,25 @@ export default {
 .user-login-container {
   display: flex;
   flex-direction: column;
-  .components-wrapper {
+
+  .slider-container {
+    height: 100%;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+  }
+  .slider {
+    position: relative;
+    left: var(--offset-x);
+    transition: left var(--ts-g);
     display: flex;
+    width: auto;
     height: 100%;
     > div {
       min-width: 100%;
+      height: 100%;
     }
+
   }
 }
 </style>

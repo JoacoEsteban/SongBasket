@@ -1,8 +1,8 @@
 <template>
     <div
      :class="loadingState === 'Loading' ? 'loading' : 'doneloading'"
-     class="display-whole-container alt">
-            <!-- <router-link to="/" tag="button" class="button"  >Log in</router-link> -->
+     class="df fldc global-center alt">
+            <button class="button" @click="$emit('backLogin')">Log in</button>
             <!-- <div class="top">
               <div class="radio-label">
                 <span @click="changeMode(0)">Username</span>
@@ -70,7 +70,7 @@ export default {
     }
   },
   mounted () {
-    this.focusInput()
+    // this.focusInput()
   }
 }
 </script>

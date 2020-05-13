@@ -1,17 +1,14 @@
 <template>
-    <div class="">
-      <button class="button" @click="login">Login to Spotify</button>
+    <div class="df fldc global-center">
+      <button class="button" @click="$emit('login')">Login to Spotify</button>
       <div>or</div>
-      <router-link to="/setup/guest" tag="button" class="button">Continue without Logging in</router-link>
+      <button tag="button" @click="$emit('guestLogin')" class="button">Continue without Logging in</button>
     </div>
 </template>
 
 <script>
 export default {
   methods: {
-    login () {
-      this.$emit('login')
-    }
   }
   // //Auto login For dev speed purposes
   // mounted(){

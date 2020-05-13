@@ -6,6 +6,7 @@ import FileWatchers from '../FileSystem/FileWatchers'
 import IpcController from './ipc.controller'
 import youtubeDl from '../DownloadPhase/youtube-dl'
 import connectionController from './connection.controller'
+import protocolController from './protocol.controller'
 import VUEX_MAIN from '../Store/mainProcessStore'
 import { v4 as uuid } from 'uuid'
 
@@ -122,6 +123,7 @@ export function init (electron) {
   setVars(electron)
   electron.app.allowRendererProcessReuse = true
   electron.app.on('ready', async () => {
+    protocolController.startProtocols(electron)
     connectionController.init({
       connectionChangeCallback: (value) => {
         ipcSend('Connection:CHANGE', value)
@@ -152,17 +154,23 @@ export function createWindow () {
   window.on('closed', () => global.CONSTANTS.MAIN_WINDOW = null)
 }
 
-export function createLoginWindow () {
-  if (global.CONSTANTS.LOGIN_WINDOW) return
+export function login (e, {listenerId}) {
+  let error
+  try {
+    if (global.CONSTANTS.LOGIN_WINDOW) return
+    const loginWindow = global.CONSTANTS.LOGIN_WINDOW = new BROWSER_WINDOW(global.CONSTANTS.POPUP_WINDOW_CONFIG)
 
-  const loginWindow = global.CONSTANTS.LOGIN_WINDOW = new BROWSER_WINDOW(global.CONSTANTS.POPUP_WINDOW_CONFIG)
-
-  loginWindow.loadURL(`${global.CONSTANTS.BACKEND}/init`, { 'extraHeaders': 'pragma: no-cache\n' })
-  loginWindow.on('closed', () => global.CONSTANTS.LOGIN_WINDOW = null)
-  SESSION.defaultSession.webRequest.onHeadersReceived({urls: [global.CONSTANTS.BACKEND + '/*']}, async (details, cb) => {
-    await core.onLogin(details, cb)
-    REFLECT_RENDERER()
-  })
+    loginWindow.loadURL(`${global.CONSTANTS.BACKEND}/init`, { 'extraHeaders': 'pragma: no-cache\n' })
+    loginWindow.on('closed', () => (global.CONSTANTS.LOGIN_WINDOW = null) + (global.CONSTANTS.SESSION.defaultSession.webRequest.onHeadersReceived({urls: [global.CONSTANTS.BACKEND + '/*']}, null)))
+    SESSION.defaultSession.webRequest.onHeadersReceived({urls: [global.CONSTANTS.BACKEND + '/*']}, async (details, cb) => {
+      await core.onLogin(details, cb)
+      REFLECT_RENDERER()
+    })
+  } catch (err) {
+    error = err
+  } finally {
+    e.sender.send(listenerId, error)
+  }
 }
 
 export async function logout (e, {listenerId}) {
