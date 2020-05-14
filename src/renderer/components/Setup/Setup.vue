@@ -101,6 +101,9 @@ export default {
     async backLogin () {
       this.prevSub()
       await this.transition()
+      await this.$sleep(300)
+      this.$('#onboarding-login-button').focus()
+      await this.$sleep(500)
       this.login()
     },
     login () {
@@ -189,7 +192,7 @@ export default {
   justify-content: center;
   align-items: center;
   font-size: 7vw;
-  font-family: 'Poppins Bold';
+  font-weight: bold;
   background: var(--global-grey)
 }
 

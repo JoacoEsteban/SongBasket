@@ -95,8 +95,7 @@ const core = {
           global.CONSTANTS.LOGIN_WINDOW = null
           ProtocolController.off('auth', core.onLogin)
           console.log('---Login window closed---')
-          global.CONSTANTS.APP_STATUS.IS_LOGGED = true
-          resolve()
+          global.CONSTANTS.APP_STATUS.IS_LOGGED && resolve()
         })
         ProtocolController.on('auth', core.onLogin)
       } catch (error) {
@@ -116,6 +115,7 @@ const core = {
 
       await global.CONSTANTS.LOGIN_WINDOW.loadURL(`file://${process.cwd()}/src/renderer/landings/after-login-loading.html`)
       await core.updateAll()
+      global.CONSTANTS.APP_STATUS.IS_LOGGED = true
       global.CONSTANTS.LOGIN_WINDOW && await global.CONSTANTS.LOGIN_WINDOW.close()
 
       console.log('Login successfull')

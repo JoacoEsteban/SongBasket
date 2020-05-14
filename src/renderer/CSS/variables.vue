@@ -28,6 +28,8 @@
 
   --global-transition-time: #{tr(.5s)};
   --ts-g: var(--global-transition-time) var(--bezier-chill);
+  --ts-g-inverted: var(--global-transition-time) var(--bezier-chill-inverted);
+  --ts-g-out: var(--global-transition-time) var(--bezier-out);
   --ts-g-hard: var(--global-transition-time) var(--bezier);
   --ts-g-symmetric: var(--global-transition-time) var(--bezier-symmetric);
   --home-transition: #{tr(.3s)} var(--bezier-chill);
@@ -40,7 +42,8 @@
 
   --body-colors-transition: #{tr(1s)} var(--bezier-chill);
 
-  --button-transition: #{tr(0.3s)} var(--bezier-chill);
+    --button-transition-time: #{tr(0.3s)};
+  --button-transition: var(--button-transition-time) var(--bezier-chill);
   --banner-background-transition: width #{tr(1s)} var(--bezier-chill), opacity #{tr(.2s)} var(--bezier-chill);
 
   /* VARIABLES */

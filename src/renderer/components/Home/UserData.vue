@@ -61,7 +61,6 @@ export default {
     display: flex;
     align-items: center;
     width: 10rem;
-    font-family: "poppins regular";
     box-sizing: border-box;
 }
 .ud-user-img{
@@ -96,7 +95,7 @@ export default {
 
 .ud-playlist-total{
     font-size: 0.69rem;
-    font-family: "poppins bold";
+    font-weight: bold;
 }
 
 

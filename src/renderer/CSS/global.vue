@@ -86,7 +86,8 @@ body:hover {
   border-radius: 2em;
   color: var(--text-black);
   background: var(--text-white);
-  transition: transform $transition, background $transition, opacity $transition, box-shadow $transition;
+  --local-shadow-transition: var(--button-transition-time) var(--bezier-out);
+  transition: transform $transition, background $transition, opacity $transition, box-shadow var(--local-shadow-transition);
   cursor: pointer;
 
   &:hover {
@@ -96,6 +97,7 @@ body:hover {
     color: var(--text-white);
   }
   &:focus:not(:active) {
+    --local-shadow-transition: #{$transition};
     --outline-shadow: 0 0 0 4px var(--button-purple);
   }
   &:active {
@@ -158,7 +160,7 @@ body:hover {
   font-size: 1em;
   outline: none;
   width: 100%;
-  font-family: "Poppins black";
+  font-weight: bold;
   text-align: center;
   border: none;
   color: white;

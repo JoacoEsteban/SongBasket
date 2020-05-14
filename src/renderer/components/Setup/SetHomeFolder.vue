@@ -21,7 +21,6 @@ export default {
 }
 .login-sb-welcome{
   font-size: 1rem;
-  // font-family: 'Poppins thin'
 }
 .login-sb-title {
   font-size: 4.2em;

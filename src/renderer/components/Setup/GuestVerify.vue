@@ -108,11 +108,10 @@ $viewmin: 10vmin;
   .name {
     text-align: left;
     font-size: $viewmin * .7;
-    font-family: 'Poppins SemiBold';
+    font-weight: 500;
   }
   .followers {
     font-size: $viewh * .5;
-    font-family: 'Poppins Light';
   }
 }
 

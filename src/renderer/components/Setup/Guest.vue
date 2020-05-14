@@ -2,7 +2,7 @@
     <div
      :class="loadingState === 'Loading' ? 'loading' : 'doneloading'"
      class="df fldc global-center alt">
-            <button class="button" @click="$emit('backLogin')">Log in</button>
+            <button class="button slim" @click="$emit('backLogin')">Log in instead</button>
             <!-- <div class="top">
               <div class="radio-label">
                 <span @click="changeMode(0)">Username</span>
@@ -97,7 +97,6 @@ export default {
   align-items: center;
 }
 .radio-label {
-  font-family: 'Poppins Light';
   min-width: 7rem;
 }
 
