@@ -40,7 +40,7 @@ const getDefaultState = () => {
 const getters = {
   get syncedPlaylists_safe () {
     let aux
-    return state.syncedPlaylists.filter(id => (aux = this.playlists.find(pl => pl.id === id)) && !aux.isPaused)
+    return state.syncedPlaylists.filter(id => (aux = state.playlists.find(pl => pl.id === id)) && !aux.isPaused)
   }
 }
 

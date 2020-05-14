@@ -232,7 +232,7 @@ const core = {
   youtubize: async (params = { trackCompletionCallback: null }) => {
     // TODO Rethink this routine
     try {
-      const empty = await core.populateQueuedPlaylists()
+      await core.populateQueuedPlaylists()
       const queries = []
       try {
         queries.push(...QUERY_MAKER.makeConversionQueries())
@@ -241,13 +241,13 @@ const core = {
         else throw error
       }
 
-      if (!empty && queries.length) {
+      if (queries.length) {
         const pausedPlaylists = GETTERS.pausedPlaylists
         const trackShouldConvert = track => !((track.flags.converted && !track.conversionError) || track.flags.paused || track.playlists.every(({id}) => pausedPlaylists.includes(id)))
         const {tracks, failed} = await API.youtubizeAll(queries, trackShouldConvert, params.trackCompletionCallback)
         VUEX_MAIN.COMMIT.YOUTUBIZE_RESULT(tracks)
         if (failed) throw new Error()
-      } console.log('nothing to do, just commiting')
+      } else console.log('nothing to do, just committing')
       VUEX_MAIN.COMMIT.COMMIT_ALL_CHANGES()
       console.log('Youtubize done from core')
     } catch (error) {

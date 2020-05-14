@@ -141,7 +141,7 @@ const statuses = {
       sortOrder: 0,
       color: 'var(--red-cancel)',
       get msg () {
-        return this.ammount + ' conversion error' + this.ammount === 1 ? '' : 's'
+        return this.ammount + ' conversion error' + (this.ammount === 1 ? '' : 's')
       }
     }
   }

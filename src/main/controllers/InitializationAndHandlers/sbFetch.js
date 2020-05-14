@@ -11,7 +11,7 @@ let Api
 export function createAxiosInstance () {
   Api = axios.create({
     baseURL: PATHS.BASE,
-    timeout: 10000,
+    timeout: 20000,
     headers: {
       'Authorization': 'Bearer ' + global.SONGBASKET_ID,
       'user_id': global.USER_ID

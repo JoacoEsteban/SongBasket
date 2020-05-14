@@ -143,7 +143,7 @@ export default {
     },
     async handleError (val, autoHide = {
       val: true,
-      time: 400
+      time: 4000
     }) {
       this.errorTimeout && clearTimeout(this.errorTimeout)
       this.errorPill.message = val.message
