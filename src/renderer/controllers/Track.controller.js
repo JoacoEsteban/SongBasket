@@ -33,15 +33,12 @@ const TrackController = {
     }
   },
   sort (a, b) {
-    if (a.status.slug === 'review-conversion') return -1
-    if (b.status.slug === 'review-conversion') return 1
+    const aOrd = SortOrders[a.status.slug]
+    const bOrd = SortOrders[b.status.slug]
 
-    if (a.status.slug === 'error') return -1
-    if (b.status.slug === 'error') return 1
+    if (!aOrd || !bOrd) return
 
-    if (a.status.slug === 'downloaded') return 1
-    if (b.status.slug === 'downloaded') return -1
-    return 0
+    return aOrd - bOrd
   },
   isDownloaded: function ({id, selectionObj}) {
     const dlTrack = getVueInstance().DOWNLOADED_TRACKS[id]
@@ -49,12 +46,22 @@ const TrackController = {
   }
 }
 
+const SortOrders = {
+  'paused': 1000,
+  'error': 0,
+  'awaiting-conversion': 5,
+  'downloaded': 100,
+  'awaiting-download': 10,
+  'custom:awaiting-download': 10,
+  'review-conversion': 2,
+  'no-conversion': 1
+}
+
 const Colors = {
   'paused': 'var(--global-grey)',
   'error': 'var(--red-cancel)',
   'awaiting-conversion': 'var(--global-grey)',
   'downloaded': 'var(--green-accept)',
-  'custom-selection': 'var(--custom-selection-color)',
   'awaiting-download': 'var(--button-purple)',
   'custom:awaiting-download': 'var(--custom-selection-color)',
   'review-conversion': 'var(--orange-warning)',
@@ -65,7 +72,6 @@ const Strings = {
   'error': 'conversion error',
   'awaiting-conversion': 'awaiting conversion',
   'downloaded': 'downloaded',
-  'custom-selection': 'paused',
   'awaiting-download': 'awaiting download',
   'custom:awaiting-download': 'awaiting download | custom',
   'review-conversion': 'review conversion',

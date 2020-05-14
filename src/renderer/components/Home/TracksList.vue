@@ -91,7 +91,7 @@ export default {
       await this.transitionTracks('show')
     },
     refreshAll () {
-      this.tracks = this.$root.CONVERTED_TRACKS_FORMATTED
+      this.tracks = this.$root.CONVERTED_TRACKS_FORMATTED.sort(this.$controllers.track.sort)
       this.scheduleFilter()
     },
     calcScrollOpacity () {
