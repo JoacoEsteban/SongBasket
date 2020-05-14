@@ -14,15 +14,31 @@ const vue = {
   get store () {
     return getVueInstance().$store
   },
+  get router () {
+    return getVueInstance().$router
+  },
   get controllers () {
     return getVueInstance().$controllers
   }
 }
 const SetupController = {
-  async login () {
+  setHomeFolder () {
+    return new Promise((resolve, reject) => {
+      const listenerId = uuid()
+      console.log('sendin')
+      vue.ipc.once(listenerId, (e, {isLogged, error}) => {
+        console.log('response')
+        if (error) return error.message !== 'CANCELLED' ? reject(error) : null
+        if (!isLogged) resolve()
+      })
+      vue.ipc.send('HOME_FOLDERS:ASK', {listenerId})
+    })
+  },
+  login () {
     const listenerId = uuid()
     vue.ipc.once(listenerId, (e, error) => {
       console.log('aber on login', error)
+      vue.router.push('home')
     })
     vue.ipc.send('LOGIN', {listenerId})
   }

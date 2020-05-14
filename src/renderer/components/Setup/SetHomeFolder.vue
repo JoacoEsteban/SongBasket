@@ -3,7 +3,6 @@
     <div class="login-sb-welcome">welcome to</div>
     <div class="login-sb-title">SongBasket</div>
     <button class="button" @click="$emit('handleClick')">Set a Home Folder</button>
-    <a class="button" href="songbasket://ping">Ping</a>
 </div>
 </template>
 

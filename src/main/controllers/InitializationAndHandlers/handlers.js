@@ -21,7 +21,7 @@ const ipcSend = (...args) => {
 const ipcOnce = IpcController.once
 
 let BROWSER_WINDOW
-let SESSION
+// let SESSION
 let DIALOG
 
 export const load = {
@@ -101,22 +101,25 @@ export function SEND_ERROR ({type, error}) {
 
 const setVars = ({ app, BrowserWindow, session, dialog }) => {
   global.CONSTANTS.BROWSER_WINDOW = BROWSER_WINDOW = BrowserWindow
-  global.CONSTANTS.SESSION = SESSION = session
+  global.CONSTANTS.SESSION = session
   global.CONSTANTS.DIALOG = DIALOG = dialog
 }
 
-export async function setHomeFolder () {
-  const { canceled, filePaths } = await DIALOG.showOpenDialog(global.CONSTANTS.MAIN_WINDOW, {
-    properties: ['openDirectory']
-  })
-  if (canceled) return
+export async function setHomeFolder (e, {listenerId}) {
+  let isLogged
   try {
-    await core.setHomeFolder(filePaths[0])
-    await core.setAppStatus()
-    ipcSend('STATUS:SET')
-  } catch (err) {
-    // Else ask to login and start a folder from 0
-    ipcSend('continueToLogin')
+    const { canceled, filePaths } = await DIALOG.showOpenDialog(global.CONSTANTS.MAIN_WINDOW, {
+      properties: ['openDirectory']
+    })
+    if (canceled) throw new Error('CANCELLED')
+    await core.addHomeFolder(filePaths[0])
+    if (!await core.stateExists()) return
+    isLogged = await core.setAppStatus()
+    if (isLogged) return ipcSend('STATUS:SET')
+  } catch (error) {
+    e.sender.send(listenerId, {error})
+  } finally {
+    e.sender.send(listenerId, {isLogged})
   }
 }
 export function init (electron) {
@@ -154,18 +157,11 @@ export function createWindow () {
   window.on('closed', () => global.CONSTANTS.MAIN_WINDOW = null)
 }
 
-export function login (e, {listenerId}) {
+export async function login (e, {listenerId}) {
   let error
   try {
-    if (global.CONSTANTS.LOGIN_WINDOW) return
-    const loginWindow = global.CONSTANTS.LOGIN_WINDOW = new BROWSER_WINDOW(global.CONSTANTS.POPUP_WINDOW_CONFIG)
-
-    loginWindow.loadURL(`${global.CONSTANTS.BACKEND}/init`, { 'extraHeaders': 'pragma: no-cache\n' })
-    loginWindow.on('closed', () => (global.CONSTANTS.LOGIN_WINDOW = null) + (global.CONSTANTS.SESSION.defaultSession.webRequest.onHeadersReceived({urls: [global.CONSTANTS.BACKEND + '/*']}, null)))
-    SESSION.defaultSession.webRequest.onHeadersReceived({urls: [global.CONSTANTS.BACKEND + '/*']}, async (details, cb) => {
-      await core.onLogin(details, cb)
-      REFLECT_RENDERER()
-    })
+    await core.initializeLogin()
+    await REFLECT_RENDERER()
   } catch (err) {
     error = err
   } finally {

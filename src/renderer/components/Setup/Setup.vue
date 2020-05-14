@@ -66,11 +66,14 @@ export default {
     // }
   },
   methods: {
-    setHomeFolder () {
+    async setHomeFolder () {
       try {
-        // await this.$IPC.send('setHomeFolder')
+        console.log('try')
+        await this.controller.setHomeFolder()
+        console.log('resolved')
         this.next()
       } catch (error) {
+        console.error('ERROR setting folder', error)
       }
     },
     async transition () {

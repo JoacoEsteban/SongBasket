@@ -3,10 +3,10 @@ const keytar = require('keytar')
 const API = require('./sbFetch')
 
 const GETTERS = require('../Store/Helpers/customGetters').default
-const HANDLERS = require('./handlers')
 const QUERY_MAKER = require('../../queryMaker')
 const VUEX_MAIN = require('../Store/mainProcessStore').default
 const FSController = require('../FileSystem').default
+const ProtocolController = require('./protocol.controller').default
 
 const core = {
   // ---------------- FILESYSTEM ----------------
@@ -25,15 +25,23 @@ const core = {
         // TODO ReAuthenticate
         throw error
       }
-      status.IS_LOGGED = true
-    } catch (err) {
+      return status.IS_LOGGED = true
+    } catch (error) {
+      if (!folders) throw error
       await FSController.UserMethods.removeFolder(folders.selected)
       core.setAppStatus()
     }
   },
-  setHomeFolder: async (path) => {
+  addHomeFolder: async (path) => {
     try {
       await FSController.UserMethods.addFolder(path)
+    } catch (err) {
+      throw err
+    }
+  },
+  setHomeFolder: async (path) => {
+    try {
+      await core.addHomeFolder(path)
       await core.retrieveAndStoreState()
     } catch (err) {
       throw err
@@ -48,6 +56,15 @@ const core = {
       await FSController.FileWatchers.createPlaylistWatchers()
     } catch (err) {
       throw err
+    }
+  },
+  stateExists: async (path = global.HOME_FOLDER) => {
+    try {
+      const data = await FSController.UserMethods.retrieveState(path)
+      return !!data
+    } catch (err) {
+      // TODO differetiate between ENOENT and parsing errors, false if enoent throw if error
+      return false
     }
   },
   clearUser: async () => {
@@ -66,31 +83,45 @@ const core = {
     }
   },
   // -------------
-  onLogin: async (details, CB) => {
-    const next = () => CB({ requestHeaders: details.requestHeaders })
+  initializeLogin: async () => {
+    return new Promise((resolve, reject) => {
+      try {
+        if (global.CONSTANTS.LOGIN_WINDOW) return reject(new Error('LOGIN WINDOW EXISTS'))
+
+        const loginWindow = global.CONSTANTS.LOGIN_WINDOW = new global.CONSTANTS.BROWSER_WINDOW(global.CONSTANTS.POPUP_WINDOW_CONFIG)
+
+        loginWindow.loadURL(`${global.CONSTANTS.BACKEND}/init`, { 'extraHeaders': 'pragma: no-cache\n' })
+        loginWindow.on('closed', () => {
+          global.CONSTANTS.LOGIN_WINDOW = null
+          ProtocolController.off('auth', core.onLogin)
+          console.log('---Login window closed---')
+          global.CONSTANTS.APP_STATUS.IS_LOGGED = true
+          resolve()
+        })
+        ProtocolController.on('auth', core.onLogin)
+      } catch (error) {
+        reject(error)
+      }
+    })
+  },
+  onLogin: async ({payload}) => {
     try {
-      const responseHeaders = (details && details.responseHeaders) || {}
+      if (!(payload && payload.spotify_authorization_success)) throw new Error('AUTHORIZATION FAILED')
+      const {user_data} = payload
+      await core.setCredentials(user_data.id, user_data.songbasket_id)
+      await core.setSongbasketIdGlobally(user_data.id)
 
-      console.log('authorized', responseHeaders.spotify_authorization_success)
-      if (!(responseHeaders.spotify_authorization_success && responseHeaders.spotify_authorization_success[0])) return
-      global.CONSTANTS.LOGIN_WINDOW.close()
+      user_data.songbasket_id = null
+      core.setUser(user_data)
 
-      const user = JSON.parse(details.responseHeaders.user_data[0])
-      await core.setCredentials(user.id, user.songbasket_id)
-      await core.setSongbasketIdGlobally(user.id)
-      user.songbasket_id = null
-      core.setUser(user)
+      await global.CONSTANTS.LOGIN_WINDOW.loadURL(`file://${process.cwd()}/src/renderer/landings/after-login-loading.html`)
       await core.updateAll()
-      console.log('data retrieved')
+      global.CONSTANTS.LOGIN_WINDOW && await global.CONSTANTS.LOGIN_WINDOW.close()
 
-      // TODO test unattachment
-      global.CONSTANTS.SESSION.defaultSession.webRequest.onHeadersReceived({urls: [global.CONSTANTS.BACKEND + '/*']}, null)
-
-      HANDLERS.pushToHome()
+      console.log('Login successfull')
     } catch (error) {
       throw error
     } finally {
-      next()
     }
   },
   setCredentials: async (id, songbasket_id) => {
@@ -165,6 +196,7 @@ const core = {
   getAndStorePlaylists: async (playlists, completionCb) => {
     return new Promise((resolve, reject) => {
       try {
+        if (!playlists.length) return resolve()
         playlists = playlists.map(pl => typeof pl === 'string' ? { id: pl } : pl)
         // for (const pl of playlists) {
         let remaining = playlists.length
