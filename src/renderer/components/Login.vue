@@ -1,8 +1,8 @@
 <template>
     <div class="df fldc global-center">
       <button class="button" id="onboarding-login-button" @click="$emit('login')">Login to Spotify</button>
-      <div>or</div>
-      <button tag="button" @click="$emit('guestLogin')" class="button">Continue without Logging in</button>
+      <!-- <div>or</div>
+      <button tag="button" @click="$emit('guestLogin')" class="button">Continue without Logging in</button> -->
     </div>
 </template>
 

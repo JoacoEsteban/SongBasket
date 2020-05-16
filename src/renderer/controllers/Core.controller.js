@@ -109,7 +109,7 @@ const CoreController = {
           await getVueInstance().$store.dispatch('logout')
           vue.root.DOWNLOADED_TRACKS = {}
           vue.root.CONVERTED_TRACKS_FORMATTED
-
+          vue.ipc.send('WINDOW:LOCK')
           getVueInstance().$router.push('setup')
         } catch (error) {
           throw error

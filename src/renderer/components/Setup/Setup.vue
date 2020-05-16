@@ -177,7 +177,8 @@ export default {
   height: var(--max-container-height);
   position: relative;
   --offset: 0px;
-  transition: bottom var(--ts-g);
+  transition: bottom var(--ts-g-symmetric-inverted);
+  transition-duration: 1.2s;
   bottom: calc(var(--offset) * -1);
   > div {
     min-height: 100%;

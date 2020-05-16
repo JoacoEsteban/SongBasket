@@ -42,7 +42,7 @@
 
   --body-colors-transition: #{tr(1s)} var(--bezier-chill);
 
-    --button-transition-time: #{tr(0.3s)};
+  --button-transition-time: #{tr(0.3s)};
   --button-transition: var(--button-transition-time) var(--bezier-chill);
   --banner-background-transition: width #{tr(1s)} var(--bezier-chill), opacity #{tr(.2s)} var(--bezier-chill);
 

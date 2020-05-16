@@ -91,6 +91,7 @@ function onDocumentReady () {
         onConnectionChange(null, status.CONNECTED_TO_INTERNET)
         onApiConnectionChange(null, status.CONNECTED_TO_API)
       }, 1000)
+      vue.ipc.send('WINDOW:UNLOCK')
       return
     }
     let path = 'setup'

@@ -13,6 +13,19 @@ export function init (ipc = global.ipc) {
 
   ipc.on('GET_STATUS', handlers.sendStatus)
 
+  ipc.on('WINDOW:LOCK', (e, setSize = true) => {
+    const window = global.CONSTANTS.MAIN_WINDOW
+    if (!window) return
+    setSize && window.setSize(global.CONSTANTS.MAIN_WINDOW_CONFIG.width, global.CONSTANTS.MAIN_WINDOW_CONFIG.height)
+    window.resizable = false
+  })
+  ipc.on('WINDOW:UNLOCK', (e, setSize = true) => {
+    const window = global.CONSTANTS.MAIN_WINDOW
+    if (!window) return
+    setSize && window.setSize(global.CONSTANTS.MAIN_WINDOW_CONFIG.width, global.CONSTANTS.MAIN_WINDOW_CONFIG.height)
+    window.resizable = true
+  })
+
   ipc.on('YOUTUBE_DETAILS:GET', handlers.getYtTrackDetails)
 
   ipc.on('download', handlers.download)
