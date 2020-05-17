@@ -16,6 +16,9 @@ const vue = {
   },
   get controllers () {
     return getVueInstance().$controllers
+  },
+  get sbRouter () {
+    return getVueInstance().$sbRouter
   }
 }
 const CoreController = {
@@ -74,12 +77,12 @@ const CoreController = {
     const loading = vue.store.state.Events.LOADING_STATE || {}
     if (loading.value) return
     vue.ipc.send('REFRESH')
-    getVueInstance().$sbRouter.push({name: 'home', params: {which: 'playlists-list'}})
+    vue.sbRouter.push({name: 'home', params: {which: 'playlists-list'}})
   },
   download (playlistFilter) {
     const loading = vue.store.state.Events.LOADING_STATE || {}
     if (!loading.value) vue.ipc.send('download', playlistFilter)
-    getVueInstance().$sbRouter.push({name: 'downloads-view'})
+    vue.sbRouter.push({name: 'downloads-view'})
   },
   pausePlaylist (id) {
     return new Promise((resolve, reject) => {
@@ -98,6 +101,9 @@ const CoreController = {
       vue.ipc.once(listenerId, (e, error) => error ? reject(error) : resolve())
       vue.ipc.send('TRACK:PAUSE', {id, listenerId})
     })
+  },
+  reviewTrack (track) {
+    vue.sbRouter.push({name: 'track-review', params: {track}})
   },
   async logOut () {
     try {

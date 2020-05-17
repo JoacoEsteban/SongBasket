@@ -1,5 +1,5 @@
 <template>
-  <div class="global-search-bar-container">
+  <div class="global-search-bar-container" :class="{hide: hide}">
     <div class="filters-container">
       <div class="filters-content">
         <div class="search-bar global-scroll-shadow">
@@ -30,12 +30,16 @@ export default {
   data () {
     return {
       searchInput: '',
-      model: this.$root.SEARCH_INPUT
+      model: this.$root.SEARCH_INPUT,
+      hideOn: [
+        'track-review'
+      ],
+      hide: false
     }
   },
   mounted () {
     this.searchInputOnBlur()
-    this.$sbRouter.beforeTransition(() => (this.searchInput = '') + (this.model.value = ''))
+    this.$sbRouter.beforeTransition(this.onBeforeTransition)
   },
   computed: {
   },
@@ -46,6 +50,20 @@ export default {
     }
   },
   methods: {
+    onBeforeTransition (to, from) {
+      this.searchInput = ''
+      this.model.value = ''
+      this.checkVisibility(to)
+    },
+    checkVisibility (to) {
+      if (this.hideOn.includes(to.name)) {
+        this.$setRootVar('filters-container-height', '0')
+        this.hide = true
+        return
+      }
+      this.$setRootVar('filters-container-height', '4em')
+      this.hide = false
+    },
     searchInputOnFocus () {
       this.$root.searchInputElement = null
     },
@@ -76,6 +94,8 @@ export default {
   z-index: 1;
   box-sizing: border-box;
   height: var(--filters-container-height);
+  $t: var(--ts-g);
+  transition: opacity $t, height $t;
   .filters-background {
     background: linear-gradient(180deg, var(--global-grey-secondary), transparent);
     position: absolute;
@@ -104,6 +124,10 @@ export default {
     padding-left: 1em;
     padding-right: .2em;
   }
+}
+&.hide {
+  opacity: 0;
+  pointer-events: none;
 }
 }
 </style>

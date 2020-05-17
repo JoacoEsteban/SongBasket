@@ -149,6 +149,7 @@ $tit-fz: 1.2em;
 .image {
   position: absolute;
   top: 0;bottom: 0;right: 0;
+  z-index: 0;
   width: 12em;
   max-width: 40%;
   background-position: center;
@@ -163,6 +164,7 @@ $tit-fz: 1.2em;
 .data {
   margin-top: calc(var(--tb-title-height) * 1.5);
   margin-bottom: 1em;
+  z-index: 1;
   > div {
     line-height: 1;
     display: flex;

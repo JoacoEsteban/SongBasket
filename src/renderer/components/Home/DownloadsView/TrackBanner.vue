@@ -1,5 +1,5 @@
 <template>
-  <div class="track-banner-container w100" :class="isDownload ? 'download ' + downloadStatus.state : ''">
+  <div class="track-banner-container w100" :class="isDownload ? 'download ' + downloadStatus.state : isConversion ? 'conversion' : ''">
     <banner>
       <div class="background-progress" :style="{'--progress': (downloadStatus.ptg || 0) + '%'}" :class="downloadStatus.state" v-if="isDownload">
         <div class="progress-label df alic">
@@ -20,16 +20,15 @@
         </div>
         <div class="track-info df fldc jucb ellipsis h100">
           <div class="ellipsis lh1point5">
-            <span class="name">
-              {{track.data.name}}
+            <span class="name" v-html="trackFormatted.name">
             </span>
           </div>
           <div class="ellipsis">
             <span class="artists">
-              {{$controllers.track.getArtistsString(track)}}
+              {{trackFormatted.creator}}
             </span>
           </div>
-          <div class="ellipsis">
+          <div v-if="!isConversion" class="ellipsis">
             <span class="playlists">
               Inside <b>{{$controllers.track.getPlaylistsString(track)}}</b>
             </span>
@@ -57,9 +56,16 @@ export default {
   computed: {
     trackFormatted () {
       const itm = this.track
-      const album = itm.album || itm.data.album
+      const snippet = itm.snippet || {}
+      let image
+      if (!this.isConversion) {
+        const album = itm.album || itm.data.album
+        image = album && album.images && album.images[0] && album.images[0].url
+      } else image = snippet.thumbnails.high.url
       return itm && {
-        image: album && album.images && album.images[0] && album.images[0].url
+        name: this.isConversion ? itm.isCustomTrack ? snippet.title : itm.nameFormatted : itm.data.name,
+        image,
+        creator: this.isConversion ? snippet.channelTitle : this.$controllers.track.getArtistsString(itm)
       }
     },
     cardItem () {
@@ -71,12 +77,13 @@ export default {
   props: {
     track: Object,
     isDownload: Boolean,
+    isConversion: Boolean,
     downloadStatus: {
       type: Object,
       required: false,
-      default: {
+      default: () => ({
         state: 'awaiting'
-      }
+      })
     }
   }
 }
@@ -117,6 +124,11 @@ $extraction-bg: linear-gradient(258.84deg, $ex1, $ex2);
           --progress: 100% !important;
           background: $error-bg;
         }
+      }
+    }
+    &.conversion {
+      .track-info .name {
+        font-size: 1.3em;
       }
     }
   }

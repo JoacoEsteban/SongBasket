@@ -30,10 +30,7 @@ export default {
       tracks: [],
       tracksFiltered: null,
       filterMap: {},
-      scrollOpKeys: {
-        kebab: 'scroll-opacity',
-        camel: this.$camelcase('scroll-opacity')
-      }
+      scrollOpKey: 'scroll-opacity'
     }
   },
   components: {
@@ -97,7 +94,7 @@ export default {
     calcScrollOpacity () {
       let ratio = (this.getContainerElement().scrollTop / 100)
       if (ratio > 1) ratio = 1
-      this.$setRootVar(this.scrollOpKeys, (this.filterBackgroundOpacity = ratio))
+      this.$setRootVar(this.scrollOpKey, (this.filterBackgroundOpacity = ratio))
     },
     getContainerElement () {
       return (this.containerElement || (this.containerElement = this.$root.$refs['home-router']))

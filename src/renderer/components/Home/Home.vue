@@ -122,6 +122,7 @@ export default {
 .home-router{
   z-index: 1;
   max-height: 100%;
+  transition: padding var(--ts-g);
   padding-top: var(--filters-container-height);
   display: flex;
   box-sizing: border-box;
@@ -131,30 +132,30 @@ export default {
 </style>
 
 <style lang="scss" scoped>
-.router-view {
-  $transition: var(--home-transition);
-  transition: transform $transition, opacity $transition;
-  opacity: 1;
-  transform: scale(1);
-  transform-origin: bottom;
+// .router-view {
+//   $transition: var(--home-transition);
+//   transition: transform $transition, opacity $transition;
+//   opacity: 1;
+//   transform: scale(1);
+//   transform-origin: bottom;
 
-  &.fast {
-    transition: transform 0s
-  }
-  &:not(.release) {
-    transition-timing-function: var(--bezier-out);
-  }
-  &.push {
-    transform: scale(.75);
-    opacity: 0;
-  }
-  &.pull {
-    transform: scale(1.5);
-    opacity: 0;
-  }
-  &.release {
-    opacity: 1;
-    transform: scale(1)
-  }
-}
+//   &.fast {
+//     transition: transform 0s
+//   }
+//   &:not(.release) {
+//     transition-timing-function: var(--bezier-out);
+//   }
+//   &.push {
+//     transform: scale(.75);
+//     opacity: 0;
+//   }
+//   &.pull {
+//     transform: scale(1.5);
+//     opacity: 0;
+//   }
+//   &.release {
+//     opacity: 1;
+//     transform: scale(1)
+//   }
+// }
 </style>

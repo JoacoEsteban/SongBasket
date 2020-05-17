@@ -56,15 +56,15 @@ export default {
     getCallback () {
       const status = this.item.status && this.item.status.slug
       switch (status) {
-        case 'awaiting-download':
-        case 'downloaded':
-        case 'custom:awaiting-download':
-        case 'review-conversion':
-        case 'no-conversion':
-        case 'paused':
-          return this.reviewTrack
+        // case 'awaiting-download':
+        // case 'downloaded':
+        // case 'custom:awaiting-download':
+        // case 'review-conversion':
+        // case 'no-conversion':
+        // case 'paused':
         default:
-          return null
+          return this.reviewTrack
+          // return null
       }
     },
     handleClick () {
@@ -72,7 +72,7 @@ export default {
       typeof this.clickCB === 'function' && this.clickCB()
     },
     reviewTrack () {
-      this.$emit('review-track')
+      this.$controllers.core.reviewTrack(this.item)
     }
   },
   data () {

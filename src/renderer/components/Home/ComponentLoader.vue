@@ -11,8 +11,11 @@
     <playlist-view
       v-show="componentBeingShown === 'playlist-view'"
       :currentPlaylist="currentPath.params && currentPath.params.id"
-      @openYtVideo="$emit('openYtVideo', $event)"
     ></playlist-view>
+    <track-review
+      :refresh="componentBeingShown === 'track-review'"
+      v-show="componentBeingShown === 'track-review'"
+    ></track-review>
     <downloads-view
       v-show="componentBeingShown === 'downloads-view'"
     ></downloads-view>
@@ -23,6 +26,7 @@
 import PlaylistsList from './PlaylistsList'
 import TracksList from './TracksList'
 import PlaylistView from './PlaylistView/PlaylistView'
+import TrackReview from './TrackReview/TrackReview'
 import DownloadsView from './DownloadsView/DownloadsView'
 let sleep
 
@@ -31,6 +35,7 @@ export default {
     PlaylistsList,
     TracksList,
     PlaylistView,
+    TrackReview,
     DownloadsView
   },
   data () {
@@ -58,17 +63,24 @@ export default {
     this.$root.onComponentLoaderMount && this.$root.onComponentLoaderMount()
   },
   methods: {
-    async handleAnimation (to) {
+    async handleAnimation (to, from) {
       if (this.transitioning) return
       this.transitioning = this.$sbRouter.setTransitioningState(true)
       let anim1
       let anim2 = 'fast '
-      let pull = 'pull'
-      let push = 'push'
+      const pull = 'pull'
+      const push = 'push'
+      const left = 'left'
+      const right = 'right'
 
       if (to.name === 'home') {
-        anim1 = pull
-        anim2 += push
+        if (from.name === 'home') {
+          anim1 = to.params.which === 'tracks-list' ? left : right
+          anim2 += (anim1 === right ? left : right)
+        } else {
+          anim1 = pull
+          anim2 += push
+        }
       } else {
         anim1 = push
         anim2 += pull
@@ -90,7 +102,7 @@ export default {
       this.componentBeingShown = to.name
     },
     async handleRouteChange (to, from) {
-      await this.handleAnimation(to)
+      await this.handleAnimation(to, from)
     }
   }
 }
@@ -108,6 +120,13 @@ export default {
   &.fast {
     transition: transform 0s
   }
+
+  &.push,
+  &.pull,
+  &.left,
+  &.right {
+    opacity: 0;
+  }
   &.push {
     transform: scale(.75);
     opacity: 0;
@@ -116,9 +135,16 @@ export default {
     transform: scale(1.5);
     opacity: 0;
   }
+  $x-offset: 3em;
+  &.left {
+    transform: translateX(-$x-offset);
+  }
+  &.right {
+    transform: translateX($x-offset);
+  }
   &.release {
     opacity: 1;
-    transform: scale(1)
+    transform: scale(1) translateX(0)
   }
 }
 

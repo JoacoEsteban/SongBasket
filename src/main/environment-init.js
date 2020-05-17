@@ -6,7 +6,7 @@ const util = require('util')
 const child_process = require('child_process')
 const youtubeDl = require('youtube-dl')
 
-const USE_PROD_BACKEND = false
+const USE_PROD_BACKEND = true
 const USE_HEROKU = false
 ;(() => {
   const subDomain = USE_HEROKU ? 'heroku' : 'api'

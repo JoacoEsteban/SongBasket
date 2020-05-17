@@ -67,6 +67,18 @@ body:hover {
   font-family: "DM Sans";
   font-weight: normal;
 }
+.default-title {
+  --fz: 2em;
+  font-weight: 500;
+  font-size: var(--fz);
+}
+.container-fluid {
+  --px: var(--container-padding-x);
+  width: 100%;
+  box-sizing: border-box;
+  padding-left: var(--px);
+  padding-right: var(--px);
+}
 .button {
   $transition: var(--button-transition);
   @extend .window-nodrag;

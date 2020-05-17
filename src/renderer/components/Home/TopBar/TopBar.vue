@@ -62,6 +62,7 @@
         </div>
       </div>
       <playlist-view-slide :class="{show: currentPath === 'playlist-view'}" class="bar-slide" style="--slide-height: 6em;"></playlist-view-slide>
+      <track-review-slide :class="{show: currentPath === 'track-review'}" class="bar-slide hidden-of" style="--slide-height: 8em;"></track-review-slide>
       <downloads-view-slide :class="{show: currentPath === 'downloads-view'}" class="bar-slide"></downloads-view-slide>
     </div>
 
@@ -81,6 +82,7 @@
 import { dateFormatter } from '../../../utils'
 
 import PlaylistViewSlide from './slides/PlaylistViewSlide.vue'
+import TrackReviewSlide from './slides/TrackReviewSlide.vue'
 import DownloadsViewSlide from './slides/DownloadsViewSlide.vue'
 
 import SyncIcon from '@/assets/icons/sync-icon.vue'
@@ -93,6 +95,7 @@ export default {
     SyncIcon,
     CloudSearchIcon,
     PlaylistViewSlide,
+    TrackReviewSlide,
     DownloadsViewSlide,
     HomeIcon
   },
@@ -200,6 +203,7 @@ export default {
       this.currentPath = to.name
       switch (to.name) {
         case 'downloads-view':
+        case 'track-review':
         case 'playlist-view':
           this.slideTo(1)
           break
@@ -353,7 +357,9 @@ $loading-bar-height: 3px;
   &:not(.show) {
     --slide-height: 0 !important;
   }
-
+  &.hidden-of {
+    overflow: hidden;
+  }
 }
 
 .loading-bar {

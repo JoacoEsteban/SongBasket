@@ -164,13 +164,12 @@ export default {
     },
     setIterable () {
       this.iterableItems = this.isSynced ? this.conversion : this.items
-      console.log('dale', this.iterableItems, '\n', this.conversion)
     },
     reviewTrack (track) {
-      this.$root.OPEN_MODAL({
-        wich: 'track-review',
-        payload: { tracks: this.conversion, index: this.conversion.indexOf(track), playlistId: this.plId }
-      })
+      // this.$root.OPEN_MODAL({
+      //   wich: 'track-review',
+      //   payload: { tracks: this.conversion, index: this.conversion.indexOf(track), playlistId: this.plId }
+      // })
     },
     calcChangesHeight () {
       if (this.changesHeight !== null && !this.showingChanges) return
