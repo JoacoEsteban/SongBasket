@@ -1,7 +1,6 @@
 import FSController from '../FileSystem/index'
 // import customGetters from '../Store/Helpers/customGetters'
 import * as sbFetch from './sbFetch'
-
 import FileWatchers from '../FileSystem/FileWatchers'
 import IpcController from './ipc.controller'
 import youtubeDl from '../DownloadPhase/youtube-dl'
@@ -11,6 +10,8 @@ import VUEX_MAIN from '../Store/mainProcessStore'
 import { v4 as uuid } from 'uuid'
 
 import core from './core.controller'
+import windowStateKeeper from 'electron-window-state'
+import Positioner from 'electron-positioner'
 
 const openBrowser = require('open')
 const ipcSend = (...args) => {
@@ -136,7 +137,7 @@ export function init (electron) {
       }
     })
     await core.setAppStatus()
-    createWindow()
+    windowController.createWindow()
   })
 
   electron.app.on('window-all-closed', () => {
@@ -147,14 +148,53 @@ export function init (electron) {
   })
 
   electron.app.on('activate', () => {
-    if (global.CONSTANTS.MAIN_WINDOW === null) createWindow()
+    if (global.CONSTANTS.MAIN_WINDOW === null) windowController.createWindow()
   })
 }
 
-export function createWindow () {
-  const window = global.CONSTANTS.MAIN_WINDOW = new BROWSER_WINDOW(global.CONSTANTS.MAIN_WINDOW_CONFIG)
-  window.loadURL(process.env.NODE_ENV === 'development' ? `http://localhost:9080` : `file://${__dirname}/index.html`)
-  window.on('closed', () => global.CONSTANTS.MAIN_WINDOW = null)
+export const windowController = {
+  windowState: null,
+  positioner: null,
+  lockWindow (e, setSize = true) {
+    const window = global.CONSTANTS.MAIN_WINDOW
+    if (!window) return
+    setSize && window.setSize(global.CONSTANTS.MAIN_WINDOW_CONFIG.width, global.CONSTANTS.MAIN_WINDOW_CONFIG.height)
+    window.resizable = false
+    windowController.positioner.move('center')
+  },
+  unlockWindow (e, setSize = true, setPosition = true) {
+    const window = global.CONSTANTS.MAIN_WINDOW
+    if (!window) return
+
+    const windowState = windowController.windowState
+
+    setSize && window.setSize(windowState.width, windowState.height)
+    setPosition && window.setPosition(windowState.x, windowState.y, true)
+    window.resizable = true
+    windowState.manage(window)
+  },
+  createWindow () {
+    windowController.windowState = windowStateKeeper({
+      defaultWidth: global.CONSTANTS.MAIN_WINDOW_CONFIG.width,
+      defaultHeight: global.CONSTANTS.MAIN_WINDOW_CONFIG.height
+    })
+    const window = global.CONSTANTS.MAIN_WINDOW = new BROWSER_WINDOW({
+      ...global.CONSTANTS.MAIN_WINDOW_CONFIG,
+      width: global.CONSTANTS.MAIN_WINDOW_CONFIG.width,
+      height: global.CONSTANTS.MAIN_WINDOW_CONFIG.height
+    })
+    window.setPositionSafe = window.setPosition
+    window.setPosition = (x, y, animate = true) => window.setPositionSafe(x, y, animate)
+
+    windowController.positioner = new Positioner(window)
+
+    window.loadURL(process.env.NODE_ENV === 'development' ? `http://localhost:9080` : `file://${__dirname}/index.html`)
+    window.on('closed', () => {
+      global.CONSTANTS.MAIN_WINDOW = null
+      windowController.windowState = null
+      windowController.positioner = null
+    })
+  }
 }
 
 export async function login (e, {listenerId}) {

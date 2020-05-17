@@ -54,7 +54,7 @@ module.exports = global.CONSTANTS = {
     minWidth: width,
     minHeight: height,
     backgroundColor: '#151515',
-    useContentSize: true,
+    useContentSize: false,
     resizable: false,
     webPreferences: {
       nodeIntegration: true
