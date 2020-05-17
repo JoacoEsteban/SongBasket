@@ -25,6 +25,8 @@ let BROWSER_WINDOW
 // let SESSION
 let DIALOG
 
+console.log('NODE ENV', process.env.NODE_ENV)
+
 export const load = {
   target: [],
   count: 0,
@@ -118,6 +120,7 @@ export async function setHomeFolder (e, {listenerId}) {
     isLogged = await core.setAppStatus()
     if (isLogged) return ipcSend('STATUS:SET')
   } catch (error) {
+    console.error('EROR SETTING HOME FOLDER', error)
     e.sender.send(listenerId, {error})
   } finally {
     e.sender.send(listenerId, {isLogged})
@@ -168,9 +171,9 @@ export const windowController = {
 
     const windowState = windowController.windowState
 
+    window.resizable = true
     setSize && window.setSize(windowState.width, windowState.height)
     setPosition && window.setPosition(windowState.x, windowState.y, true)
-    window.resizable = true
     windowState.manage(window)
   },
   createWindow () {

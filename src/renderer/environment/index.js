@@ -1,6 +1,6 @@
 const { BrowserWindow } = require('electron').remote
-const GLOBAL = require('../../main/Global/VARIABLES')
-
+const GLOBAL = window.CONSTANTS = require('electron').remote.getGlobal('CONSTANTS')
+console.log('gl', GLOBAL)
 export default (Vue) => {
   // -----------------PROTOTYPES-----------------
   require('../../main/controllers/Prototype/Array')
@@ -12,7 +12,7 @@ export default (Vue) => {
 
   let electronWindow
 
-  const platform = window.platform = GLOBAL.PLATFORM
+  const platform = GLOBAL.PLATFORM
 
   function toggleFullscreen () {
     let isFullscreen = false

@@ -103,7 +103,7 @@ export default {
     let sectionId = 0
     return {
       user: this.$store.state.CurrentUser.user,
-      isMac: window.platform === 'mac',
+      isMac: window.CONSTANTS.PLATFORM === 'mac',
       sliderPosition: 0,
       showingLoadingBar: false,
       loadingBar: {
@@ -241,7 +241,7 @@ export default {
       // }
     },
     maximize (e) {
-      if (!this.isMac || e.target.classList.contains('window-nodrag')) return
+      if (e.target.classList.contains('window-nodrag')) return
       window.toggleMaximization()
     },
     addBarClass (className) {

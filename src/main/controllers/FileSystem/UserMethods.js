@@ -16,10 +16,9 @@ const PATHS = {
   stateFileName: '/.songbasket'
 }
 
-let SESSION_FOLDER_PATHS = {
-  paths: [],
-  selected: null
-}
+const getEmptyFolders = () => ({paths: [], selected: null})
+
+let SESSION_FOLDER_PATHS = getEmptyFolders()
 
 Object.defineProperties(global, {
   SESSION_FOLDER_PATHS: {
@@ -40,10 +39,19 @@ const homeFolderPath = () => global.HOME_FOLDER
 const UserMethods = {
   async getFolders () {
     try {
-      if (await utils.pathDoesExist(PATHS.foldersJsonPath)) return SESSION_FOLDER_PATHS = JSON.parse((await utils.promisify(fs.readFile, [PATHS.foldersJsonPath, 'utf8']))[1])
+      if (await utils.pathDoesExist(PATHS.foldersJsonPath)) {
+        let paths = JSON.parse((await utils.promisify(fs.readFile, [PATHS.foldersJsonPath, 'utf8']))[1])
+        if (!this.isValidFolderStructure(paths)) paths = await this.resetFolderPaths()
+        return SESSION_FOLDER_PATHS = paths
+      }
     } catch (error) {
       throw error
     }
+  },
+  isValidFolderStructure (paths) {
+    const them = Object.keys(paths)
+    const def = Object.keys(getEmptyFolders())
+    return them.length === def.length && them.every(key => def.includes(key))
   },
   async setCurrentFolder (path) {
     if (!path) path = null
@@ -86,7 +94,7 @@ const UserMethods = {
   },
   async resetFolderPaths () {
     try {
-      const emptyFolders = {paths: [], selected: null}
+      const emptyFolders = getEmptyFolders()
       await this.writeHomeFolders(emptyFolders)
       return emptyFolders
     } catch (error) {

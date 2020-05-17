@@ -30,7 +30,7 @@ export default {
     return {
       header: {
         show: true,
-        text: "Let's find your music",
+        text: 'Let\'s find your music',
         userOnHold: null,
         showHeader: false
       },

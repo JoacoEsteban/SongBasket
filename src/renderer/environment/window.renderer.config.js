@@ -49,7 +49,7 @@ function handleMetaKeyCombo (keyCode, e) {
   }
 }
 function isCommandKey (meta, control) {
-  if (global.CONSTANTS.PLATFORM === 'mac') return meta
+  if (window.CONSTANTS.PLATFORM === 'mac') return meta
   return control
 }
 function handleWindowKey (e) {

@@ -6,6 +6,9 @@
   "license": "MIT",
   "main": "./dist/electron/main.js",
   "scripts": {
+    "build-packager": "node .electron-vue/build.js && npm run package",
+    "package": "npm run package:osx",
+    "package:osx": "electron-rebuild && electron-packager . SongBasket --overwrite --out=build/osx --platform=darwin --arch=x64 --icon=build/icons/icon.icns",
     "build": "node .electron-vue/build.js && electron-builder -c.mac.identity=null",
     "build:dir": "node .electron-vue/build.js && electron-builder --dir",
     "build:clean": "cross-env BUILD_TARGET=clean node .electron-vue/build.js",
@@ -101,6 +104,7 @@
     "electron-builder": "^20.19.2",
     "electron-debug": "^1.5.0",
     "electron-devtools-installer": "^2.2.4",
+    "electron-packager": "^14.2.1",
     "electron-rebuild": "^1.10.1",
     "eslint": "^4.19.1",
     "eslint-config-standard": "^11.0.0",

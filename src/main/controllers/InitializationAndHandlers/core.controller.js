@@ -113,7 +113,7 @@ const core = {
       user_data.songbasket_id = null
       core.setUser(user_data)
 
-      await global.CONSTANTS.LOGIN_WINDOW.loadURL(`file://${process.cwd()}/src/renderer/landings/after-login-loading.html`)
+      // await global.CONSTANTS.LOGIN_WINDOW.loadURL(`file://${process.cwd()}/src/renderer/landings/after-login-loading.html`)
       await core.updateAll()
       global.CONSTANTS.APP_STATUS.IS_LOGGED = true
       global.CONSTANTS.LOGIN_WINDOW && await global.CONSTANTS.LOGIN_WINDOW.close()
