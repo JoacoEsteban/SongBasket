@@ -19,6 +19,23 @@
           </Card>
         </div>
         <div class="track-info df fldc jucb ellipsis h100">
+          <div class="df alic">
+            <div v-if="isConversion" class="sb-tag mr-1 hidable-item gradient-background-cycle-less" :class="{hidden: !isSelected}" style="--fz: .7em">
+              <b>
+                Selected
+              </b>
+            </div>
+            <div class="df alic text-secondary" v-if="isConversion && trackFormatted.issue">
+              <div class="svg-icon" style="--size: .75em; margin-right: .3em">
+                <warning-icon></warning-icon>
+              </div>
+              <span class="conversion-status df alic">
+                <span class="bold point75-em">
+                  {{trackFormatted.issue}}
+                </span>
+              </span>
+            </div>
+          </div>
           <div class="ellipsis lh1point5">
             <span class="name" v-html="trackFormatted.name">
             </span>
@@ -28,9 +45,22 @@
               {{trackFormatted.creator}}
             </span>
           </div>
+          <div v-if="isConversion" class="track-controls df mt-1">
+            <button :class="{hidden: !canSelect}" class="hidable-item link-button m-0" style="margin-right: .5em" @click="select">
+              {{isSelected && isDoubtly ? 'Apply Selection' : 'Select'}}
+            </button>
+            <button class="link-button m-0" @click="openVideo">
+              Open
+            </button>
+          </div>
           <div v-if="!isConversion" class="ellipsis">
             <span class="playlists">
               Inside <b>{{$controllers.track.getPlaylistsString(track)}}</b>
+            </span>
+          </div>
+          <div v-if="!isConversion && !isDownload" class="df">
+            <span class="bold uppercase point5-em" v-if="trackFormatted.status" :style="{color: trackFormatted.status.color}">
+              {{trackFormatted.status.str}}
             </span>
           </div>
         </div>
@@ -42,10 +72,12 @@
 <script>
 import Banner from '../Generic/Banner'
 import Card from '../Generic/Card'
+import WarningIcon from '@/assets/icons/warning-icon'
 export default {
   components: {
     Banner,
-    Card
+    Card,
+    WarningIcon
   },
   data () {
     return {
@@ -54,6 +86,14 @@ export default {
     }
   },
   computed: {
+    canSelect () {
+      console.log('aberga', this.isConversion, this.isSelected, this.isDoubtly)
+      return this.isConversion && (!this.isSelected || this.isDoubtly)
+    },
+    isDoubtly () {
+      console.log('dnue', this.track.isDoubtlyConversion, this.parentRef.flags.selectionIsApplied)
+      return this.track.isDoubtlyConversion && !this.parentRef.flags.selectionIsApplied
+    },
     trackFormatted () {
       const itm = this.track
       const snippet = itm.snippet || {}
@@ -65,7 +105,9 @@ export default {
       return itm && {
         name: this.isConversion ? itm.isCustomTrack ? snippet.title : itm.nameFormatted : itm.data.name,
         image,
-        creator: this.isConversion ? snippet.channelTitle : this.$controllers.track.getArtistsString(itm)
+        creator: this.isConversion ? snippet.channelTitle : this.$controllers.track.getArtistsString(itm),
+        status: itm.status,
+        issue: this.isConversion && !itm.isCustomTrack && (itm.isDoubtlyConversion ? ((itm.wordScore === 0 || !itm.nameTokensMap[0]) ? 'Name' : 'Duration') + ' doesn\'t match' : null)
       }
     },
     cardItem () {
@@ -74,10 +116,20 @@ export default {
       }
     }
   },
+  methods: {
+    select () {
+      this.$emit('select')
+    },
+    openVideo () {
+      this.$controllers.core.openVideo(this.track.youtube_id || this.track.id)
+    }
+  },
   props: {
     track: Object,
+    parentRef: Object,
     isDownload: Boolean,
     isConversion: Boolean,
+    isSelected: Boolean,
     downloadStatus: {
       type: Object,
       required: false,
@@ -128,7 +180,7 @@ $extraction-bg: linear-gradient(258.84deg, $ex1, $ex2);
     }
     &.conversion {
       .track-info .name {
-        font-size: 1.3em;
+        font-size: 1em;
       }
     }
   }
@@ -186,6 +238,9 @@ $extraction-bg: linear-gradient(258.84deg, $ex1, $ex2);
       font-size: $name-size;
     }
     .artists {
+      font-weight: bold;
+      display: flex;
+      margin-top: .2em;
       font-size: $name-size * .4;
     }
     .playlists {

@@ -8,6 +8,7 @@
   --global-grey: #333;
   --global-grey-secondary: #222;
   --text-white: #f5f5f5;
+  --text-secondary: #666;
   --text-black: #111;
   --button-purple: #9900cc;
   --green-accept: #1dcc00;

@@ -172,9 +172,11 @@ export const windowController = {
     const windowState = windowController.windowState
 
     window.resizable = true
-    setSize && window.setSize(windowState.width, windowState.height)
-    setPosition && window.setPosition(windowState.x, windowState.y, true)
-    windowState.manage(window)
+    setTimeout(() => {
+      setSize && window.setSize(windowState.width, windowState.height)
+      setPosition && window.setPosition(windowState.x, windowState.y, true)
+      windowState.manage(window)
+    }, 500)
   },
   createWindow () {
     windowController.windowState = windowStateKeeper({

@@ -36,7 +36,7 @@ const actions = {
     commit('TRIGGER', 'RESET_SELECTION')
   },
   reComputeConvertedTracks ({commit}) {
-    commit('TRIGGER', 'PLAYLIST_TRACKS_RE_COMPUTED')
+    // commit('TRIGGER', 'PLAYLIST_TRACKS_RE_COMPUTED')
     global.VUE_ROOT.$controllers.core.formatConvertedTracks()
   },
   playlistTracksReComputed ({commit}) {

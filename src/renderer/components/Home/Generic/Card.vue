@@ -1,5 +1,5 @@
 <template>
-<div class="card-container" :class="classObject" :style="styleObject">
+<div class="card-container window-nodrag" :class="classObject" :style="styleObject">
   <div class="transformation-parent rel-full" @mousemove="onMouseMove" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave" @mousedown="setMouseListener" @click="handleClick">
     <div class="content" ref="content-container">
       <div class="card-background abs-full">

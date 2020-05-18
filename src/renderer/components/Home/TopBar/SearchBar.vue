@@ -125,9 +125,11 @@ export default {
     padding-right: .2em;
   }
 }
-&.hide {
-  opacity: 0;
-  pointer-events: none;
-}
+  &.hide {
+    opacity: 0;
+    &, * {
+      pointer-events: none !important;
+    }
+  }
 }
 </style>

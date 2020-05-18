@@ -1,7 +1,9 @@
 <template>
     <div class="container">
         <div class="header">
+          <b>
             Enter a YouTube Url
+          </b>
         </div>
         <div class="info light">
           <input @keyup.enter="accept" ref="input" v-model="url" class="std-input" type="text">
@@ -9,7 +11,7 @@
         </div>
         <div :class="{'hide': hideControls}" class="controls df jucc aliic">
           <div @click="accept" class="button accept">Accept</div>
-          <div @click="$emit('close')" class="button cancel">Cancel</div>
+          <div @click="cancel" class="button cancel">Cancel</div>
         </div>
         <div :class="{'hide': !hideControls}" class="controls loading">
           {{loadingText}}
@@ -60,6 +62,10 @@ export default {
     this.$refs.input.focus()
   },
   methods: {
+    cancel () {
+      this.$emit('close')
+      this.payload.cancelCb && this.payload.cancelCb()
+    },
     accept () {
       if (!this.valid || this.url === '') return
       this.hide = true
@@ -67,9 +73,8 @@ export default {
       return new Promise(resolve => {
         const listenerId = this.$uuid()
         this.$IPC.once(listenerId, (event, details) => {
-          let {trackId} = this.payload
-          this.$store.dispatch('customTrackUrl', {details, trackId})
           this.$emit('close')
+          this.payload.cb && this.payload.cb()
         })
         this.$IPC.once(listenerId + ':ERROR', () => {
           this.loadingText = 'Video not found'

@@ -1,5 +1,5 @@
 <template>
-  <div :class="'router-view ' + routerAnimation"  ref="home-router">
+  <div :class="'router-view ' + routerAnimation" ref="home-router">
     <playlists-list
       v-show="showPlList"
       @openPlaylist="$emit('openPlaylist', $event)"
@@ -65,6 +65,7 @@ export default {
   methods: {
     async handleAnimation (to, from) {
       if (this.transitioning) return
+      this.$refs['home-router'].scrollTop = 0
       this.transitioning = this.$sbRouter.setTransitioningState(true)
       let anim1
       let anim2 = 'fast '
@@ -82,8 +83,16 @@ export default {
           anim2 += push
         }
       } else {
-        anim1 = push
-        anim2 += pull
+        if (to.name === 'track-review') {
+          anim1 = left
+          anim2 += right
+        } else if (from.name === 'track-review') {
+          anim1 = right
+          anim2 += left
+        } else {
+          anim1 = push
+          anim2 += pull
+        }
       }
       this.routerAnimation = anim1
 

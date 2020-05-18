@@ -62,7 +62,7 @@
         </div>
       </div>
       <playlist-view-slide :class="{show: currentPath === 'playlist-view'}" class="bar-slide" style="--slide-height: 6em;"></playlist-view-slide>
-      <track-review-slide :class="{show: currentPath === 'track-review'}" class="bar-slide hidden-of" style="--slide-height: 8em;"></track-review-slide>
+      <track-review-slide :class="{show: currentPath === 'track-review'}" class="bar-slide hidden-of" style="--slide-height: 10em;"></track-review-slide>
       <downloads-view-slide :class="{show: currentPath === 'downloads-view'}" class="bar-slide"></downloads-view-slide>
     </div>
 

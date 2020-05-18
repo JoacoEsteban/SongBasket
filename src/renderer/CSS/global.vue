@@ -146,10 +146,66 @@ body:hover {
 }
 
 .link-button {
-  color: var(--text-white);
+  --local-text-color: var(--text-white);
+  color: var(--local-text-color);
   cursor: pointer;
-  text-decoration: underline;
   margin: 0 0.3em;
+  display: flex;
+  align-items: center;
+  background: none;
+  font-size: .75em;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0;
+  outline: none;
+  border: none;
+  --border-color: transparent;
+  border-bottom: .1em solid var(--border-color);
+  opacity: 0.7;
+  transition: var(--hover-n-active-transitions), border var(--ts-g);
+  &:hover {
+    --border-color: var(--local-text-color);
+    opacity: 1;
+  }
+  &:active {
+    opacity: 0.7;
+  }
+}
+.sb-tag {
+  --fz: .9em;
+  font-size: var(--fz);
+  --bg-color: var(--green-accept);
+  --text-color: var(--text-white);
+  padding: .1em .5em;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  --icon-color: var(--text-color);
+  display: flex;
+  width: fit-content;
+  box-sizing: border-box;
+  > * {
+    font-size: .8em;
+    text-transform: lowercase;
+  }
+}
+.hidable-item {
+  $t: var(--ts-g);
+  transition: var(--hover-n-active-transitions), padding $t, margin $t, height $t, width $t;
+  box-sizing: border-box;
+  overflow: visible;
+  &.hidden {
+    transform: scale(.7);
+    opacity: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    pointer-events: none;
+  }
+}
+.text-secondary {
+  color: var(--text-secondary);
+  --icon-color: var(--text-secondary);
 }
 
 .sb-title {
@@ -240,6 +296,16 @@ body:hover {
     transform: translateX(-3em);
     opacity: 0;
   }
+}
+.svg-icon {
+  --size: 2em;
+  --width: var(--size);
+  --height: var(--size);
+  width: var(--width);
+  height: var(--height);
+  display: flex;
+  align-content: center;
+  justify-content: center;
 }
 </style>
 

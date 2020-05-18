@@ -11,7 +11,7 @@
 import Unsync from './Unsync'
 import CustomTrackUrl from './CustomTrackUrl'
 import ResetAllPlaylistTracks from './ResetAllPlaylistTracks'
-import TrackReview from './TrackReview'
+import TrackReview from './TrackReviewOld'
 export default {
   components: {
     Unsync,

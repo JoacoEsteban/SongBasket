@@ -56,15 +56,16 @@ export default {
     getCallback () {
       const status = this.item.status && this.item.status.slug
       switch (status) {
-        // case 'awaiting-download':
-        // case 'downloaded':
-        // case 'custom:awaiting-download':
-        // case 'review-conversion':
-        // case 'no-conversion':
-        // case 'paused':
-        default:
+        case 'awaiting-download':
+        case 'downloaded':
+        case 'custom:awaiting-download':
+        case 'review-conversion':
+        case 'no-conversion':
+        case 'paused':
           return this.reviewTrack
-          // return null
+        case 'error':
+        default:
+          return null
       }
     },
     handleClick () {

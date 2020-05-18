@@ -377,9 +377,10 @@ const mutations = {
 
       const track = state.convertedTracks.find(t => t.id === trackId)
       if (!track) throw new Error('Converted Track not found:: @ mainProcessStore :: CHANGE_YT_TRACK_SELECTION')
+      if (!track.conversion.yt.length && newId !== false) throw new Error('NO CONVERSION RESULTS TO CHANGE')
 
       track.selection = newId
-      track.flags.selectionIsApplied = true
+      track.flags.selectionIsApplied = newId !== null
 
       SAVE_TO_DISK()
     } catch (error) {

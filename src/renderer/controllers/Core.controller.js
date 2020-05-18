@@ -102,8 +102,17 @@ const CoreController = {
       vue.ipc.send('TRACK:PAUSE', {id, listenerId})
     })
   },
+  askTrackCustomUrl (trackId) {
+    return new Promise((resolve, reject) => {
+      vue.root.OPEN_MODAL({wich: 'custom-track-url', payload: {trackId, cb: resolve, cancelCB: reject}})
+    })
+  },
   reviewTrack (track) {
     vue.sbRouter.push({name: 'track-review', params: {track}})
+  },
+  openVideo (id) {
+    if (!id) return
+    vue.ipc.send('VIDEO:OPEN', id)
   },
   async logOut () {
     try {
