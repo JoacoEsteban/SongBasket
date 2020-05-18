@@ -147,7 +147,6 @@ export default {
       this.showPlaylists()
     },
     filter () {
-      console.log('insside filter')
       const txt = (this.searchInput && this.searchInput.toLowerCase()) || ''
       let noPlaylists = false
       if (!txt.length) {

@@ -21,6 +21,7 @@ export function init (ipc = global.ipc) {
   ipc.on('download', handlers.download)
 
   ipc.on('VIDEO:OPEN', handlers.openYtVideo)
+  ipc.on('VIDEO:SEARCH', handlers.searchYtVideo)
 
   ipc.on('HOME_FOLDERS:ASK', handlers.setHomeFolder)
 

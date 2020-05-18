@@ -26,12 +26,12 @@
               </b>
             </div>
             <div class="df alic text-secondary" v-if="isConversion && trackFormatted.issue">
-              <div class="svg-icon" style="--size: .75em; margin-right: .3em">
+              <div class="svg-icon" style="--size: .75em; margin-right: .3em" v-if="trackFormatted.issue.warn">
                 <warning-icon></warning-icon>
               </div>
               <span class="conversion-status df alic">
-                <span class="bold point75-em">
-                  {{trackFormatted.issue}}
+                <span class="bold point75-em color-transition" :style="{color: trackFormatted.issue.color || ''}">
+                  {{trackFormatted.issue.msg}}
                 </span>
               </span>
             </div>
@@ -59,9 +59,14 @@
             </span>
           </div>
           <div v-if="!isConversion && !isDownload" class="df">
-            <span class="bold uppercase point5-em" v-if="trackFormatted.status" :style="{color: trackFormatted.status.color}">
+            <span class="bold uppercase point5-em color-transition" v-if="trackFormatted.status" :style="{color: trackFormatted.status.color}">
               {{trackFormatted.status.str}}
             </span>
+          </div>
+        </div>
+        <div class="duration" v-if="!isDownload">
+          <div class="default-title bold" :style="{color: duration.color}" style="--fz: 2em">
+            {{duration.str}}
           </div>
         </div>
       </div>
@@ -87,11 +92,9 @@ export default {
   },
   computed: {
     canSelect () {
-      console.log('aberga', this.isConversion, this.isSelected, this.isDoubtly)
       return this.isConversion && (!this.isSelected || this.isDoubtly)
     },
     isDoubtly () {
-      console.log('dnue', this.track.isDoubtlyConversion, this.parentRef.flags.selectionIsApplied)
       return this.track.isDoubtlyConversion && !this.parentRef.flags.selectionIsApplied
     },
     trackFormatted () {
@@ -107,8 +110,30 @@ export default {
         image,
         creator: this.isConversion ? snippet.channelTitle : this.$controllers.track.getArtistsString(itm),
         status: itm.status,
-        issue: this.isConversion && !itm.isCustomTrack && (itm.isDoubtlyConversion ? ((itm.wordScore === 0 || !itm.nameTokensMap[0]) ? 'Name' : 'Duration') + ' doesn\'t match' : null)
+        issue: (() => {
+          if (!this.isConversion) return null
+          if (!itm.isCustomTrack && (itm.isDoubtlyConversion)) {
+            return {
+              msg: ((itm.wordScore === 0 || !itm.nameTokensMap[0]) ? 'Name' : 'Duration') + ' doesn\'t match',
+              warn: true
+            }
+          }
+          if (itm.isCustomTrack) return {
+            msg: 'Custom',
+            color: 'var(--custom-selection-color)'
+          }
+        })()
       }
+    },
+    duration () {
+      if (this.isDownload) return
+      if (!this.isConversion) return {str: Math.round(this.track.duration || this.track.data.duration_ms / 1000) + "''", color: this.durationColor()}
+      const durationDiff = (this.parentRef.duration || this.parentRef.data.duration_ms / 1000) - this.track.duration
+      const obj = {
+        str: Math.round(durationDiff) + "''",
+        color: this.durationColor(durationDiff)
+      }
+      return obj
     },
     cardItem () {
       return {
@@ -117,6 +142,10 @@ export default {
     }
   },
   methods: {
+    durationColor (durationDiff = 0) {
+      const deg = 150 - 150 * Math.pow(Math.abs(durationDiff / 150), 1.2)
+      return `hsl(${deg < 0 ? 0 : deg}, 100%, 50%)`
+    },
     select () {
       this.$emit('select')
     },

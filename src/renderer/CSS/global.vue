@@ -207,7 +207,9 @@ body:hover {
   color: var(--text-secondary);
   --icon-color: var(--text-secondary);
 }
-
+.color-transition {
+  transition: color var(--ts-g), background-color var(--ts-g);
+}
 .sb-title {
   font-weight: 500;
   font-size: 1.5em;

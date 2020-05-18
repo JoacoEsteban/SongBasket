@@ -2,7 +2,7 @@
   <div class="track-review-container">
     <div class="container-fluid text-left pt-2" style="--px: 2em">
       <div class="default-title text-secondary" style="--fz: 1.2em">
-        Conversions
+        {{conversions.length ? 'Conversions' : 'No conversions found, try adding a custom url'}}
       </div>
     </div>
     <div class="conversions-list" v-if="track">
@@ -36,11 +36,11 @@ export default {
   computed: {
     conversions () {
       let convs = this.track && this.track.conversion.yt
-      if (this.track.custom) convs = [this.track.custom, ...(convs || [])]
-      return convs
+      if (this.track && this.track.custom) convs = [this.track.custom, ...(convs || [])]
+      return convs || []
     },
     selection () {
-      return this.track.selectionObj.id
+      return this.track.selectionObj && (this.track.selectionObj.youtube_id || this.track.selectionObj.id)
     }
   },
   created () {

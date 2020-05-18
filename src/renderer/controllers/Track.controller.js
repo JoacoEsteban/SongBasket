@@ -10,7 +10,7 @@ const TrackController = {
     if (selectionId === false) return track.selectionObj = track.custom
     if (selectionId === null) selectionId = track.conversion.bestMatch
 
-    track.selectionObj = track.conversion.yt.find(yt => yt && yt.youtube_id === selectionId)
+    track.selectionObj = track.conversion.yt.find(yt => yt && yt.youtube_id === selectionId) || (track.custom && track.custom.youtube_id === selectionId && track.custom)
   },
   getStatus: function (t) {
     const slug = (() => {

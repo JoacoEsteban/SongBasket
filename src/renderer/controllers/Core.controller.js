@@ -114,6 +114,11 @@ const CoreController = {
     if (!id) return
     vue.ipc.send('VIDEO:OPEN', id)
   },
+  searchYt (track) {
+    const query = track.query && track.query.query
+    if (!query) return
+    vue.ipc.send('VIDEO:SEARCH', query)
+  },
   async logOut () {
     try {
       console.log('Logging Out:::::')

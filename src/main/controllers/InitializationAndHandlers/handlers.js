@@ -393,5 +393,11 @@ export async function getYtTrackDetails (event, {url, trackId, listenerId}) {
 }
 
 export function openYtVideo (event, id) {
+  if (!id) return
   openBrowser('https://www.youtube.com/watch?v=' + id)
+}
+
+export function searchYtVideo (event, query) {
+  if (!query) return
+  openBrowser('https://www.youtube.com/results?search_query=' + query)
 }
