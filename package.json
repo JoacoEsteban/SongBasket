@@ -19,6 +19,7 @@
     "lint:fix": "eslint --ext .js,.vue -f ./node_modules/eslint-friendly-formatter --fix src test"
   },
   "build": {
+    "asar": false,
     "productName": "songbasket",
     "appId": "com.joacoesteban.songbasket",
     "directories": {
