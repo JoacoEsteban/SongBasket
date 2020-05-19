@@ -6,10 +6,11 @@
   "license": "MIT",
   "main": "./dist/electron/main.js",
   "scripts": {
-    "build-packager": "node .electron-vue/build.js && npm run package",
+    "compile": "node .electron-vue/build.js",
+    "build-packager": "npm run compile && npm run package",
     "package": "npm run package:osx",
-    "package:osx": "electron-rebuild && electron-packager . SongBasket --overwrite --out=build/osx --platform=darwin --arch=x64 --icon=assets/icons/mac/songbasket.icns",
-    "build": "node .electron-vue/build.js && electron-rebuild && electron-builder -c.mac.identity=null",
+    "package:osx": "npm run compile && electron-rebuild && electron-packager . SongBasket --overwrite --out=build/osx --platform=darwin --arch=x64 --icon=assets/icons/songbasket.icns",
+    "build": "electron-rebuild && electron-builder -c.mac.identity=null",
     "dev": "node .electron-vue/dev-runner.js",
     "pack": "npm run pack:main && npm run pack:renderer",
     "pack:main": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.main.config.js",
@@ -24,17 +25,19 @@
       "output": "build"
     },
     "files": [
-      "dist/electron/**/*"
+      "dist/electron/**/*",
+      "node_modules/fileicon",
+      "node_modules/youtube-dl"
     ],
     "mac": {
-      "icon": "assets/icons/mac/songbasket.icns",
+      "icon": "assets/icons/songbasket.icns",
       "target": "pkg"
     },
     "win": {
       "icon": "assets/icons/songbasket.ico"
     },
     "linux": {
-      "icon": "assets/icons/png"
+      "icon": "assets/icons/songbasket.png"
     }
   },
   "dependencies": {
