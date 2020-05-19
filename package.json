@@ -8,7 +8,7 @@
   "scripts": {
     "build-packager": "node .electron-vue/build.js && npm run package",
     "package": "npm run package:osx",
-    "package:osx": "electron-rebuild && electron-packager . SongBasket --overwrite --out=build/osx --platform=darwin --arch=x64 --icon=build/icons/icon.icns",
+    "package:osx": "electron-rebuild && electron-packager . SongBasket --overwrite --out=build/osx --platform=darwin --arch=x64 --icon=assets/icons/mac/songbasket.icns",
     "build": "node .electron-vue/build.js && electron-rebuild && electron-builder -c.mac.identity=null",
     "build:dir": "node .electron-vue/build.js && electron-builder --dir",
     "build:clean": "cross-env BUILD_TARGET=clean node .electron-vue/build.js",
