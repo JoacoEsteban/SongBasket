@@ -146,6 +146,7 @@ body:hover {
 }
 
 .link-button {
+  @extend .window-nodrag;
   --local-text-color: var(--text-white);
   color: var(--local-text-color);
   cursor: pointer;

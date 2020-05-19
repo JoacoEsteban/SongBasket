@@ -4,6 +4,7 @@ dist/web/*
 build/*
 temp/*
 logs/*
+.yarn
 !build/icons
 node_modules/
 npm-debug.log

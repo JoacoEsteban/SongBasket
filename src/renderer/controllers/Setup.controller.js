@@ -39,6 +39,7 @@ const SetupController = {
     vue.ipc.once(listenerId, (e, error) => {
       console.log('aber on login', error)
       vue.router.push('home')
+      vue.ipc.send('WINDOW:UNLOCK')
     })
     vue.ipc.send('LOGIN', {listenerId})
   }
