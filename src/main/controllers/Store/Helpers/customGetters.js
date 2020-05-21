@@ -67,7 +67,7 @@ export default {
     return store.safe.convertedTracks
   },
   convertedTracks_SAFE () {
-    return this.convertedTracks().filter(track => (track.conversion.yt.length || track.custom) && track.playlists.length)// TODO Prevent this filter from ever happening
+    return this.convertedTracks().filter(track => !track.flags.conversionError && (track.conversion.yt.length || track.custom) && track.playlists.length)// TODO Prevent this filter from ever happening
   },
   anythingToConvert () {
 

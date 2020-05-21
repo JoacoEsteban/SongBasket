@@ -63,7 +63,7 @@ const folderFns = {
       return new Promise((resolve, reject) => {
         if (!folderPath) return reject(new Error('NO FOLDER PATH'))
         if (!iconPath) return reject(new Error('NO ICON PATH'))
-
+        // TODO Fix this command in build by directly referencing binary
         exec(`fileicon set ${folderPath} ${iconPath}`, (err, m) => {
           if (err) return reject(err)
           resolve()

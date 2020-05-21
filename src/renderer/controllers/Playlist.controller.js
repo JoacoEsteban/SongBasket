@@ -138,7 +138,7 @@ const statuses = {
     return {
       slug: 'error',
       ammount: 0,
-      sortOrder: 0,
+      sortOrder: 1,
       color: 'var(--red-cancel)',
       get msg () {
         return this.ammount + ' conversion error' + (this.ammount === 1 ? '' : 's')

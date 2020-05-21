@@ -48,13 +48,13 @@ const TrackController = {
 
 const SortOrders = {
   'paused': 1000,
-  'error': 0,
+  'error': 1,
   'awaiting-conversion': 5,
   'downloaded': 100,
   'awaiting-download': 10,
   'custom:awaiting-download': 10,
-  'review-conversion': 2,
-  'no-conversion': 1
+  'review-conversion': 3,
+  'no-conversion': 2
 }
 
 const Colors = {
