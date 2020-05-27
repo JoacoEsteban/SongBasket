@@ -10,6 +10,7 @@
     "build-packager": "npm run compile && npm run package",
     "package": "npm run package:osx",
     "package:osx": "npm run compile && electron-rebuild && electron-packager . SongBasket --overwrite --out=build/osx --platform=darwin --arch=x64 --icon=assets/icons/songbasket.icns",
+    "full-build": "npm run compile && npm run build",
     "build": "electron-rebuild && electron-builder -c.mac.identity=null",
     "dev": "node .electron-vue/dev-runner.js",
     "pack": "npm run pack:main && npm run pack:renderer",
