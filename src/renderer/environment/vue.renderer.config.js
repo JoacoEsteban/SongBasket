@@ -48,6 +48,7 @@ function setControllers (Vue) {
     setup: require('../controllers/Setup.controller').default,
     core: require('../controllers/Core.controller').default,
     track: require('../controllers/Track.controller').default,
-    playlist: require('../controllers/Playlist.controller').default
+    playlist: require('../controllers/Playlist.controller').default,
+    utils: require('../controllers/Utils.controller').default
   }
 }

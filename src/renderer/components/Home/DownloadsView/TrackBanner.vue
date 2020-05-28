@@ -127,10 +127,11 @@ export default {
     },
     duration () {
       if (this.isDownload) return
-      if (!this.isConversion) return {str: Math.round(this.track.duration || this.track.data.duration_ms / 1000) + "''", color: this.durationColor()}
-      const durationDiff = (this.parentRef.duration || this.parentRef.data.duration_ms / 1000) - this.track.duration
+      // if (!this.isConversion) return {str: Math.round(this.track.duration || this.track.data.duration_ms / 1000) + "''", color: this.durationColor()}
+      // return {str: Math.round(this.track.duration || this.track.data.duration_ms / 1000) + "''", color: this.durationColor()}
+      const durationDiff = this.isConversion && (this.parentRef.duration || this.parentRef.data.duration_ms / 1000) - this.track.duration
       const obj = {
-        str: Math.round(durationDiff) + "''",
+        str: this.$controllers.utils.minsFromSecs(Math.round(this.track.duration || this.track.data.duration_ms / 1000)),
         color: this.durationColor(durationDiff)
       }
       return obj
@@ -143,7 +144,8 @@ export default {
   },
   methods: {
     durationColor (durationDiff = 0) {
-      const deg = 150 - 150 * Math.pow(Math.abs(durationDiff / 150), 1.2)
+      const factor = 150
+      const deg = factor - factor * Math.pow(Math.abs(durationDiff / factor), 0.5)
       return `hsl(${deg < 0 ? 0 : deg}, 100%, 50%)`
     },
     select () {
