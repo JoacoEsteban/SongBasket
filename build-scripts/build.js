@@ -1,10 +1,8 @@
 'use strict'
 require('dotenv-flow').config()
-console.log('TOKK', process.env.GH_TOKEN)
 const builder = require('electron-builder')
 const Platform = builder.Platform
 
-// Promise is returned
 builder.build({
   // '-c.mac.identity': null,
   publish: 'onTag',
