@@ -64,29 +64,41 @@ const folderFns = {
         if (!folderPath) return reject(new Error('NO FOLDER PATH'))
         if (!iconPath) return reject(new Error('NO ICON PATH'))
         // TODO Fix this command in build by directly referencing binary
-        exec(`fileicon set ${folderPath} ${iconPath}`, (err, m) => {
-          if (err) return reject(err)
-          resolve()
-        })
+        try {
+          exec(`fileicon set ${folderPath} ${iconPath}`, (err, m) => {
+            if (err) return reject(err)
+            resolve()
+          })
+        } catch (error) {
+          reject(error)
+        }
       })
     },
     test (path) {
       return new Promise((resolve, reject) => {
         if (!path) throw new Error('NO PATH')
 
-        exec(`fileicon test ${path}`, (err, m) => {
-          if (err) resolve(false)
-          else resolve(m.indexOf('HAS custom icon') > -1)
-        })
+        try {
+          exec(`fileicon test ${path}`, (err, m) => {
+            if (err) resolve(false)
+            else resolve(m.indexOf('HAS custom icon') > -1)
+          })
+        } catch (error) {
+          reject(error)
+        }
       })
     },
     remove (path) {
       return new Promise((resolve, reject) => {
         if (!path) throw new Error('NO PATH')
-        exec(`fileicon rm ${path}`, (err, m) => {
-          if (err) reject(err)
-          else resolve()
-        })
+        try {
+          exec(`fileicon rm ${path}`, (err, m) => {
+            if (err) reject(err)
+            else resolve()
+          })
+        } catch (error) {
+          reject(error)
+        }
       })
     }
   },

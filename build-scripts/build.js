@@ -2,11 +2,22 @@
 require('dotenv-flow').config()
 const builder = require('electron-builder')
 const Platform = builder.Platform
+const currentPlatform = (() => {
+  switch (process.platform) {
+    case 'darwin':
+      return 'MAC'
+    default:
+      if (process.platform.includes('win')) return 'WINDOWS'
+      return 'LINUX'
+  }
+})()
 
 builder.build({
   // '-c.mac.identity': null,
   publish: 'onTag',
-  targets: Platform.MAC.createTarget(),
+  // publish: 'always',
+  // targets: Platform.WINDOWS.createTarget(),
+  targets: Platform[currentPlatform].createTarget(),
   config: {
     asar: false,
     productName: 'SongBasket',

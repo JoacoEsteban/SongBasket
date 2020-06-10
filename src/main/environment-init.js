@@ -2,15 +2,16 @@ require('./controllers/Prototype/Array')
 require('./controllers/Prototype/Object')
 require('./Global/VARIABLES')
 
+const PROD = global.CONSTANTS.ENV_PROD
+
 const util = require('util')
 const child_process = require('child_process')
 const youtubeDl = require('youtube-dl')
 
 const USE_PROD_BACKEND = false
-const USE_HEROKU = false
 ;(() => {
-  const subDomain = USE_HEROKU ? 'heroku' : 'api'
-  process.env.BACKEND = process.env.NODE_ENV === 'production' || USE_PROD_BACKEND ? ('https://' + subDomain + '.songbasket.com') : 'http://localhost:5000'
+  const subDomain = 'api'
+  process.env.BACKEND = PROD || USE_PROD_BACKEND ? ('https://' + subDomain + '.songbasket.com') : 'http://localhost:5000'
   global.log = (...aa) => aa.forEach(a => console.log(util.inspect(a, {showHidden: false, depth: null})))
 })()
 
@@ -28,7 +29,7 @@ global.flushYtDlCache()
 const CATCH_TO_FILE = false
 const logFile = require('electron-log')
 ;(function setErrorHandling () {
-  if (process.env.NODE_ENV === 'production' || CATCH_TO_FILE) {
+  if (PROD || CATCH_TO_FILE) {
     const toLogFile = error => {
       console.error('----------UNCAUGHT----------\n', error)
       logFile.error(error)
@@ -41,9 +42,11 @@ const logFile = require('electron-log')
       const fs = require('fs')
       const path = require('path')
 
-      const logsPath = path.join((process.env.NODE_ENV === 'production' ? require('electron').app.getPath('userData') : process.cwd()), 'logs')
+      const logsPath = path.join((PROD ? require('electron').app.getPath('userData') : process.cwd()), 'logs')
       if (!fs.existsSync(logsPath)) fs.mkdirSync(logsPath)
-      const access = fs.createWriteStream(path.join(logsPath, 'SONGBASKET RUNTIME LOG - ' + new Date()))
+      const filePath = path.join(logsPath, 'SONGBASKET RUNTIME LOG - ' + new Date() + '.log')
+      fs.closeSync(fs.openSync(filePath, 'w'))
+      const access = fs.createWriteStream(filePath)
       process.stdout.write = process.stderr.write = access.write.bind(access)
     }
   }

@@ -3,8 +3,10 @@
 // })()
 const height = 500
 const width = 1000
+const ENV_PROD = process.env.NODE_ENV === 'production'
 module.exports = global.CONSTANTS = {
   // STATES
+  ENV_PROD,
   APP_STATUS: {
     IS_LOGGED: false,
     FOLDERS: {
@@ -26,7 +28,7 @@ module.exports = global.CONSTANTS = {
   get BACKEND () {
     return process.env.BACKEND
   },
-  APP_CWD: (process.env.NODE_ENV === 'production' ? require('electron').app.getPath('userData') : process.cwd()),
+  APP_CWD: (ENV_PROD ? require('electron').app.getPath('userData') : process.cwd()),
   PROTOCOL_PATHS: {
     BASE: 'songbasket'
   },
