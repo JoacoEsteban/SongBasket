@@ -26,7 +26,7 @@ global.flushYtDlCache = async () => {
 
 global.flushYtDlCache()
 
-const CATCH_TO_FILE = false
+const CATCH_TO_FILE = true
 const logFile = require('electron-log')
 ;(function setErrorHandling () {
   if (PROD || CATCH_TO_FILE) {
