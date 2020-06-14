@@ -174,7 +174,7 @@ export const windowController = {
     window.resizable = true
     setTimeout(() => {
       setSize && window.setSize(windowState.width, windowState.height)
-      setPosition && window.setPosition(windowState.x, windowState.y, true)
+      setPosition && windowState.x && windowState.y && window.setPosition(windowState.x, windowState.y, true)
       windowState.manage(window)
     }, 500)
   },

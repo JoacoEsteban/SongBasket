@@ -18,15 +18,18 @@ const USE_PROD_BACKEND = false
 global.flushYtDlCache = async () => {
   return new Promise((resolve, reject) => {
     child_process.exec(youtubeDl.getYtdlBinary() + ' --rm-cache-dir', (err, out) => {
-      if (err) return reject(err)
+      if (err) {
+        console.error('Error flushding ytdl cache', err)
+        return reject(err)
+      }
       resolve(out)
     })
   })
 }
 
-global.flushYtDlCache()
+global.flushYtDlCache().catch(() => {})
 
-const CATCH_TO_FILE = true
+const CATCH_TO_FILE = false
 const logFile = require('electron-log')
 ;(function setErrorHandling () {
   if (PROD || CATCH_TO_FILE) {
