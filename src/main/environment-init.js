@@ -43,10 +43,14 @@ const logFile = require('electron-log')
       const path = require('path')
 
       const logsPath = path.join((PROD ? require('electron').app.getPath('userData') : process.cwd()), 'logs')
+
       if (!fs.existsSync(logsPath)) fs.mkdirSync(logsPath)
-      const filePath = path.join(logsPath, 'SONGBASKET RUNTIME LOG - ' + new Date() + '.log')
+
+      const filePath = path.join(logsPath, 'SONGBASKET RUNTIME LOG - ' + (new Date()).toDateString() + '.log')
+
       fs.closeSync(fs.openSync(filePath, 'w'))
       const access = fs.createWriteStream(filePath)
+
       process.stdout.write = process.stderr.write = access.write.bind(access)
     }
   }
