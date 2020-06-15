@@ -14,8 +14,8 @@ const currentPlatform = (() => {
 
 builder.build({
   // '-c.mac.identity': null,
-  publish: 'onTag',
-  // publish: 'always',
+  // publish: 'onTag',
+  publish: 'always',
   // targets: Platform.WINDOWS.createTarget(),
   targets: Platform[currentPlatform].createTarget(),
   config: {
@@ -41,7 +41,16 @@ builder.build({
       ]
     },
     win: {
-      icon: 'assets/icons/songbasket.ico'
+      icon: 'assets/icons/songbasket.ico',
+      target: [
+        'appx',
+        'nsis',
+        'zip'
+      ]
+    },
+    appx: {
+      publisherDisplayName: 'Psiloware',
+      backgroundColor: '#151515'
     },
     linux: {
       icon: 'assets/icons/songbasket.png'
