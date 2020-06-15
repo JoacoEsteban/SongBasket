@@ -8,7 +8,7 @@ const util = require('util')
 const child_process = require('child_process')
 const youtubeDl = require('youtube-dl')
 
-const USE_PROD_BACKEND = false
+const USE_PROD_BACKEND = true
 ;(() => {
   const subDomain = 'api'
   process.env.BACKEND = PROD || USE_PROD_BACKEND ? ('https://' + subDomain + '.songbasket.com') : 'http://localhost:5000'
