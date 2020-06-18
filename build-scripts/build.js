@@ -49,7 +49,10 @@ builder.build({
       ]
     },
     appx: {
-      publisherDisplayName: 'Psiloware',
+      identityName: process.env.IDENTITY_NAME,
+      applicationId: process.env.APPLICATION_ID,
+      publisher: process.env.PUBLISHER,
+      publisherDisplayName: process.env.PUBLISHER_DISPLAY_NAME,
       backgroundColor: '#151515'
     },
     linux: {
