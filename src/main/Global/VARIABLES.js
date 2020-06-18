@@ -75,7 +75,8 @@ module.exports = global.CONSTANTS = {
     // icon: require('path').join(__dirname, 'assets/icons/png/icon_128@1x.png')
   },
   // MISC
-  HEROKU_PING_INTERVAL: 1000 * 60 * 15
+  HEROKU_PING_INTERVAL: 1000 * 60 * 15,
+  APP_VERSION: require('electron').app.getVersion()
   // -------------
 
 }
