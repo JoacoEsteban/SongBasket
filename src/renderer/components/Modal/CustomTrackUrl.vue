@@ -49,19 +49,21 @@ export default {
       this.hide = false
     },
     show (val) {
-      if (!val) {
-        this.url = ''
-        this.valid = null
-        this.hide = true
-        this.hideControls = false
-        this.loadingText = 'Loading'
-      }
+      if (val) return this.focusInput()
+      this.url = ''
+      this.valid = null
+      this.hide = true
+      this.hideControls = false
+      this.loadingText = 'Loading'
     }
   },
   mounted () {
-    this.$refs.input.focus()
+    this.focusInput()
   },
   methods: {
+    focusInput () {
+      this.$refs.input && this.$refs.input.focus()
+    },
     cancel () {
       this.$emit('close')
       this.payload.cancelCb && this.payload.cancelCb()
