@@ -1,5 +1,8 @@
 'use strict'
 require('dotenv-flow').config()
+const fs = require('fs')
+const PATH = require('path')
+
 const builder = require('electron-builder')
 const Platform = builder.Platform
 const currentPlatform = (() => {
@@ -12,10 +15,16 @@ const currentPlatform = (() => {
   }
 })()
 
+const winTargets = [
+  'appx',
+  // 'nsis',
+  // 'zip'
+]
+const shouldSignAppx = true
 builder.build({
   // '-c.mac.identity': null,
-  // publish: 'onTag',
-  publish: 'always',
+  publish: 'onTag',
+  // publish: 'always',
   // targets: Platform.WINDOWS.createTarget(),
   targets: Platform[currentPlatform].createTarget(),
   config: {
@@ -42,11 +51,7 @@ builder.build({
     },
     win: {
       icon: 'assets/icons/songbasket.ico',
-      target: [
-        'appx',
-        'nsis',
-        'zip'
-      ]
+      target: winTargets
     },
     appx: {
       identityName: process.env.IDENTITY_NAME,
@@ -60,10 +65,30 @@ builder.build({
     }
   }
 })
-  .then(() => {
-    // handle result
+  .then(paths => {
+    if (currentPlatform === 'WINDOWS' && winTargets.includes('appx') && shouldSignAppx) signAppx(paths)
   })
   .catch(error => {
-    // handle error
     console.error(error)
   })
+
+function signAppx (paths) {
+  const base = process.cwd()
+  const buildPath = PATH.join(base, 'build')
+  const appxPath = paths.find(p => p.includes('.appx'))
+
+  const signedAppxName = PATH.relative(buildPath, appxPath).replace('.appx', '_SIGNED.appx').replace(/ /g, '-')
+  const signedAppxPath = PATH.join(buildPath, signedAppxName)
+
+  console.log('ABOUT TO SELF-SIGN APPX')
+  fs.copyFile(appxPath, signedAppxPath, err => {
+    if (err) return console.error('ERROR COPYING APPX FOR CERTIFICATION: ', err)
+    const signToolPath = 'C:\\"Program Files (x86)"\\"Windows Kits"\\10\\"App Certification Kit"\\signtool.exe'
+    const certPath = PATH.join(__dirname, 'certs', 'self-cert.pfx') + ' /p pass'
+    const command = `${signToolPath} sign /fd SHA256 /a /f ${certPath} ${signedAppxPath}`
+    require('child_process').exec(command, (err, out) => {
+      err && console.error(err)
+      !err && console.log('\n----Certification Successfull----\n', out)
+    })
+  })
+}
