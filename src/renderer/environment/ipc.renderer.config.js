@@ -55,6 +55,8 @@ export default function (Vue) {
   ipc.on('DOWNLOAD:EVENT', (e, payload) => store.dispatch('downloadEvent', payload))
   ipc.on('DOWNLOAD:END', async (e, payload) => store.dispatch('downloadFinished', payload))
 
+  // ipc.on('READY_TO_UPDATE', readyToUpdate)
+
   $(document).ready(onDocumentReady)
 }
 
@@ -80,7 +82,7 @@ function onDocumentReady () {
   if (!window.VUE_HAS_MOUNTED) return setTimeout(onDocumentReady, 100)
   const listenerId = uuid()
   vue.ipc.once(listenerId, async (e, status) => {
-    console.log('setttt', status)
+    console.log('Setting app status', status)
     if (status.APP_STATUS.IS_LOGGED) {
       await storeState(null, { state: status.state, listenerId: null, dontFormat: true })
       await onRetrievedTracks(null, status.downloadedTracks)

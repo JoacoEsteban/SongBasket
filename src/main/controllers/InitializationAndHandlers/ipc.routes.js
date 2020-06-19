@@ -1,6 +1,7 @@
 // import GLOBAL from '../../Global/VARIABLES'
 import * as handlers from './handlers'
 import * as sbFetch from './sbFetch'
+// import updater from './auto-update'
 import store from '../../../renderer/store'
 import FileWatchers from '../FileSystem/FileWatchers'
 import IpcController from './ipc.controller'
@@ -28,6 +29,8 @@ export function init (ipc = global.ipc) {
   ipc.on('LOGIN', handlers.login)
 
   ipc.on('LOGOUT', handlers.logout)
+
+  // ipc.on('APP_UPDATE:CONFIRM', updater.handlers.onUserUpdateConfirmation)
 
   ipc.on('guestSignIn', function (event, { mode, query }) {
     console.log('Guest:: Type:', mode, query)

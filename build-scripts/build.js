@@ -18,10 +18,11 @@ const currentPlatform = (() => {
 const winTargets = [
   'appx',
   // 'nsis',
-  // 'zip'
 ]
+
 const shouldSignAppx = true
-builder.build({
+
+const CONFIG = {
   // '-c.mac.identity': null,
   publish: 'onTag',
   // publish: 'always',
@@ -64,7 +65,8 @@ builder.build({
       icon: 'assets/icons/songbasket.png'
     }
   }
-})
+}
+builder.build(CONFIG)
   .then(paths => {
     if (currentPlatform === 'WINDOWS' && winTargets.includes('appx') && shouldSignAppx) signAppx(paths)
   })

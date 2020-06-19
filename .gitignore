@@ -5,6 +5,7 @@ dist/mac/*
 *builder-effective-config.yaml
 dist/win-unpacked/
 build/*
+build-scrits/certs/
 temp/*
 logs/*
 .yarn

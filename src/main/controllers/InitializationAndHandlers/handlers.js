@@ -13,8 +13,10 @@ import core from './core.controller'
 import windowStateKeeper from 'electron-window-state'
 import Positioner from 'electron-positioner'
 
-const openBrowser = require('open')
-const ipcSend = (...args) => {
+import updater from './auto-update'
+
+const openBrowser = global.openUrl = require('open')
+export const ipcSend = (...args) => {
   if (!global.CONSTANTS.MAIN_WINDOW) return
   return IpcController.send(...args)
 }
@@ -130,6 +132,7 @@ export function init (electron) {
   setVars(electron)
   electron.app.allowRendererProcessReuse = true
   electron.app.on('ready', async () => {
+    updater.init()
     protocolController.startProtocols(electron)
     connectionController.init({
       connectionChangeCallback: (value) => {
@@ -400,4 +403,8 @@ export function openYtVideo (event, id) {
 export function searchYtVideo (event, query) {
   if (!query) return
   openBrowser('https://www.youtube.com/results?search_query=' + query)
+}
+
+export function showChangelog (event, query) {
+  global.openUrl(global.CONSTANTS.CHANGELOG_URL)
 }
