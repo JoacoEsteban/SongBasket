@@ -21,11 +21,10 @@ const winTargets = [
 ]
 
 const shouldSignAppx = true
+const shouldPublish = process.env.VAR_PUBLISH ? 'always' : 'onTag'
 
 const CONFIG = {
-  // '-c.mac.identity': null,
-  publish: 'onTag',
-  // publish: 'always',
+  publish: shouldPublish,
   // targets: Platform.WINDOWS.createTarget(),
   targets: Platform[currentPlatform].createTarget(),
   config: {

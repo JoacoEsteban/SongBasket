@@ -9,6 +9,8 @@
     "dist": "node .electron-vue/build.js",
     "pack": "electron-rebuild && node ./build-scripts/build.js",
     "build": "npm run dist && npm run pack",
+    "build-publish": "VAR_PUBLISH=true npm run build",
+    "publish": "VAR_PUBLISH=true npm run pack",
     "dev": "node .electron-vue/dev-runner.js",
     "lint": "eslint --ext .js,.vue -f ./node_modules/eslint-friendly-formatter src test",
     "lint:fix": "eslint --ext .js,.vue -f ./node_modules/eslint-friendly-formatter --fix src test",
