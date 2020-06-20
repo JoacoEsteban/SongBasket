@@ -16,7 +16,7 @@ const currentPlatform = (() => {
 })()
 
 const targets = {
-  win: [
+  win: process.env.VAR_TESTING ? 'nsis' : [
     'appx',
     'nsis'
   ],
