@@ -149,17 +149,6 @@ export default {
     route () {
       return this.$route.name
     },
-    // selectedPlaylistsData: function () {
-    //   let st = this.$store.getters.SelectedPlaylistsCompute
-    //   let ret = {
-    //     playlists: [
-    //       st.playlists,
-    //       'Playlist' + (st.playlists === 1 ? '' : 's') + ' selected'
-    //     ],
-    //     tracks: [st.tracks, 'Track' + (st.tracks === 1 ? '' : 's')]
-    //   }
-    //   return ret
-    // },
     now () {
       let separator = ' / '
       let thisDate = dateFormatter(this.$store.state.CurrentUser.lastSync || new Date())

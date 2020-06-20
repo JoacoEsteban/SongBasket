@@ -32,9 +32,14 @@ export function dateFormatter (dateParam) {
   }
 
   const time = {
-    hours: dateParam.getHours(),
-    minutes: dateParam.getMinutes() < 10 ? '0' + dateParam.getMinutes() : dateParam.getMinutes()
+    rawHours: dateParam.getHours(),
+    rawMinutes: dateParam.getMinutes(),
+    rawSeconds: dateParam.getSeconds()
   }
+
+  time.hours = ((time.rawHours < 10 ? '0' : '') + time.rawHours).toString()
+  time.minutes = ((time.rawMinutes < 10 ? '0' : '') + time.rawMinutes).toString()
+  time.seconds = ((time.rawSeconds < 10 ? '0' : '') + time.rawSeconds).toString()
 
   return {date, time}
 }

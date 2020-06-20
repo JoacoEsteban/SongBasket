@@ -50,7 +50,15 @@ const logFile = require('electron-log')
       if (!fs.existsSync(logsPath)) fs.mkdirSync(logsPath)
 
       const now = new Date()
-      const filePath = path.join(logsPath, `SONGBASKET RUNTIME LOG - ${now.toDateString() + ' @ ' + now.getHours() + '(' + now.getMinutes() + ')'}.log`)
+      const filePath = path.join(logsPath, `${now.toDateString() + ' @' + (() => {
+        let hours = now.getHours()
+        let minutes = now.getMinutes()
+
+        hours < 10 && (hours = '0' + hours)
+        minutes < 10 && (minutes = '0' + minutes)
+
+        return hours + '-' + minutes
+      })()}.log`)
 
       fs.closeSync(fs.openSync(filePath, 'w'))
       const access = fs.createWriteStream(filePath)

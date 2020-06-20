@@ -60,12 +60,7 @@ export default {
 const folderFns = {
   mac: {
     get fileIconPath () {
-      // try {
-      // !this.moduleImported && (require('fileicon') + (this.moduleImported = true))
       return PATH.join(global.CONSTANTS.NODE_MODULES_PATH, 'fileicon', 'bin', 'fileicon')
-      // } catch (error) {
-      //   throw error
-      // }
     },
     set (folderPath, iconPath) {
       return new Promise((resolve, reject) => {
