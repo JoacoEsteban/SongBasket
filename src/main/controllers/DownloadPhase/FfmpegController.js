@@ -8,7 +8,7 @@ const ffmpeg = require('fluent-ffmpeg')
 const NodeID3 = require('node-id3')
 const axios = require('axios')
 
-const basePath = global.CONSTANTS.APP_CWD
+const basePath = global.CONSTANTS.APP_SUPPORT_PATH
 const binPath = basePath + '/bin/ffmpeg';
 
 (async () => {

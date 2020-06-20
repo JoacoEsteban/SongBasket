@@ -15,17 +15,22 @@ const currentPlatform = (() => {
   }
 })()
 
-const winTargets = [
-  'appx',
-  // 'nsis',
-]
+const targets = {
+  win: [
+    'appx',
+    'nsis'
+  ],
+  mac: [
+    'dmg',
+    'zip'
+  ]
+}
 
-const shouldSignAppx = true
+const shouldSignAppx = currentPlatform === 'WINDOWS'
 const shouldPublish = process.env.VAR_PUBLISH ? 'always' : 'onTag'
 
 const CONFIG = {
   publish: shouldPublish,
-  // targets: Platform.WINDOWS.createTarget(),
   targets: Platform[currentPlatform].createTarget(),
   config: {
     asar: false,
@@ -41,17 +46,17 @@ const CONFIG = {
     ],
     mac: {
       icon: 'assets/icons/songbasket.icns',
-      target: [
-        'dmg',
-        'zip'
-      ],
+      target: targets.mac,
       publish: [
         'github'
       ]
     },
     win: {
       icon: 'assets/icons/songbasket.ico',
-      target: winTargets
+      target: targets.win,
+      publish: [
+        'github'
+      ]
     },
     appx: {
       identityName: process.env.IDENTITY_NAME,
@@ -67,7 +72,7 @@ const CONFIG = {
 }
 builder.build(CONFIG)
   .then(paths => {
-    if (currentPlatform === 'WINDOWS' && winTargets.includes('appx') && shouldSignAppx) signAppx(paths)
+    if (currentPlatform === 'WINDOWS' && targets.win.includes('appx') && shouldSignAppx) signAppx(paths)
   })
   .catch(error => {
     console.error(error)

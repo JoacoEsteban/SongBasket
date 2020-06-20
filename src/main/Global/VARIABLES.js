@@ -1,12 +1,12 @@
-// const config = (async () => {
+const PATH = require('path')
 
-// })()
 const height = 500
 const width = 1000
 const ENV_PROD = process.env.NODE_ENV === 'production'
 const IS_DEV = !ENV_PROD
 
-const APP_VERSION = require('electron').app.getVersion()
+const APP = require('electron').app
+const APP_VERSION = APP.getVersion()
 const APP_VERSION_STRING = (APP_VERSION + ' ') + (IS_DEV ? 'Electron. Development' : 'Closed Beta')
 module.exports = global.CONSTANTS = {
   // STATES
@@ -32,6 +32,7 @@ module.exports = global.CONSTANTS = {
   // -------------
 
   // ELECTRON DEFAULTS
+  APP,
   BROWSER_WINDOW: null,
   SESSION: null,
   DIALOG: null,
@@ -41,7 +42,8 @@ module.exports = global.CONSTANTS = {
   get BACKEND () {
     return process.env.BACKEND
   },
-  APP_CWD: (ENV_PROD ? require('electron').app.getPath('userData') : process.cwd()),
+  APP_SUPPORT_PATH: (ENV_PROD ? APP.getPath('userData') : process.cwd()),
+  APP_CWD: PATH.join(APP.getAppPath()),
   PROTOCOL_PATHS: {
     BASE: 'songbasket'
   },

@@ -9,7 +9,7 @@ import ipc from '../InitializationAndHandlers/ipc.controller'
 
 import {downloadLinkRemove} from './StoredTracksChecker'
 
-const tempDownloadsFolderPath = () => PATH.join(global.CONSTANTS.APP_CWD, 'temp', 'downloads')
+const tempDownloadsFolderPath = () => PATH.join(global.CONSTANTS.APP_SUPPORT_PATH, 'temp', 'downloads')
 
 const emitEvent = {
   send: ipc.send,
