@@ -59,13 +59,21 @@ export default {
 
 const folderFns = {
   mac: {
+    get fileIconPath () {
+      // try {
+      // !this.moduleImported && (require('fileicon') + (this.moduleImported = true))
+      return PATH.join(global.CONSTANTS.NODE_MODULES_PATH, 'fileicon', 'bin', 'fileicon')
+      // } catch (error) {
+      //   throw error
+      // }
+    },
     set (folderPath, iconPath) {
       return new Promise((resolve, reject) => {
         if (!folderPath) return reject(new Error('NO FOLDER PATH'))
         if (!iconPath) return reject(new Error('NO ICON PATH'))
         // TODO Fix this command in build by directly referencing binary
         try {
-          exec(`fileicon set ${folderPath} ${iconPath}`, (err, m) => {
+          exec(`${this.fileIconPath} set ${folderPath} ${iconPath}`, (err, m) => {
             if (err) return reject(err)
             resolve()
           })
@@ -79,7 +87,7 @@ const folderFns = {
         if (!path) throw new Error('NO PATH')
 
         try {
-          exec(`fileicon test ${path}`, (err, m) => {
+          exec(`${this.fileIconPath} test ${path}`, (err, m) => {
             if (err) resolve(false)
             else resolve(m.indexOf('HAS custom icon') > -1)
           })
@@ -92,7 +100,7 @@ const folderFns = {
       return new Promise((resolve, reject) => {
         if (!path) throw new Error('NO PATH')
         try {
-          exec(`fileicon rm ${path}`, (err, m) => {
+          exec(`${this.fileIconPath} rm ${path}`, (err, m) => {
             if (err) reject(err)
             else resolve()
           })

@@ -44,6 +44,9 @@ module.exports = global.CONSTANTS = {
   },
   APP_SUPPORT_PATH: (ENV_PROD ? APP.getPath('userData') : process.cwd()),
   APP_CWD: PATH.join(APP.getAppPath()),
+  get NODE_MODULES_PATH () {
+    return this.__node_modules_path || (this.__node_modules_path = PATH.join(ENV_PROD ? this.APP_CWD : this.APP_SUPPORT_PATH, 'node_modules'))
+  },
   PROTOCOL_PATHS: {
     BASE: 'songbasket'
   },
