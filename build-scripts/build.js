@@ -20,14 +20,14 @@ const targets = {
     'appx',
     'nsis'
   ],
-  mac: [
+  mac: process.env.VAR_TESTING ? 'dmg' : [
     'dmg',
     'zip'
   ]
 }
 
 const shouldSignAppx = currentPlatform === 'WINDOWS'
-const shouldPublish = process.env.VAR_PUBLISH ? 'always' : 'onTag'
+const shouldPublish = !process.env.VAR_TESTING && process.env.VAR_PUBLISH ? 'always' : 'onTag'
 
 const CONFIG = {
   publish: shouldPublish,

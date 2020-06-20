@@ -8,7 +8,9 @@
   "scripts": {
     "dist": "node .electron-vue/build.js",
     "pack": "electron-rebuild && node ./build-scripts/build.js",
+    "pack-testing": "VAR_TESTING=true npm run pack",
     "build": "npm run dist && npm run pack",
+    "build-testing": "VAR_TESTING=true npm run build",
     "build-publish": "VAR_PUBLISH=true npm run build",
     "publish": "VAR_PUBLISH=true npm run pack",
     "dev": "node .electron-vue/dev-runner.js",
