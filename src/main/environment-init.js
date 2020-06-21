@@ -33,6 +33,7 @@ const CATCH_TO_FILE = false
 const logFile = require('electron-log')
 ;(function setErrorHandling () {
   if (PROD || CATCH_TO_FILE) {
+    console.log = console.info
     const toLogFile = error => {
       console.error('----------UNCAUGHT----------\n', error)
       logFile.error(error)
@@ -40,32 +41,29 @@ const logFile = require('electron-log')
     process.on('uncaughtException', toLogFile)
     process.on('unhandledRejection:', toLogFile)
 
-    const stdoutToFile = true
-    if (stdoutToFile) {
-      const fs = require('fs')
-      const path = require('path')
+    const fs = require('fs')
+    const path = require('path')
 
-      const logsPath = path.join(global.CONSTANTS.APP_SUPPORT_PATH, 'logs')
+    const logsPath = path.join(global.CONSTANTS.APP_SUPPORT_PATH, 'logs')
 
-      if (!fs.existsSync(logsPath)) fs.mkdirSync(logsPath)
+    if (!fs.existsSync(logsPath)) fs.mkdirSync(logsPath)
 
-      const now = new Date()
-      const filePath = path.join(logsPath, `${now.toDateString() + ' @' + (() => {
-        let hours = now.getHours()
-        let minutes = now.getMinutes()
+    const now = new Date()
+    const filePath = path.join(logsPath, `${now.toDateString() + ' @' + (() => {
+      let hours = now.getHours()
+      let minutes = now.getMinutes()
 
-        hours < 10 && (hours = '0' + hours)
-        minutes < 10 && (minutes = '0' + minutes)
+      hours < 10 && (hours = '0' + hours)
+      minutes < 10 && (minutes = '0' + minutes)
 
-        return hours + '-' + minutes
-      })()}.log`)
+      return hours + '-' + minutes
+    })()}.log`)
 
-      fs.closeSync(fs.openSync(filePath, 'w'))
-      const access = fs.createWriteStream(filePath)
+    fs.closeSync(fs.openSync(filePath, 'w'))
+    const access = fs.createWriteStream(filePath)
 
-      process.env.ELECTRON_NO_ATTACH_CONSOLE = true
-      process.stdout.write = process.stderr.write = access.write.bind(access)
-    }
+    process.env.ELECTRON_NO_ATTACH_CONSOLE = true
+    process.stdout.write = process.stderr.write = access.write.bind(access)
   }
 
   if (process.env.NODE_ENV !== 'development') {
