@@ -5,11 +5,12 @@ dist/mac/*
 *builder-effective-config.yaml
 dist/win-unpacked/
 build/*
+!build/icons
+!build/appx
 build-scripts/certs
 temp/*
 logs/*
 .yarn
-!build/icons
 node_modules/
 npm-debug.log
 npm-debug.log.*
