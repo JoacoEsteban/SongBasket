@@ -20,7 +20,7 @@ const targets = {
     'appx',
     'nsis'
   ],
-  mac: process.env.VAR_TESTING ? 'dmg' : [
+  mac: process.env.VAR_TESTING ? ['dmg'] : [
     'dmg',
     'zip'
   ]
@@ -33,16 +33,20 @@ const CONFIG = {
   publish: shouldPublish,
   targets: Platform[currentPlatform].createTarget(),
   config: {
-    asar: false,
+    asar: {
+      smartUnpack: true
+    },
+    asarUnpack: [
+      'node_modules/fileicon',
+      'node_modules/youtube-dl'
+    ],
     productName: 'SongBasket',
     appId: 'com.joacoesteban.songbasket',
     directories: {
       output: 'build'
     },
     files: [
-      'dist/electron/**/*',
-      'node_modules/fileicon',
-      'node_modules/youtube-dl'
+      'dist/electron/**/*'
     ],
     mac: {
       icon: 'assets/icons/songbasket.icns',

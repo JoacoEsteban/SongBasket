@@ -8,8 +8,8 @@ import { exec } from 'child_process'
 
 import * as utils from '../../../MAIN_PROCESS_UTILS'
 
-const { PLATFORM, APP_CWD } = global.CONSTANTS
-const tempPath = APP_CWD + '/temp/'
+const { PLATFORM, TEMP_PATH } = global.CONSTANTS
+const tempPath = TEMP_PATH + '/image/'
 const computed = {
   folderIconFnc: null
 }

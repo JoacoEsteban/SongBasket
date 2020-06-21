@@ -7,6 +7,7 @@ const PROD = global.CONSTANTS.ENV_PROD
 const util = require('util')
 const child_process = require('child_process')
 const youtubeDl = require('youtube-dl')
+PROD && youtubeDl.setYtdlBinary(youtubeDl.getYtdlBinary().replace('app.asar', 'app.asar.unpacked'))
 
 const USE_PROD_BACKEND = true
 ;(() => {
