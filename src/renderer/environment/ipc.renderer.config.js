@@ -41,8 +41,8 @@ export default function (Vue) {
   ipc.on('ERROR:CATCH', async ({type, error}) => {
     await store.dispatch('catchGlobalError', {type, error})
   })
-  ipc.on('Connection:CHANGE', onConnectionChange)
-  ipc.on('apiConnection:CHANGE', onApiConnectionChange)
+  ipc.on('CONNECTION:CHANGE', onConnectionChange)
+  ipc.on('API_CONNECTION:CHANGE', onApiConnectionChange)
   ipc.on('FileWatchers:ADDED', onAddedTrack)
   ipc.on('FileWatchers:REMOVED', onRemovedTrack)
   ipc.on('FileWatchers:RETRIEVED_TRACKS', onRetrievedTracks)

@@ -132,14 +132,14 @@ export function init (electron) {
   setVars(electron)
   electron.app.allowRendererProcessReuse = true
   electron.app.on('ready', async () => {
-    updater.init()
+    global.CONSTANTS.ENV_PROD && updater.init()
     protocolController.startProtocols(electron)
     connectionController.init({
       connectionChangeCallback: (value) => {
-        ipcSend('Connection:CHANGE', value)
+        ipcSend('CONNECTION:CHANGE', value)
       },
       apiConnectionChangeCallback: (value) => {
-        ipcSend('ApiConnection:CHANGE', value)
+        ipcSend('API_CONNECTION:CHANGE', value)
       }
     })
     await core.setAppStatus()
