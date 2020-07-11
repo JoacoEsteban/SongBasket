@@ -199,13 +199,15 @@ const UserMethods = {
       })
     })
   },
-  async renameFolder ({oldName, newName}) {
-    newName = utils.encodeIntoFilename(newName)
-    oldName = utils.encodeIntoFilename(oldName)
-    let base = homeFolderPath() + '/'
-    if (!await utils.pathDoesExist(base + oldName)) return
-    console.log('RENAMING FOLDER: ' + oldName + ' => ' + newName)
-    fs.rename(base + oldName, base + newName)
+  renameFolder ({oldName, newName}) {
+    return new Promise(async (resolve, reject) => {
+      newName = utils.encodeIntoFilename(newName)
+      oldName = utils.encodeIntoFilename(oldName)
+      let base = homeFolderPath() + '/'
+      if (!await utils.pathDoesExist(base + oldName)) return
+      console.log('RENAMING FOLDER: ' + oldName + ' => ' + newName)
+      fs.rename(base + oldName, base + newName, (err) => err ? reject(err) : resolve())
+    })
   },
   retrieveMP3FileTags (path) {
     return new Promise((resolve, reject) => {

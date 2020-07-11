@@ -167,7 +167,7 @@ const mutations = {
       if (statePl.name !== playlist.name) {
         oldName = statePl.folderName || statePl.name
         statePl.folderName = null
-        cbs.push(() => FSController.FileWatchers.renameFolder({oldName, newName: playlist.folderName})) // Rename Folder
+        cbs.push(() => FSController.UserMethods.renameFolder({oldName, newName: playlist.folderName})) // Rename Folder
       }
 
       if ((statePl.images && statePl.images[0] && statePl.images[0].url) !== (playlist.images && playlist.images[0] && playlist.images[0].url)) {
