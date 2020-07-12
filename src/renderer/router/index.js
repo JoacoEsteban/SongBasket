@@ -4,6 +4,7 @@ import store from '../store'
 
 import LoadingScreen from '../components/LoadingScreen/LoadingScreen.vue'
 import Setup from '../components/Setup/Setup.vue'
+import FolderView from '../components/FolderView/FolderView.vue'
 // import SetHomeFolder from '../components/Setup/SetHomeFolder.vue'
 // import Login from '../components/Login.vue'
 // import Guest from '../components/Setup/Guest.vue'
@@ -31,6 +32,10 @@ let router = new Router({
     {
       path: '/setup',
       component: Setup
+    },
+    {
+      path: '/folder-view',
+      component: FolderView
     },
     {
       path: '/empty',

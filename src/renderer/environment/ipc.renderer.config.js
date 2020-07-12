@@ -78,29 +78,37 @@ function onApiConnectionChange (e, val) {
 function onLoadingEvent (e, payload) {
   store.dispatch('loadingEvent', payload)
 }
+
+window.retrieveStatus = () => {
+  return new Promise((resolve, reject) => {
+    const listenerId = uuid()
+    vue.ipc.once(listenerId, async (e, status) => {
+      console.log('Setting app status', status)
+      if (status.APP_STATUS.IS_LOGGED) {
+        await storeState(null, { state: status.state, listenerId: null, dontFormat: true })
+        await onRetrievedTracks(null, status.downloadedTracks)
+        await onFfmpegBinaries(e, {value: status.FFMPEG_BINS_DOWNLOADED})
+        await store.dispatch('SETUP_LOADING_STATE', 'found')
+        await redirect('home')
+        setTimeout(() => {
+          onConnectionChange(null, status.CONNECTED_TO_INTERNET)
+          onApiConnectionChange(null, status.CONNECTED_TO_API)
+        }, 1000)
+        vue.ipc.send('WINDOW:UNLOCK')
+        return resolve()
+      }
+      let path = 'setup'
+      if (status.APP_STATUS.FOLDERS.paths.length) (path = 'folder-view') && vue.ipc.send('WINDOW:UNLOCK')
+      redirect(path)
+      resolve()
+    })
+    vue.ipc.send('GET_STATUS', { listenerId })
+  })
+}
+
 function onDocumentReady () {
   if (!window.VUE_HAS_MOUNTED) return setTimeout(onDocumentReady, 100)
-  const listenerId = uuid()
-  vue.ipc.once(listenerId, async (e, status) => {
-    console.log('Setting app status', status)
-    if (status.APP_STATUS.IS_LOGGED) {
-      await storeState(null, { state: status.state, listenerId: null, dontFormat: true })
-      await onRetrievedTracks(null, status.downloadedTracks)
-      await onFfmpegBinaries(e, {value: status.FFMPEG_BINS_DOWNLOADED})
-      await store.dispatch('SETUP_LOADING_STATE', 'found')
-      await redirect('home')
-      setTimeout(() => {
-        onConnectionChange(null, status.CONNECTED_TO_INTERNET)
-        onApiConnectionChange(null, status.CONNECTED_TO_API)
-      }, 1000)
-      vue.ipc.send('WINDOW:UNLOCK')
-      return
-    }
-    let path = 'setup'
-    // if (chooseFolder) path = 'folderView' // TODO
-    redirect(path)
-  })
-  vue.ipc.send('GET_STATUS', { listenerId })
+  window.retrieveStatus()
 }
 async function onRetrievedTracks (e, tracks = {}) {
   console.log('RETRIEVED', Object.keys(tracks).length)

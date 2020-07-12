@@ -121,6 +121,7 @@ const CoreController = {
   },
   async logOut () {
     try {
+      if (!global.CONSTANTS.APP_STATUS.IS_LOGGED) return
       console.log('Logging Out:::::')
       const listenerId = uuid()
       vue.ipc.once(listenerId, async (e, appStatus) => {
@@ -128,14 +129,31 @@ const CoreController = {
           if (appStatus.error) throw appStatus.error
           await getVueInstance().$store.dispatch('logout')
           vue.root.DOWNLOADED_TRACKS = {}
-          vue.root.CONVERTED_TRACKS_FORMATTED
-          vue.ipc.send('WINDOW:LOCK')
-          getVueInstance().$router.push('setup')
+          vue.root.CONVERTED_TRACKS_FORMATTED = {}
+
+          let path = 'folder-view'
+          if (!appStatus.APP_STATUS.FOLDERS.paths.length) {
+            vue.ipc.send('WINDOW:LOCK')
+            path = 'setup'
+          }
+          getVueInstance().$router.push(path)
         } catch (error) {
           throw error
         }
       })
       vue.ipc.send('LOGOUT', {listenerId})
+    } catch (error) {
+      throw error
+    }
+  },
+  async setHomeFolder (path) {
+    try {
+      const listenerId = uuid()
+      vue.ipc.once(listenerId, async (e, {error}) => {
+        if (error) throw error
+        await window.retrieveStatus()
+      })
+      vue.ipc.send('HOME_FOLDER:SET', {path, listenerId})
     } catch (error) {
       throw error
     }

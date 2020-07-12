@@ -189,6 +189,19 @@ body:hover {
     text-transform: lowercase;
   }
 }
+
+.setup-header {
+  --height: 20vmax;
+  min-height: var(--height);
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 7vw;
+  font-weight: bold;
+  background: var(--global-grey)
+}
+
 .hidable-item {
   $t: var(--ts-g);
   transition: var(--hover-n-active-transitions), padding $t, margin $t, height $t, width $t;

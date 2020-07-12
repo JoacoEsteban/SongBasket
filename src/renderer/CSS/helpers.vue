@@ -102,6 +102,11 @@
     opacity: 0.5;
 }
 
+.w-fit {
+  width: fit-content;
+}
+
+
 // -----------------BOUNDS------------------
 .p-0imp {
     padding: 0 !important;
@@ -322,5 +327,47 @@
 
 .border-transparent {
     border: 1px solid transparent
+}
+</style>
+
+
+<style lang="less">
+.hero {
+  --size: 100%;
+  @s: var(--size);
+  --width: @s;
+  --height: @s;
+  width: var(--width);
+  height: var(--height);
+
+  object-fit: cover;
+  background-size: cover;
+  background-position: center;
+  background-image: var(--url);
+  &.tight {
+    min-width: var(--width);
+  }
+}
+
+.circle {
+  border-radius: 50%;
+}
+
+.round-img {
+  .circle();
+  .hero();
+  --size: 2em;
+  min-width: @s;
+  max-width: @s;
+  min-height: @s;
+  max-height: @s;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  --fallback-background: var(--text-color);
+  --fallback-text: var(--body-color);
+  background-color: var(--fallback-background);
+  color: var(--fallback-text);
 }
 </style>

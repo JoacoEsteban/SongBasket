@@ -2,7 +2,7 @@
     <div class="login-container window-drag-recursive" :style="'--offset: ' + offsetPtg + '%'">
       <set-home-folder @handleClick="setHomeFolder" />
       <div class="user-login-container">
-        <div class="login-header">{{header.text}}</div>
+        <div class="setup-header">{{header.text}}</div>
         <div class="slider-container">
           <div class="slider" :style="{'--offset-x': offsetXPtg}">
             <Login v-if="showLogin" @login="login" @guestLogin="nextSub" />
@@ -184,17 +184,6 @@ export default {
     min-height: 100%;
     min-width: 100vw;
   }
-}
-.login-header {
-  $h: 20vmax;
-  min-height: $h;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 7vw;
-  font-weight: bold;
-  background: var(--global-grey)
 }
 
 .user-login-container {

@@ -146,14 +146,14 @@ const setVars = ({ app, BrowserWindow, session, dialog, shell }) => {
   global.CONSTANTS.SHELL_OPEN = shell.openItem
 }
 
-export async function setHomeFolder (e, {listenerId}) {
+export async function askHomeFolder (e, {listenerId}) {
   let isLogged
   try {
     const { canceled, filePaths } = await DIALOG.showOpenDialog(global.CONSTANTS.MAIN_WINDOW, {
       properties: ['openDirectory']
     })
     if (canceled) throw new Error('CANCELLED')
-    await core.addHomeFolder(filePaths[0])
+    await addHomeFolder(null, { path: filePaths[0] })
     if (!await core.stateExists()) return
     isLogged = await core.setAppStatus()
     if (isLogged) return ipcSend('STATUS:SET')
@@ -164,6 +164,32 @@ export async function setHomeFolder (e, {listenerId}) {
     e.sender.send(listenerId, {isLogged})
   }
 }
+
+export async function addHomeFolder (e, {path, listenerId}) {
+  let error
+  try {
+    await core.addHomeFolder(path)
+    if (e && listenerId) return e.sender.send(listenerId, {})
+  } catch (err) {
+    error = err
+    if (e && listenerId) return e.sender.send(listenerId, {error})
+    throw error
+  }
+}
+
+export async function setHomeFolder (e, {path, listenerId}) {
+  let error
+  try {
+    await addHomeFolder(e, {path})
+    await core.setAppStatus()
+    if (e && listenerId) return e.sender.send(listenerId, {})
+  } catch (err) {
+    error = err
+    if (e && listenerId) return e.sender.send(listenerId, {error})
+    throw error
+  }
+}
+
 export async function openHomeFolder (e, {listenerId}) {
   let error
   try {

@@ -9,7 +9,7 @@
 <script>
 export default {
   mounted () {
-    if (this.$store.state.CurrentUser.playlists.length > 0) { this.$router.push('/home') }
+    if (this.$store.state.CurrentUser.playlists.length) { this.$router.push('/home') }
   }
 }
 </script>
