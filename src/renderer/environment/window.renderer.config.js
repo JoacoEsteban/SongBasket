@@ -15,6 +15,12 @@ export default function (window) {
   window.$ = $
   $(window).on('mousedown', () => window.MOUSE_BEING_CLICKED = true)
   $(window).on('mouseup', () => window.MOUSE_BEING_CLICKED = false)
+  $(window).on('dblclick', toggleMaximization)
+}
+
+function toggleMaximization (e) {
+  console.log($(e.target).css('-webkit-app-region'))
+  $(e.target).css('-webkit-app-region') === 'drag' && window.toggleMaximization()
 }
 
 function invalidatePlTransformCache () {

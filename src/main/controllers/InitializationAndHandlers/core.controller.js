@@ -15,7 +15,7 @@ const core = {
     try {
       const status = global.CONSTANTS.APP_STATUS
       // Check Homefolders
-      folders = status.FOLDERS = await FSController.UserMethods.retrieveFolders()
+      folders = await FSController.UserMethods.retrieveFolders()
       if (!folders.paths.length || !folders.selected) return status.IS_LOGGED = false
 
       await core.setHomeFolder(folders.selected)

@@ -1,7 +1,7 @@
 <template>
 <div class="card-container window-nodrag" :class="classObject" :style="styleObject">
   <div class="transformation-parent rel-full" @mousemove="onMouseMove" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave" @mousedown="setMouseListener" @click="handleClick">
-    <div class="content" ref="content-container">
+    <div class="card-content" ref="content-container">
       <div class="card-background abs-full">
         <div class="rel-full ovfh">
           <div class="card-img" :style="{backgroundImage: `url(${bgImage})`}">
@@ -179,6 +179,7 @@ $transition-soft: var(--card-hover-transition);
 $transition-hard: var(--ts-g-hard);
 
 .card-container {
+  --borr: 0;
   box-sizing: border-box;
   padding: var(--container-padding-x) calc(var(--container-padding-x) / 2);
   padding-top: 0;
@@ -215,13 +216,15 @@ $transition-hard: var(--ts-g-hard);
       opacity: .7;
     }
 
-    > .content {
+    > .card-content {
       cursor: pointer;
       position: relative;
       background: $q-false-color;
       $transition: var(--card-hover-transition);
       transition: background-color $transition,
       box-shadow $transition;
+      border-radius: var(--borr);
+      overflow: hidden;
       // transform $transition;
       transform-style: preserve-3d;
       will-change: transform;

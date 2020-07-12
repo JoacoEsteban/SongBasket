@@ -35,7 +35,9 @@ html {
 }
 
 .window-nodrag {
-  -webkit-app-region: no-drag !important;
+  &, * {
+    -webkit-app-region: no-drag !important;
+  }
 }
 .window-drag {
   -webkit-app-region: drag;
@@ -101,6 +103,7 @@ body:hover {
   --local-shadow-transition: var(--button-transition-time) var(--bezier-out);
   transition: transform $transition, background $transition, opacity $transition, box-shadow var(--local-shadow-transition);
   cursor: pointer;
+  transform: scale(1);
 
   &:hover {
     font-weight: 500;

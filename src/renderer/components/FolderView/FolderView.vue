@@ -5,8 +5,18 @@
         {{title}}
       </span>
     </div>
-    <div class="folder-list">
-      <Folder v-for="(path, key) in folders" :key="key" :path="path" @clicked="openFolder(path)" />
+    <div class="list-wrapper df fldc">
+      <div class="folder-list row">
+        <Folder v-for="(path, key) in folders" :key="key" :path="path" @clicked="openFolder(path)" :index="key"/>
+      </div>
+      <div class="pusher w100"></div>
+    </div>
+    <div class="w100 df global-center py-2 abs-bot no-click controls-container" @click="addFolder">
+      <button class="button all-click">
+        <span>
+          Add a new Folder
+        </span>
+      </button>
     </div>
   </div>
 </template>
@@ -26,6 +36,14 @@ export default {
   methods: {
     openFolder (path) {
       this.$controllers.core.setHomeFolder(path)
+    },
+    async addFolder () {
+      try {
+        await this.$root.$controllers.setup.setHomeFolder()
+        this.$root.$controllers.setup.login()
+      } catch (error) {
+        console.error('ERROR setting folder', error)
+      }
     }
   },
   mounted () {
@@ -34,16 +52,33 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.folder-view-container {
+--controls-height: 3em;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
 .setup-header {
   --height: 15vw;
   > span {
     font-size: .75em;
   }
 }
-.folder-list {
-  padding: 1em;
+.list-wrapper {
   width: 100%;
+  height: 100%;
   overflow: auto;
+  padding: 1em;
   box-sizing: border-box;
+  .pusher { 
+    min-height: var(--controls-height);
+  }
+}
+.folder-list {
+}
+
+.controls-container {
+  height: var(--controls-height);
 }
 </style>

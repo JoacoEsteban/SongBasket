@@ -1,5 +1,5 @@
 <template>
-  <div class="tb-container window-drag" @dblclick="maximize" :class="{'showing-loading-bar': showingLoadingBar}">
+  <div class="tb-container window-drag" :class="{'showing-loading-bar': showingLoadingBar}">
     <div class="drop-shadow abs-full show-on-scroll"></div>
     <div class="drop-gradient abs-full hide-on-scroll"></div>
 
@@ -228,10 +228,6 @@ export default {
       // } else {
       //   this.showLoadingBar()
       // }
-    },
-    maximize (e) {
-      if (e.target.classList.contains('window-nodrag')) return
-      window.toggleMaximization()
     },
     addBarClass (className) {
       if (typeof className === 'string') className = [className]

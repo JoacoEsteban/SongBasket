@@ -270,12 +270,14 @@ export async function login (e, {listenerId}) {
 export async function logout (e, {listenerId}) {
   let error
   try {
+    if (!global.CONSTANTS.APP_STATUS.IS_LOGGED) throw new Error('NOT LOGGED IN')
     await core.logout()
   } catch (err) {
     error = err
     SEND_ERROR(err)
   } finally {
     const status = getAppStatus()
+    console.log('PPP', status.APP_STATUS.FOLDERS.paths)
     status.error = error
     ipcSend(listenerId, status)
   }

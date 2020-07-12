@@ -18,17 +18,20 @@ const PATHS = {
 
 const getEmptyFolders = () => ({paths: [], selected: null})
 
-let SESSION_FOLDER_PATHS = getEmptyFolders()
+global.CONSTANTS.APP_STATUS.FOLDERS = getEmptyFolders()
 
 Object.defineProperties(global, {
   SESSION_FOLDER_PATHS: {
     get: function () {
-      return SESSION_FOLDER_PATHS
+      return global.CONSTANTS.APP_STATUS.FOLDERS
+    },
+    set: function (paths) {
+      global.CONSTANTS.APP_STATUS.FOLDERS = paths
     }
   },
   HOME_FOLDER: {
     get: function () {
-      return SESSION_FOLDER_PATHS.selected
+      return global.CONSTANTS.APP_STATUS.FOLDERS.selected
     }
   }
 })
@@ -42,7 +45,7 @@ const UserMethods = {
       if (await utils.pathDoesExist(PATHS.foldersJsonPath)) {
         let paths = JSON.parse((await utils.promisify(fs.readFile, [PATHS.foldersJsonPath, 'utf8']))[1])
         if (!this.isValidFolderStructure(paths)) paths = await this.resetFolderPaths()
-        return SESSION_FOLDER_PATHS = paths
+        return global.SESSION_FOLDER_PATHS = paths
       }
     } catch (error) {
       throw error
@@ -55,14 +58,14 @@ const UserMethods = {
   },
   async setCurrentFolder (path) {
     if (!path) path = null
-    SESSION_FOLDER_PATHS.selected = path
+    global.SESSION_FOLDER_PATHS.selected = path
     await this.writeHomeFolders()
   },
   async addFolder (path, params = { set: true }) {
     console.log('path', path)
     const folders = await this.getFolders()
     if (!folders.paths.find(p => p === path)) folders.paths.push(path)
-    SESSION_FOLDER_PATHS = folders
+    global.SESSION_FOLDER_PATHS = folders
 
     if (params.set) await this.setCurrentFolder(path)
     else this.writeHomeFolders()
@@ -71,13 +74,13 @@ const UserMethods = {
     const folders = await this.getFolders()
     folders.paths = folders.paths.filter(p => p !== path)
     if (path === folders.selected) folders.selected = null
-    SESSION_FOLDER_PATHS = folders
+    global.SESSION_FOLDER_PATHS = folders
     this.writeHomeFolders()
   },
   async unsetCurrentFolder (path) {
     const folders = await this.getFolders()
     folders.selected = null
-    SESSION_FOLDER_PATHS = folders
+    global.SESSION_FOLDER_PATHS = folders
     await this.writeHomeFolders()
   },
   async retrieveFolders () {
@@ -101,10 +104,10 @@ const UserMethods = {
       throw error
     }
   },
-  writeHomeFolders: async function (folders = SESSION_FOLDER_PATHS) {
+  writeHomeFolders: async function (folders = global.SESSION_FOLDER_PATHS) {
     try {
       await utils.promisify(fs.writeFile, [PATHS.foldersJsonPath, JSON.stringify(folders), 'utf8'])
-      SESSION_FOLDER_PATHS = folders
+      global.SESSION_FOLDER_PATHS = folders
       return 'success'
     } catch (err) {
       throw err
