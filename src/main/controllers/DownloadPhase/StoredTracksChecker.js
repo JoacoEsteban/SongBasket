@@ -42,16 +42,21 @@ async function VTWO (localTracks, queryTracks = [], plFilter = []) {
       if (!(lTrack.songbasket_spotify_id === qTrack.id && lTrack.songbasket_youtube_id === qTrack.selection)) return false // skip
 
       qTrack.downloadFlags.download = false
-      if (!qTrack.downloadFlags.linkData) qTrack.downloadFlags.linkData = {
+      !qTrack.downloadFlags.linkData && (qTrack.downloadFlags.linkData = {
         path: lTrack.path,
         file: lTrack.file
+      })
+
+      if (qTrack.playlists.some(pl => pl.id === lTrack.playlist)) {
+        lTrack.dontUnlink = true
+        qTrack.playlists = qTrack.playlists.filter(pl => pl.id !== lTrack.playlist)
       }
 
-      if (qTrack.playlists.some(pl => pl.id === lTrack.playlist)) lTrack.dontUnlink = true
-      if (!(qTrack.playlists = qTrack.playlists.filter(pl => pl.id !== lTrack.playlist)).length) { // TODO prevent linking to paused playlists
+      if (!qTrack.playlists.length) { // TODO prevent linking to paused playlists
         localTracks.splice(i, 1)
         return true
       }
+      return false
     })
   })
 

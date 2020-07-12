@@ -2,8 +2,8 @@ const PATH = require('path')
 
 const height = 500
 const width = 1000
-const ENV_PROD = process.env.NODE_ENV === 'production'
-const IS_DEV = !ENV_PROD
+const ENV_PROD = global.ENV_PROD = process.env.NODE_ENV === 'production'
+const IS_DEV = global.IS_DEV = !ENV_PROD
 
 const APP = require('electron').app
 const APP_VERSION = APP.getVersion()
@@ -36,6 +36,7 @@ module.exports = global.CONSTANTS = {
   BROWSER_WINDOW: null,
   SESSION: null,
   DIALOG: null,
+  SHELL_OPEN: () => {},
   // -------------
 
   // PATHS

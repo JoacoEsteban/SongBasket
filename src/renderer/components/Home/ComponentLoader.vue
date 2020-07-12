@@ -65,7 +65,7 @@ export default {
   methods: {
     async handleAnimation (to, from) {
       if (this.transitioning) return
-      this.$refs['home-router'].scrollTop = 0
+      this.$refs['home-router'] && (this.$refs['home-router'].scrollTop = 0)
       this.transitioning = this.$sbRouter.setTransitioningState(true)
       let anim1
       let anim2 = 'fast '

@@ -139,6 +139,17 @@ const CoreController = {
     } catch (error) {
       throw error
     }
+  },
+  async openHomeFolder () {
+    try {
+      const listenerId = uuid()
+      vue.ipc.once(listenerId, async (e, error) => {
+        if (error) throw error
+      })
+      vue.ipc.send('HOME_FOLDER:OPEN', {listenerId})
+    } catch (error) {
+      throw error
+    }
   }
 }
 

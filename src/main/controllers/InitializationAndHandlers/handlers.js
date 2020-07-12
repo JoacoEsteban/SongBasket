@@ -29,7 +29,7 @@ let DIALOG
 
 console.log('NODE ENV', process.env.NODE_ENV)
 
-export const load = {
+const loadingController = {
   target: [],
   count: 0,
   // -----------------------
@@ -104,10 +104,46 @@ export function SEND_ERROR ({type, error}) {
 
 // ------------------------- FLOW -------------------------
 
-const setVars = ({ app, BrowserWindow, session, dialog }) => {
+export function init (electron) {
+  setVars(electron)
+  electron.app.allowRendererProcessReuse = true
+  electron.app.on('ready', async () => {
+    global.CONSTANTS.ENV_PROD && updater.init()
+    protocolController.startProtocols(electron)
+    connectionController.init({
+      connectionChangeCallback: (value) => {
+        ipcSend('CONNECTION:CHANGE', value)
+      },
+      apiConnectionChangeCallback: (value) => {
+        ipcSend('API_CONNECTION:CHANGE', value)
+      }
+    })
+    createMenu(electron)
+    await core.setAppStatus()
+    windowController.createWindow()
+  })
+
+  electron.app.on('window-all-closed', () => {
+    if (global.CONSTANTS.PLATFORM !== 'mac') {
+      // TODO Manage background processing on every platform
+      electron.app.quit()
+    }
+  })
+
+  electron.app.on('activate', () => {
+    if (global.CONSTANTS.MAIN_WINDOW === null) windowController.createWindow()
+  })
+
+  electron.app.on('will-quit', () => {
+    electron.globalShortcut.unregisterAll()
+  })
+}
+
+const setVars = ({ app, BrowserWindow, session, dialog, shell }) => {
   global.CONSTANTS.BROWSER_WINDOW = BROWSER_WINDOW = BrowserWindow
   global.CONSTANTS.SESSION = session
   global.CONSTANTS.DIALOG = DIALOG = dialog
+  global.CONSTANTS.SHELL_OPEN = shell.openItem
 }
 
 export async function setHomeFolder (e, {listenerId}) {
@@ -128,34 +164,22 @@ export async function setHomeFolder (e, {listenerId}) {
     e.sender.send(listenerId, {isLogged})
   }
 }
-export function init (electron) {
-  setVars(electron)
-  electron.app.allowRendererProcessReuse = true
-  electron.app.on('ready', async () => {
-    global.CONSTANTS.ENV_PROD && updater.init()
-    protocolController.startProtocols(electron)
-    connectionController.init({
-      connectionChangeCallback: (value) => {
-        ipcSend('CONNECTION:CHANGE', value)
-      },
-      apiConnectionChangeCallback: (value) => {
-        ipcSend('API_CONNECTION:CHANGE', value)
-      }
-    })
-    await core.setAppStatus()
-    windowController.createWindow()
-  })
+export async function openHomeFolder (e, {listenerId}) {
+  let error
+  try {
+    await global.CONSTANTS.SHELL_OPEN(global.HOME_FOLDER)
+  } catch (err) {
+    error = err
+  } finally {
+    e.sender.send(listenerId, error)
+  }
+}
 
-  electron.app.on('window-all-closed', () => {
-    if (global.CONSTANTS.PLATFORM !== 'mac') {
-      // TODO Manage background processing on every platform
-      electron.app.quit()
-    }
-  })
-
-  electron.app.on('activate', () => {
-    if (global.CONSTANTS.MAIN_WINDOW === null) windowController.createWindow()
-  })
+const createMenu = ({globalShortcut}) => {
+  if (global.ENV_PROD) {
+    globalShortcut.register('f5', global.emptyFn)
+    globalShortcut.register('CmdOrCtrl+R', global.emptyFn)
+  }
 }
 
 export const windowController = {
@@ -241,7 +265,7 @@ const getAppStatus = () => {
     CONNECTED_TO_INTERNET: global.CONNECTED_TO_INTERNET,
     CONNECTED_TO_API: global.CONNECTED_TO_API
   }
-  if (load.instance.value && load.instance.target === 'DOWNLOAD') setTimeout(youtubeDl.onDowloadStart)
+  if (loadingController.instance.value && loadingController.instance.target === 'DOWNLOAD') setTimeout(youtubeDl.onDowloadStart)
   return all
 }
 
@@ -257,34 +281,34 @@ export async function sendStatus (e, {listenerId}) {
 export async function refresh () {
   try {
     let completed = 0
-    if (!load.canRequest) return
-    load.on('PLAYLISTS:REFRESH')
+    if (!loadingController.canRequest) return
+    loadingController.on('PLAYLISTS:REFRESH')
     await core.updateAll({
       playlistCompletionCallback: (err, pl, playlists) => {
         if (err) {
         }
-        load.ptg('PLAYLISTS:REFRESH', (++completed / playlists.length))
+        loadingController.ptg('PLAYLISTS:REFRESH', (++completed / playlists.length))
       }
     })
   } catch (error) {
     SEND_ERROR({type: 'PLAYLISTS:REFRESH', error})
   } finally {
     console.log('before loadoff')
-    load.off('PLAYLISTS:REFRESH')
+    loadingController.off('PLAYLISTS:REFRESH')
     await REFLECT_RENDERER()
   }
 }
 
 export async function loadMorePlaylists () {
   try {
-    if (!load.canRequest) return
-    load.on('PLAYLISTS:LOAD_MORE')
+    if (!loadingController.canRequest) return
+    loadingController.on('PLAYLISTS:LOAD_MORE')
     await core.loadMorePlaylists()
   } catch (error) {
     SEND_ERROR({type: 'PLAYLISTS:LOAD_MORE', error})
     throw error
   } finally {
-    load.off('PLAYLISTS:LOAD_MORE')
+    loadingController.off('PLAYLISTS:LOAD_MORE')
     await REFLECT_RENDERER()
   }
 }
@@ -292,32 +316,32 @@ export async function loadMorePlaylists () {
 export async function youtubize () {
   try {
     let completed = 0
-    if (!load.canRequest) return
-    load.on('YOUTUBIZE')
+    if (!loadingController.canRequest) return
+    loadingController.on('YOUTUBIZE')
     await core.youtubize({
       trackCompletionCallback: total => {
-        load.ptg('YOUTUBIZE', (++completed / total))
+        loadingController.ptg('YOUTUBIZE', (++completed / total))
       }
     })
   } catch (error) {
     SEND_ERROR({type: 'YOUTUBIZE', error})
     throw error
   } finally {
-    load.off('YOUTUBIZE')
+    loadingController.off('YOUTUBIZE')
     await REFLECT_RENDERER()
   }
 }
 
 export async function download (e, plFilter) {
-  if (!load.canRequest) return console.log('CANT REQUEST')
+  if (!loadingController.canRequest) return console.log('CANT REQUEST')
   console.log('About to download')
   if (plFilter && !Array.isArray(plFilter)) plFilter = [ plFilter ]
   try {
-    load.on('DOWNLOAD')
+    loadingController.on('DOWNLOAD')
     const tracks = await FSController.UserMethods.retrieveLocalTracks()
     await youtubeDl.downloadSyncedPlaylists(tracks, plFilter)
     // await FileWatchers.rebuildWatchers()
-    load.off('DOWNLOAD')
+    loadingController.off('DOWNLOAD')
   } catch (error) {
     throw error
   }
@@ -330,22 +354,22 @@ export function queuePlaylist (id) {
 
 export async function unsyncPlaylist (id) {
   try {
-    if (load.isLoading) return
-    load.on('PLAYLIST:UNSYNC')
+    if (loadingController.isLoading) return
+    loadingController.on('PLAYLIST:UNSYNC')
     await VUEX_MAIN.COMMIT.UNSYNC_PLAYLIST(id)
   } catch (error) {
     console.error('Error unsyncing @ handlers.unsyncPlaylist', error)
     SEND_ERROR({type: 'PLAYLIST:UNSYNC', error})
     throw error
   } finally {
-    load.off('PLAYLIST:UNSYNC')
+    loadingController.off('PLAYLIST:UNSYNC')
     await REFLECT_RENDERER()
   }
 }
 
 export async function pausePlaylist (id) {
   try {
-    if (load.isLoading) return
+    if (loadingController.isLoading) return
     VUEX_MAIN.COMMIT.PAUSE_PLAYLIST(id)
   } catch (error) {
     console.error('Error pausing playlist @ handlers.pausePlaylist', error)
@@ -358,7 +382,7 @@ export async function pausePlaylist (id) {
 
 export async function pauseTrack (id) {
   try {
-    if (load.isLoading) return
+    if (loadingController.isLoading) return
     VUEX_MAIN.COMMIT.PAUSE_TRACK(id)
   } catch (error) {
     console.error('Error pausing track @ handlers.pauseTrack', error)
@@ -371,7 +395,7 @@ export async function pauseTrack (id) {
 
 export async function changeYtTrackSelection ({trackId, newId}) {
   try {
-    if (load.isLoading) return
+    if (loadingController.isLoading) return
     VUEX_MAIN.COMMIT.CHANGE_YT_TRACK_SELECTION({trackId, newId})
   } catch (err) {
     console.error('Error changing track selection', err)
@@ -382,7 +406,7 @@ export async function changeYtTrackSelection ({trackId, newId}) {
 }
 
 export async function getYtTrackDetails (event, {url, trackId, listenerId}) {
-  if (!load.canRequest) return
+  if (!loadingController.canRequest) return
   try {
     const details = await sbFetch.ytDetails(url)
     console.log('YT Details retrieved', details)

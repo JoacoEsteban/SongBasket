@@ -71,3 +71,5 @@ const logFile = require('electron-log')
     global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
   }
 })()
+
+global.emptyFn = () => {}

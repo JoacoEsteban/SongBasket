@@ -32,7 +32,8 @@ export default {
       searchInput: '',
       model: this.$root.SEARCH_INPUT,
       hideOn: [
-        'track-review'
+        'track-review',
+        'downloads-view'
       ],
       hide: false
     }
