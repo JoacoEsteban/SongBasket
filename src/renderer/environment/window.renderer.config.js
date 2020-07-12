@@ -19,7 +19,6 @@ export default function (window) {
 }
 
 function toggleMaximization (e) {
-  console.log($(e.target).css('-webkit-app-region'))
   $(e.target).css('-webkit-app-region') === 'drag' && window.toggleMaximization()
 }
 

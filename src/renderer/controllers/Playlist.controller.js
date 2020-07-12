@@ -1,16 +1,4 @@
-let VueInstance
-const getVueInstance = () => (VueInstance || (VueInstance = require('../main').default))
-const env = {
-  get vue () {
-    return getVueInstance()
-  },
-  get store () {
-    return getVueInstance().$store
-  },
-  get root () {
-    return getVueInstance().$root
-  }
-}
+const env = require('./VueInstance')
 const PlaylistController = {
   getObject (id) {
     console.log('ID?', id)

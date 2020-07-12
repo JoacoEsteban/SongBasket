@@ -1,105 +1,105 @@
 <style lang="scss">
 // -----------------FLEX-----------------
 .df {
-    display: flex;
+  display: flex;
 }
 .dcontents {
-    display: contents;
+  display: contents;
 }
 .fldc {
-    flex-direction: column;
+  flex-direction: column;
 }
 .global-center {
-    align-items: center;
-    justify-content: center;
+  align-items: center;
+  justify-content: center;
 }
 .jucc {
-    justify-content: center;
+  justify-content: center;
 }
 .jucb {
-    justify-content: space-between;
+  justify-content: space-between;
 }
 .juce {
-    justify-content: space-evenly;
+  justify-content: space-evenly;
 }
 .jucend {
-    justify-content: flex-end;
+  justify-content: flex-end;
 }
 .alic {
-    align-items: center;
+  align-items: center;
 }
 .aliend {
-    align-items: flex-end;
+  align-items: flex-end;
 }
 .flww {
-    flex-wrap: wrap;
+  flex-wrap: wrap;
 }
 
 // -----------------FONT------------------
 .thin {
-    font-weight: 200;
+  font-weight: 200;
 }
 .light {
-    font-weight: lighter;
+  font-weight: lighter;
 }
 .regular {
-    font-weight: normal;
+  font-weight: normal;
 }
 .bold {
-    font-weight: bold;
+  font-weight: bold;
 }
 .semibold {
-    font-weight: 500;
+  font-weight: 500;
 }
 .uppercase {
-    text-transform: uppercase;
+  text-transform: uppercase;
 }
 .lowercase {
-    text-transform: lowercase;
+  text-transform: lowercase;
 }
 
 .point5-em {
-    font-size: .5em;
+  font-size: .5em;
 }
 
 .point75-em {
-    font-size: .75em;
+  font-size: .75em;
 }
 
 // -----------------MISC------------------
 .d-none {
-    display: none;
+  display: none;
 }
 
 .box-shadow {
-    box-shadow: var(--box-shadow-std);
+  box-shadow: var(--box-shadow-std);
 }
 
 .w100 {
-    width: 100%;
+  width: 100%;
 }
 
 .h100 {
-    height: 100%;
+  height: 100%;
 }
 .h-fc {
-    height: 100%;
+  height: 100%;
 }
 .lh1 {
-    line-height: 1;
+  line-height: 1;
 }
 .lh1point5 {
-    line-height: 1.5;
+  line-height: 1.5;
 }
 .ellipsis {
-    width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .half-op {
-    opacity: 0.5;
+  opacity: 0.5;
 }
 
 .w-fit {
@@ -115,8 +115,17 @@
 }
 
 // -----------------BOUNDS------------------
+.z-0 {
+  z-index: 0;
+}
+.z-1 {
+  z-index: 1;
+}
+.z-minus1 {
+  z-index: -1;
+}
 .p-0imp {
-    padding: 0 !important;
+  padding: 0 !important;
 }
 .p-0 {
   padding: 0;
@@ -397,64 +406,72 @@
 
 // -----------------POSITION------------------
 .abs {
-    position: absolute;
+  position: absolute;
 }
 .abs-top {
-    @extend .abs;
-    top: 0;
+  @extend .abs;
+  top: 0;
 }
 .abs-bot {
-    @extend .abs;
-    bottom: 0;
+  @extend .abs;
+  bottom: 0;
+}
+.abs-right {
+  @extend .abs;
+  right: 0;
+}
+.abs-left {
+  @extend .abs;
+  left: 0;
 }
 .abs-full {
-    @extend .abs;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    left: 0;
+  @extend .abs;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
 }
 .rel-full {
-    position: relative;
-    width: 100%;
-    height: 100%;
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
 
 .ovfh {
-    overflow: hidden;
+  overflow: hidden;
 }
 
 // -----------------POSITION------------------
 // -----------------TEXT-POSITION------------------
 .text-center {
-    text-align: center;
+  text-align: center;
 }
 .text-left {
-    text-align: left;
+  text-align: left;
 }
 .text-right {
-    text-align: right;
+  text-align: right;
 }
 // -----------------TEXT-POSITION------------------
 .color-green {
-    color: var(--green-accept)
+  color: var(--green-accept)
 }
 .bg-green {
-    background-color: var(--green-accept)
+  background-color: var(--green-accept)
 }
 .border-green {
-    border: 1px solid var(--green-accept)
+  border: 1px solid var(--green-accept)
 }
 
 .color-red {
-    color: var(--red-cancel)
+  color: var(--red-cancel)
 }
 .bg-red {
-    background-color: var(--red-cancel)
+  background-color: var(--red-cancel)
 }
 
 .border-transparent {
-    border: 1px solid transparent
+  border: 1px solid transparent
 }
 </style>
 

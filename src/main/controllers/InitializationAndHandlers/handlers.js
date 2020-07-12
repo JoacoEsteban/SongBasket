@@ -277,7 +277,6 @@ export async function logout (e, {listenerId}) {
     SEND_ERROR(err)
   } finally {
     const status = getAppStatus()
-    console.log('PPP', status.APP_STATUS.FOLDERS.paths)
     status.error = error
     ipcSend(listenerId, status)
   }

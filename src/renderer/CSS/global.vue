@@ -241,6 +241,9 @@ body:hover {
 //   transform: scale(1.25);
 //   cursor: pointer;
 // }
+input {
+  @extend .window-nodrag;
+}
 .std-input {
   display: block;
   margin: 0;

@@ -1,8 +1,7 @@
-let VueInstance
-const getVueInstance = () => (VueInstance || (VueInstance = require('../main').default))
+const env = require('./VueInstance')
 const TrackController = {
   getArtistsString: (item) => (item.artists || item.data.artists).map(({name}) => name).join(', '),
-  getPlaylistsString: (item) => item.playlists.map(({id}) => getVueInstance().$store.getters.PlaylistById(id)).map(({name}) => name).join(', '),
+  getPlaylistsString: (item) => item.playlists.map(({id}) => env.instance.$store.getters.PlaylistById(id)).map(({name}) => name).join(', '),
   populateTrackSelection: track => {
     if (track.flags.conversionError) return null
     let selectionId = track.selection
@@ -41,7 +40,7 @@ const TrackController = {
     return aOrd - bOrd
   },
   isDownloaded: function ({id, selectionObj}) {
-    const dlTrack = getVueInstance().DOWNLOADED_TRACKS[id]
+    const dlTrack = env.instance.DOWNLOADED_TRACKS[id]
     return !!(dlTrack && dlTrack[selectionObj.youtube_id])
   }
 }
