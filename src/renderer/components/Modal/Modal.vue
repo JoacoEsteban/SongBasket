@@ -1,23 +1,16 @@
 <template>
-    <div
-    :class="{'d-none': !transitioning && !showLocal}"
-    class="modal-container">
-        <div
-        :class="{'show': showLocal}"
-        class="actual-modal">
-            <div class="content box-shadow">
-                <loader @close="close" />
-            </div>
-        </div>
-        <div
-        @click="close"
-        :class="{'show': showLocal}"
-        class="dark-body" />
+  <div v-show="!(!transitioning && !showLocal)" class="modal-wrapper">
+    <div :class="{'show': showLocal}" class="modal-container">
+      <div class="content box-shadow">
+        <modal-loader @close="close" />
+      </div>
     </div>
+    <div @click="close" :class="{'show': showLocal}" class="dark-body" />
+  </div>
 </template>
 
 <script>
-import Loader from './Loader'
+import ModalLoader from './ModalLoader'
 export default {
   data () {
     return {
@@ -28,7 +21,7 @@ export default {
     }
   },
   components: {
-    Loader
+    ModalLoader
   },
   methods: {
     close () {
@@ -60,21 +53,19 @@ export default {
       }, 0)
     }
   }
-
 }
 </script>
 
-<style lang="scss" scoped>
-$tst: .2s cubic-bezier(.12,.82,0,.99);
-.modal-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 1;
-}
-.actual-modal {
+<style lang="scss">
+$tst: var(--ts-g);
+.modal-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  .modal-container {
     position: absolute;
     display: flex;
     justify-content: center;
@@ -91,16 +82,11 @@ $tst: .2s cubic-bezier(.12,.82,0,.99);
     transform: scale(.7);
 
     &.show {
-        opacity: 1;
-        transform: scale(1);
+      opacity: 1;
+      transform: scale(1);
     }
-}
-.content {
-    background-color: var(--global-grey);
-    pointer-events: all;
-    border-radius: .3em;
-}
-.dark-body {
+  }
+  .dark-body {
     position: relative;
     height: 100%;
     width: 100%;
@@ -114,6 +100,22 @@ $tst: .2s cubic-bezier(.12,.82,0,.99);
     &.show {
         opacity: .8;
     }
-
+  }
+  .content {
+    background-color: var(--global-grey-secondary);
+    pointer-events: all;
+    border-radius: .2em;
+  }
+  .modal-body {
+    font-size: .7em;
+  }
+  .modal-controls {
+    margin-top: 1em;
+    .button {
+      margin: 0 .3em;
+      min-width: 11em;
+    }
 }
+}
+
 </style>

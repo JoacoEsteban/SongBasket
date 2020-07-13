@@ -1,9 +1,12 @@
-// const env = require('./VueInstance')
+// import env from './VueInstance'
+
+// const genericModalInstance = {
+//   show: false
+// }
 
 const ModalController = {
-  // queuePlaylist (id) {
-  //   vue.ipc.send('PLAYLISTS:QUEUE', id)
-  // }
+  genericModal (options = {}) {
+  }
 }
 
 export default ModalController

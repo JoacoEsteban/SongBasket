@@ -1,4 +1,4 @@
-const env = require('./VueInstance')
+import env from './VueInstance'
 const uuid = () => env.instance.$uuid()
 
 const SetupController = {

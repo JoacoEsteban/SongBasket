@@ -7,7 +7,7 @@
     </div>
     <div class="list-wrapper df fldc">
       <div class="folder-list row">
-        <Folder v-for="(path, key) in folders" :key="key" :path="path" @clicked="openFolder(path)" :index="key"/>
+        <Folder v-for="(path, key) in folders" :key="key" :path="path" @clicked="openFolder(path)" @editFolder="editFolder(path)" @deleteFolder="deleteFolder(path)" :index="key"/>
       </div>
       <div class="pusher w100"></div>
     </div>
@@ -37,16 +37,22 @@ export default {
     openFolder (path) {
       this.$controllers.core.setHomeFolder(path)
     },
+    editFolder (path) {
+    },
+    deleteFolder (path) {
+      this.$root.$controllers.core.askRemoveFolder({path})
+    },
     async addFolder () {
       try {
         await this.$root.$controllers.setup.setHomeFolder()
-        this.$root.$controllers.setup.login()
+        await this.$root.$controllers.setup.login()
       } catch (error) {
         console.error('ERROR setting folder', error)
       }
     }
   },
   mounted () {
+    this.deleteFolder(this.folders[0])
   }
 }
 </script>

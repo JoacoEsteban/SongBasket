@@ -8,6 +8,7 @@ const env = {
     return this.instance.$IPC
   },
   get root () {
+    console.log('////', this.instance)
     return this.instance.$root
   },
   get store () {

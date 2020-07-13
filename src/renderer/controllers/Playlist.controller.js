@@ -1,4 +1,4 @@
-const env = require('./VueInstance')
+import env from './VueInstance'
 const PlaylistController = {
   getObject (id) {
     console.log('ID?', id)

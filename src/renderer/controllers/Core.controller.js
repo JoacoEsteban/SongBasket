@@ -1,4 +1,4 @@
-const env = require('./VueInstance')
+import env from './VueInstance'
 const uuid = () => env.instance.$uuid()
 
 const CoreController = {
@@ -85,6 +85,12 @@ const CoreController = {
   askTrackCustomUrl (trackId) {
     return new Promise((resolve, reject) => {
       env.root.OPEN_MODAL({wich: 'custom-track-url', payload: {trackId, cb: resolve, cancelCB: reject}})
+    })
+  },
+  askRemoveFolder (payload) {
+    return new Promise((resolve, reject) => {
+      console.log('vamos', env)
+      env.root.OPEN_MODAL({wich: 'delete-folder', payload})
     })
   },
   reviewTrack (track) {

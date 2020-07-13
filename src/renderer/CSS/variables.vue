@@ -17,15 +17,30 @@
   --custom-selection-color: hsl(30, 100%, 60%);
   --orange-warning: hsl(15, 100%, 50%);
 
+  --darkest-gray: #151515;
+  --darkey-gray: #333;
+  --light-gray: #cacaca;
+  --dark-gray: #666;
+  --gray: #999;
+  --neutral-gray: #aaa;
+  --lighter-gray: #f0f0f0;
+  --lightest-gray: #f9f9f9;
+  --gray-6: #f2f2f2;
+
   /* TRANSITIONS */
   --transition-scale: 1;
   --bezier: cubic-bezier(0, 1, 0, 1);
   --bezier-chill: cubic-bezier(0, 1, .5, 1);
   --bezier-chill-2: cubic-bezier(0.12, 0.82, 0, 1);;
   --bezier-chill-inverted: cubic-bezier(1, 0, 1, .5);
-  --bezier-out: cubic-bezier(.75, 0, 1, .5);
-  --bezier-symmetric: cubic-bezier(.1, .5, .9, .5);
-  --bezier-symmetric-inverted: cubic-bezier(.5, .1, .5, .9);
+  --bezier-out: cubic-bezier(1, 0.24, 1, 0.66);
+  --bezier-relaxed: cubic-bezier(0.35, 0.7, 0.25, 1);
+  --bezier-round: cubic-bezier(0, 0.5, 0.5, 1);
+  --bezier-round-inverted: cubic-bezier(.5, 0, 1, .5);
+  --bezier-symmetric: cubic-bezier(0.7, 0, 0.25, 1);
+  --bezier-symmetric-inverted: cubic-bezier(0, .7, 1, 0.25);
+  --bezier-symmetric-hard: cubic-bezier(.5, .1, .5, .9);
+  --bezier-symmetric-hard-inverted: cubic-bezier(.1, .5, .9, .5);
 
   --global-transition-time: #{tr(.5s)};
   --ts-g: var(--global-transition-time) var(--bezier-chill);

@@ -1,17 +1,27 @@
 <template>
-<Card :item="item" @click="atClick">
-  <div class="folder-container">
-    <div class="content">
-      <div class="left">
-        <div class="round-img" :style="{'background-image': 'url(' + item.backgroundImage + ')'}"></div>
+<!-- <div class="folder-card-wrapper"> -->
+  <Card :item="item" @click="atClick">
+    <template v-slot:outside>
+      <div class="floating-controls-container abs-right abs-top df z-1">
+        <button class="button" @click="$emit('editFolder')">edit</button>
+        <button class="button" @click="$emit('deleteFolder')">delete</button>
       </div>
-      <div class="right"></div>
-      <div class="bottom w100 df global-center">
-        <div class="folder-path">{{path}}</div>
+    </template>
+    <template v-slot:default>
+      <div class="folder-container">
+        <div class="content">
+          <div class="left">
+            <div class="round-img" :style="{'background-image': 'url(' + item.backgroundImage + ')'}"></div>
+          </div>
+          <div class="right"></div>
+          <div class="bottom w100 df global-center">
+            <div class="folder-path">{{path}}</div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</Card>
+    </template>
+  </Card>
+<!-- </div> -->
 </template>
 
 <script>
@@ -40,6 +50,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.folder-card-wrapper {
+  position: relative;
+  .floating-controls-container {
+    $h:2em;
+    position: absolute;
+    right: 0;top: 0;
+    display: flex;
+    align-items: center;
+  }
+}
 .folder-container {
   box-sizing: border-box;
   // flex-shrink: 0;

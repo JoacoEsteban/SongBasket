@@ -1,5 +1,5 @@
 <template>
-  <div class="tb-container window-drag" :class="{'showing-loading-bar': showingLoadingBar}">
+  <div class="tb-container window-drag-recursive" :class="{'showing-loading-bar': showingLoadingBar}">
     <div class="drop-shadow abs-full show-on-scroll"></div>
     <div class="drop-gradient abs-full hide-on-scroll"></div>
 

@@ -1,4 +1,4 @@
-const env = require('./VueInstance')
+import env from './VueInstance'
 const TrackController = {
   getArtistsString: (item) => (item.artists || item.data.artists).map(({name}) => name).join(', '),
   getPlaylistsString: (item) => item.playlists.map(({id}) => env.instance.$store.getters.PlaylistById(id)).map(({name}) => name).join(', '),

@@ -1,5 +1,7 @@
 <template>
 <div class="card-container window-nodrag" :class="classObject" :style="styleObject">
+  <slot name="outside">
+  </slot>
   <div class="transformation-parent rel-full" @mousemove="onMouseMove" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave" @mousedown="setMouseListener" @click="handleClick">
     <div class="card-content" ref="content-container">
       <div class="card-background abs-full">

@@ -125,9 +125,7 @@ export default {
       const id = this.track && this.track.id
       try {
         if (!id) throw new Error('NO TRACK ID')
-        console.log('venga')
         await this.$controllers.core.askTrackCustomUrl(id)
-        console.log('dowsinho')
         this.refresh()
       } catch (error) {
         console.error(error)
