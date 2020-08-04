@@ -3,8 +3,8 @@ require('./Bootstrap/bootstrap.css')
 require('./fonts.css')
 require('./user-select.css')
 
-require('./variables')
-require('./title-bar')
+require('./variables.scss')
+require('./title-bar.scss')
 require('./global')
-require('./helpers')
+require('./helpers.scss')
 </script>
