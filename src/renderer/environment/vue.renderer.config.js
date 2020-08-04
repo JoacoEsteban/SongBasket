@@ -10,7 +10,8 @@ import SbRouter from './sbRouter'
 
 const icons = [
   'faArrowRight',
-  'faArrowLeft'
+  'faArrowLeft',
+  'faChevronUp'
   // 'faLongArrowDown'
 ]
 icons.forEach(icon => library.add(FontAwesome[icon]))

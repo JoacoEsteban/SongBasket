@@ -1,13 +1,15 @@
 <template>
-    <div class="modal-content">
+    <div class="modal-content p-4">
         <div class="header">
+          <h3>
             Are you sure you want to remove all data asociated with
             <b>
               {{payload.path}}
             </b>?
+          </h3>
         </div>
         <div class="modal-body light">
-          Delete all data or just remove from the list
+          You can delete all data or just remove it from the list
         </div>
         <div class="modal-controls df global-center">
           <button @click="removeFromList" class="button">Remove from list</button>
@@ -38,5 +40,8 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+h3 {
+  margin-block-end: .5em;
 }
 </style>

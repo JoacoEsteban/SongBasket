@@ -1,27 +1,37 @@
 <template>
 <div class="floating-buttons-container" :class="{show: showComponent}">
   <div class="gradient"></div>
-  <div class="df content">
-    <div class="floater" v-if="!forceKill.all && !forceKill.refresh">
-      <div class="sb-fab" @click="refresh" :class="{show: showRefresh}">
-        <sync-icon></sync-icon>
+  <div class="df jucb">
+    <div class="df floater-container">
+      <div class="floater rel" v-if="!forceKill.all && !forceKill.download">
+        <!-- <div class="dropdown"></div> -->
+        <div class="sb-fab" @click="toggleDropdown" :class="{show: showDl}">
+          <font-awesome-icon size="xs" icon="chevron-up" />
+        </div>
       </div>
     </div>
-    <div class="floater" v-if="!forceKill.all && !forceKill.sync">
-      <div class="sb-fab" @click="sync" :class="{show: showSync}">
-        <cloud-search-icon></cloud-search-icon>
+    <div class="df floater-container">
+      <div class="floater" v-if="!forceKill.all && !forceKill.refresh">
+        <div class="sb-fab" @click="refresh" :class="{show: showRefresh}">
+          <sync-icon></sync-icon>
+        </div>
       </div>
-    </div>
-    <div class="floater" v-if="!forceKill.all && !forceKill.download">
-      <div class="sb-fab" @click="download" :class="{show: showDl}">
-        <download-icon></download-icon>
+      <div class="floater" v-if="!forceKill.all && !forceKill.sync">
+        <div class="sb-fab" @click="sync" :class="{show: showSync}">
+          <cloud-search-icon></cloud-search-icon>
+        </div>
       </div>
-    </div>
-    <div class="floater error-floater" v-if="!errorPill.kill">
-      <div class="sb-fab error-pill-container" :class="{show: showError}">
-        <span>
-          <span v-html="errorPill.message"></span>
-        </span>
+      <div class="floater" v-if="!forceKill.all && !forceKill.download">
+        <div class="sb-fab" @click="download" :class="{show: showDl}">
+          <download-icon></download-icon>
+        </div>
+      </div>
+      <div class="floater error-floater" v-if="!errorPill.kill">
+        <div class="sb-fab error-pill-container" :class="{show: showError}">
+          <span>
+            <span v-html="errorPill.message"></span>
+          </span>
+        </div>
       </div>
     </div>
   </div>
@@ -49,6 +59,7 @@ export default {
         kill: true,
         message: 'ERROR: dou not detected'
       },
+      showingDropdown: false,
       forceHide: {
         all: false,
         sync: false,
@@ -174,6 +185,10 @@ export default {
     },
     download () {
       this.$controllers.core.download()
+    },
+    toggleDropdown () {
+      // this.showingDropdown = !this.showingDropdown
+      this.$controllers.core.logOut()
     }
   }
 
@@ -192,7 +207,7 @@ $whole-height: 5em;
   left: 0;
   right: 0;
   transition: bottom $t;
-  > .content {
+  .floater-container {
     padding: $offsetY var(--container-padding-x);
   }
   z-index: 10;
@@ -218,7 +233,9 @@ $whole-height: 5em;
   z-index: 1;
   display: flex;
   align-items: center;
-  width: 100%;
+  // width: 100%;
+  margin-left: .5em;
+  margin-right: .5em;
     &:nth-child(1) {
       justify-content: flex-start
     }
