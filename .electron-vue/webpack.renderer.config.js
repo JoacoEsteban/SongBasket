@@ -64,7 +64,19 @@ let rendererConfig = {
       },
       {
         test: /\.js$/,
-        use: 'babel-loader',
+        use: {
+          loader: 'babel-loader',
+          options: {
+            sourceMap: true,
+            compact: false,
+            presets: [
+              ['@babel/preset-env']
+            ],
+            "plugins": [
+              "syntax-dynamic-import"
+            ]
+          },
+        },
         exclude: /node_modules/
       },
       {
@@ -121,7 +133,7 @@ let rendererConfig = {
   },
   plugins: [
     new VueLoaderPlugin(),
-    new MiniCssExtractPlugin({filename: 'styles.css'}),
+    new MiniCssExtractPlugin({ filename: 'styles.css' }),
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: path.resolve(__dirname, '../src/index.ejs'),

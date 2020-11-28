@@ -103,7 +103,7 @@ export default {
     let sectionId = 0
     return {
       user: this.$store.state.CurrentUser.user,
-      isMac: window.CONSTANTS.PLATFORM === 'mac',
+      isMac: window.CONSTANTS?.PLATFORM === 'mac',
       sliderPosition: 0,
       showingLoadingBar: false,
       loadingBar: {
