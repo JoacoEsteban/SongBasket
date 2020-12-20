@@ -1,6 +1,6 @@
-require('./controllers/Prototype/Array')
-require('./controllers/Prototype/Object')
-require('./Global/VARIABLES')
+(r => r.keys().forEach(r))(require.context('./controllers/Prototype', true, /\.js$/))
+
+require('./Global/core.CONSTANTS')
 
 const PROD = global.CONSTANTS.ENV_PROD
 
@@ -9,11 +9,11 @@ const child_process = require('child_process')
 const youtubeDl = require('youtube-dl')
 PROD && youtubeDl.setYtdlBinary(youtubeDl.getYtdlBinary().replace('app.asar', 'app.asar.unpacked'))
 
-const USE_PROD_BACKEND = true
-;(() => {
+const USE_PROD_BACKEND = true;
+(() => {
   const subDomain = 'api'
   process.env.BACKEND = PROD || USE_PROD_BACKEND ? ('https://' + subDomain + '.songbasket.com') : 'http://localhost:5000'
-  global.log = (...aa) => aa.forEach(a => console.log(util.inspect(a, {showHidden: false, depth: null})))
+  global.log = (...aa) => aa.forEach(a => console.log(util.inspect(a, { showHidden: false, depth: null })))
 })()
 
 global.flushYtDlCache = async () => {
@@ -28,11 +28,11 @@ global.flushYtDlCache = async () => {
   })
 }
 
-global.flushYtDlCache().catch(() => {})
+global.flushYtDlCache().catch(global.emptyFn)
 
 const CATCH_TO_FILE = false
-const logFile = require('electron-log')
-;(function setErrorHandling () {
+const logFile = require('electron-log');
+(function setErrorHandling () {
   if (PROD || CATCH_TO_FILE) {
     console.log = console.info
     const toLogFile = error => {
@@ -72,4 +72,4 @@ const logFile = require('electron-log')
   }
 })()
 
-global.emptyFn = () => {}
+global.emptyFn = () => { }

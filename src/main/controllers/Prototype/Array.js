@@ -53,3 +53,5 @@ Object.defineProperty(Array.prototype, 'asyncFilter', {
     }
   }
 })
+
+module.exports = {}

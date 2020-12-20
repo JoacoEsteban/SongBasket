@@ -1,4 +1,4 @@
-// import GLOBAL from '../../Global/VARIABLES'
+// import GLOBAL from '../../Global/core.CONSTANTS'
 import * as handlers from './handlers'
 import * as sbFetch from './sbFetch'
 // import updater from './auto-update'
@@ -83,7 +83,7 @@ export function init (ipc = global.ipc) {
 
   ipc.on('REFRESH', handlers.refresh)
 
-  ipc.on('PLAYLISTS:LOAD_MORE', async (e, {listenerId}) => {
+  ipc.on('PLAYLISTS:LOAD_MORE', async (e, { listenerId }) => {
     let err
     try {
       await handlers.loadMorePlaylists()
@@ -103,7 +103,7 @@ export function init (ipc = global.ipc) {
   ipc.on('PLAYLISTS:QUEUE', function (event, id) {
     handlers.queuePlaylist(id)
   })
-  ipc.on('PLAYLISTS:UNSYNC', async function (event, {id, listenerId}) {
+  ipc.on('PLAYLISTS:UNSYNC', async function (event, { id, listenerId }) {
     let error
     try {
       await handlers.unsyncPlaylist(id)
@@ -114,7 +114,7 @@ export function init (ipc = global.ipc) {
     }
   })
 
-  ipc.on('PLAYLISTS:PAUSE', async function (event, {id, listenerId}) {
+  ipc.on('PLAYLISTS:PAUSE', async function (event, { id, listenerId }) {
     let error
     try {
       await handlers.pausePlaylist(id)
@@ -125,7 +125,7 @@ export function init (ipc = global.ipc) {
     }
   })
 
-  ipc.on('TRACK:PAUSE', async function (event, {id, listenerId}) {
+  ipc.on('TRACK:PAUSE', async function (event, { id, listenerId }) {
     let error
     try {
       await handlers.pauseTrack(id)
@@ -136,10 +136,10 @@ export function init (ipc = global.ipc) {
     }
   })
 
-  ipc.on('TRACK:CHANGE_SELECTION', async function (event, {trackId, newId, listenerId}) {
+  ipc.on('TRACK:CHANGE_SELECTION', async function (event, { trackId, newId, listenerId }) {
     let error
     try {
-      await handlers.changeYtTrackSelection({trackId, newId})
+      await handlers.changeYtTrackSelection({ trackId, newId })
     } catch (err) {
       error = err
     }
