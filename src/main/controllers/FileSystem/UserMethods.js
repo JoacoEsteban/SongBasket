@@ -1,5 +1,5 @@
 /* eslint-disable new-cap */
-import customGetters from '../Store/Helpers/customGetters'
+import customGetters from '../../Store/Helpers/customGetters'
 import * as utils from '../../../MAIN_PROCESS_UTILS'
 import Helpers from './Helpers'
 import REGEX from '../../Global/REGEX'
@@ -16,7 +16,7 @@ const PATHS = {
   stateFileName: '/.songbasket'
 }
 
-const getEmptyFolders = () => ({paths: [], selected: null})
+const getEmptyFolders = () => ({ paths: [], selected: null })
 
 global.CONSTANTS.APP_STATUS.FOLDERS = getEmptyFolders()
 
@@ -113,7 +113,7 @@ const UserMethods = {
       throw err
     }
   },
-  saveState: async function ({state, path}) {
+  saveState: async function ({ state, path }) {
     // console.log('Saving state to', path)
     return new Promise(async (resolve, reject) => {
       if (!(await utils.pathDoesExist(path))) {
@@ -202,7 +202,7 @@ const UserMethods = {
       })
     })
   },
-  renameFolder ({oldName, newName}) {
+  renameFolder ({ oldName, newName }) {
     return new Promise(async (resolve, reject) => {
       newName = utils.encodeIntoFilename(newName)
       oldName = utils.encodeIntoFilename(oldName)
@@ -281,7 +281,7 @@ const UserMethods = {
 
     const iconSetter = Helpers.getIconSetterHelper()
     if (!iconSetter) return console.error('NO ICONSETTER FOR THIS PLATFORM')
-    const pls = customGetters.SyncedPlaylistsSp_SAFE().filter(p => !plFilter || plFilter.includes(p.id)).map(({folderName, name, images}) => ({ path: PATH.join((homeFolderPath()), utils.encodeIntoFilename(folderName || name)).replace(/ /g, '\\ '), imageUrl: images && images[0] && images[0].url })).filter(pl => pl.path && pl.imageUrl)
+    const pls = customGetters.SyncedPlaylistsSp_SAFE().filter(p => !plFilter || plFilter.includes(p.id)).map(({ folderName, name, images }) => ({ path: PATH.join((homeFolderPath()), utils.encodeIntoFilename(folderName || name)).replace(/ /g, '\\ '), imageUrl: images && images[0] && images[0].url })).filter(pl => pl.path && pl.imageUrl)
 
     pls.forEach(async pl => {
       if (!params.force && await iconSetter.test(pl.path)) return

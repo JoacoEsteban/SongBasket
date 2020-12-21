@@ -6,7 +6,7 @@ import IpcController from './ipc.controller'
 import youtubeDl from '../DownloadPhase/youtube-dl'
 import connectionController from './connection.controller'
 import protocolController from './protocol.controller'
-import VUEX_MAIN from '../Store/mainProcessStore'
+import VUEX_MAIN from '../../Store/mainProcessStore'
 import { v4 as uuid } from 'uuid'
 
 import core from './core.controller'
@@ -39,7 +39,7 @@ const loadingController = {
     if (value > 0) this.target.push(target)
     else this.target.splice(this.target.indexOf(target), 1)
 
-    this.reflect({value: this.isLoading, target})
+    this.reflect({ value: this.isLoading, target })
     return this.isLoading
   },
   reflect (payload = this.instance) {
@@ -48,7 +48,7 @@ const loadingController = {
   },
   // -----------------------
   get instance () {
-    return {value: this.isLoading, target: this.which}
+    return { value: this.isLoading, target: this.which }
   },
   get isLoading () {
     return this.count > 0
@@ -67,7 +67,7 @@ const loadingController = {
     return this.fn(-1)
   },
   ptg (target, ptg) {
-    this.reflect({target: target, value: this.isLoading, ptg})
+    this.reflect({ target: target, value: this.isLoading, ptg })
   },
   fn (val) {
     return function (target) {
@@ -77,7 +77,7 @@ const loadingController = {
 }
 
 export function normalizeError (error) {
-  if (error && error.response) return {status: error.response.status, data: error.response.data}
+  if (error && error.response) return { status: error.response.status, data: error.response.data }
   return error
 }
 
@@ -85,7 +85,7 @@ export function REFLECT_RENDERER () {
   return new Promise((resolve, reject) => {
     const listenerId = uuid()
     ipcOnce(listenerId, resolve)
-    ipcSend('VUEX:STORE', {state: VUEX_MAIN.STATE_SAFE(), listenerId})
+    ipcSend('VUEX:STORE', { state: VUEX_MAIN.STATE_SAFE(), listenerId })
   })
 }
 export function REFLECT_RENDERER_KEY (key) {
@@ -93,12 +93,12 @@ export function REFLECT_RENDERER_KEY (key) {
     const listenerId = uuid()
     ipcOnce(listenerId, resolve)
     const value = VUEX_MAIN.STATE_SAFE(key)[key]
-    ipcSend('VUEX:SET', {key, value, listenerId})
+    ipcSend('VUEX:SET', { key, value, listenerId })
   })
 }
-export function SEND_ERROR ({type, error}) {
+export function SEND_ERROR ({ type, error }) {
   return new Promise((resolve, reject) => {
-    ipcSend('ERROR:CATCH', {type, error: normalizeError(error)})
+    ipcSend('ERROR:CATCH', { type, error: normalizeError(error) })
   })
 }
 
@@ -146,7 +146,7 @@ const setVars = ({ app, BrowserWindow, session, dialog, shell }) => {
   global.CONSTANTS.SHELL_OPEN = shell.openItem
 }
 
-export async function askHomeFolder (e, {listenerId}) {
+export async function askHomeFolder (e, { listenerId }) {
   let isLogged
   try {
     const { canceled, filePaths } = await DIALOG.showOpenDialog(global.CONSTANTS.MAIN_WINDOW, {
@@ -159,38 +159,38 @@ export async function askHomeFolder (e, {listenerId}) {
     if (isLogged) return ipcSend('STATUS:SET')
   } catch (error) {
     console.error('EROR SETTING HOME FOLDER', error)
-    e.sender.send(listenerId, {error})
+    e.sender.send(listenerId, { error })
   } finally {
-    e.sender.send(listenerId, {isLogged})
+    e.sender.send(listenerId, { isLogged })
   }
 }
 
-export async function addHomeFolder (e, {path, listenerId}) {
+export async function addHomeFolder (e, { path, listenerId }) {
   let error
   try {
     await core.addHomeFolder(path)
     if (e && listenerId) return e.sender.send(listenerId, {})
   } catch (err) {
     error = err
-    if (e && listenerId) return e.sender.send(listenerId, {error})
+    if (e && listenerId) return e.sender.send(listenerId, { error })
     throw error
   }
 }
 
-export async function setHomeFolder (e, {path, listenerId}) {
+export async function setHomeFolder (e, { path, listenerId }) {
   let error
   try {
-    await addHomeFolder(e, {path})
+    await addHomeFolder(e, { path })
     await core.setAppStatus()
     if (e && listenerId) return e.sender.send(listenerId, {})
   } catch (err) {
     error = err
-    if (e && listenerId) return e.sender.send(listenerId, {error})
+    if (e && listenerId) return e.sender.send(listenerId, { error })
     throw error
   }
 }
 
-export async function openHomeFolder (e, {listenerId}) {
+export async function openHomeFolder (e, { listenerId }) {
   let error
   try {
     await global.CONSTANTS.SHELL_OPEN(global.HOME_FOLDER)
@@ -201,7 +201,7 @@ export async function openHomeFolder (e, {listenerId}) {
   }
 }
 
-const createMenu = ({globalShortcut}) => {
+const createMenu = ({ globalShortcut }) => {
   if (global.ENV_PROD) {
     globalShortcut.register('f5', global.emptyFn)
     globalShortcut.register('CmdOrCtrl+R', global.emptyFn)
@@ -255,7 +255,7 @@ export const windowController = {
   }
 }
 
-export async function login (e, {listenerId}) {
+export async function login (e, { listenerId }) {
   let error
   try {
     await core.initializeLogin()
@@ -267,7 +267,7 @@ export async function login (e, {listenerId}) {
   }
 }
 
-export async function logout (e, {listenerId}) {
+export async function logout (e, { listenerId }) {
   let error
   try {
     if (!global.CONSTANTS.APP_STATUS.IS_LOGGED) throw new Error('NOT LOGGED IN')
@@ -300,7 +300,7 @@ export async function onFfmpegBinaries () {
   ipcSend('FFMPEG_BINS_DOWNLOADED', { value: global.CONSTANTS.FFMPEG_BINS_DOWNLOADED })
 }
 
-export async function sendStatus (e, {listenerId}) {
+export async function sendStatus (e, { listenerId }) {
   e.sender.send(listenerId, getAppStatus())
 }
 
@@ -318,7 +318,7 @@ export async function refresh () {
       }
     })
   } catch (error) {
-    SEND_ERROR({type: 'PLAYLISTS:REFRESH', error})
+    SEND_ERROR({ type: 'PLAYLISTS:REFRESH', error })
   } finally {
     console.log('before loadoff')
     loadingController.off('PLAYLISTS:REFRESH')
@@ -332,7 +332,7 @@ export async function loadMorePlaylists () {
     loadingController.on('PLAYLISTS:LOAD_MORE')
     await core.loadMorePlaylists()
   } catch (error) {
-    SEND_ERROR({type: 'PLAYLISTS:LOAD_MORE', error})
+    SEND_ERROR({ type: 'PLAYLISTS:LOAD_MORE', error })
     throw error
   } finally {
     loadingController.off('PLAYLISTS:LOAD_MORE')
@@ -351,7 +351,7 @@ export async function youtubize () {
       }
     })
   } catch (error) {
-    SEND_ERROR({type: 'YOUTUBIZE', error})
+    SEND_ERROR({ type: 'YOUTUBIZE', error })
     throw error
   } finally {
     loadingController.off('YOUTUBIZE')
@@ -362,7 +362,7 @@ export async function youtubize () {
 export async function download (e, plFilter) {
   if (!loadingController.canRequest) return console.log('CANT REQUEST')
   console.log('About to download')
-  if (plFilter && !Array.isArray(plFilter)) plFilter = [ plFilter ]
+  if (plFilter && !Array.isArray(plFilter)) plFilter = [plFilter]
   try {
     loadingController.on('DOWNLOAD')
     const tracks = await FSController.UserMethods.retrieveLocalTracks()
@@ -386,7 +386,7 @@ export async function unsyncPlaylist (id) {
     await VUEX_MAIN.COMMIT.UNSYNC_PLAYLIST(id)
   } catch (error) {
     console.error('Error unsyncing @ handlers.unsyncPlaylist', error)
-    SEND_ERROR({type: 'PLAYLIST:UNSYNC', error})
+    SEND_ERROR({ type: 'PLAYLIST:UNSYNC', error })
     throw error
   } finally {
     loadingController.off('PLAYLIST:UNSYNC')
@@ -400,7 +400,7 @@ export async function pausePlaylist (id) {
     VUEX_MAIN.COMMIT.PAUSE_PLAYLIST(id)
   } catch (error) {
     console.error('Error pausing playlist @ handlers.pausePlaylist', error)
-    SEND_ERROR({type: 'PLAYLIST:PAUSE', error})
+    SEND_ERROR({ type: 'PLAYLIST:PAUSE', error })
     throw error
   } finally {
     await REFLECT_RENDERER_KEY('playlists')
@@ -413,17 +413,17 @@ export async function pauseTrack (id) {
     VUEX_MAIN.COMMIT.PAUSE_TRACK(id)
   } catch (error) {
     console.error('Error pausing track @ handlers.pauseTrack', error)
-    SEND_ERROR({type: 'TRACKS:PAUSE', error})
+    SEND_ERROR({ type: 'TRACKS:PAUSE', error })
     throw error
   } finally {
     await REFLECT_RENDERER_KEY('convertedTracks')
   }
 }
 
-export async function changeYtTrackSelection ({trackId, newId}) {
+export async function changeYtTrackSelection ({ trackId, newId }) {
   try {
     if (loadingController.isLoading) return
-    VUEX_MAIN.COMMIT.CHANGE_YT_TRACK_SELECTION({trackId, newId})
+    VUEX_MAIN.COMMIT.CHANGE_YT_TRACK_SELECTION({ trackId, newId })
   } catch (err) {
     console.error('Error changing track selection', err)
     throw err
@@ -432,12 +432,12 @@ export async function changeYtTrackSelection ({trackId, newId}) {
   }
 }
 
-export async function getYtTrackDetails (event, {url, trackId, listenerId}) {
+export async function getYtTrackDetails (event, { url, trackId, listenerId }) {
   if (!loadingController.canRequest) return
   try {
     const details = await sbFetch.ytDetails(url)
     console.log('YT Details retrieved', details)
-    VUEX_MAIN.COMMIT.CUSTOM_TRACK_URL({details, trackId})
+    VUEX_MAIN.COMMIT.CUSTOM_TRACK_URL({ details, trackId })
     await REFLECT_RENDERER_KEY('convertedTracks')
     event.sender.send(listenerId)
   } catch (err) {

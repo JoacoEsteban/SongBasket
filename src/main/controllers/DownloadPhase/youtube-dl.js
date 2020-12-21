@@ -2,12 +2,12 @@ import fs from 'fs'
 import PATH from 'path'
 import youtubedl from 'youtube-dl'
 
-import {extractMp3, applyTags} from './FfmpegController'
-import customGetters from '../Store/Helpers/customGetters'
+import { extractMp3, applyTags } from './FfmpegController'
+import customGetters from '../../Store/Helpers/customGetters'
 import * as utils from '../../../MAIN_PROCESS_UTILS'
 import ipc from '../InitializationAndHandlers/ipc.controller'
 
-import {downloadLinkRemove} from './StoredTracksChecker'
+import { downloadLinkRemove } from './StoredTracksChecker'
 
 const tempDownloadsFolderPath = () => PATH.join(global.CONSTANTS.APP_SUPPORT_PATH, 'temp', 'downloads')
 
@@ -27,7 +27,7 @@ const emitEvent = {
     }, 300)
   },
   downloadStarted: (tracks) => {
-    emitEvent.send('DOWNLOAD:START', tracks.map(({id, info}) => ({id, info})))
+    emitEvent.send('DOWNLOAD:START', tracks.map(({ id, info }) => ({ id, info })))
   },
   downloadFinished: (tracks) => {
     emitEvent.send('DOWNLOAD:END')
@@ -123,7 +123,7 @@ function constructDownloads (tracks) {
         }
       }
     */
-    const {id, playlists, data, selection} = track
+    const { id, playlists, data, selection } = track
     const instance = {
       id,
       info: {
@@ -149,7 +149,7 @@ function constructDownloads (tracks) {
       },
       yt: selection,
       data,
-      playlists: playlists.map(({id}) => ({
+      playlists: playlists.map(({ id }) => ({
         id,
         folderName: customGetters.giveMePlFolderName(id)
       }))
@@ -208,21 +208,21 @@ function constructDownloads (tracks) {
           download.on('info', info => {
             instance.info.download.size = info.size
             instance.info.currentStatus = 'downloading'
-            emitEvent.download({type: 'start', id: instance.id})
+            emitEvent.download({ type: 'start', id: instance.id })
           })
 
           download.on('data', chunk => {
             instance.info.download.currentSize += chunk.length
             const ptg = Math.round(instance.info.download.currentSize / instance.info.download.size * 100)
             instance.info.ptg = instance.info.download.ptg = ptg
-            emitEvent.download({type: 'progress', id: instance.id, ptg})
+            emitEvent.download({ type: 'progress', id: instance.id, ptg })
           })
 
           download.on('error', (error) => {
             console.error('Error when downloading video::::', error)
             instance.info.download.error = error
             instance.info.currentStatus = 'download_error'
-            emitEvent.download({type: 'error', id: instance.id})
+            emitEvent.download({ type: 'error', id: instance.id })
             return reject(error)
           })
 
@@ -232,7 +232,7 @@ function constructDownloads (tracks) {
             instance.info.download.ptg = 100
             instance.info.currentStatus = 'download_end'
             console.log('video downloaded')
-            emitEvent.download({type: 'end', id: instance.id})
+            emitEvent.download({ type: 'end', id: instance.id })
             return resolve()
           })
 
@@ -251,34 +251,34 @@ function constructDownloads (tracks) {
         convert: async () => {
           try {
             instance.info.currentStatus = 'extracting'
-            emitEvent.extraction({type: 'start', id: instance.id})
+            emitEvent.extraction({ type: 'start', id: instance.id })
             instance.info.ptg = 0
             await extractMp3(instance.paths.mp3FilePath, instance.paths.mp4FilePath, instance.downloadFormat, progress => {
               const ptg = Math.round(progress.percent)
               instance.info.ptg = instance.info.extraction.ptg = ptg
-              emitEvent.extraction({type: 'progress', id: instance.id, ptg})
+              emitEvent.extraction({ type: 'progress', id: instance.id, ptg })
             })
           } catch (err) {
             instance.info.extraction.error = err
             instance.info.currentStatus = 'extraction_error'
-            emitEvent.extraction({type: 'error', id: instance.id})
+            emitEvent.extraction({ type: 'error', id: instance.id })
             throw err
           } finally {
             instance.info.extraction.finished = true
             !instance.info.extraction.error && (instance.info.extraction.ptg = 100) + (instance.info.currentStatus = 'extraction_end')
-            emitEvent.extraction({type: 'end', id: instance.id})
+            emitEvent.extraction({ type: 'end', id: instance.id })
           }
 
           try {
             instance.info.currentStatus = 'tags'
-            emitEvent.tags({type: 'start', id: instance.id})
+            emitEvent.tags({ type: 'start', id: instance.id })
             await applyTags(instance.paths.mp3FilePath, instance.data, instance.yt)
             console.log('finished tags')
-            emitEvent.tags({type: 'end', id: instance.id})
+            emitEvent.tags({ type: 'end', id: instance.id })
           } catch (err) {
             instance.info.tags.error = err
             instance.info.currentStatus = 'tags_error'
-            emitEvent.tags({type: 'error', id: instance.id})
+            emitEvent.tags({ type: 'error', id: instance.id })
             throw err
           } finally {
             !instance.info.tags.error && (instance.info.currentStatus = 'tags_end')

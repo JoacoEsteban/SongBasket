@@ -6,9 +6,7 @@ const ENV_PROD = global.ENV_PROD = process.env.NODE_ENV === 'production'
 const IS_DEV = global.IS_DEV = !ENV_PROD
 
 const APP = require('electron').app
-const APP_VERSION = APP.getVersion()
-const APP_VERSION_STRING = (APP_VERSION + ' ') + (IS_DEV ? 'Electron. Development' : 'Closed Beta')
-module.exports = global.CONSTANTS = {
+const CONSTANTS = module.exports = global.CONSTANTS = {
   // STATES
   ENV_PROD,
   IS_DEV,
@@ -36,7 +34,7 @@ module.exports = global.CONSTANTS = {
   BROWSER_WINDOW: null,
   SESSION: null,
   DIALOG: null,
-  SHELL_OPEN: () => {},
+  SHELL_OPEN: () => { },
   // -------------
 
   // PATHS
@@ -52,6 +50,7 @@ module.exports = global.CONSTANTS = {
   PROTOCOL_PATHS: {
     BASE: 'songbasket'
   },
+  FFMPEG_BINARIES_PATH: null,
   // -------------
 
   // INSTANCES
@@ -96,9 +95,14 @@ module.exports = global.CONSTANTS = {
   },
   // MISC
   HEROKU_PING_INTERVAL: 1000 * 60 * 2,
-  APP_VERSION,
-  APP_VERSION_STRING,
+  APP_VERSION: null,
+  APP_VERSION_STRING: null,
   CHANGELOG_URL: 'https://download.songbasket.com'
   // -------------
 
 }
+
+CONSTANTS.APP_VERSION = CONSTANTS.APP.getVersion()
+CONSTANTS.APP_VERSION_STRING = (CONSTANTS.APP_VERSION + ' ') + (IS_DEV ? 'Electron. Development' : 'Closed Beta')
+
+CONSTANTS.FFMPEG_BINARIES_PATH = global.CONSTANTS.APP_SUPPORT_PATH + '/bin/ffmpeg'

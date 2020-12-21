@@ -3,10 +3,11 @@ import electron from 'electron'
 // ---------------------DEFINE ENVIRONMENT---------------------
 require('./environment-init')
 // ---------------------LOAD DEPENDENCIES---------------------
-
-// ---------------------INITIALIZE RENDERER---------------------
+require('./bootstrap')
 // ffmpeg
 // youtubedl
+
+// ---------------------INITIALIZE RENDERER---------------------
 // ---------------------SET IPC LISTENERS---------------------
 // ---------------------SET IPC LISTENERS---------------------
 

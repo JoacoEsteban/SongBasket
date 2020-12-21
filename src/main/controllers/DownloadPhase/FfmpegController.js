@@ -1,41 +1,26 @@
 
-import * as handlers from '../InitializationAndHandlers/handlers'
 import * as utils from '../../../MAIN_PROCESS_UTILS'
 const fs = require('fs')
-const ffbinaries = require('ffbinaries')
 const ffmpeg = require('fluent-ffmpeg')
 
 const NodeID3 = require('node-id3')
 const axios = require('axios')
 
-const basePath = global.CONSTANTS.APP_SUPPORT_PATH
-const binPath = basePath + '/bin/ffmpeg';
-
-(async () => {
-  await utils.createDirRecursive(binPath)
-  ffbinaries.downloadBinaries(['ffmpeg', 'ffprobe'], {destination: binPath}, () => {
-    global.CONSTANTS.FFMPEG_BINS_DOWNLOADED = true
-    handlers.onFfmpegBinaries()
-    ffmpeg.setFfmpegPath(binPath + '/ffmpeg')
-    ffmpeg.setFfprobePath(binPath + '/ffprobe')
-  })
-})()
-
 export function extractMp3 (pathmp3, pathmp4, inputFormat, progressCb) {
   return new Promise((resolve, reject) => {
     const command =
-          ffmpeg(pathmp4)
-            .inputFormat(inputFormat)
-            .on('progress', progressCb)
-            .on('end', async () => {
-              try {
-                await utils.promisify(fs.unlink, pathmp4)
-              } catch (err) {
-                console.error(err)
-              }
-              console.log('Finished processing')
-              resolve()
-            })
+      ffmpeg(pathmp4)
+        .inputFormat(inputFormat)
+        .on('progress', progressCb)
+        .on('end', async () => {
+          try {
+            await utils.promisify(fs.unlink, pathmp4)
+          } catch (err) {
+            console.error(err)
+          }
+          console.log('Finished processing')
+          resolve()
+        })
     command.save(pathmp3)
   })
 }

@@ -1,7 +1,7 @@
-const UserMethods = require('../FileSystem/UserMethods').default
-const FileWatchers = require('../FileSystem/FileWatchers').default
+const UserMethods = require('../controllers/FileSystem/UserMethods').default
+const FileWatchers = require('../controllers/FileSystem/FileWatchers').default
 const trackUtils = require('./Helpers/Tracks').default
-const UTILS = require('../../../MAIN_PROCESS_UTILS')
+const UTILS = require('../../MAIN_PROCESS_UTILS')
 const FSController = {
   UserMethods,
   FileWatchers
@@ -19,7 +19,7 @@ function SAVE_TO_DISK (check) {
 
   if (--saveQueue > 0) return
   console.log('::::::::::::::::::::::::::::SAVING::::::::::::::::::::::::::::::::')
-  FSController.UserMethods.saveState({state, path: global.HOME_FOLDER})
+  FSController.UserMethods.saveState({ state, path: global.HOME_FOLDER })
 }
 
 const getDefaultState = () => {
@@ -51,7 +51,7 @@ const mutations = {
     state = UTILS.cloneObject(newState)
   },
   STORE_DATA_FROM_DISK (data) {
-    const {cachedPlaylists, control, playlists, queuedPlaylists, syncedPlaylists, deletedPlaylists, user, convertedTracks, lastSync} = data
+    const { cachedPlaylists, control, playlists, queuedPlaylists, syncedPlaylists, deletedPlaylists, user, convertedTracks, lastSync } = data
 
     state.playlists = playlists
     state.user = user
@@ -87,7 +87,7 @@ const mutations = {
       // I dont care about the version controlling synced ones in here because version control has been handled elsewhere
       let s = findById(id, state.syncedPlaylists) >= 0
 
-      return {c, s}
+      return { c, s }
     }
     function normalizePlaylist (pl) {
       pl.tracks.items = []
@@ -167,12 +167,12 @@ const mutations = {
       if (statePl.name !== playlist.name) {
         oldName = statePl.folderName || statePl.name
         statePl.folderName = null
-        cbs.push(() => FSController.UserMethods.renameFolder({oldName, newName: playlist.folderName})) // Rename Folder
+        cbs.push(() => FSController.UserMethods.renameFolder({ oldName, newName: playlist.folderName })) // Rename Folder
       }
 
       if ((statePl.images && statePl.images[0] && statePl.images[0].url) !== (playlist.images && playlist.images[0] && playlist.images[0].url)) {
         console.log('new folder image', statePl.name, statePl.images[0].url, playlist.images[0].url)
-        cbs.push(() => FSController.UserMethods.setFolderIcons(playlist.id, {force: true}))
+        cbs.push(() => FSController.UserMethods.setFolderIcons(playlist.id, { force: true }))
       }
 
       playlist.folderName = statePl.folderName || (() => {
@@ -188,7 +188,7 @@ const mutations = {
       ]
       // Compute track changes
       // Using just removed and items. Im not using added because they will pop up in the new data.
-      const {items, removed, added} = playlistComputeChanges(oldPl, playlist.tracks.items)
+      const { items, removed, added } = playlistComputeChanges(oldPl, playlist.tracks.items)
       // console.log('CHANGES', items.map(i => i.name), added.map(i => i.name), removed.map(i => i.name))
       playlist.tracks.items = items
       playlist.tracks.added = added
@@ -201,26 +201,26 @@ const mutations = {
         added: [],
         removed: []
       }
-      const {id, snapshot_id} = playlist
-      this.PLAYLIST_UPDATE_CACHED({id, snapshot_id})
-      FSController.UserMethods.setFolderIcons(playlist.id, {force: true}) // creates folder and sets icon
+      const { id, snapshot_id } = playlist
+      this.PLAYLIST_UPDATE_CACHED({ id, snapshot_id })
+      FSController.UserMethods.setFolderIcons(playlist.id, { force: true }) // creates folder and sets icon
     }
     state.playlists[index] = playlist
 
     SAVE_TO_DISK()
   },
 
-  PLAYLIST_UPDATE_CACHED ({id, snapshot_id}) {
+  PLAYLIST_UPDATE_CACHED ({ id, snapshot_id }) {
     let found = false
     for (let i = 0; i < state.cachedPlaylists.length; i++) {
       let p = state.cachedPlaylists[i]
       if (p.id === id) {
-        p = {id, time: Date.now(), snapshot_id}
+        p = { id, time: Date.now(), snapshot_id }
         // console.log('UPDATING CACHE LOG FOR PLAYLIST WITH ID ' + id)
         found = true
       }
     }
-    if (!found) state.cachedPlaylists = [ ...state.cachedPlaylists, { id, time: Date.now(), snapshot_id } ]
+    if (!found) state.cachedPlaylists = [...state.cachedPlaylists, { id, time: Date.now(), snapshot_id }]
     SAVE_TO_DISK()
   },
   SET_CURRENT_PLAYLIST (id) {
@@ -237,16 +237,16 @@ const mutations = {
     }
     if (!found) state.queuedPlaylists = [...state.queuedPlaylists, id]
   },
-  FIND_AND_UNQUEUE ({id}) {
+  FIND_AND_UNQUEUE ({ id }) {
     let index = findById(id, state.queuedPlaylists.map(pl => {
-      return {id: pl}
+      return { id: pl }
     }))
     // console.log('Unqueueing', id, index)
     if (index >= 0) {
       state.queuedPlaylists.splice(index, 1)
     }
   },
-  FIND_AND_UNCACHE ({id}) {
+  FIND_AND_UNCACHE ({ id }) {
     let index = findById(id, state.cachedPlaylists)
     // console.log('Uncaching', id, index)
     if (index >= 0) {
@@ -314,8 +314,8 @@ const mutations = {
   },
   async YOUTUBIZE_RESULT (convertedTracks) {
     try {
-      state.convertedTracks = convertedTracks.map(convertedTrack => trackUtils.calculateBestMatch(convertedTrack)).filter(t => t)
-      ;([...state.queuedPlaylists]).forEach(pl => {
+      state.convertedTracks = convertedTracks.map(convertedTrack => trackUtils.calculateBestMatch(convertedTrack)).filter(t => t);
+      ([...state.queuedPlaylists]).forEach(pl => {
         state.syncedPlaylists.push(pl)
         state.queuedPlaylists = state.queuedPlaylists.filter(p => p !== pl)
         state.cachedPlaylists = state.cachedPlaylists.filter(p => p.id !== pl)
@@ -370,7 +370,7 @@ const mutations = {
     state.playlists[index].tracks.added = []
     state.playlists[index].tracks.removed = []
   },
-  CHANGE_YT_TRACK_SELECTION ({trackId, newId}) {
+  CHANGE_YT_TRACK_SELECTION ({ trackId, newId }) {
     try {
       if (newId === undefined) throw new Error('New selection id does not exist:: @ mainProcessStore :: CHANGE_YT_TRACK_SELECTION')
       if (trackId === undefined) throw new Error('SP Track id does not exist:: @ mainProcessStore :: CHANGE_YT_TRACK_SELECTION')
@@ -435,7 +435,7 @@ const mutations = {
       throw error
     }
   },
-  CUSTOM_TRACK_URL ({details, trackId}) {
+  CUSTOM_TRACK_URL ({ details, trackId }) {
     const track = state.convertedTracks[findById(trackId, state.convertedTracks)]
     if (!track) return console.error('TRACK NOT FOUND IN CONVERTED TRACKS :: CUSTOM_TRACK_URL')
 
@@ -476,8 +476,8 @@ function playlistComputeChanges (oldPl, newPl) {
   // Tracks will be compared between both arrays and if it's a match, then both will be spliced from both arrays
   // If there are no changes, then both arrays will be empty
 
-  let added = [ ...newPl ]
-  let removed = [ ...oldPl ]
+  let added = [...newPl]
+  let removed = [...oldPl]
   let items = [] // Tracks that are preserved between versions
 
   if (removed.length > 0) { // This checks if the synced playlist has not been added to DB yet, if so, then every song will be 'new'
@@ -501,7 +501,7 @@ function playlistComputeChanges (oldPl, newPl) {
       if (!found) i++
     }
   } else removed = []
-  return {added, items, removed}
+  return { added, items, removed }
 }
 
 export default controller

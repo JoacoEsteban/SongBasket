@@ -1,4 +1,4 @@
-import customGetters from './controllers/Store/Helpers/customGetters'
+import customGetters from './Store/Helpers/customGetters'
 
 let ALL_PLAYLISTS = []
 let ALL_TRACKS = []
@@ -38,7 +38,7 @@ function findDuplicatedTracks () {
       ALL_PLAYLISTS.splice(i--, 1)
       continue
     }
-    pls.push({id: pl.id, tracks})
+    pls.push({ id: pl.id, tracks })
   }
   // No new tracks
   if (pls.length === 0) return false
@@ -105,6 +105,6 @@ function makeQueries () {
     if (duration <= 20 && duration >= 4) duration = 'medium'
     if (duration < 4) duration = 'short'
 
-    ALL_TRACKS[o].query = {query, duration, duration_s: track.duration_ms / 1000, id: track.id}
+    ALL_TRACKS[o].query = { query, duration, duration_s: track.duration_ms / 1000, id: track.id }
   }
 }

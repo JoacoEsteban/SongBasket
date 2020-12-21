@@ -1,4 +1,4 @@
-import customGetters from '../Store/Helpers/customGetters'
+import customGetters from '../../Store/Helpers/customGetters'
 import * as utils from '../../../MAIN_PROCESS_UTILS'
 const PATH = require('path')
 const uuid = require('uuid')
@@ -35,7 +35,7 @@ async function VTWO (localTracks, queryTracks = [], plFilter = []) {
     if (qTrack.selection === false) qTrack.selection = qTrack.custom.youtube_id
 
     qTrack.downloadFlags = {
-      download: !(qTrack.flags.paused || qTrack.playlists.every(({id}) => pausedPlaylists.includes(id)))
+      download: !(qTrack.flags.paused || qTrack.playlists.every(({ id }) => pausedPlaylists.includes(id)))
     }
 
     return !localTracks.some((lTrack, i) => { // some track (full conv) exists and is in every playlist

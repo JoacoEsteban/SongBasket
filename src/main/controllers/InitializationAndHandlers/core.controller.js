@@ -2,9 +2,9 @@ const keytar = require('keytar')
 
 const API = require('./sbFetch')
 
-const GETTERS = require('../Store/Helpers/customGetters').default
+const GETTERS = require('../../Store/Helpers/customGetters').default
 const QUERY_MAKER = require('../../queryMaker')
-const VUEX_MAIN = require('../Store/mainProcessStore').default
+const VUEX_MAIN = require('../../Store/mainProcessStore').default
 const FSController = require('../FileSystem').default
 const ProtocolController = require('./protocol.controller').default
 
@@ -103,10 +103,10 @@ const core = {
       }
     })
   },
-  onLogin: async ({payload}) => {
+  onLogin: async ({ payload }) => {
     try {
       if (!(payload && payload.spotify_authorization_success)) throw new Error('AUTHORIZATION FAILED')
-      const {user_data} = payload
+      const { user_data } = payload
       await core.setCredentials(user_data.id, user_data.songbasket_id)
       await core.setSongbasketIdGlobally(user_data.id)
 
@@ -160,7 +160,7 @@ const core = {
   setUser: userData => {
     VUEX_MAIN.COMMIT.SET_USER(userData)
   },
-  updateAll: async (params = {playlistCompletionCallback: null}) => {
+  updateAll: async (params = { playlistCompletionCallback: null }) => {
     try {
       await core.updateSelf()
       await core.updatePlaylists(params.playlistCompletionCallback)
@@ -243,8 +243,8 @@ const core = {
 
       if (queries.length) {
         const pausedPlaylists = GETTERS.pausedPlaylists
-        const trackShouldConvert = track => !((track.flags.converted && !track.conversionError) || track.flags.paused || track.playlists.every(({id}) => pausedPlaylists.includes(id)))
-        const {tracks, failed} = await API.youtubizeAll(queries, trackShouldConvert, params.trackCompletionCallback)
+        const trackShouldConvert = track => !((track.flags.converted && !track.conversionError) || track.flags.paused || track.playlists.every(({ id }) => pausedPlaylists.includes(id)))
+        const { tracks, failed } = await API.youtubizeAll(queries, trackShouldConvert, params.trackCompletionCallback)
         VUEX_MAIN.COMMIT.YOUTUBIZE_RESULT(tracks)
         if (failed) throw new Error()
       } else console.log('nothing to do, just committing')
