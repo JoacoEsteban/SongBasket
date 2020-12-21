@@ -30,7 +30,20 @@ let mainConfig = {
       },
       {
         test: /\.js$/,
-        use: 'babel-loader',
+        use: {
+          loader: 'babel-loader',
+          options: {
+            sourceMap: true,
+            compact: false,
+            presets: [
+              ['@babel/preset-env']
+            ],
+            'plugins': [
+              'syntax-dynamic-import'
+            ]
+          },
+
+        },
         exclude: /node_modules/
       },
       {

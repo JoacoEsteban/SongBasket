@@ -11,6 +11,7 @@ const rimraf = require('rimraf')
 const iconv = require('iconv-lite')
 
 const PATHS = {
+  // TODO use global.APP_SUPPORT_PATH
   userDataPath: (electron.app || electron.remote.app).getPath('userData') + '/',
   get foldersJsonPath () { return this.userDataPath + '.songbasket-folders' },
   stateFileName: '/.songbasket'

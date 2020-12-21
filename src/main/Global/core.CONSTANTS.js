@@ -41,6 +41,7 @@ const CONSTANTS = module.exports = global.CONSTANTS = {
   get BACKEND () {
     return process.env.BACKEND
   },
+  // TODO scope this path in dev
   APP_SUPPORT_PATH: (ENV_PROD ? APP.getPath('userData') : process.cwd()),
   APP_CWD: PATH.join(APP.getAppPath()),
   get NODE_MODULES_PATH () {
@@ -105,4 +106,6 @@ const CONSTANTS = module.exports = global.CONSTANTS = {
 CONSTANTS.APP_VERSION = CONSTANTS.APP.getVersion()
 CONSTANTS.APP_VERSION_STRING = (CONSTANTS.APP_VERSION + ' ') + (IS_DEV ? 'Electron. Development' : 'Closed Beta')
 
-CONSTANTS.FFMPEG_BINARIES_PATH = global.CONSTANTS.APP_SUPPORT_PATH + '/bin/ffmpeg'
+CONSTANTS.FFMPEG_BINARIES_PATH = PATH.join(global.CONSTANTS.APP_SUPPORT_PATH, 'bin', 'ffmpeg')
+CONSTANTS.YTDL_BINARIES_PATH = PATH.join(global.CONSTANTS.APP_SUPPORT_PATH, 'bin', 'ytdl')
+CONSTANTS.YTDL_VERSION_CONTROL_PATH = PATH.join(global.CONSTANTS.APP_SUPPORT_PATH, 'ytdl-version.json')

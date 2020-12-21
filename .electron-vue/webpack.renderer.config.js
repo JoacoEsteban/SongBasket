@@ -72,8 +72,8 @@ let rendererConfig = {
             presets: [
               ['@babel/preset-env']
             ],
-            "plugins": [
-              "syntax-dynamic-import"
+            'plugins': [
+              'syntax-dynamic-import'
             ]
           },
         },
