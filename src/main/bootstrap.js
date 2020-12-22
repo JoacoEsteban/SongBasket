@@ -1,7 +1,10 @@
+import sudo from 'sudo-prompt'
 import * as handlers from './controllers/InitializationAndHandlers/handlers'
 import * as utils from '../MAIN_PROCESS_UTILS'
-const PATH = require('path');
+const PATH = require('path')
 
+// ---------------------sudo-prompt---------------------
+global.sudo = sudo;
 // ---------------------ffmepeg---------------------
 (async function botstrapFfmpeg () {
   const ffmpeg = require('fluent-ffmpeg')
@@ -29,6 +32,7 @@ const PATH = require('path');
       this.fetch = this.axios.get
       this.binariesPath = global.CONSTANTS.YTDL_BINARIES_PATH
       this.versionControlPath = global.CONSTANTS.YTDL_VERSION_CONTROL_PATH
+
       this.apiUrl = 'https://api.github.com/repos/ytdl-org/youtube-dl/releases/latest'
 
       this.setLocals()
@@ -86,7 +90,8 @@ const PATH = require('path');
       if (!asset) throw new Error('YOUTUBE-DL RELEASE ASSET NOT FOUND')
 
       await utils.createDirRecursive(this.binariesPath)
-      const writer = this.createWriteStream(PATH.join(this.binariesPath, asset.name))
+      const binaryPath = PATH.join(this.binariesPath, asset.name)
+      const writer = this.createWriteStream(binaryPath)
       this.axios({
         method: 'get',
         url: asset.browser_download_url,
@@ -99,6 +104,19 @@ const PATH = require('path');
       })
 
       console.log('youtube-dl binaries downloaded')
+
+      // SET EXECUTION PERMISSIONS
+      if (global.CONSTANTS.platform !== 'windows') {
+        try {
+          console.log('setting execution permissions to yt-dl binary')
+          await new Promise((resolve, reject) => global.sudo.exec('chmod +x ' + binaryPath, { name: 'SongBasket' }, error => error ? reject(error) : resolve()))
+          console.log('execution permissions set to yt-dl binary')
+        } catch (error) {
+          console.error('ERROR SETTING EXECUTION PERMISSIONS', error)
+          throw error
+        }
+      }
+
       this.writeLocalVersion()
     }
     async checkNUpdate () {
@@ -109,6 +127,7 @@ const PATH = require('path');
     }
     updateLibraryPaths () {
       youtubeDl.setYtdlBinary(this.binariesPath)
+      // TODO set execution permisions (chmod +x)
     }
   }
 
