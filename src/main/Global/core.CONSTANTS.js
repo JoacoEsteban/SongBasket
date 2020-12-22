@@ -41,11 +41,11 @@ const CONSTANTS = module.exports = global.CONSTANTS = {
   get BACKEND () {
     return process.env.BACKEND
   },
-  // TODO scope this path in dev
-  APP_SUPPORT_PATH: (ENV_PROD ? APP.getPath('userData') : process.cwd()),
+  APP_SUPPORT_PATH: (ENV_PROD ? APP.getPath('userData') : PATH.join(process.cwd(), 'APPLICATION_SUPPORT')),
   APP_CWD: PATH.join(APP.getAppPath()),
+  PROCESS_CWD: process.cwd(),
   get NODE_MODULES_PATH () {
-    return this.__node_modules_path || (this.__node_modules_path = PATH.join(ENV_PROD ? this.APP_CWD.replace('app.asar', 'app.asar.unpacked') : this.APP_SUPPORT_PATH, 'node_modules'))
+    return this.__node_modules_path || (this.__node_modules_path = PATH.join(ENV_PROD ? this.APP_CWD.replace('app.asar', 'app.asar.unpacked') : this.PROCESS_CWD, 'node_modules'))
   },
   TEMP_PATH: APP.getPath('temp'),
   PROTOCOL_PATHS: {

@@ -2,7 +2,7 @@ import sudo from 'sudo-prompt'
 import * as handlers from './controllers/InitializationAndHandlers/handlers'
 import * as utils from '../MAIN_PROCESS_UTILS'
 const PATH = require('path')
-
+console.log(PATH.join(global.CONSTANTS.APP.getAppPath()))
 // ---------------------sudo-prompt---------------------
 global.sudo = sudo;
 // ---------------------ffmepeg---------------------
@@ -81,6 +81,10 @@ global.sudo = sudo;
       return this.localVersion?.id !== this.latestVersion?.id
     }
     // ---------------------
+    getBinaryPath () {
+      const asset = this.getAsset()
+      return asset && PATH.join(this.binariesPath, asset.name)
+    }
     getAsset () {
       return this.latestVersion.assets.find(({ name }) => name === this.assetName)
     }
@@ -90,7 +94,7 @@ global.sudo = sudo;
       if (!asset) throw new Error('YOUTUBE-DL RELEASE ASSET NOT FOUND')
 
       await utils.createDirRecursive(this.binariesPath)
-      const binaryPath = PATH.join(this.binariesPath, asset.name)
+      const binaryPath = this.getBinaryPath()
       const writer = this.createWriteStream(binaryPath)
       this.axios({
         method: 'get',
@@ -106,18 +110,21 @@ global.sudo = sudo;
       console.log('youtube-dl binaries downloaded')
 
       // SET EXECUTION PERMISSIONS
+      await this.setExecutionPermissions()
+
+      this.writeLocalVersion()
+    }
+    async setExecutionPermissions () {
       if (global.CONSTANTS.platform !== 'windows') {
         try {
           console.log('setting execution permissions to yt-dl binary')
-          await new Promise((resolve, reject) => global.sudo.exec('chmod +x ' + binaryPath, { name: 'SongBasket' }, error => error ? reject(error) : resolve()))
+          await new Promise((resolve, reject) => global.sudo.exec('chmod +x ' + this.getBinaryPath(), { name: 'SongBasket' }, error => error ? reject(error) : resolve()))
           console.log('execution permissions set to yt-dl binary')
         } catch (error) {
           console.error('ERROR SETTING EXECUTION PERMISSIONS', error)
           throw error
         }
       }
-
-      this.writeLocalVersion()
     }
     async checkNUpdate () {
       if (await this.hasUpdates()) await this.update()
@@ -126,8 +133,7 @@ global.sudo = sudo;
       this.updateLibraryPaths()
     }
     updateLibraryPaths () {
-      youtubeDl.setYtdlBinary(this.binariesPath)
-      // TODO set execution permisions (chmod +x)
+      youtubeDl.setYtdlBinary(this.getBinaryPath())
     }
   }
 

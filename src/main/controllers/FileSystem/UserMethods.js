@@ -3,7 +3,6 @@ import customGetters from '../../Store/Helpers/customGetters'
 import * as utils from '../../../MAIN_PROCESS_UTILS'
 import Helpers from './Helpers'
 import REGEX from '../../Global/REGEX'
-const electron = require('electron')
 const fs = require('fs')
 const PATH = require('path')
 const rimraf = require('rimraf')
@@ -11,9 +10,10 @@ const rimraf = require('rimraf')
 const iconv = require('iconv-lite')
 
 const PATHS = {
-  // TODO use global.APP_SUPPORT_PATH
-  userDataPath: (electron.app || electron.remote.app).getPath('userData') + '/',
-  get foldersJsonPath () { return this.userDataPath + '.songbasket-folders' },
+  userDataPath: global.CONSTANTS.APP_SUPPORT_PATH,
+  get foldersJsonPath () {
+    return PATH.join(this.userDataPath, '.songbasket-folders')
+  },
   stateFileName: '/.songbasket'
 }
 
