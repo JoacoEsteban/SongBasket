@@ -244,6 +244,9 @@ export default electron => new Promise(async (resolve, reject) => {
       })
       createMenu(electron)
       await core.setAppStatus()
+
+      require('./controllers/InitializationAndHandlers/ipc.routes').init(global.ipc = electron.ipcMain)
+
       WindowController.createWindow()
 
       resolve()
