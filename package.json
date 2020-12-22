@@ -47,6 +47,7 @@
     "less-loader": "^5.0.0",
     "node-id3": "^0.1.11",
     "open": "^6.4.0",
+    "path-exists": "^4.0.0",
     "rimraf": "^3.0.0",
     "sudo-prompt": "^9.2.1",
     "to-ico": "^1.1.5",

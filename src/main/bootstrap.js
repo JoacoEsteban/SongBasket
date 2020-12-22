@@ -3,7 +3,8 @@ import * as handlers from './controllers/InitializationAndHandlers/handlers'
 import * as utils from '../MAIN_PROCESS_UTILS'
 const PATH = require('path')
 console.log(PATH.join(global.CONSTANTS.APP.getAppPath()))
-// ---------------------sudo-prompt---------------------
+// ---------------------utlis---------------------
+global.pathExists = require('path-exists')
 global.sudo = sudo;
 // ---------------------ffmepeg---------------------
 (async function botstrapFfmpeg () {
@@ -40,14 +41,39 @@ global.sudo = sudo;
 
     async findLocalVersion () {
       try {
-        // TODO check if binary exists
-        // if not then delete json
+        console.log('Finding youtube-dl local version info')
         this.localVersion = JSON.parse(await this.fs.readFile(this.versionControlPath, 'utf8'))
       } catch (error) {
         this.localVersion = null
       }
+
+      const jsonExists = !!this.localVersion
+      const binaryExists = await global.pathExists(this.getBinaryPath())
+
+      if (jsonExists ? !binaryExists : binaryExists) { // XOR
+        console.log('youtube-dl ' + (jsonExists ? 'Binary' : 'JSON') + ' doesn\'t exist, wiping both')
+        await this.wipeAll()
+      }
+
       this.localVersion && console.log('youtube-dl local version is', this.localVersion.id)
     }
+
+    async wipeVersionInfo () {
+      this.fs.unlink(this.versionControlPath).catch(global.emptyFn)
+      this.localVersion = null
+    }
+
+    async wipeBinary (binaryPath = this.getBinaryPath()) {
+      this.fs.unlink(binaryPath).catch(global.emptyFn)
+    }
+
+    async wipeAll (binaryPath) {
+      await Promise.all([
+        this.wipeVersionInfo(),
+        this.wipeBinary(binaryPath)
+      ])
+    }
+
     async findLatestVersion () {
       console.log('Finding youtube-dl latest version info')
       try {
@@ -81,20 +107,27 @@ global.sudo = sudo;
       return this.localVersion?.id !== this.latestVersion?.id
     }
     // ---------------------
-    getBinaryPath () {
-      const asset = this.getAsset()
+    getBinaryPath (asset = this.getLocalAsset()) {
       return asset && PATH.join(this.binariesPath, asset.name)
     }
-    getAsset () {
-      return this.latestVersion.assets.find(({ name }) => name === this.assetName)
+    getLocalAsset () {
+      return this.localVersion?.assets.find(({ name }) => name === this.assetName)
     }
+    getLatestAsset () {
+      return this.latestVersion?.assets.find(({ name }) => name === this.assetName)
+    }
+
     async update () {
       console.log('about to update youtube-dl from', this.localVersion?.id || '?', 'to', this.latestVersion.id)
-      const asset = this.getAsset()
+      const asset = this.getLatestAsset()
       if (!asset) throw new Error('YOUTUBE-DL RELEASE ASSET NOT FOUND')
 
-      await utils.createDirRecursive(this.binariesPath)
-      const binaryPath = this.getBinaryPath()
+      const binaryPath = this.getBinaryPath(asset)
+      await Promise.all([
+        utils.createDirRecursive(this.binariesPath),
+        this.wipeBinary(binaryPath)
+      ])
+
       const writer = this.createWriteStream(binaryPath)
       this.axios({
         method: 'get',
@@ -108,17 +141,23 @@ global.sudo = sudo;
       })
 
       console.log('youtube-dl binaries downloaded')
+      await this.writeLocalVersion()
 
       // SET EXECUTION PERMISSIONS
-      await this.setExecutionPermissions()
-
-      this.writeLocalVersion()
+      try {
+        await this.setExecutionPermissions()
+      } catch (error) {
+        await this.wipeAll(binaryPath)
+      }
     }
+
     async setExecutionPermissions () {
       if (global.CONSTANTS.platform !== 'windows') {
         try {
           console.log('setting execution permissions to yt-dl binary')
-          await new Promise((resolve, reject) => global.sudo.exec('chmod +x ' + this.getBinaryPath(), { name: 'SongBasket' }, error => error ? reject(error) : resolve()))
+          const binPath = this.getBinaryPath()
+          if (!binPath) throw new Error('NO BINARY PATH')
+          await new Promise((resolve, reject) => global.sudo.exec('chmod +x ' + binPath, { name: 'SongBasket' }, error => error ? reject(error) : resolve()))
           console.log('execution permissions set to yt-dl binary')
         } catch (error) {
           console.error('ERROR SETTING EXECUTION PERMISSIONS', error)
