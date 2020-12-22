@@ -1,16 +1,19 @@
-import electron from 'electron'
+const electron = require('electron')
 
-// ---------------------DEFINE ENVIRONMENT---------------------
 require('./environment-init')
-// ---------------------LOAD DEPENDENCIES---------------------
-require('./bootstrap')
-// ffmpeg
-// youtubedl
+console.log('bebebe')
+const bootstrap = require('./bootstrap').default
+console.log(bootstrap);
+(async () => {
+  // ---------------------DEFINE ENVIRONMENT---------------------
+  // ---------------------LOAD DEPENDENCIES---------------------
+  console.log('before')
+  await bootstrap(electron)
+  console.log('after')
+  // ---------------------INITIALIZE RENDERER---------------------
+  // ---------------------SET IPC LISTENERS---------------------
+  // ---------------------SET IPC LISTENERS---------------------
 
-// ---------------------INITIALIZE RENDERER---------------------
-// ---------------------SET IPC LISTENERS---------------------
-// ---------------------SET IPC LISTENERS---------------------
-
-// ---------------------INITIALIZE APPLICATION---------------------
-require('./controllers/InitializationAndHandlers/handlers').init(electron)
-require('./controllers/InitializationAndHandlers/ipc.routes').init(global.ipc = electron.ipcMain)
+  // ---------------------INITIALIZE APPLICATION---------------------
+  require('./controllers/InitializationAndHandlers/ipc.routes').init(global.ipc = electron.ipcMain)
+})()

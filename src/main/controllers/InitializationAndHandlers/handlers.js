@@ -4,28 +4,14 @@ import * as sbFetch from './sbFetch'
 import FileWatchers from '../FileSystem/FileWatchers'
 import IpcController from './ipc.controller'
 import youtubeDl from '../DownloadPhase/youtube-dl'
-import connectionController from './connection.controller'
-import protocolController from './protocol.controller'
 import VUEX_MAIN from '../../Store/mainProcessStore'
 import { v4 as uuid } from 'uuid'
 
 import core from './core.controller'
-import windowStateKeeper from 'electron-window-state'
-import Positioner from 'electron-positioner'
-
-import updater from './auto-update'
 
 const openBrowser = global.openUrl = require('open')
-export const ipcSend = (...args) => {
-  if (!global.CONSTANTS.MAIN_WINDOW) return
-  return IpcController.send(...args)
-}
 
 const ipcOnce = IpcController.once
-
-let BROWSER_WINDOW
-// let SESSION
-let DIALOG
 
 console.log('NODE ENV', process.env.NODE_ENV)
 
@@ -44,7 +30,7 @@ const loadingController = {
   },
   reflect (payload = this.instance) {
     console.log('current', this.instance)
-    ipcSend('LOADING_EVENT', payload)
+    global.ipcSend('LOADING_EVENT', payload)
   },
   // -----------------------
   get instance () {
@@ -85,7 +71,7 @@ export function REFLECT_RENDERER () {
   return new Promise((resolve, reject) => {
     const listenerId = uuid()
     ipcOnce(listenerId, resolve)
-    ipcSend('VUEX:STORE', { state: VUEX_MAIN.STATE_SAFE(), listenerId })
+    global.ipcSend('VUEX:STORE', { state: VUEX_MAIN.STATE_SAFE(), listenerId })
   })
 }
 export function REFLECT_RENDERER_KEY (key) {
@@ -93,70 +79,28 @@ export function REFLECT_RENDERER_KEY (key) {
     const listenerId = uuid()
     ipcOnce(listenerId, resolve)
     const value = VUEX_MAIN.STATE_SAFE(key)[key]
-    ipcSend('VUEX:SET', { key, value, listenerId })
+    global.ipcSend('VUEX:SET', { key, value, listenerId })
   })
 }
 export function SEND_ERROR ({ type, error }) {
   return new Promise((resolve, reject) => {
-    ipcSend('ERROR:CATCH', { type, error: normalizeError(error) })
+    global.ipcSend('ERROR:CATCH', { type, error: normalizeError(error) })
   })
 }
 
 // ------------------------- FLOW -------------------------
 
-export function init (electron) {
-  setVars(electron)
-  electron.app.allowRendererProcessReuse = true
-  electron.app.on('ready', async () => {
-    global.CONSTANTS.ENV_PROD && updater.init()
-    protocolController.startProtocols(electron)
-    connectionController.init({
-      connectionChangeCallback: (value) => {
-        ipcSend('CONNECTION:CHANGE', value)
-      },
-      apiConnectionChangeCallback: (value) => {
-        ipcSend('API_CONNECTION:CHANGE', value)
-      }
-    })
-    createMenu(electron)
-    await core.setAppStatus()
-    windowController.createWindow()
-  })
-
-  electron.app.on('window-all-closed', () => {
-    if (global.CONSTANTS.PLATFORM !== 'mac') {
-      // TODO Manage background processing on every platform
-      electron.app.quit()
-    }
-  })
-
-  electron.app.on('activate', () => {
-    if (global.CONSTANTS.MAIN_WINDOW === null) windowController.createWindow()
-  })
-
-  electron.app.on('will-quit', () => {
-    electron.globalShortcut.unregisterAll()
-  })
-}
-
-const setVars = ({ app, BrowserWindow, session, dialog, shell }) => {
-  global.CONSTANTS.BROWSER_WINDOW = BROWSER_WINDOW = BrowserWindow
-  global.CONSTANTS.SESSION = session
-  global.CONSTANTS.DIALOG = DIALOG = dialog
-  global.CONSTANTS.SHELL_OPEN = shell.openItem
-}
-
 export async function askHomeFolder (e, { listenerId }) {
   let isLogged
   try {
-    const { canceled, filePaths } = await DIALOG.showOpenDialog(global.CONSTANTS.MAIN_WINDOW, {
+    const { canceled, filePaths } = await global.CONSTANTS.DIALOG.showOpenDialog(global.CONSTANTS.MAIN_WINDOW, {
       properties: ['openDirectory']
     })
     if (canceled) throw new Error('CANCELLED')
     await addHomeFolder(null, { path: filePaths[0] })
     if (!await core.stateExists()) return
     isLogged = await core.setAppStatus()
-    if (isLogged) return ipcSend('STATUS:SET')
+    if (isLogged) return global.ipcSend('STATUS:SET')
   } catch (error) {
     console.error('EROR SETTING HOME FOLDER', error)
     e.sender.send(listenerId, { error })
@@ -201,60 +145,6 @@ export async function openHomeFolder (e, { listenerId }) {
   }
 }
 
-const createMenu = ({ globalShortcut }) => {
-  if (global.ENV_PROD) {
-    globalShortcut.register('f5', global.emptyFn)
-    globalShortcut.register('CmdOrCtrl+R', global.emptyFn)
-  }
-}
-
-export const windowController = {
-  windowState: null,
-  positioner: null,
-  lockWindow (e, setSize = true) {
-    const window = global.CONSTANTS.MAIN_WINDOW
-    if (!window) return
-    setSize && window.setSize(global.CONSTANTS.MAIN_WINDOW_CONFIG.width, global.CONSTANTS.MAIN_WINDOW_CONFIG.height)
-    window.resizable = false
-    windowController.positioner.move('center')
-  },
-  unlockWindow (e, setSize = true, setPosition = true) {
-    const window = global.CONSTANTS.MAIN_WINDOW
-    if (!window) return
-
-    const windowState = windowController.windowState
-
-    window.resizable = true
-    setTimeout(() => {
-      setSize && window.setSize(windowState.width, windowState.height)
-      setPosition && windowState.x && windowState.y && window.setPosition(windowState.x, windowState.y, true)
-      windowState.manage(window)
-    }, 500)
-  },
-  createWindow () {
-    windowController.windowState = windowStateKeeper({
-      defaultWidth: global.CONSTANTS.MAIN_WINDOW_CONFIG.width,
-      defaultHeight: global.CONSTANTS.MAIN_WINDOW_CONFIG.height
-    })
-    const window = global.CONSTANTS.MAIN_WINDOW = new BROWSER_WINDOW({
-      ...global.CONSTANTS.MAIN_WINDOW_CONFIG,
-      width: global.CONSTANTS.MAIN_WINDOW_CONFIG.width,
-      height: global.CONSTANTS.MAIN_WINDOW_CONFIG.height
-    })
-    window.setPositionSafe = window.setPosition
-    window.setPosition = (x, y, animate = true) => window.setPositionSafe(x, y, animate)
-
-    windowController.positioner = new Positioner(window)
-
-    window.loadURL(process.env.NODE_ENV === 'development' ? `http://localhost:9080` : `file://${__dirname}/index.html`)
-    window.on('closed', () => {
-      global.CONSTANTS.MAIN_WINDOW = null
-      windowController.windowState = null
-      windowController.positioner = null
-    })
-  }
-}
-
 export async function login (e, { listenerId }) {
   let error
   try {
@@ -278,7 +168,7 @@ export async function logout (e, { listenerId }) {
   } finally {
     const status = getAppStatus()
     status.error = error
-    ipcSend(listenerId, status)
+    global.ipcSend(listenerId, status)
   }
 }
 
@@ -297,7 +187,7 @@ const getAppStatus = () => {
 }
 
 export async function onFfmpegBinaries () {
-  ipcSend('FFMPEG_BINS_DOWNLOADED', { value: global.CONSTANTS.FFMPEG_BINS_DOWNLOADED })
+  global.ipcSend('FFMPEG_BINS_DOWNLOADED', { value: global.CONSTANTS.FFMPEG_BINS_DOWNLOADED })
 }
 
 export async function sendStatus (e, { listenerId }) {

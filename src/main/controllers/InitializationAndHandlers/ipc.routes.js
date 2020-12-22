@@ -1,12 +1,10 @@
-// import GLOBAL from '../../Global/core.CONSTANTS'
 import * as handlers from './handlers'
 import * as sbFetch from './sbFetch'
-// import updater from './auto-update'
+import WindowController from './window.controller'
 import store from '../../../renderer/store'
 import FileWatchers from '../FileSystem/FileWatchers'
-import IpcController from './ipc.controller'
 
-const ipcSend = IpcController.send
+const ipcSend = global.ipcSend
 
 // :::::::::::::::::::::::::::::::::IPC:::::::::::::::::::::::::::::::::
 export function init (ipc = global.ipc) {
@@ -14,8 +12,8 @@ export function init (ipc = global.ipc) {
 
   ipc.on('GET_STATUS', handlers.sendStatus)
 
-  ipc.on('WINDOW:LOCK', handlers.windowController.lockWindow)
-  ipc.on('WINDOW:UNLOCK', handlers.windowController.unlockWindow)
+  ipc.on('WINDOW:LOCK', WindowController.lockWindow)
+  ipc.on('WINDOW:UNLOCK', WindowController.unlockWindow)
 
   ipc.on('YOUTUBE_DETAILS:GET', handlers.getYtTrackDetails)
 
