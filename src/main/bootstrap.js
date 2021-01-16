@@ -172,7 +172,7 @@ export default electron => new Promise(async (resolve, reject) => {
               console.log('setting execution permissions to yt-dl binary')
               const binPath = this.getBinaryPath()
               if (!binPath) throw new Error('NO BINARY PATH')
-              await new Promise((resolve, reject) => global.sudo.exec('chmod +x ' + binPath, { name: 'SongBasket' }, error => error ? reject(error) : resolve()))
+              await new Promise((resolve, reject) => global.sudo.exec('chmod +x ' + `"${binPath}"`, { name: 'SongBasket' }, error => error ? reject(error) : resolve()))
               console.log('execution permissions set to yt-dl binary')
             } catch (error) {
               console.error('ERROR SETTING EXECUTION PERMISSIONS', error)
@@ -187,6 +187,7 @@ export default electron => new Promise(async (resolve, reject) => {
           this.updateLibraryPaths()
         }
         updateLibraryPaths () {
+          console.log('\n\nsetting youtube binary ', this.getBinaryPath())
           youtubeDl.setYtdlBinary(this.getBinaryPath())
         }
       }
@@ -198,7 +199,7 @@ export default electron => new Promise(async (resolve, reject) => {
       // ------------------------------------------
       const exec = require('child_process').exec
       global.flushYtDlCache = () => new Promise((resolve, reject) => {
-        exec(youtubeDl.getYtdlBinary() + ' --rm-cache-dir', (err, out) => {
+        exec(`"${youtubeDl.getYtdlBinary()}"` + ' --rm-cache-dir', (err, out) => {
           if (err) {
             console.error('Error flushding ytdl cache', err)
             return reject(err)
