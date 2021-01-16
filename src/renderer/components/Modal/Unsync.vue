@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="container" v-if="playlist">
         <div class="header">
             Are you sure you want to unsync <span class="bold">
                 {{playlist.name}}

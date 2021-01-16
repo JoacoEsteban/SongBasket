@@ -3,7 +3,7 @@
         <unsync @close="$emit('close')" v-show="options.wich === 'unsync'" />
         <custom-track-url @close="$emit('close')" v-show="options.wich === 'custom-track-url'" />
         <reset-all-playlist-tracks @close="$emit('close')" v-show="options.wich === 'reset-all-playlist-tracks'" />
-        <track-review @close="$emit('close')" v-show="options.wich === 'track-review'" :options="options.payload" />
+        <!-- <track-review @close="$emit('close')" v-show="options.wich === 'track-review'" :options="options.payload" /> -->
         <delete-folder @close="$emit('close')" v-show="options.wich === 'delete-folder'" />
     </div>
 </template>

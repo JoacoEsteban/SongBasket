@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <div class="header">
+        <div class="header" v-if="playlist">
             Are you sure you want to reset all track selections for playlist <span class="bold">
                 {{playlist.name}}
                 </span>?
@@ -21,6 +21,9 @@ export default {
     playlist () {
       return this.$store.getters.PlaylistById(this.payload.playlistId)
     }
+  },
+  mounted () {
+    console.log('aber', this.playlist)
   },
   methods: {
     accept () {

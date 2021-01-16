@@ -34,7 +34,7 @@ const invalidWords = [
 const isInvalidWord = str => invalidWords.includes(str.toLowerCase())
 
 const normalizeConversion = conv => {
-  if (!conv.youtube_id) conv.youtube_id = conv.id
+  if (!conv?.youtube_id) conv.youtube_id = conv.id
 }
 
 const exec = ({
@@ -85,7 +85,7 @@ const makeValidRegex = str => {
   regex = regex.replace(/\]/g, '\\]')
   regex = regex.replace(/\?/g, '\\?')
 
-  return {str, regex}
+  return { str, regex }
 }
 
 const round = num => +(num).toFixed(5)
