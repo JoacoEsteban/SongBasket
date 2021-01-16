@@ -20,7 +20,6 @@ global.ipcSend = (...args) => {
 }
 
 // ---------------------FLOW---------------------
-console.log('before expor', module)
 export default electron => new Promise(async (resolve, reject) => {
   await Promise.all([
     // ---------------------ffmepeg---------------------
@@ -167,7 +166,7 @@ export default electron => new Promise(async (resolve, reject) => {
         }
 
         async setExecutionPermissions () {
-          if (global.CONSTANTS.platform !== 'windows') {
+          if (global.CONSTANTS.PLATFORM !== 'windows') {
             try {
               console.log('setting execution permissions to yt-dl binary')
               const binPath = this.getBinaryPath()
