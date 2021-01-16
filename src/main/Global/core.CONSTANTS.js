@@ -98,7 +98,8 @@ const CONSTANTS = module.exports = global.CONSTANTS = {
   HEROKU_PING_INTERVAL: 1000 * 60 * 2,
   APP_VERSION: null,
   APP_VERSION_STRING: null,
-  CHANGELOG_URL: 'https://download.songbasket.com'
+  CHANGELOG_URL: 'https://download.songbasket.com',
+  FEATURES: require('./core.FEATURES')
   // -------------
 
 }

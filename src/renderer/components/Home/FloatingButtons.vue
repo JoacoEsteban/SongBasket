@@ -3,9 +3,9 @@
   <div class="gradient"></div>
   <div class="df jucb">
     <div class="df floater-container">
-      <div class="floater rel" v-if="!forceKill.all && !forceKill.download">
+      <div class="floater rel" v-if="!forceKill.all && !forceKill.dropdown">
         <!-- <div class="dropdown"></div> -->
-        <div class="sb-fab" @click="toggleDropdown" :class="{show: showDl}">
+        <div class="sb-fab" @click="toggleDropdown" :class="{show: showDropdown}">
           <font-awesome-icon size="xs" icon="chevron-up" />
         </div>
       </div>
@@ -52,6 +52,7 @@ export default {
     HomeIcon
   },
   data () {
+    this._FEATURES = global.CONSTANTS.FEATURES.FLOAT_MENU
     return {
       route: '',
       errorPill: {
@@ -70,7 +71,8 @@ export default {
         all: false,
         sync: false,
         refresh: false,
-        download: false
+        download: false,
+        dropdown: false
       }
     }
   },
@@ -116,6 +118,9 @@ export default {
     },
     showDl () {
       return (!this.loading || this.loadingTarget === 'DOWNLOAD') && this.syncedPls.length && this.connectedToInternet && !this.forceHide.all && !this.forceHide.download && this.ffmpeg
+    },
+    showDropdown () {
+      return !this.forceHide.all && !this.forceHide.dropdown && this._FEATURES.DROPDOWN
     },
     queue () {
       return this.$store.state.CurrentUser.queuedPlaylists
