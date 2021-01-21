@@ -1,6 +1,6 @@
 {
   "name": "songbasket",
-  "version": "0.1.11-beta",
+  "version": "0.1.11.1-beta",
   "author": "Joaco Esteban <dev@joacoesteban.com>",
   "description": "Download your Spotify Playlists as MP3",
   "license": "MIT",
