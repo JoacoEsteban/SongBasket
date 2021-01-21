@@ -17,6 +17,9 @@ const env = {
   get controllers () {
     return this.instance.$controllers
   },
+  get router () {
+    return this.instance.$router
+  },
   get sbRouter () {
     return this.instance.$sbRouter
   }
