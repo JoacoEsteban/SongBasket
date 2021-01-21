@@ -52,7 +52,7 @@ export default {
     }
   },
   mounted () {
-    this.deleteFolder(this.folders[0])
+    // this.deleteFolder(this.folders[0])
   }
 }
 </script>

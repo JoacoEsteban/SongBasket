@@ -38,8 +38,8 @@ export default function (Vue) {
   ipc.on('STATUS:SET', onDocumentReady)
   ipc.on('FFMPEG_BINS_DOWNLOADED', onFfmpegBinaries)
   ipc.on('LOADING_EVENT', onLoadingEvent)
-  ipc.on('ERROR:CATCH', async ({type, error}) => {
-    await store.dispatch('catchGlobalError', {type, error})
+  ipc.on('ERROR:CATCH', async ({ type, error }) => {
+    await store.dispatch('catchGlobalError', { type, error })
   })
   ipc.on('CONNECTION:CHANGE', onConnectionChange)
   ipc.on('API_CONNECTION:CHANGE', onApiConnectionChange)
@@ -47,8 +47,8 @@ export default function (Vue) {
   ipc.on('FileWatchers:REMOVED', onRemovedTrack)
   ipc.on('FileWatchers:RETRIEVED_TRACKS', onRetrievedTracks)
   ipc.on('VUEX:STORE', storeState)
-  ipc.on('VUEX:SET', async (e, {key, value, listenerId}) => {
-    await store.dispatch('set', {key, value})
+  ipc.on('VUEX:SET', async (e, { key, value, listenerId }) => {
+    await store.dispatch('set', { key, value })
     ipc.send(listenerId)
   })
   ipc.on('DOWNLOAD:START', (e, payload) => store.dispatch('downloadStarted', payload))
@@ -60,13 +60,13 @@ export default function (Vue) {
   $(document).ready(onDocumentReady)
 }
 
-async function storeState (e, {state, listenerId, dontFormat}) {
+async function storeState (e, { state, listenerId, dontFormat }) {
   await store.dispatch('setState', state)
   !dontFormat && vue.controllers.core.formatConvertedTracks()
   await store.dispatch('stateReplaced')
   listenerId && ipc.send(listenerId)
 }
-async function onFfmpegBinaries (e, {value}) {
+async function onFfmpegBinaries (e, { value }) {
   store.dispatch('ffmpegBinsDownloaded', value)
 }
 function onConnectionChange (e, val) {
@@ -87,7 +87,7 @@ window.retrieveStatus = () => {
       if (status.APP_STATUS.IS_LOGGED) {
         await storeState(null, { state: status.state, listenerId: null, dontFormat: true })
         await onRetrievedTracks(null, status.downloadedTracks)
-        await onFfmpegBinaries(e, {value: status.FFMPEG_BINS_DOWNLOADED})
+        await onFfmpegBinaries(e, { value: status.FFMPEG_BINS_DOWNLOADED })
         await store.dispatch('SETUP_LOADING_STATE', 'found')
         await redirect('home')
         setTimeout(() => {
@@ -98,7 +98,7 @@ window.retrieveStatus = () => {
         return resolve()
       }
       let path = 'setup'
-      if (status.APP_STATUS.FOLDERS.paths.length) (path = 'folder-view') && vue.ipc.send('WINDOW:UNLOCK')
+      if (status.APP_STATUS.FOLDERS.paths.length && window.CONSTANTS.FEATURES.FOLDER_VIEW) (path = 'folder-view') && vue.ipc.send('WINDOW:UNLOCK')
       redirect(path)
       resolve()
     })
@@ -136,7 +136,7 @@ function onAddedTrack (e, track) {
   if (!id) return
   tracks[track.spotify_id][track.youtube_id].playlists.push(id)
 
-  propagateFileChange({...track, playlistId: id})
+  propagateFileChange({ ...track, playlistId: id })
 }
 function onRemovedTrack (e, track) {
   const tracks = vue.root.DOWNLOADED_TRACKS
@@ -150,7 +150,7 @@ function onRemovedTrack (e, track) {
   if (!trackRef.playlists.length) {
     tracks[track.spotify_id][track.youtube_id] = undefined
   }
-  propagateFileChange({...track, playlistId: id})
+  propagateFileChange({ ...track, playlistId: id })
 }
 function propagateFileChange (track) {
   const path = thisVue().$sbRouter.giveMeCurrent() || {}
@@ -158,7 +158,7 @@ function propagateFileChange (track) {
 
   if (env.propagationTimeout) clearTimeout(env.propagationTimeout)
   env.propagationTimeout = setTimeout(() => {
-    vue.controllers.core.formatConvertedTracks({trackFilter: (env.propagationTrackQueue.length && env.propagationTrackQueue) || null})
+    vue.controllers.core.formatConvertedTracks({ trackFilter: (env.propagationTrackQueue.length && env.propagationTrackQueue) || null })
     env.propagationTrackQueue = []
     env.propagationTimeout = null
 
