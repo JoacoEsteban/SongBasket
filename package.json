@@ -1,6 +1,6 @@
 {
   "name": "songbasket",
-  "version": "0.1.11-beta",
+  "version": "0.1.12-beta",
   "author": "Joaco Esteban <dev@joacoesteban.com>",
   "description": "Download your Spotify Playlists as MP3",
   "license": "MIT",
@@ -81,7 +81,7 @@
     "css-loader": "^0.28.11",
     "del": "^3.0.0",
     "devtron": "^1.4.0",
-    "electron": "^8.5.2",
+    "electron": "^9.4.0",
     "electron-builder": "^22.6.0",
     "electron-debug": "^1.5.0",
     "electron-devtools-installer": "^2.2.4",
