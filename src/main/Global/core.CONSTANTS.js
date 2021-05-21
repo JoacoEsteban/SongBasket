@@ -6,7 +6,7 @@ const ENV_PROD = global.ENV_PROD = process.env.NODE_ENV === 'production'
 const IS_DEV = global.IS_DEV = !ENV_PROD
 
 const APP = require('electron').app
-const CONSTANTS = module.exports = global.CONSTANTS = {
+const CONSTANTS = {
   // STATES
   ENV_PROD,
   IS_DEV,
@@ -107,6 +107,8 @@ const CONSTANTS = module.exports = global.CONSTANTS = {
 CONSTANTS.APP_VERSION = CONSTANTS.APP.getVersion()
 CONSTANTS.APP_VERSION_STRING = (CONSTANTS.APP_VERSION + ' ') + (IS_DEV ? 'Electron. Development' : 'Closed Beta')
 
-CONSTANTS.FFMPEG_BINARIES_PATH = PATH.join(global.CONSTANTS.APP_SUPPORT_PATH, 'bin', 'ffmpeg')
-CONSTANTS.YTDL_BINARIES_PATH = PATH.join(global.CONSTANTS.APP_SUPPORT_PATH, 'bin', 'ytdl')
-CONSTANTS.YTDL_VERSION_CONTROL_PATH = PATH.join(global.CONSTANTS.APP_SUPPORT_PATH, 'ytdl-version.json')
+CONSTANTS.FFMPEG_BINARIES_PATH = PATH.join(CONSTANTS.APP_SUPPORT_PATH, 'bin', 'ffmpeg')
+CONSTANTS.YTDL_BINARIES_PATH = PATH.join(CONSTANTS.APP_SUPPORT_PATH, 'bin', 'ytdl')
+CONSTANTS.YTDL_VERSION_CONTROL_PATH = PATH.join(CONSTANTS.APP_SUPPORT_PATH, 'ytdl-version.json')
+
+module.exports = global.CONSTANTS = CONSTANTS

@@ -3,8 +3,9 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import store from './store'
+import setEnvironment from './environment'
 
-require('./environment').default(Vue)
+setEnvironment(Vue)
 
 export default global.VUE_ROOT = new Vue({
   components: {

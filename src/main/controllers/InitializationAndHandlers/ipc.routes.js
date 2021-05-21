@@ -4,11 +4,11 @@ import WindowController from './window.controller'
 import store from '../../../renderer/store'
 import FileWatchers from '../FileSystem/FileWatchers'
 
-const ipcSend = global.ipcSend
-
 // :::::::::::::::::::::::::::::::::IPC:::::::::::::::::::::::::::::::::
-export function init (ipc = global.ipc) {
-  if (!ipc) throw new Error('IPC OBJECT NOT PROVIDED @ ipc.routes.init')
+export default function () {
+  const ipcSend = global.ipcSend
+  const ipc = global.ipc
+  if (!ipc) throw new Error('IPC OBJECT NOT FOUND')
 
   ipc.on('GET_STATUS', handlers.sendStatus)
 

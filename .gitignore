@@ -10,6 +10,7 @@ build/*
 build-scripts/certs
 temp/*
 logs/*
+bin/*
 .yarn
 node_modules/
 npm-debug.log

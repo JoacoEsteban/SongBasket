@@ -1,6 +1,7 @@
-const electron = require('electron')
-require('./environment-init')
-const bootstrap = require('./bootstrap').default;
+import electron from 'electron'
+import './environment-init'
+import bootstrap from './bootstrap'
+
 (async () => {
   await bootstrap(electron)
 })()

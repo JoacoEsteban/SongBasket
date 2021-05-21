@@ -148,14 +148,10 @@ const core = {
     }
   },
   setSongbasketIdGlobally: async (id = GETTERS.currentUserId()) => {
-    try {
-      if (!id) throw new Error('USER ID DOESN\'T EXIST')
-      global.USER_ID = id
-      global.SONGBASKET_ID = await core.getCredentials()
-      API.createAxiosInstance()
-    } catch (error) {
-      throw error
-    }
+    if (!id) throw new Error('USER ID DOESN\'T EXIST')
+    global.USER_ID = id
+    global.SONGBASKET_ID = await core.getCredentials()
+    API.createAxiosInstance()
   },
   setUser: userData => {
     VUEX_MAIN.COMMIT.SET_USER(userData)
