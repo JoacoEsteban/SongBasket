@@ -1,13 +1,11 @@
 import * as utils from '../../MAIN_PROCESS_UTILS'
-const youtubeDl = require('youtube-dl')
-const PATH = require('path')
-
+import youtubeDl from 'youtube-dl'
+import PATH from 'path'
+import { promises as fs, createWriteStream } from 'fs'
+import axios from 'axios'
 class YoutubeDlVersionManager {
   constructor () {
-    this.fs = require('fs').promises
-    this.createWriteStream = require('fs').createWriteStream
-    this.axios = require('axios')
-    this.fetch = this.axios.get
+    this.fetch = axios.get
     this.binariesPath = global.CONSTANTS.YTDL_BINARIES_PATH
     this.versionControlPath = global.CONSTANTS.YTDL_VERSION_CONTROL_PATH
 
@@ -19,7 +17,7 @@ class YoutubeDlVersionManager {
   async findLocalVersion () {
     try {
       console.log('Finding youtube-dl local version info')
-      this.localVersion = JSON.parse(await this.fs.readFile(this.versionControlPath, 'utf8'))
+      this.localVersion = JSON.parse(await fs.readFile(this.versionControlPath, 'utf8'))
     } catch (error) {
       this.localVersion = null
     }
@@ -36,12 +34,12 @@ class YoutubeDlVersionManager {
   }
 
   async wipeVersionInfo () {
-    this.fs.unlink(this.versionControlPath).catch(global.emptyFn)
+    fs.unlink(this.versionControlPath).catch(global.emptyFn)
     this.localVersion = null
   }
 
   async wipeBinary (binaryPath = this.getBinaryPath()) {
-    this.fs.unlink(binaryPath).catch(global.emptyFn)
+    fs.unlink(binaryPath).catch(global.emptyFn)
   }
 
   async wipeAll (binaryPath) {
@@ -62,7 +60,7 @@ class YoutubeDlVersionManager {
     this.latestVersion && console.log('youtube-dl latest version is', this.latestVersion.id)
   }
   async writeLocalVersion () {
-    await this.fs.writeFile(this.versionControlPath, JSON.stringify(this.latestVersion))
+    await fs.writeFile(this.versionControlPath, JSON.stringify(this.latestVersion))
     this.localVersion = this.latestVersion
   }
   // ------------------------------------------
@@ -105,8 +103,8 @@ class YoutubeDlVersionManager {
       this.wipeBinary(binaryPath)
     ])
 
-    const writer = this.createWriteStream(binaryPath)
-    this.axios({
+    const writer = createWriteStream(binaryPath)
+    axios({
       method: 'get',
       url: asset.browser_download_url,
       responseType: 'stream'

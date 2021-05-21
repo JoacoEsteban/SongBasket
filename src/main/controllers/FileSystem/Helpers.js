@@ -7,6 +7,7 @@ import Jimp from 'Jimp'
 import { exec } from 'child_process'
 
 import * as utils from '../../../MAIN_PROCESS_UTILS'
+import UserMethods from './UserMethods'
 
 const { PLATFORM, TEMP_PATH } = global.CONSTANTS
 const tempPath = TEMP_PATH + '/image/'
@@ -18,7 +19,7 @@ export default {
   getIconSetterHelper: () => computed.folderIconFnc || (computed.folderIconFnc = folderFns[PLATFORM]),
   plIconDownloader: (pl, iconSetterHelper) => {
     if (!pl || !pl.path || !pl.imageUrl) return null
-    require('./UserMethods').default.checkPathThenCreate(tempPath)
+    UserMethods.checkPathThenCreate(tempPath)
 
     const { path, imageUrl } = pl
     const imageTempPath = PATH.join(tempPath, uuid.v4())
@@ -172,7 +173,7 @@ const folderFns = {
     async test (path) {
       if (!path) throw new Error('NO PATH')
       try {
-        const {iconName, iniName, iconInIniTest} = this.guidelines
+        const { iconName, iniName, iconInIniTest } = this.guidelines
         const join = p => PATH.join(path, p)
         const exists = async p => utils.pathDoesExist(join(p))
 

@@ -1,12 +1,12 @@
-const dns = require('dns')
-const axios = require('axios')
+import dns from 'dns'
+import axios from 'axios'
 
 let CB
 let API_CB
 export default {
-  init ({connectionChangeCallback, apiConnectionChangeCallback}) {
-    CB = connectionChangeCallback || (() => {})
-    API_CB = apiConnectionChangeCallback || (() => {})
+  init ({ connectionChangeCallback, apiConnectionChangeCallback }) {
+    CB = connectionChangeCallback || (() => { })
+    API_CB = apiConnectionChangeCallback || (() => { })
     checkInternet()
     pingApi()
   }

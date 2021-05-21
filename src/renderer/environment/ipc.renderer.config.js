@@ -1,45 +1,23 @@
+import { ipcRenderer } from 'electron'
 import $ from 'jquery'
 import { sleep } from '../utils'
+import vue from '../controllers/VueInstance'
 
-let ipc
-let VueInstance
-const thisVue = () => (VueInstance || (VueInstance = require('../main').default))
-const vue = {
-  get ipc () {
-    return thisVue().$IPC
-  },
-  get instance () {
-    return thisVue()
-  },
-  get root () {
-    return thisVue().$root
-  },
-  get store () {
-    return thisVue().$store
-  },
-  get controllers () {
-    return thisVue().$controllers
-  }
-}
-const store = {
-  get dispatch () {
-    return thisVue().$store.dispatch
-  }
-}
-const uuid = () => thisVue().$uuid()
+const ipc = ipcRenderer
+const uuid = () => vue.instance.$uuid()
 
 const env = {
   propagationTimeout: null,
   propagationTrackQueue: []
 }
 export default function (Vue) {
-  ipc = Vue.prototype.$IPC = require('electron').ipcRenderer
+  Vue.prototype.$IPC = ipcRenderer
 
   ipc.on('STATUS:SET', onDocumentReady)
   ipc.on('FFMPEG_BINS_DOWNLOADED', onFfmpegBinaries)
   ipc.on('LOADING_EVENT', onLoadingEvent)
   ipc.on('ERROR:CATCH', async ({ type, error }) => {
-    await store.dispatch('catchGlobalError', { type, error })
+    await vue.store.dispatch('catchGlobalError', { type, error })
   })
   ipc.on('CONNECTION:CHANGE', onConnectionChange)
   ipc.on('API_CONNECTION:CHANGE', onApiConnectionChange)
@@ -48,12 +26,12 @@ export default function (Vue) {
   ipc.on('FileWatchers:RETRIEVED_TRACKS', onRetrievedTracks)
   ipc.on('VUEX:STORE', storeState)
   ipc.on('VUEX:SET', async (e, { key, value, listenerId }) => {
-    await store.dispatch('set', { key, value })
+    await vue.store.dispatch('set', { key, value })
     ipc.send(listenerId)
   })
-  ipc.on('DOWNLOAD:START', (e, payload) => store.dispatch('downloadStarted', payload))
-  ipc.on('DOWNLOAD:EVENT', (e, payload) => store.dispatch('downloadEvent', payload))
-  ipc.on('DOWNLOAD:END', async (e, payload) => store.dispatch('downloadFinished', payload))
+  ipc.on('DOWNLOAD:START', (e, payload) => vue.store.dispatch('downloadStarted', payload))
+  ipc.on('DOWNLOAD:EVENT', (e, payload) => vue.store.dispatch('downloadEvent', payload))
+  ipc.on('DOWNLOAD:END', async (e, payload) => vue.store.dispatch('downloadFinished', payload))
 
   // ipc.on('READY_TO_UPDATE', readyToUpdate)
 
@@ -61,22 +39,22 @@ export default function (Vue) {
 }
 
 async function storeState (e, { state, listenerId, dontFormat }) {
-  await store.dispatch('setState', state)
+  await vue.store.dispatch('setState', state)
   !dontFormat && vue.controllers.core.formatConvertedTracks()
-  await store.dispatch('stateReplaced')
+  await vue.store.dispatch('stateReplaced')
   listenerId && ipc.send(listenerId)
 }
 async function onFfmpegBinaries (e, { value }) {
-  store.dispatch('ffmpegBinsDownloaded', value)
+  vue.store.dispatch('ffmpegBinsDownloaded', value)
 }
 function onConnectionChange (e, val) {
-  store.dispatch('connectionChange', val)
+  vue.store.dispatch('connectionChange', val)
 }
 function onApiConnectionChange (e, val) {
-  store.dispatch('apiConnectionChange', val)
+  vue.store.dispatch('apiConnectionChange', val)
 }
 function onLoadingEvent (e, payload) {
-  store.dispatch('loadingEvent', payload)
+  vue.store.dispatch('loadingEvent', payload)
 }
 
 window.retrieveStatus = () => {
@@ -88,7 +66,7 @@ window.retrieveStatus = () => {
         await storeState(null, { state: status.state, listenerId: null, dontFormat: true })
         await onRetrievedTracks(null, status.downloadedTracks)
         await onFfmpegBinaries(e, { value: status.FFMPEG_BINS_DOWNLOADED })
-        await store.dispatch('SETUP_LOADING_STATE', 'found')
+        await vue.store.dispatch('SETUP_LOADING_STATE', 'found')
         await redirect('home')
         setTimeout(() => {
           onConnectionChange(null, status.CONNECTED_TO_INTERNET)
@@ -153,7 +131,7 @@ function onRemovedTrack (e, track) {
   propagateFileChange({ ...track, playlistId: id })
 }
 function propagateFileChange (track) {
-  const path = thisVue().$sbRouter.giveMeCurrent() || {}
+  const path = vue.sbRouter.giveMeCurrent() || {}
   env.propagationTrackQueue.push(track.spotify_id)
 
   if (env.propagationTimeout) clearTimeout(env.propagationTimeout)
@@ -175,6 +153,6 @@ function propagateFileChange (track) {
 async function redirect (path, payload) {
   await sleep(1000)
   path = (path[0] === '/' ? '' : '/') + path
-  if (path === thisVue().$route.fullPath) return console.error('ERROR Trying to navigate to same path')
-  thisVue().$router.push(path)
+  if (path === vue.instance.$route.fullPath) return console.error('ERROR Trying to navigate to same path')
+  vue.router.push(path)
 }

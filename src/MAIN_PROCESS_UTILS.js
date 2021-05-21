@@ -1,5 +1,5 @@
-const fs = require('fs')
-const PATH = require('path')
+import fs from 'fs'
+import PATH from 'path'
 
 export function cloneObject (aObject) {
   return clone(aObject)

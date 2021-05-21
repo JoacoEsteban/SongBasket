@@ -1,10 +1,10 @@
 
 import * as utils from '../../../MAIN_PROCESS_UTILS'
-const fs = require('fs')
-const ffmpeg = require('fluent-ffmpeg')
+import fs from 'fs'
+import ffmpeg from 'fluent-ffmpeg'
 
-const NodeID3 = require('node-id3')
-const axios = require('axios')
+import NodeID3 from 'node-id3'
+import axios from 'axios'
 
 export function extractMp3 (pathmp3, pathmp4, inputFormat, progressCb) {
   return new Promise((resolve, reject) => {

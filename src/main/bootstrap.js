@@ -1,5 +1,9 @@
 import youtubeDl from 'youtube-dl'
+import ffmpeg from 'fluent-ffmpeg'
+import ffbinaries from 'ffbinaries'
+import { exec } from 'child_process'
 import sudo from 'sudo-prompt'
+import pathExists from 'path-exists'
 import * as handlers from './controllers/InitializationAndHandlers/handlers'
 import * as utils from '../MAIN_PROCESS_UTILS'
 
@@ -12,7 +16,7 @@ import core from './controllers/InitializationAndHandlers/core.controller'
 import YoutubeDlVersionManager from './utils/youtube-dl-version-manager'
 import ipcRoutes from './controllers/InitializationAndHandlers/ipc.routes'
 // ---------------------utlis---------------------
-global.pathExists = require('path-exists')
+global.pathExists = pathExists
 global.sudo = sudo
 
 global.ipcSend = (...args) => {
@@ -21,8 +25,6 @@ global.ipcSend = (...args) => {
 }
 
 async function botstrapFfmpeg () {
-  const ffmpeg = require('fluent-ffmpeg')
-  const ffbinaries = require('ffbinaries')
   const binPath = global.CONSTANTS.FFMPEG_BINARIES_PATH
 
   await utils.createDirRecursive(binPath)
@@ -38,7 +40,6 @@ async function botstrapYoutubeDl () {
   const manager = new YoutubeDlVersionManager()
   await manager.checkNUpdate()
   // ------------------------------------------
-  const exec = require('child_process').exec
   global.flushYtDlCache = () => new Promise((resolve, reject) => {
     exec(`"${youtubeDl.getYtdlBinary()}"` + ' --rm-cache-dir', (err, out) => {
       if (err) {

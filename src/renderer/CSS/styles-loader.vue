@@ -1,10 +1,12 @@
 <script>
-require('./Bootstrap/bootstrap.css')
-require('./fonts.css')
-require('./user-select.css')
+import './Bootstrap/bootstrap.css'
+import './fonts.css'
+import './user-select.css'
 
-require('./variables.scss')
-require('./title-bar.scss')
-require('./global')
-require('./helpers.scss')
+import './variables.scss'
+import './title-bar.scss'
+import './global'
+import './helpers.scss'
+
+export default {}
 </script>

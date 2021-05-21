@@ -1,14 +1,21 @@
-const { BrowserWindow } = require('electron').remote
-const GLOBAL = window.CONSTANTS = require('electron').remote.getGlobal('CONSTANTS')
+import electron from 'electron'
+import '../../main/controllers/Prototype/Array'
+import '../../main/controllers/Prototype/Object'
+
+import VueRendererConfig from './vue.renderer.config'
+import WindowRendererConfig from './window.renderer.config'
+
+const { BrowserWindow, getGlobal } = electron.remote
+
+const GLOBAL = window.CONSTANTS = getGlobal('CONSTANTS')
 console.log('gl', GLOBAL)
+
 export default (Vue) => {
   // -----------------PROTOTYPES-----------------
-  require('../../main/controllers/Prototype/Array')
-  require('../../main/controllers/Prototype/Object')
   // -----------------VUE-----------------
-  require('./vue.renderer.config').default(Vue)
+  VueRendererConfig(Vue)
   // -----------------WINDOW-----------------
-  require('./window.renderer.config').default(window)
+  WindowRendererConfig(window)
 
   let electronWindow
 
@@ -29,9 +36,9 @@ export default (Vue) => {
   function toggleMaximization () {
     electronWindow && (electronWindow.isMaximized() ? electronWindow.unmaximize() : electronWindow.maximize())
   }
-  window.toggleMaximization = toggleMaximization
+  window.toggleMaximization = toggleMaximization;
 
-  ;(function () {
+  (function () {
     function init () {
       // TODO improve this logic
       const window = electronWindow = BrowserWindow.getFocusedWindow()

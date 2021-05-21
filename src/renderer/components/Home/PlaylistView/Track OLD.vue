@@ -100,7 +100,7 @@
 
 <script>
 import * as utils from '../../../utils'
-const he = require('he')
+import he from 'he'
 
 export default {
   data () {

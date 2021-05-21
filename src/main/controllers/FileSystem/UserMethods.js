@@ -3,11 +3,11 @@ import customGetters from '../../Store/Helpers/customGetters'
 import * as utils from '../../../MAIN_PROCESS_UTILS'
 import Helpers from './Helpers'
 import REGEX from '../../Global/REGEX'
-const fs = require('fs')
-const PATH = require('path')
-const rimraf = require('rimraf')
-// const NodeID3 = require('node-id3')
-const iconv = require('iconv-lite')
+import fs from 'fs'
+import PATH from 'path'
+import rimraf from 'rimraf'
+// import NodeID3 from 'node-id3'
+import iconv from 'iconv-lite'
 
 const PATHS = {
   userDataPath: global.CONSTANTS.APP_SUPPORT_PATH,

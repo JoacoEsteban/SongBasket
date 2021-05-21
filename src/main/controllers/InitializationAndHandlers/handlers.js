@@ -1,3 +1,5 @@
+import open from 'open'
+
 import FSController from '../FileSystem/index'
 // import customGetters from '../Store/Helpers/customGetters'
 import * as sbFetch from './sbFetch'
@@ -9,7 +11,7 @@ import { v4 as uuid } from 'uuid'
 
 import core from './core.controller'
 
-const openBrowser = global.openUrl = require('open')
+const openBrowser = global.openUrl = open
 
 const ipcOnce = IpcController.once
 

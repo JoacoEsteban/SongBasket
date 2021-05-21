@@ -5,6 +5,8 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import * as FontAwesome from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { v4 as uuidv4 } from 'uuid'
+import camelCase from 'camelcase'
+import constantCase from 'constant-case'
 import * as utils from '../utils'
 import SbRouter from './sbRouter'
 
@@ -15,8 +17,6 @@ const icons = [
   // 'faLongArrowDown'
 ]
 icons.forEach(icon => library.add(FontAwesome[icon]))
-
-const camelCase = require('camelcase')
 
 export default function (Vue) {
   if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
@@ -33,7 +33,7 @@ export default function (Vue) {
     $(':root')[0].style.setProperty('--' + key, val)
     window.ROOT_VARS[camelCase(key)] = valJs || val
   }
-  Vue.prototype.$constantcase = window.$constantcase = require('constant-case')
+  Vue.prototype.$constantcase = window.$constantcase = constantCase
   Vue.prototype.$camelcase = camelCase
   Vue.prototype.$ComponentRefs = {
     slides: {}

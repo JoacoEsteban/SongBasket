@@ -1,19 +1,23 @@
-(r => r.keys().forEach(r))(require.context('./controllers/Prototype', true, /\.js$/))
-
-require('./Global/core.CONSTANTS')
+import './env'
+import './controllers/Prototype'
+import './Global/core.CONSTANTS'
+import util from 'util'
+import logFile from 'electron-log'
+import fs from 'fs'
+import path from 'path'
 
 const PROD = global.CONSTANTS.ENV_PROD
 
-const util = require('util')
-const USE_PROD_BACKEND = true;
-(() => {
+const USE_PROD_BACKEND = true
+
+{
   const subDomain = 'api'
   process.env.BACKEND = PROD || USE_PROD_BACKEND ? ('https://' + subDomain + '.songbasket.com') : 'http://localhost:5000'
   global.log = (...aa) => aa.forEach(a => console.log(util.inspect(a, { showHidden: false, depth: null })))
-})()
+}
 
-const CATCH_TO_FILE = false
-const logFile = require('electron-log');
+const CATCH_TO_FILE = false;
+
 (function setErrorHandling () {
   if (PROD || CATCH_TO_FILE) {
     console.log = console.info
@@ -23,9 +27,6 @@ const logFile = require('electron-log');
     }
     process.on('uncaughtException', toLogFile)
     process.on('unhandledRejection:', toLogFile)
-
-    const fs = require('fs')
-    const path = require('path')
 
     const logsPath = path.join(global.CONSTANTS.APP_SUPPORT_PATH, 'logs')
 
@@ -50,7 +51,7 @@ const logFile = require('electron-log');
   }
 
   if (process.env.NODE_ENV !== 'development') {
-    global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
+    global.__static = path.join(__dirname, '/static').replace(/\\/g, '\\\\')
   }
 })()
 

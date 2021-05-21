@@ -1,12 +1,12 @@
-const keytar = require('keytar')
+import keytar from 'keytar'
 
-const API = require('./sbFetch')
+import * as API from './sbFetch'
 
-const GETTERS = require('../../Store/Helpers/customGetters').default
-const QUERY_MAKER = require('../../queryMaker')
-const VUEX_MAIN = require('../../Store/mainProcessStore').default
-const FSController = require('../FileSystem').default
-const ProtocolController = require('./protocol.controller').default
+import GETTERS from '../../Store/Helpers/customGetters'
+import * as QUERY_MAKER from '../../queryMaker'
+import VUEX_MAIN from '../../Store/mainProcessStore'
+import FSController from '../FileSystem'
+import ProtocolController from './protocol.controller'
 
 const core = {
   // ---------------- FILESYSTEM ----------------

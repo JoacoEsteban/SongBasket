@@ -1,7 +1,7 @@
-const UserMethods = require('../controllers/FileSystem/UserMethods').default
-const FileWatchers = require('../controllers/FileSystem/FileWatchers').default
-const trackUtils = require('./Helpers/Tracks').default
-const UTILS = require('../../MAIN_PROCESS_UTILS')
+import UserMethods from '../controllers/FileSystem/UserMethods'
+import FileWatchers from '../controllers/FileSystem/FileWatchers'
+import trackUtils from './Helpers/Tracks'
+import * as UTILS from '../../MAIN_PROCESS_UTILS'
 const FSController = {
   UserMethods,
   FileWatchers

@@ -1,9 +1,8 @@
 import $ from 'jquery'
+import vue from '../controllers/VueInstance'
 
 window.SHOW_KEYCODES = false
 
-let VueInstance
-const thisVue = () => (VueInstance || (VueInstance = require('../main').default))
 export default function (window) {
   $(window).on('mousewheel', invalidatePlTransformCache)
   $(window).on('resize', invalidatePlTransformCache)
@@ -23,32 +22,32 @@ function toggleMaximization (e) {
 }
 
 function invalidatePlTransformCache () {
-  thisVue().$root.cardTransformInvalidation = Date.now()
+  vue.root.cardTransformInvalidation = Date.now()
 }
 
 function handleMetaKeyCombo (keyCode, e) {
-  const {shiftKey} = e
+  const { shiftKey } = e
   switch (keyCode) {
     case 219:
-      thisVue().$sbRouter.goBack()
+      vue.sbRouter.goBack()
       break
     case 221:
-      thisVue().$sbRouter.goForward()
+      vue.sbRouter.goForward()
       break
     case 68:
-      (shiftKey && thisVue().$controllers.core.download((() => {
-        const path = thisVue().$sbRouter.giveMeCurrent()
+      (shiftKey && vue.controllers.core.download((() => {
+        const path = vue.sbRouter.giveMeCurrent()
         return path.name === 'playlist-view' && path.params.id
-      })())) + thisVue().$sbRouter.push({name: 'downloads-view'})
+      })())) + vue.sbRouter.push({ name: 'downloads-view' })
       break
     case 82:
-      shiftKey && (thisVue().$controllers.core.refresh() + (e && e.preventDefault()))
+      shiftKey && (vue.controllers.core.refresh() + (e && e.preventDefault()))
       break
     case 80:
-      (thisVue().$sbRouter.push({name: 'home', params: {which: 'playlists-list'}}) + (e && e.preventDefault()))
+      (vue.sbRouter.push({ name: 'home', params: { which: 'playlists-list' } }) + (e && e.preventDefault()))
       break
     case 84:
-      (thisVue().$sbRouter.push({name: 'home', params: {which: 'tracks-list'}}) + (e && e.preventDefault()))
+      (vue.sbRouter.push({ name: 'home', params: { which: 'tracks-list' } }) + (e && e.preventDefault()))
       break
     default:
   }
@@ -58,21 +57,21 @@ function isCommandKey (meta, control) {
   return control
 }
 function handleWindowKey (e) {
-  const {keyCode, metaKey, ctrlKey} = e
+  const { keyCode, metaKey, ctrlKey } = e
   if (window.SHOW_KEYCODES) console.log(keyCode)
   if (isCommandKey(metaKey, ctrlKey) && keyCode !== 8) return handleMetaKeyCombo(keyCode, e)
-  if (isAscii(keyCode) || (keyCode === 8 && thisVue().$root.searchInputElement && thisVue().$root.searchInputElement.value.length)) return focusSearchbar()
+  if (isAscii(keyCode) || (keyCode === 8 && vue.root.searchInputElement && vue.root.searchInputElement.value.length)) return focusSearchbar()
 }
 function focusSearchbar () {
-  thisVue().$root.searchInputElement && thisVue().$root.searchInputElement.focus()
+  vue.root.searchInputElement && vue.root.searchInputElement.focus()
 }
-function handleMouseKey ({button}) {
+function handleMouseKey ({ button }) {
   switch (button) {
     case 3:
-      thisVue().$sbRouter.goBack()
+      vue.sbRouter.goBack()
       break
     case 4:
-      thisVue().$sbRouter.goForward()
+      vue.sbRouter.goForward()
       break
   }
 }
