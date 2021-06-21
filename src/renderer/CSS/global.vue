@@ -39,17 +39,20 @@ h1, h2, h3, h4, h5, h6 {
   background: #ccc;
 }
 
-.window-nodrag {
-  &, * {
-    -webkit-app-region: no-drag !important;
-  }
-}
 .window-drag {
   -webkit-app-region: drag;
 }
 .window-drag-recursive {
   &, * {
     @extend .window-drag;
+  }
+  button, a, input {
+    @extend .window-nodrag;
+  }
+}
+.window-nodrag {
+  &, * {
+    -webkit-app-region: no-drag !important;
   }
 }
 

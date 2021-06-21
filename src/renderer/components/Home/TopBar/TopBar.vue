@@ -1,11 +1,11 @@
 <template>
-  <div class="tb-container window-drag" :class="{'showing-loading-bar': showingLoadingBar}">
+  <div class="tb-container window-drag-recursive" :class="{'showing-loading-bar': showingLoadingBar}">
     <div class="drop-shadow abs-full show-on-scroll"></div>
     <div class="drop-gradient abs-full hide-on-scroll"></div>
 
     <div class="title-bar-container abs-full">
       <div id="title-bar" class="mac title-section">
-        <div class="title-bar-buttons-container window-nodrag" v-if="isMac">
+        <div class="title-bar-buttons-container" v-if="isMac">
           <button id="min-btn" class="bar-btn button-minimize">
             <div class="mask"></div>
           </button>

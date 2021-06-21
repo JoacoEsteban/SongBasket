@@ -1,6 +1,5 @@
 /* GLOBAL */
 #title-bar {
-  -webkit-app-region: drag;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -8,14 +7,15 @@
   padding: 0;
   left: 0;
 }
+
 /* MACOS */
 #title-bar.mac .title {
   font-size: 14px;
 }
+
 #title-bar.mac .title-bar-buttons-container {
   display: flex;
   flex-direction: row-reverse;
-  -webkit-app-region: no-drag;
   margin-left: 4px;
 }
 
@@ -27,13 +27,13 @@
   margin: 5px;
 
   display: inline-block;
-  -webkit-app-region: no-drag;
   height: 12px;
   width: 12px;
   margin: 7.5px 4px;
   border-radius: 50%;
   overflow: hidden;
 }
+
 #title-bar.mac .title-bar-buttons-container .bar-btn .mask {
   height: 100%;
   width: 100%;
@@ -41,7 +41,9 @@
   -webkit-mask-size: 100% !important;
   mask-size: 100% !important;
 }
-#title-bar .title-bar-buttons-container .bar-btn, #title-bar .title-bar-buttons-container .bar-btn .mask {
+
+#title-bar .title-bar-buttons-container .bar-btn,
+#title-bar .title-bar-buttons-container .bar-btn .mask {
   transition: background-color var(--ts-g);
 }
 
@@ -111,6 +113,7 @@
   justify-content: left;
   overflow: visible;
 }
+
 #title-bar.windows .title-bar-buttons-container {
   height: 100%;
   display: flex;
@@ -118,7 +121,6 @@
 
 #title-bar.windows .title-bar-buttons-container .bar-btn {
   display: inline-block;
-  -webkit-app-region: no-drag;
   height: 100%;
   width: 46px;
 
@@ -142,7 +144,7 @@
 }
 
 #title-bar.windows .title-bar-buttons-container .bar-btn .mask:hover {
-  background-color: #ffffff!important;
+  background-color: #ffffff !important;
 }
 
 #title-bar.windows .title-bar-buttons-container .bar-btn.button-unmaximize .mask {
@@ -161,19 +163,18 @@
 }
 
 #title-bar.windows .title-bar-buttons-container .bar-btn.button-close:hover {
-  background-color: rgba(232, 17, 35, 0.9)!important;
+  background-color: rgba(232, 17, 35, 0.9) !important;
 }
 
 #title-bar.windows .title-bar-buttons-container .bar-btn.inactive {
-  background-color: transparent!important;
+  background-color: transparent !important;
 }
 
 #title-bar.windows .title-bar-buttons-container .bar-btn.inactive .mask {
   opacity: .4;
 }
 
-#title-bar.windows .title-bar-buttons-container .mask {
-}
+#title-bar.windows .title-bar-buttons-container .mask {}
 
 #title-bar.windows.light .title-bar-buttons-container .mask {
   background-color: #333333;
