@@ -69,9 +69,9 @@ export default {
     async setHomeFolder () {
       try {
         console.log('try')
-        await this.controller.setHomeFolder()
+        const canAdvance = await this.controller.setHomeFolder()
         console.log('resolved')
-        this.next()
+        canAdvance && this.next()
       } catch (error) {
         console.error('ERROR setting folder', error)
       }
@@ -112,7 +112,7 @@ export default {
     guestSearch (request) {
       if (this.loadingState !== 'Loading' && request.query !== '' && request.query !== undefined && request.query !== null) {
         this.$store.dispatch('SETUP_LOADING_STATE', 'loading')
-        this.$IPC.send('guestSignIn', request)
+        this.$IPC.callMain('guestSignIn', request)
       }
     },
     redirect (path, payload) {
@@ -139,29 +139,29 @@ export default {
       }
     },
     confirmUser () {
-      this.$IPC.send('guestConfirm', this.userOnHold.id)
+      this.$IPC.callMain('guestConfirm', this.userOnHold.id)
     }
 
   },
   mounted () {
-    this.$IPC.on('continueToLogin', () => {
+    this.$IPC.answerMain('continueToLogin', async () => {
       this.redirect('login')
     })
 
-    this.$IPC.on('not-found', () => {
+    this.$IPC.answerMain('not-found', async () => {
       this.$store.dispatch('SETUP_LOADING_STATE', 'not found')
     })
-    this.$IPC.on('invalid', () => {
+    this.$IPC.answerMain('invalid', async () => {
       this.$store.dispatch('SETUP_LOADING_STATE', 'invalid id')
     })
 
-    this.$IPC.on('user-found', (event, user) => {
+    this.$IPC.answerMain('user-found', async (user) => {
       this.$store.dispatch('SETUP_LOADING_STATE', 'found')
       this.userOnHold = user
       this.redirect('guest-verify', user)
     })
 
-    this.$IPC.on('playlists done', () => {
+    this.$IPC.answerMain('playlists done', async () => {
       this.$store.dispatch('SETUP_LOADING_STATE', 'found')
       this.redirect('home')
     })

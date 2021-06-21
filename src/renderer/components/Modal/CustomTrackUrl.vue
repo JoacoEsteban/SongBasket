@@ -68,25 +68,23 @@ export default {
       this.$emit('close')
       this.payload.cancelCb && this.payload.cancelCb()
     },
-    accept () {
+    async accept () {
       if (!this.valid || this.url === '') return
       this.hide = true
       this.hideControls = true
-      return new Promise(resolve => {
-        const listenerId = this.$uuid()
-        this.$IPC.once(listenerId, (event, details) => {
+
+      this.$IPC.callMain('YOUTUBE_DETAILS:GET', { url: this.url, trackId: this.payload.trackId })
+        .then((details) => {
           this.$emit('close')
           this.payload.cb && this.payload.cb()
         })
-        this.$IPC.once(listenerId + ':ERROR', () => {
+        .catch(() => {
           this.loadingText = 'Video not found'
           setTimeout(() => {
             this.hideControls = false
             this.loadingText = 'Loading'
           }, 200)
         })
-        this.$IPC.send('YOUTUBE_DETAILS:GET', {url: this.url, trackId: this.payload.trackId, listenerId})
-      })
     }
   }
 }

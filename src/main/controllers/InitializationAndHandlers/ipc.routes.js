@@ -3,36 +3,36 @@ import * as sbFetch from './sbFetch'
 import WindowController from './window.controller'
 import store from '../../../renderer/store'
 import FileWatchers from '../FileSystem/FileWatchers'
+import { ipcMain } from 'electron-better-ipc'
 
 // :::::::::::::::::::::::::::::::::IPC:::::::::::::::::::::::::::::::::
 export default function () {
   const ipcSend = global.ipcSend
-  const ipc = global.ipc
-  if (!ipc) throw new Error('IPC OBJECT NOT FOUND')
+  const on = ipcMain.answerRenderer
 
-  ipc.on('GET_STATUS', handlers.sendStatus)
+  on('GET_STATUS', handlers.sendStatus)
 
-  ipc.on('WINDOW:LOCK', WindowController.lockWindow)
-  ipc.on('WINDOW:UNLOCK', WindowController.unlockWindow)
+  on('WINDOW:LOCK', WindowController.lockWindow)
+  on('WINDOW:UNLOCK', WindowController.unlockWindow)
 
-  ipc.on('YOUTUBE_DETAILS:GET', handlers.getYtTrackDetails)
+  on('YOUTUBE_DETAILS:GET', handlers.getYtTrackDetails)
 
-  ipc.on('download', handlers.download)
+  on('download', handlers.download)
 
-  ipc.on('VIDEO:OPEN', handlers.openYtVideo)
-  ipc.on('VIDEO:SEARCH', handlers.searchYtVideo)
+  on('VIDEO:OPEN', handlers.openYtVideo)
+  on('VIDEO:SEARCH', handlers.searchYtVideo)
 
-  ipc.on('HOME_FOLDERS:ASK', handlers.askHomeFolder)
-  ipc.on('HOME_FOLDER:SET', handlers.setHomeFolder)
-  ipc.on('HOME_FOLDER:OPEN', handlers.openHomeFolder)
+  on('HOME_FOLDERS:ASK', handlers.askHomeFolder)
+  on('HOME_FOLDER:SET', handlers.setHomeFolder)
+  on('HOME_FOLDER:OPEN', handlers.openHomeFolder)
 
-  ipc.on('LOGIN', handlers.login)
+  on('LOGIN', handlers.login)
 
-  ipc.on('LOGOUT', handlers.logout)
+  on('LOGOUT', handlers.logout)
 
-  // ipc.on('APP_UPDATE:CONFIRM', updater.handlers.onUserUpdateConfirmation)
+  // on('APP_UPDATE:CONFIRM', updater.handlers.onUserUpdateConfirmation)
 
-  ipc.on('guestSignIn', function (event, { mode, query }) {
+  on('guestSignIn', function (event, { mode, query }) { // TODO deprecate
     console.log('Guest:: Type:', mode, query)
     if (mode === 'user') {
       if (!query) return
@@ -71,7 +71,7 @@ export default function () {
     }
   })
 
-  ipc.on('guestConfirm', async function (event, userID) {
+  on('guestConfirm', async function (event, userID) { // TODO deprecate
     // Saving Home folder to .songbasket-userdata
     try {
       console.log(`Fetching Playlists from Guest user ${userID}`)
@@ -79,29 +79,22 @@ export default function () {
     } catch (err) { throw err }
   })
 
-  ipc.on('REFRESH', handlers.refresh)
+  on('REFRESH', handlers.refresh)
 
-  ipc.on('PLAYLISTS:LOAD_MORE', async (e, { listenerId }) => {
-    let err
-    try {
-      await handlers.loadMorePlaylists()
-    } catch (error) {
-      err = error
-    } finally {
-      e.sender.send(listenerId, err)
-    }
+  on('PLAYLISTS:LOAD_MORE', async () => {
+    await handlers.loadMorePlaylists()
   })
 
-  ipc.on('get tracks from', function (event, id) {
+  on('get tracks from', function (event, id) { // TODO deprecate
     console.log('wtf')
   })
 
-  ipc.on('Youtube Convert', handlers.youtubize)
+  on('Youtube Convert', handlers.youtubize)
 
-  ipc.on('PLAYLISTS:QUEUE', function (event, id) {
+  on('PLAYLISTS:QUEUE', async function (event, id) {
     handlers.queuePlaylist(id)
   })
-  ipc.on('PLAYLISTS:UNSYNC', async function (event, { id, listenerId }) {
+  on('PLAYLISTS:UNSYNC', async function (event, { id, listenerId }) {
     let error
     try {
       await handlers.unsyncPlaylist(id)
@@ -112,40 +105,21 @@ export default function () {
     }
   })
 
-  ipc.on('PLAYLISTS:PAUSE', async function (event, { id, listenerId }) {
-    let error
-    try {
-      await handlers.pausePlaylist(id)
-    } catch (err) {
-      error = err
-    } finally {
-      event.sender.send(listenerId, error)
-    }
+  on('PLAYLISTS:PAUSE', async function ({ id }) {
+    await handlers.pausePlaylist(id)
   })
 
-  ipc.on('TRACK:PAUSE', async function (event, { id, listenerId }) {
-    let error
-    try {
-      await handlers.pauseTrack(id)
-    } catch (err) {
-      error = err
-    } finally {
-      event.sender.send(listenerId, error)
-    }
+  on('TRACK:PAUSE', async function ({ id }) {
+    await handlers.pauseTrack(id)
   })
 
-  ipc.on('TRACK:CHANGE_SELECTION', async function (event, { trackId, newId, listenerId }) {
-    let error
-    try {
-      await handlers.changeYtTrackSelection({ trackId, newId })
-    } catch (err) {
-      error = err
-    }
-    event.sender.send(listenerId, error)
+  on('TRACK:CHANGE_SELECTION', async function ({ trackId, newId }) {
+    await handlers.changeYtTrackSelection({ trackId, newId })
   })
   // FileWatchers
+  // TODO turn into ipc promise
 
-  ipc.on('FileWatchers:ASK_TRACKS', function () {
+  on('FileWatchers:ASK_TRACKS', function () {
     ipcSend('FileWatchers:RETRIEVED_TRACKS', FileWatchers.retrieveTracks())
   })
 

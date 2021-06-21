@@ -1,10 +1,10 @@
-import { ipcRenderer } from 'electron'
+// import { ipcRenderer } from 'electron'
+import { ipcRenderer } from 'electron-better-ipc'
 import $ from 'jquery'
 import { sleep } from '../utils'
 import vue from '../controllers/VueInstance'
 
 const ipc = ipcRenderer
-const uuid = () => vue.instance.$uuid()
 
 const env = {
   propagationTimeout: null,
@@ -12,84 +12,81 @@ const env = {
 }
 export default function (Vue) {
   Vue.prototype.$IPC = ipcRenderer
+  console.log(ipc)
 
-  ipc.on('STATUS:SET', onDocumentReady)
-  ipc.on('FFMPEG_BINS_DOWNLOADED', onFfmpegBinaries)
-  ipc.on('LOADING_EVENT', onLoadingEvent)
-  ipc.on('ERROR:CATCH', async ({ type, error }) => {
+  ipc.answerMain('STATUS:SET', onDocumentReady)
+  ipc.answerMain('FFMPEG_BINS_DOWNLOADED', onFfmpegBinaries)
+  ipc.answerMain('LOADING_EVENT', onLoadingEvent)
+  ipc.answerMain('ERROR:CATCH', async ({ type, error }) => {
     await vue.store.dispatch('catchGlobalError', { type, error })
   })
-  ipc.on('CONNECTION:CHANGE', onConnectionChange)
-  ipc.on('API_CONNECTION:CHANGE', onApiConnectionChange)
-  ipc.on('FileWatchers:ADDED', onAddedTrack)
-  ipc.on('FileWatchers:REMOVED', onRemovedTrack)
-  ipc.on('FileWatchers:RETRIEVED_TRACKS', onRetrievedTracks)
-  ipc.on('VUEX:STORE', storeState)
-  ipc.on('VUEX:SET', async (e, { key, value, listenerId }) => {
+  ipc.answerMain('CONNECTION:CHANGE', onConnectionChange)
+  ipc.answerMain('API_CONNECTION:CHANGE', onApiConnectionChange)
+  ipc.answerMain('FileWatchers:ADDED', onAddedTrack)
+  ipc.answerMain('FileWatchers:REMOVED', onRemovedTrack)
+  ipc.answerMain('FileWatchers:RETRIEVED_TRACKS', onRetrievedTracks)
+  ipc.answerMain('VUEX:STORE', storeState)
+  ipc.answerMain('VUEX:SET', async ({ key, value }) => {
     await vue.store.dispatch('set', { key, value })
-    ipc.send(listenerId)
   })
-  ipc.on('DOWNLOAD:START', (e, payload) => vue.store.dispatch('downloadStarted', payload))
-  ipc.on('DOWNLOAD:EVENT', (e, payload) => vue.store.dispatch('downloadEvent', payload))
-  ipc.on('DOWNLOAD:END', async (e, payload) => vue.store.dispatch('downloadFinished', payload))
+  ipc.answerMain('DOWNLOAD:START', (payload) => vue.store.dispatch('downloadStarted', payload))
+  ipc.answerMain('DOWNLOAD:EVENT', (payload) => vue.store.dispatch('downloadEvent', payload))
+  ipc.answerMain('DOWNLOAD:END', async (payload) => vue.store.dispatch('downloadFinished', payload))
 
   // ipc.on('READY_TO_UPDATE', readyToUpdate)
 
   $(document).ready(onDocumentReady)
 }
 
-async function storeState (e, { state, listenerId, dontFormat }) {
+async function storeState ({ state, dontFormat }) {
   await vue.store.dispatch('setState', state)
   !dontFormat && vue.controllers.core.formatConvertedTracks()
   await vue.store.dispatch('stateReplaced')
-  listenerId && ipc.send(listenerId)
 }
-async function onFfmpegBinaries (e, { value }) {
+async function onFfmpegBinaries ({ value }) {
   vue.store.dispatch('ffmpegBinsDownloaded', value)
 }
-function onConnectionChange (e, val) {
+async function onConnectionChange (val) {
   vue.store.dispatch('connectionChange', val)
 }
-function onApiConnectionChange (e, val) {
+async function onApiConnectionChange (val) {
   vue.store.dispatch('apiConnectionChange', val)
 }
-function onLoadingEvent (e, payload) {
+async function onLoadingEvent (payload) {
   vue.store.dispatch('loadingEvent', payload)
 }
 
-window.retrieveStatus = () => {
-  return new Promise((resolve, reject) => {
-    const listenerId = uuid()
-    vue.ipc.once(listenerId, async (e, status) => {
-      console.log('Setting app status', status)
-      if (status.APP_STATUS.IS_LOGGED) {
-        await storeState(null, { state: status.state, listenerId: null, dontFormat: true })
-        await onRetrievedTracks(null, status.downloadedTracks)
-        await onFfmpegBinaries(e, { value: status.FFMPEG_BINS_DOWNLOADED })
-        await vue.store.dispatch('SETUP_LOADING_STATE', 'found')
-        await redirect('home')
-        setTimeout(() => {
-          onConnectionChange(null, status.CONNECTED_TO_INTERNET)
-          onApiConnectionChange(null, status.CONNECTED_TO_API)
-        }, 1000)
-        vue.ipc.send('WINDOW:UNLOCK')
-        return resolve()
-      }
-      let path = 'setup'
-      console.log('dou?', window.CONSTANTS.FEATURES.FOLDER_VIEW)
-      if (status.APP_STATUS.FOLDERS.paths.length && window.CONSTANTS.FEATURES.FOLDER_VIEW) (path = 'folder-view') && vue.ipc.send('WINDOW:UNLOCK')
-      redirect(path)
-      resolve()
-    })
-    vue.ipc.send('GET_STATUS', { listenerId })
-  })
+window.retrieveStatus = async () => {
+  const status = await vue.ipc.callMain('GET_STATUS')
+  console.log('Setting app status', status)
+  if (status.APP_STATUS.IS_LOGGED) {
+    await storeState({ state: status.state, dontFormat: true })
+    await onRetrievedTracks(status.downloadedTracks)
+    await onFfmpegBinaries({ value: status.FFMPEG_BINS_DOWNLOADED })
+    await vue.store.dispatch('SETUP_LOADING_STATE', 'found')
+    await redirect('home')
+    setTimeout(() => {
+      onConnectionChange(status.CONNECTED_TO_INTERNET)
+      onApiConnectionChange(status.CONNECTED_TO_API)
+    }, 1000)
+    vue.ipc.callMain('WINDOW:UNLOCK')
+    return
+  }
+
+  let path = 'setup'
+
+  if (status.APP_STATUS.FOLDERS.paths.length && window.CONSTANTS.FEATURES.FOLDER_VIEW) {
+    path = 'folder-view'
+    vue.ipc.callMain('WINDOW:UNLOCK')
+  }
+  redirect(path)
 }
 
 function onDocumentReady () {
   if (!window.VUE_HAS_MOUNTED) return setTimeout(onDocumentReady, 100)
   window.retrieveStatus()
 }
-async function onRetrievedTracks (e, tracks = {}) {
+async function onRetrievedTracks (tracks = {}) {
   console.log('RETRIEVED', Object.keys(tracks).length)
   for (const primKey in tracks) {
     for (const secKey in tracks[primKey]) {
@@ -104,7 +101,7 @@ function getPlaylistIdFromFoldername (name) {
   return pl && pl.id
 }
 
-function onAddedTrack (e, track) {
+function onAddedTrack (track) {
   console.log('track added')
   const tracks = vue.root.DOWNLOADED_TRACKS
 
@@ -117,7 +114,7 @@ function onAddedTrack (e, track) {
 
   propagateFileChange({ ...track, playlistId: id })
 }
-function onRemovedTrack (e, track) {
+function onRemovedTrack (track) {
   const tracks = vue.root.DOWNLOADED_TRACKS
 
   if (!tracks[track.spotify_id] || !tracks[track.spotify_id][track.youtube_id]) return

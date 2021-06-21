@@ -1,38 +1,19 @@
 import env from './VueInstance'
-const uuid = () => env.instance.$uuid()
 
 const CoreController = {
-  queuePlaylist (id) {
-    env.ipc.send('PLAYLISTS:QUEUE', id)
+  async queuePlaylist (id) {
+    await env.ipc.callMain('PLAYLISTS:QUEUE', id)
   },
-  loadMorePlaylists () {
-    return new Promise((resolve, reject) => {
-      const listenerId = uuid()
-      env.ipc.once(listenerId, async (e, error) => error ? reject(error) : resolve())
-      env.ipc.send('PLAYLISTS:LOAD_MORE', { listenerId })
-    })
+  async loadMorePlaylists () {
+    await env.ipc.callMain('PLAYLISTS:LOAD_MORE')
   },
-  unsyncPlaylist (id) {
-    return new Promise((resolve, reject) => {
-      const listenerId = uuid()
-      env.ipc.once(listenerId, async (e, error) => {
-        await env.store.dispatch('playlistUnsynced')
-        error ? reject(error) : resolve()
-      })
-      env.ipc.send('PLAYLISTS:UNSYNC', { id, listenerId })
-    })
+  async unsyncPlaylist (id) {
+    await env.ipc.callMain('PLAYLISTS:UNSYNC', { id })
+    await env.store.dispatch('playlistUnsynced')
   },
-  changeYtTrackSelection ({ trackId, newId }) {
-    return new Promise((resolve, reject) => {
-      const listenerId = uuid()
-      env.ipc.once(listenerId, (e, error) => {
-        error ? reject(error) : (async () => {
-          CoreController.formatConvertedTracks({ trackFilter: [trackId] })
-          resolve()
-        })()
-      })
-      env.ipc.send('TRACK:CHANGE_SELECTION', { trackId, newId, listenerId })
-    })
+  async changeYtTrackSelection ({ trackId, newId }) {
+    env.ipc.callMain('TRACK:CHANGE_SELECTION', { trackId, newId })
+    CoreController.formatConvertedTracks({ trackFilter: [trackId] })
   },
   formatConvertedTracks (params = { plFilter: null, trackFilter: null }) {
     const rootTracks = env.root.CONVERTED_TRACKS_FORMATTED
@@ -56,104 +37,69 @@ const CoreController = {
   async refresh () {
     const loading = env.store.state.Events.LOADING_STATE || {}
     if (loading.value) return
-    env.ipc.send('REFRESH')
     env.sbRouter.push({ name: 'home', params: { which: 'playlists-list' } })
+    await env.ipc.callMain('REFRESH')
   },
-  download (playlistFilter) {
+  async download (playlistFilter) {
     const loading = env.store.state.Events.LOADING_STATE || {}
-    if (!loading.value) env.ipc.send('download', playlistFilter)
+    if (!loading.value) await env.ipc.callMain('download', playlistFilter)
     env.sbRouter.push({ name: 'downloads-view' })
   },
-  pausePlaylist (id) {
-    return new Promise((resolve, reject) => {
-      const loading = env.store.state.Events.LOADING_STATE || {}
-      if (loading.value) return
-      const listenerId = uuid()
-      env.ipc.once(listenerId, (e, error) => error ? reject(error) : resolve())
-      env.ipc.send('PLAYLISTS:PAUSE', { id, listenerId })
-    })
+  async pausePlaylist (id) {
+    const loading = env.store.state.Events.LOADING_STATE || {}
+    if (loading.value) return
+    await env.ipc.callMain('PLAYLISTS:PAUSE', { id })
   },
-  pauseTrack (id) {
-    return new Promise((resolve, reject) => {
-      const loading = env.store.state.Events.LOADING_STATE || {}
-      if (loading.value) return
-      const listenerId = uuid()
-      env.ipc.once(listenerId, (e, error) => error ? reject(error) : resolve())
-      env.ipc.send('TRACK:PAUSE', { id, listenerId })
-    })
+  async pauseTrack (id) {
+    const loading = env.store.state.Events.LOADING_STATE || {}
+    if (loading.value) return
+    await env.ipc.callMain('TRACK:PAUSE', { id })
   },
   askTrackCustomUrl (trackId) {
     return new Promise((resolve, reject) => {
       env.root.OPEN_MODAL({ wich: 'custom-track-url', payload: { trackId, cb: resolve, cancelCB: reject } })
     })
   },
-  askRemoveFolder (payload) {
-    return new Promise((resolve, reject) => {
-      console.log('vamos', env)
-      env.root.OPEN_MODAL({ wich: 'delete-folder', payload })
-    })
+  async askRemoveFolder (payload) {
+    console.log('vamos', env)
+    env.root.OPEN_MODAL({ wich: 'delete-folder', payload })
   },
-  reviewTrack (track) {
+  async reviewTrack (track) {
     env.sbRouter.push({ name: 'track-review', params: { track } })
   },
-  openVideo (id) {
+  async openVideo (id) {
     if (!id) return
-    env.ipc.send('VIDEO:OPEN', id)
+    await env.ipc.callMain('VIDEO:OPEN', id)
   },
-  searchYt (track) {
+  async searchYt (track) {
     const query = track.query && track.query.query
     if (!query) return
-    env.ipc.send('VIDEO:SEARCH', query)
+    await env.ipc.callMain('VIDEO:SEARCH', query)
   },
   async logOut () {
-    try {
-      if (!global.CONSTANTS.APP_STATUS.IS_LOGGED) return
-      console.log('Logging Out:::::')
-      const listenerId = uuid()
-      env.ipc.once(listenerId, async (e, appStatus) => {
-        try {
-          if (appStatus.error) throw appStatus.error
-          await env.instance.$store.dispatch('logout')
-          env.root.DOWNLOADED_TRACKS = {}
-          env.root.CONVERTED_TRACKS_FORMATTED = {}
+    if (!global.CONSTANTS.APP_STATUS.IS_LOGGED) return
+    console.log('Logging Out:::::')
 
-          let path = 'folder-view'
-          if (!appStatus.APP_STATUS.FOLDERS.paths.length || !window.CONSTANTS.FEATURES.FOLDER_VIEW) {
-            env.ipc.send('WINDOW:LOCK')
-            path = 'setup'
-          }
-          env.instance.$router.push(path)
-        } catch (error) {
-          throw error
-        }
-      })
-      env.ipc.send('LOGOUT', { listenerId })
-    } catch (error) {
-      throw error
+    const appStatus = await env.ipc.callMain('LOGOUT')
+
+    if (appStatus.error) throw appStatus.error
+    await env.instance.$store.dispatch('logout')
+    env.root.DOWNLOADED_TRACKS = {}
+    env.root.CONVERTED_TRACKS_FORMATTED = {}
+
+    let path = 'folder-view'
+    if (!appStatus.APP_STATUS.FOLDERS.paths.length || !window.CONSTANTS.FEATURES.FOLDER_VIEW) {
+      env.ipc.callMain('WINDOW:LOCK')
+      path = 'setup'
     }
+    env.instance.$router.push(path)
   },
   async setHomeFolder (path) {
-    try {
-      const listenerId = uuid()
-      env.ipc.once(listenerId, async (e, { error }) => {
-        if (error) throw error
-        await window.retrieveStatus()
-      })
-      env.ipc.send('HOME_FOLDER:SET', { path, listenerId })
-    } catch (error) {
-      throw error
-    }
+    await env.ipc.callMain('HOME_FOLDER:SET', { path })
+    await window.retrieveStatus()
   },
   async openHomeFolder () {
-    try {
-      const listenerId = uuid()
-      env.ipc.once(listenerId, async (e, error) => {
-        if (error) throw error
-      })
-      env.ipc.send('HOME_FOLDER:OPEN', { listenerId })
-    } catch (error) {
-      throw error
-    }
+    await env.ipc.callMain('HOME_FOLDER:OPEN')
   }
 }
 

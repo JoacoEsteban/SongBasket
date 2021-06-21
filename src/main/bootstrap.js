@@ -15,14 +15,12 @@ import WindowController from './controllers/InitializationAndHandlers/window.con
 import core from './controllers/InitializationAndHandlers/core.controller'
 import YoutubeDlVersionManager from './utils/youtube-dl-version-manager'
 import ipcRoutes from './controllers/InitializationAndHandlers/ipc.routes'
+// import ipcMain from 'electron-better-ipc'
 // ---------------------utlis---------------------
 global.pathExists = pathExists
 global.sudo = sudo
 
-global.ipcSend = (...args) => {
-  if (!global.CONSTANTS.MAIN_WINDOW) return
-  return IpcController.send(...args)
-}
+global.ipcSend = IpcController.send
 
 async function botstrapFfmpeg () {
   const binPath = global.CONSTANTS.FFMPEG_BINARIES_PATH
