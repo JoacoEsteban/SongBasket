@@ -72,13 +72,13 @@ export default {
     loadMore () {
       if (!this.loading) {
         this.loading = true
-        this.$IPC.send('loadMore')
+        this.$IPC.callMain('loadMore')
       }
     },
     openPlaylist (id) {
       console.log(id, this.syncedPlaylists.length, this.playlistSynced(id))
       if (this.playlistSynced(id)) return this.setPlaylistNPush(id)
-      this.$IPC.send('get tracks from', id)
+      this.$IPC.callMain('get tracks from', id)
     },
     setPlaylistNPush (id) {
       this.$sbRouter.push({name: 'playlist-view', params: {id}})
@@ -87,11 +87,11 @@ export default {
       return this.syncedPlaylists.some(p => p === id)
     },
     youtubeConvert () {
-      this.$IPC.send('Youtube Convert')
+      this.$IPC.callMain('Youtube Convert')
     },
     openYtVideo (id) {
       console.log('openYtVideo', id)
-      this.$IPC.send('openYtVideo', id)
+      this.$IPC.callMain('openYtVideo', id)
     }
   },
   mounted () {
@@ -99,7 +99,7 @@ export default {
 
     if (this.$store.state.CurrentUser.playlists.length === 0) { this.$router.push('/empty') }
 
-    this.$IPC.on('done loading', () => {
+    this.$IPC.answerMain('done loading', async () => {
       this.loading = false
     })
   }

@@ -163,7 +163,7 @@ export default {
   },
   mounted () {
     console.log('from pllist rebefo', this.searchInput, this.$root.SEARCH_INPUT)
-    this.$IPC.on('done loading', () => {
+    this.$IPC.answerMain('done loading', async () => {
       this.loading = false
     })
     this.refreshAll()

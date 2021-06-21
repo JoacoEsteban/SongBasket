@@ -4,16 +4,16 @@ import FSController from '../FileSystem/index'
 // import customGetters from '../Store/Helpers/customGetters'
 import * as sbFetch from './sbFetch'
 import FileWatchers from '../FileSystem/FileWatchers'
-import IpcController from './ipc.controller'
+// import IpcController from './ipc.controller'
 import youtubeDl from '../DownloadPhase/youtube-dl'
 import VUEX_MAIN from '../../Store/mainProcessStore'
-import { v4 as uuid } from 'uuid'
+// import { v4 as uuid } from 'uuid'
 
 import core from './core.controller'
 
 const openBrowser = global.openUrl = open
 
-const ipcOnce = IpcController.once
+// const ipcOnce = IpcController.once
 
 console.log('NODE ENV', process.env.NODE_ENV)
 
@@ -69,97 +69,63 @@ export function normalizeError (error) {
   return error
 }
 
-export function REFLECT_RENDERER () {
-  return new Promise((resolve, reject) => {
-    const listenerId = uuid()
-    ipcOnce(listenerId, resolve)
-    global.ipcSend('VUEX:STORE', { state: VUEX_MAIN.STATE_SAFE(), listenerId })
-  })
+export async function REFLECT_RENDERER () {
+  await global.ipcSend('VUEX:STORE', { state: VUEX_MAIN.STATE_SAFE() })
 }
-export function REFLECT_RENDERER_KEY (key) {
-  return new Promise((resolve, reject) => {
-    const listenerId = uuid()
-    ipcOnce(listenerId, resolve)
-    const value = VUEX_MAIN.STATE_SAFE(key)[key]
-    global.ipcSend('VUEX:SET', { key, value, listenerId })
-  })
+export async function REFLECT_RENDERER_KEY (key) {
+  const value = VUEX_MAIN.STATE_SAFE(key)[key]
+  await global.ipcSend('VUEX:SET', { key, value })
 }
-export function SEND_ERROR ({ type, error }) {
-  return new Promise((resolve, reject) => {
-    global.ipcSend('ERROR:CATCH', { type, error: normalizeError(error) })
-  })
+export async function SEND_ERROR ({ type, error }) {
+  await global.ipcSend('ERROR:CATCH', { type, error: normalizeError(error) })
 }
 
 // ------------------------- FLOW -------------------------
 
-export async function askHomeFolder (e, { listenerId }) {
-  let isLogged
+export async function askHomeFolder () {
+  let isLogged = false
+  let error = null
+
   try {
     const { canceled, filePaths } = await global.CONSTANTS.DIALOG.showOpenDialog(global.CONSTANTS.MAIN_WINDOW, {
       properties: ['openDirectory']
     })
     if (canceled) throw new Error('CANCELLED')
-    await addHomeFolder(null, { path: filePaths[0] })
-    if (!await core.stateExists()) return
-    isLogged = await core.setAppStatus()
-    if (isLogged) return global.ipcSend('STATUS:SET')
-  } catch (error) {
-    console.error('EROR SETTING HOME FOLDER', error)
-    e.sender.send(listenerId, { error })
-  } finally {
-    e.sender.send(listenerId, { isLogged })
-  }
-}
-
-export async function addHomeFolder (e, { path, listenerId }) {
-  let error
-  try {
-    await core.addHomeFolder(path)
-    if (e && listenerId) return e.sender.send(listenerId, {})
+    await addHomeFolder({ path: filePaths[0] })
+    if (await core.stateExists()) {
+      isLogged = await core.setAppStatus()
+      if (isLogged) {
+        global.ipcSend('STATUS:SET')
+      }
+    }
   } catch (err) {
+    console.error('EROR SETTING HOME FOLDER', err)
     error = err
-    if (e && listenerId) return e.sender.send(listenerId, { error })
-    throw error
   }
+  return ({ isLogged, error })
 }
 
-export async function setHomeFolder (e, { path, listenerId }) {
-  let error
-  try {
-    await addHomeFolder(e, { path })
-    await core.setAppStatus()
-    if (e && listenerId) return e.sender.send(listenerId, {})
-  } catch (err) {
-    error = err
-    if (e && listenerId) return e.sender.send(listenerId, { error })
-    throw error
-  }
+export async function addHomeFolder ({ path }) {
+  await core.addHomeFolder(path)
+  return {}
 }
 
-export async function openHomeFolder (e, { listenerId }) {
-  let error
-  try {
-    await global.CONSTANTS.SHELL_OPEN(global.HOME_FOLDER)
-  } catch (err) {
-    error = err
-  } finally {
-    e.sender.send(listenerId, error)
-  }
+export async function setHomeFolder ({ path }) {
+  await addHomeFolder({ path })
+  await core.setAppStatus()
+  return {}
 }
 
-export async function login (e, { listenerId }) {
-  let error
-  try {
-    await core.initializeLogin()
-    await REFLECT_RENDERER()
-  } catch (err) {
-    error = err
-  } finally {
-    e.sender.send(listenerId, error)
-  }
+export async function openHomeFolder () {
+  await global.CONSTANTS.SHELL_OPEN(global.HOME_FOLDER)
 }
 
-export async function logout (e, { listenerId }) {
+export async function login () {
+  await core.initializeLogin()
+  await REFLECT_RENDERER()
+}
+
+export async function logout () {
   let error
   try {
     if (!global.CONSTANTS.APP_STATUS.IS_LOGGED) throw new Error('NOT LOGGED IN')
@@ -167,11 +133,10 @@ export async function logout (e, { listenerId }) {
   } catch (err) {
     error = err
     SEND_ERROR(err)
-  } finally {
-    const status = getAppStatus()
-    status.error = error
-    global.ipcSend(listenerId, status)
   }
+  const status = getAppStatus()
+  status.error = error
+  return status
 }
 
 const getAppStatus = () => {
@@ -192,8 +157,8 @@ export async function onFfmpegBinaries () {
   global.ipcSend('FFMPEG_BINS_DOWNLOADED', { value: global.CONSTANTS.FFMPEG_BINS_DOWNLOADED })
 }
 
-export async function sendStatus (e, { listenerId }) {
-  e.sender.send(listenerId, getAppStatus())
+export async function sendStatus () {
+  return getAppStatus()
 }
 
 // ------- EXTERNAL SOURCES -------
@@ -266,7 +231,7 @@ export async function download (e, plFilter) {
   }
 }
 
-export function queuePlaylist (id) {
+export async function queuePlaylist (id) {
   VUEX_MAIN.COMMIT.QUEUE_PLAYLIST(id)
   REFLECT_RENDERER_KEY('queuedPlaylists')
 }
@@ -324,30 +289,29 @@ export async function changeYtTrackSelection ({ trackId, newId }) {
   }
 }
 
-export async function getYtTrackDetails (event, { url, trackId, listenerId }) {
+export async function getYtTrackDetails ({ url, trackId }) {
   if (!loadingController.canRequest) return
   try {
     const details = await sbFetch.ytDetails(url)
     console.log('YT Details retrieved', details)
     VUEX_MAIN.COMMIT.CUSTOM_TRACK_URL({ details, trackId })
     await REFLECT_RENDERER_KEY('convertedTracks')
-    event.sender.send(listenerId)
   } catch (err) {
     console.error('EROR AT YTTRACKDETAILS:: ipc"ytTrackDetails"', err)
-    event.sender.send(listenerId + ':ERROR')
+    throw err
   }
 }
 
-export function openYtVideo (event, id) {
+export async function openYtVideo (id) {
   if (!id) return
   openBrowser('https://www.youtube.com/watch?v=' + id)
 }
 
-export function searchYtVideo (event, query) {
+export async function searchYtVideo (query) {
   if (!query) return
   openBrowser('https://www.youtube.com/results?search_query=' + query)
 }
 
-export function showChangelog (event, query) {
+export async function showChangelog (query) {
   global.openUrl(global.CONSTANTS.CHANGELOG_URL)
 }
