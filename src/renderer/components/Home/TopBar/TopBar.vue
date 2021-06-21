@@ -4,8 +4,8 @@
     <div class="drop-gradient abs-full hide-on-scroll"></div>
 
     <div class="title-bar-container abs-full">
-      <div id="title-bar" class="mac title-section window-nodrag">
-        <div class="title-bar-buttons-container" v-if="isMac">
+      <div id="title-bar" class="mac title-section">
+        <div class="title-bar-buttons-container window-nodrag" v-if="isMac">
           <button id="min-btn" class="bar-btn button-minimize">
             <div class="mask"></div>
           </button>

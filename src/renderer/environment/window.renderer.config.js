@@ -14,10 +14,10 @@ export default function (window) {
   window.$ = $
   $(window).on('mousedown', () => window.MOUSE_BEING_CLICKED = true)
   $(window).on('mouseup', () => window.MOUSE_BEING_CLICKED = false)
-  $(window).on('dblclick', toggleMaximization)
+  $(window).on('dblclick', checkToggleMaximization)
 }
 
-function toggleMaximization (e) {
+function checkToggleMaximization (e) {
   $(e.target).css('-webkit-app-region') === 'drag' && window.toggleMaximization()
 }
 
@@ -48,6 +48,9 @@ function handleMetaKeyCombo (keyCode, e) {
       break
     case 84:
       (vue.sbRouter.push({ name: 'home', params: { which: 'tracks-list' } }) + (e && e.preventDefault()))
+      break
+    case 191:
+      global.CONSTANTS.IS_DEV && $('html').toggleClass('debug-outlines')
       break
     default:
   }

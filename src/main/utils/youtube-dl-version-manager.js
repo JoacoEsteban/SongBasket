@@ -3,16 +3,19 @@ import youtubeDl from 'youtube-dl'
 import PATH from 'path'
 import { promises as fs, createWriteStream } from 'fs'
 import axios from 'axios'
+
 class YoutubeDlVersionManager {
-  constructor () {
-    this.fetch = axios.get
-    this.binariesPath = global.CONSTANTS.YTDL_BINARIES_PATH
-    this.versionControlPath = global.CONSTANTS.YTDL_VERSION_CONTROL_PATH
+  apiUrl = 'https://api.github.com/repos/ytdl-org/youtube-dl/releases/latest'
+  fetch = axios.get
+  binariesPath = global.CONSTANTS.YTDL_BINARIES_PATH
+  versionControlPath = global.CONSTANTS.YTDL_VERSION_CONTROL_PATH
+  assetName = ({
+    windows: 'youtube-dl.exe',
+    mac: 'youtube-dl',
+    linux: 'youtube-dl'
+  })[global.CONSTANTS.PLATFORM]
 
-    this.apiUrl = 'https://api.github.com/repos/ytdl-org/youtube-dl/releases/latest'
-
-    this.setLocals()
-  }
+  // constructor () { }
 
   async findLocalVersion () {
     try {
@@ -64,13 +67,6 @@ class YoutubeDlVersionManager {
     this.localVersion = this.latestVersion
   }
   // ------------------------------------------
-  setLocals () {
-    this.assetName = ({
-      windows: 'youtube-dl.exe',
-      mac: 'youtube-dl',
-      linux: 'youtube-dl'
-    })[global.CONSTANTS.PLATFORM]
-  }
   async findData () {
     const stack = []
     if (!this.latestVersion) stack.push(this.findLatestVersion)

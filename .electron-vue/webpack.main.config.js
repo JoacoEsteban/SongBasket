@@ -39,7 +39,8 @@ let mainConfig = {
               ['@babel/preset-env']
             ],
             'plugins': [
-              'syntax-dynamic-import'
+              'syntax-dynamic-import',
+              '@babel/plugin-proposal-class-properties',
             ]
           },
 
