@@ -70,7 +70,7 @@ async function VTWO (localTracks, queryTracks = [], plFilter = []) {
     return false
   })
 
-  localTracks.forEach(async lTrack => {
+  localTracks.forEach(async lTrack => { // TODO make async with Promise.all
     if (!lTrack.dontUnlink) await unlink(lTrack.path)
   })
 
@@ -78,7 +78,7 @@ async function VTWO (localTracks, queryTracks = [], plFilter = []) {
 }
 
 const linkTrackToPlaylists = async (track) => {
-  track.playlists.forEach(async pl => {
+  track.playlists.forEach(async pl => { // TODO make async with Promise.all
     let plPath = customGetters.giveMePlFolderName(pl.id)
     console.log(plPath)
     if (!plPath) return

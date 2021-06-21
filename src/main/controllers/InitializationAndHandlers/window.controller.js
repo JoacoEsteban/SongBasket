@@ -24,7 +24,11 @@ const windowController = {
       windowState.manage(window)
     }, 500)
   },
-  createWindow () {
+  onAppInit () {
+    windowController.createMainWindow()
+    global.CONSTANTS.LOADING_WINDOW?.close()
+  },
+  createMainWindow () {
     windowController.windowState = windowStateKeeper({
       defaultWidth: global.CONSTANTS.MAIN_WINDOW_CONFIG.width,
       defaultHeight: global.CONSTANTS.MAIN_WINDOW_CONFIG.height
@@ -44,6 +48,16 @@ const windowController = {
       global.CONSTANTS.MAIN_WINDOW = null
       windowController.windowState = null
       windowController.positioner = null
+    })
+  },
+  createLoadingWindow () {
+    const window = global.CONSTANTS.LOADING_WINDOW = new global.CONSTANTS.BROWSER_WINDOW(global.CONSTANTS.LOADING_WINDOW_CONFIG)
+
+    window.loadURL(process.env.NODE_ENV === 'development' ? `http://localhost:9080` : `file://${__dirname}/index.html`)
+    window.on('closed', () => {
+      global.CONSTANTS.LOADING_WINDOW = null
+      // windowController.windowState = null
+      // windowController.positioner = null
     })
   }
 }

@@ -60,6 +60,7 @@ const CONSTANTS = {
 
   // INSTANCES
   MAIN_WINDOW: null,
+  LOADING_WINDOW: null,
   LOGIN_WINDOW: null,
   VUEX,
   SAVE_TO_DISK: null,
@@ -74,6 +75,19 @@ const CONSTANTS = {
     }
   })(),
   MAIN_WINDOW_CONFIG: {
+    width,
+    height,
+    frame: false,
+    minWidth: width,
+    minHeight: height,
+    backgroundColor: '#151515',
+    useContentSize: false,
+    resizable: true,
+    webPreferences: {
+      nodeIntegration: true
+    }
+  },
+  LOADING_WINDOW_CONFIG: {
     width,
     height,
     frame: false,

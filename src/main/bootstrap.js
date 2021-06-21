@@ -63,16 +63,7 @@ export default async electron => {
     global.CONSTANTS.SHELL_OPEN = shell.openItem
   }
 
-  await Promise.all([
-    // ---------------------ffmepeg---------------------
-    botstrapFfmpeg(),
-    // ---------------------youtube-dl---------------------
-    botstrapYoutubeDl()
-  ])
-
-  console.log('finished ffmpeg && youtubedl')
-
-  await new Promise((resolve, reject) => {
+  const electronInitPromise = new Promise((resolve, reject) => {
     const createMenu = ({ globalShortcut }) => {
       if (global.ENV_PROD) {
         globalShortcut.register('f5', global.emptyFn)
@@ -80,10 +71,10 @@ export default async electron => {
       }
     }
 
-    electron.app.allowRendererProcessReuse = true
-
     const onReady = async () => {
       console.log('onready')
+      WindowController.createLoadingWindow()
+
       global.CONSTANTS.ENV_PROD && updater.init()
       protocolController.startProtocols(electron)
       connectionController.init({
@@ -99,12 +90,10 @@ export default async electron => {
 
       ipcRoutes()
 
-      WindowController.createWindow()
-
       resolve()
     }
 
-    electron.app.isReady() ? onReady() : electron.app.on('ready', onReady)
+    electron.app.allowRendererProcessReuse = true
 
     electron.app.on('window-all-closed', () => {
       if (global.CONSTANTS.PLATFORM !== 'mac') {
@@ -114,11 +103,23 @@ export default async electron => {
     })
 
     electron.app.on('activate', () => {
-      if (global.CONSTANTS.MAIN_WINDOW === null) WindowController.createWindow()
+      if (global.CONSTANTS.MAIN_WINDOW === null) WindowController.onAppInit()
     })
 
     electron.app.on('will-quit', () => {
       electron.globalShortcut.unregisterAll()
     })
+
+    electron.app.isReady() ? onReady() : electron.app.on('ready', onReady)
   })
+
+  electronInitPromise.then(WindowController.onAppInit)
+  await Promise.all([
+    // ---------------------ffmepeg---------------------
+    botstrapFfmpeg(),
+    // ---------------------youtube-dl---------------------
+    botstrapYoutubeDl(),
+    // ---------------------electron---------------------
+    electronInitPromise
+  ])
 }

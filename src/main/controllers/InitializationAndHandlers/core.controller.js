@@ -29,7 +29,7 @@ const core = {
     } catch (error) {
       if (!folders) throw error
       await FSController.UserMethods.removeFolder(folders.selected)
-      core.setAppStatus()
+      await core.setAppStatus()
     }
   },
   addHomeFolder: async (path) => {
@@ -88,7 +88,7 @@ const core = {
       try {
         if (global.CONSTANTS.LOGIN_WINDOW) return reject(new Error('LOGIN WINDOW EXISTS'))
 
-        const loginWindow = global.CONSTANTS.LOGIN_WINDOW = new global.CONSTANTS.BROWSER_WINDOW(global.CONSTANTS.POPUP_WINDOW_CONFIG)
+        const loginWindow = global.CONSTANTS.LOGIN_WINDOW = new global.CONSTANTS.BROWSER_WINDOW(global.CONSTANTS.POPUP_WINDOW_CONFIG) // TODO initialize in window.controller
 
         loginWindow.loadURL(`${global.CONSTANTS.BACKEND}/init`, { 'extraHeaders': 'pragma: no-cache\n' })
         loginWindow.on('closed', () => {

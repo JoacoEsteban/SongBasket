@@ -76,6 +76,7 @@ window.retrieveStatus = () => {
         return resolve()
       }
       let path = 'setup'
+      console.log('dou?', window.CONSTANTS.FEATURES.FOLDER_VIEW)
       if (status.APP_STATUS.FOLDERS.paths.length && window.CONSTANTS.FEATURES.FOLDER_VIEW) (path = 'folder-view') && vue.ipc.send('WINDOW:UNLOCK')
       redirect(path)
       resolve()
