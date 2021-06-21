@@ -5133,6 +5133,11 @@
   "resolved" "https://registry.npmjs.org/file-type/-/file-type-9.0.0.tgz"
   "version" "9.0.0"
 
+"fileicon@^0.2.4":
+  "integrity" "sha512-2gipEXOI2jvh6yp7FN/SZ5M67fbLknZ+Q3kizBQupe+4w12z51WnmCBiiGfdeMZzUmhCTPSJuCK/Sl1kEyWmhA=="
+  "resolved" "https://registry.npmjs.org/fileicon/-/fileicon-0.2.4.tgz"
+  "version" "0.2.4"
+
 "filelist@^1.0.1":
   "resolved" "https://registry.npmjs.org/filelist/-/filelist-1.0.1.tgz"
   "version" "1.0.1"
