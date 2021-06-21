@@ -24,7 +24,7 @@ let whiteListedModules = ['vue']
 let rendererConfig = {
   devtool: '#cheap-module-eval-source-map',
   entry: {
-    renderer: path.join(__dirname, '../src/renderer/main.js')
+    renderer: path.join(__dirname, '../src/renderer/main.ts')
   },
   externals: [
     ...Object.keys(dependencies || {}).filter(d => !whiteListedModules.includes(d))
@@ -61,6 +61,12 @@ let rendererConfig = {
       {
         test: /\.html$/,
         use: 'vue-html-loader'
+      },
+      {
+        test: /\.ts$/,
+        loader: 'ts-loader',
+        options: { appendTsSuffixTo: [/\.vue$/] },
+        exclude: /node_modules/,
       },
       {
         test: /\.js$/,

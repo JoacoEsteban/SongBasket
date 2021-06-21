@@ -6,7 +6,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import Modal from './components/Modal/Modal'
 import StylesLoader from './CSS/styles-loader'
 export default {

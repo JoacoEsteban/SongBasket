@@ -29,6 +29,11 @@ let mainConfig = {
         }
       },
       {
+        test: /\.ts$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      },
+      {
         test: /\.js$/,
         use: {
           loader: 'babel-loader',
