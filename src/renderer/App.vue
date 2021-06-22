@@ -7,7 +7,6 @@
 </template>
 
 <script lang="ts">
-// @ts-nocheck
 
 import Modal from './components/Modal/Modal.vue'
 import StylesLoader from './CSS/styles-loader.vue'

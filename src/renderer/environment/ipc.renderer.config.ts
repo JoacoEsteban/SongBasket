@@ -1,4 +1,3 @@
-// @ts-nocheck
 // import { ipcRenderer } from 'electron'
 import { ipcRenderer } from 'electron-better-ipc'
 import * as $ from 'jquery'
@@ -20,7 +19,8 @@ export default function () {
   ipc.answerMain('STATUS:SET', onDocumentReady)
   ipc.answerMain('FFMPEG_BINS_DOWNLOADED', onFfmpegBinaries)
   ipc.answerMain('LOADING_EVENT', onLoadingEvent)
-  ipc.answerMain('ERROR:CATCH', async ({ type, error }) => {
+  ipc.answerMain('ERROR:CATCH', async (data: any) => { // TODO
+    const { type, error } = data
     await vue.store.dispatch('catchGlobalError', { type, error })
   })
   ipc.answerMain('CONNECTION:CHANGE', onConnectionChange)
@@ -29,7 +29,8 @@ export default function () {
   ipc.answerMain('FileWatchers:REMOVED', onRemovedTrack)
   ipc.answerMain('FileWatchers:RETRIEVED_TRACKS', onRetrievedTracks)
   ipc.answerMain('VUEX:STORE', storeState)
-  ipc.answerMain('VUEX:SET', async ({ key, value }) => {
+  ipc.answerMain('VUEX:SET', async (data: any) => {
+    const { key, value } = data
     await vue.store.dispatch('set', { key, value })
   })
   ipc.answerMain('DOWNLOAD:START', (payload) => vue.store.dispatch('downloadStarted', payload))
@@ -59,7 +60,7 @@ async function onLoadingEvent (payload) {
   vue.store.dispatch('loadingEvent', payload)
 }
 
-window.retrieveStatus = async () => {
+export const retrieveStatus = async () => {
   const status = await vue.ipc.callMain('GET_STATUS')
   console.log('Setting app status', status)
   if (status.APP_STATUS.IS_LOGGED) {
@@ -87,7 +88,7 @@ window.retrieveStatus = async () => {
 
 function onDocumentReady () {
   if (!window.VUE_HAS_MOUNTED) return setTimeout(onDocumentReady, 100)
-  window.retrieveStatus()
+  retrieveStatus()
 }
 async function onRetrievedTracks (tracks = {}) {
   console.log('RETRIEVED', Object.keys(tracks).length)

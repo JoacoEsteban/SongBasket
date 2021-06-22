@@ -1393,6 +1393,18 @@
   "resolved" "https://registry.npmjs.org/@types/debug/-/debug-4.1.5.tgz"
   "version" "4.1.5"
 
+"@types/ffbinaries@^1.1.0":
+  "integrity" "sha512-otss681P9yr1FDerxwQXM8HGgkKhrCQpIZ9kqfA3bxvxGnnoyUXwhKv1HrOtns5xFlv+CRN2crkpblxsiphqag=="
+  "resolved" "https://registry.npmjs.org/@types/ffbinaries/-/ffbinaries-1.1.0.tgz"
+  "version" "1.1.0"
+
+"@types/fluent-ffmpeg@^2.1.17":
+  "integrity" "sha512-/bdvjKw/mtBHlJ2370d04nt4CsWqU5MrwS/NtO96V01jxitJ4+iq8OFNcqc5CegeV3TQOK3uueK02kvRK+zjUg=="
+  "resolved" "https://registry.npmjs.org/@types/fluent-ffmpeg/-/fluent-ffmpeg-2.1.17.tgz"
+  "version" "2.1.17"
+  dependencies:
+    "@types/node" "*"
+
 "@types/fs-extra@^9.0.11":
   "integrity" "sha512-mZsifGG4QeQ7hlkhO56u7zt/ycBgGxSVsFI/6lGTU34VtwkiqrrSDgw0+ygs8kFGWcXnFQWMrzF2h7TtDFNixA=="
   "resolved" "https://registry.npmjs.org/@types/fs-extra/-/fs-extra-9.0.11.tgz"
@@ -1491,6 +1503,13 @@
   "version" "16.0.3"
   dependencies:
     "@types/yargs-parser" "*"
+
+"@types/youtube-dl@^3.0.0":
+  "integrity" "sha512-eEGPhw8IunQ6jdEYHwdj7uNdV+EjOAAARZw8s88gnxHDUHYhBdhXcn9ItH3yPhwq/BgxqktaKGeMVhptETP4mA=="
+  "resolved" "https://registry.npmjs.org/@types/youtube-dl/-/youtube-dl-3.0.0.tgz"
+  "version" "3.0.0"
+  dependencies:
+    "@types/node" "*"
 
 "@vue/component-compiler-utils@^3.1.0":
   "integrity" "sha512-rAYMLmgMuqJFWAOb3Awjqqv5X3Q3hVr4jH/kgrFJpiU0j3a90tnNBplqbj+snzrgZhC9W128z+dtgMifOiMfJg=="

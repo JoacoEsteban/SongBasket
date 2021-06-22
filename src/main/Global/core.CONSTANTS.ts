@@ -1,15 +1,17 @@
 /* eslint-disable import/first */
-import { app } from 'electron'
-import PATH from 'path'
+import { app, BrowserWindow, session, dialog, shell } from 'electron'
+import * as PATH from 'path'
+import { Constants } from '../../@types/constants'
 import FEATURES from './core.FEATURES'
 
 const ENV_PROD = global.ENV_PROD = process.env.NODE_ENV === 'production'
+const USE_PROD_BACKEND = true
 const IS_DEV = global.IS_DEV = !ENV_PROD
 
 const height = 500
 const width = 1000
 
-const CONSTANTS = {
+const cons: any = {
   // STATES
   ENV_PROD,
   IS_DEV,
@@ -34,34 +36,30 @@ const CONSTANTS = {
 
   // ELECTRON DEFAULTS
   APP: app,
-  BROWSER_WINDOW: null,
-  SESSION: null,
-  DIALOG: null,
-  SHELL_OPEN: () => { },
+  BROWSER_WINDOW: BrowserWindow,
+  SESSION: session,
+  DIALOG: dialog,
+  SHELL_OPEN: shell.openPath,
   // -------------
 
   // PATHS
-  get BACKEND () {
-    return process.env.BACKEND
-  },
+  BACKEND: process.env.BACKEND || (() => {
+    const subDomain = 'api'
+    return process.env.BACKEND = ENV_PROD || USE_PROD_BACKEND ? ('https://' + subDomain + '.songbasket.com') : 'http://localhost:5000'
+  })(),
   APP_SUPPORT_PATH: (ENV_PROD ? app.getPath('userData') : PATH.join(process.cwd(), 'APPLICATION_SUPPORT')),
   APP_CWD: PATH.join(app.getAppPath()),
   PROCESS_CWD: process.cwd(),
-  get NODE_MODULES_PATH () {
-    return this.__node_modules_path || (this.__node_modules_path = PATH.join(ENV_PROD ? this.APP_CWD.replace('app.asar', 'app.asar.unpacked') : this.PROCESS_CWD, 'node_modules'))
-  },
   TEMP_PATH: app.getPath('temp'),
   PROTOCOL_PATHS: {
     BASE: 'songbasket'
   },
-  FFMPEG_BINARIES_PATH: null,
   // -------------
 
   // INSTANCES
   MAIN_WINDOW: null,
   LOADING_WINDOW: null,
   LOGIN_WINDOW: null,
-  SAVE_TO_DISK: null,
   // -------------
   PLATFORM: (() => {
     switch (process.platform) {
@@ -112,21 +110,22 @@ const CONSTANTS = {
   },
   // MISC
   HEROKU_PING_INTERVAL: 1000 * 60 * 2,
-  APP_VERSION: null,
-  APP_VERSION_STRING: null,
   CHANGELOG_URL: 'https://download.songbasket.com',
   FEATURES
   // -------------
 
 }
+cons.NODE_MODULES_PATH = PATH.join(ENV_PROD ? cons.APP_CWD.replace('app.asar', 'app.asar.unpacked') : cons.PROCESS_CWD, 'node_modules')
 
-CONSTANTS.APP_VERSION = CONSTANTS.APP.getVersion()
-CONSTANTS.APP_VERSION_STRING = (CONSTANTS.APP_VERSION + ' ') + (IS_DEV ? 'Electron. Development' : 'Closed Beta')
+cons.APP_VERSION = cons.APP.getVersion()
+cons.APP_VERSION_STRING = (cons.APP_VERSION + ' ') + (IS_DEV ? 'Electron. Development' : 'Closed Beta')
 
-CONSTANTS.FFMPEG_BINARIES_PATH = PATH.join(CONSTANTS.APP_SUPPORT_PATH, 'bin', 'ffmpeg')
-CONSTANTS.YTDL_BINARIES_PATH = PATH.join(CONSTANTS.APP_SUPPORT_PATH, 'bin', 'ytdl')
-CONSTANTS.YTDL_VERSION_CONTROL_PATH = PATH.join(CONSTANTS.APP_SUPPORT_PATH, 'ytdl-version.json')
+cons.FFMPEG_BINARIES_PATH = PATH.join(cons.APP_SUPPORT_PATH, 'bin', 'ffmpeg')
+cons.YTDL_BINARIES_PATH = PATH.join(cons.APP_SUPPORT_PATH, 'bin', 'ytdl')
+cons.YTDL_VERSION_CONTROL_PATH = PATH.join(cons.APP_SUPPORT_PATH, 'ytdl-version.json')
+
+const CONSTANTS: Constants = cons
 
 global.CONSTANTS = CONSTANTS
 
-export default CONSTANTS
+export default cons

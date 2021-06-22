@@ -1,5 +1,4 @@
-// @ts-nocheck
-
+import { retrieveStatus } from '../environment/ipc.renderer.config'
 import env from './VueInstance'
 
 const CoreController = {
@@ -98,7 +97,7 @@ const CoreController = {
   },
   async setHomeFolder (path) {
     await env.ipc.callMain('HOME_FOLDER:SET', { path })
-    await window.retrieveStatus()
+    await retrieveStatus()
   },
   async openHomeFolder () {
     await env.ipc.callMain('HOME_FOLDER:OPEN')

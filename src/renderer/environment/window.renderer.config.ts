@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import * as $ from 'jquery'
 import vue from '../controllers/VueInstance'

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /* eslint-disable camelcase */
 import Vue from 'vue'
 

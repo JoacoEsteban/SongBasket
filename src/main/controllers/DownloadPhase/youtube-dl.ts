@@ -1,6 +1,6 @@
-import fs from 'fs'
-import PATH from 'path'
-import youtubedl from 'youtube-dl'
+import * as fs from 'fs'
+import * as PATH from 'path'
+import * as youtubedl from 'youtube-dl'
 
 import { extractMp3, applyTags } from './FfmpegController'
 import customGetters from '../../Store/Helpers/customGetters'

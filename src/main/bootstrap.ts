@@ -1,9 +1,10 @@
-import youtubeDl from 'youtube-dl'
-import ffmpeg from 'fluent-ffmpeg'
-import ffbinaries from 'ffbinaries'
+import * as electron from 'electron'
+import * as youtubeDl from 'youtube-dl'
+import * as ffmpeg from 'fluent-ffmpeg'
+import * as ffbinaries from 'ffbinaries'
 import { exec } from 'child_process'
-import sudo from 'sudo-prompt'
-import pathExists from 'path-exists'
+import * as sudo from 'sudo-prompt'
+import * as pathExists from 'path-exists'
 import * as handlers from './controllers/InitializationAndHandlers/handlers'
 import * as utils from '../MAIN_PROCESS_UTILS'
 
@@ -39,6 +40,7 @@ async function botstrapYoutubeDl () {
   await manager.checkNUpdate()
   // ------------------------------------------
   global.flushYtDlCache = () => new Promise((resolve, reject) => {
+    // @ts-ignore
     exec(`"${youtubeDl.getYtdlBinary()}"` + ' --rm-cache-dir', (err, out) => {
       if (err) {
         console.error('Error flushding ytdl cache', err)
@@ -51,18 +53,10 @@ async function botstrapYoutubeDl () {
 }
 
 // ---------------------FLOW---------------------
-export default async electron => {
-  global.ipc = electron.ipcMain
-  {
-    const { BrowserWindow, session, dialog, shell } = electron
-    global.CONSTANTS.BROWSER_WINDOW = BrowserWindow
-    global.CONSTANTS.SESSION = session
-    global.CONSTANTS.DIALOG = dialog
-    global.CONSTANTS.SHELL_OPEN = shell.openItem
-  }
-
-  const electronInitPromise = new Promise((resolve, reject) => {
-    const createMenu = ({ globalShortcut }) => {
+export default async () => {
+  const electronInitPromise: Promise<void> = new Promise((resolve, reject) => {
+    const createMenu = () => {
+      const { globalShortcut } = electron
       if (global.ENV_PROD) {
         globalShortcut.register('f5', global.emptyFn)
         globalShortcut.register('CmdOrCtrl+R', global.emptyFn)
@@ -76,14 +70,14 @@ export default async electron => {
       global.CONSTANTS.ENV_PROD && updater.init()
       protocolController.startProtocols(electron)
       connectionController.init({
-        connectionChangeCallback: (value) => {
+        connectionChangeCallback: (value: boolean) => {
           global.ipcSend('CONNECTION:CHANGE', value)
         },
-        apiConnectionChangeCallback: (value) => {
+        apiConnectionChangeCallback: (value: boolean) => {
           global.ipcSend('API_CONNECTION:CHANGE', value)
         }
       })
-      createMenu(electron)
+      createMenu()
       await core.setAppStatus()
 
       ipcRoutes()
