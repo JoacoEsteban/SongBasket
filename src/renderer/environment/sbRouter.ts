@@ -1,22 +1,22 @@
-export default class {
-  constructor () {
-    this.path = {name: '', params: {}}
-    this.history = []
-    this.pointer = -1
-    this.beforeTransitionCallbacks = []
-    this.afterTransitionCallbacks = []
-    this.transitioning = false
+export type locationEntry = { name: string, params: {} }
+export type transitionCallback = (to: locationEntry, from: locationEntry) => void
+class SbRouter {
+  path: locationEntry = { name: '', params: {} }
+  history: locationEntry[] = []
+  pointer = -1
+  beforeTransitionCallbacks: transitionCallback[] = []
+  afterTransitionCallbacks: transitionCallback[] = []
+  transitioning: boolean = false
+
+  beforeTransition (func: transitionCallback) {
+    this.beforeTransitionCallbacks.push(func)
+  }
+  afterTransition (func: transitionCallback) {
+    this.afterTransitionCallbacks.push(func)
   }
 
-  beforeTransition (func) {
-    if (typeof func === 'function') this.beforeTransitionCallbacks.push(func)
-  }
-  afterTransition (func) {
-    if (typeof func === 'function') this.afterTransitionCallbacks.push(func)
-  }
-
-  setTransitioningState (bool) {
-    return this.transitioning = !!bool
+  setTransitioningState (bool: boolean) {
+    return this.transitioning = bool
   }
 
   giveMeCurrent () {
@@ -29,8 +29,8 @@ export default class {
     return this.history[this.pointer + 1]
   }
 
-  isSamePath (path1, path2 = this.path) {
-    return path1 && path2 && path1.isSameObject(path2)
+  isSamePath (path1: locationEntry, path2 = this.path) {
+    return path1.isSameObject(path2)
   }
 
   isLast () {
@@ -41,9 +41,10 @@ export default class {
     this.history = this.history.slice(0, this.pointer + 1)
   }
 
-  async push (location) {
+  async push (location: locationEntry | string): Promise<void> {
     if (this.transitioning) return
-    if (typeof location === 'string') location = {name: location, params: {}}
+    if (typeof location === 'string') location = { name: location, params: {} }
+
     if (this.isSamePath(location)) return console.error('Same Path')
     if (this.isSamePath(location, this.giveMePrevious())) return this.goBack()
     if (this.isSamePath(location, this.giveMeNext())) return this.goForward()
@@ -74,12 +75,14 @@ export default class {
     this.onAfterTransition(this.history[this.pointer - 1]) // From
   }
 
-  async onBeforeTransition (to) {
+  async onBeforeTransition (to: locationEntry) {
     // (to, from)
-    this.beforeTransitionCallbacks.forEach(f => f(to, this.path))
+    this.beforeTransitionCallbacks.forEach(f => f(to, this.path)) // TODO await Promise.all
   }
-  async onAfterTransition (from) {
+  async onAfterTransition (from: locationEntry) {
     // (on, from)
-    this.afterTransitionCallbacks.forEach(f => f(this.path, from))
+    this.afterTransitionCallbacks.forEach(f => f(this.path, from)) // TODO await Promise.all
   }
 }
+
+export default SbRouter

@@ -18,7 +18,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import 'vuex'
 
 import TopBar from './TopBar/TopBar.vue'

@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import VueInstance from '../../main'
 
 const getDefaultState = () => ({
   CURRENT_PLAYLIST_SET: false,
@@ -17,56 +18,56 @@ const getDefaultState = () => ({
 })
 
 const actions = {
-  trigger ({commit}, key) {
-    commit('TRIGGER', window.$constantcase(key))
+  trigger ({ commit }, key) {
+    commit('TRIGGER', window.changeCase.constantCase(key))
   },
-  currentPlaylistSet ({commit}) {
+  currentPlaylistSet ({ commit }) {
     commit('TRIGGER', 'CURRENT_PLAYLIST_SET')
   },
-  ffmpegBinsDownloaded ({commit}, value) {
-    commit('SET', {key: 'FFMPEG_BINS_DOWNLOADED', value})
+  ffmpegBinsDownloaded ({ commit }, value) {
+    commit('SET', { key: 'FFMPEG_BINS_DOWNLOADED', value })
   },
-  stateReplaced ({commit}) {
+  stateReplaced ({ commit }) {
     commit('TRIGGER', 'STATE_REPLACED')
   },
-  playlistUnsynced ({commit}) {
+  playlistUnsynced ({ commit }) {
     commit('TRIGGER', 'PLAYLIST_UNSYNCED')
   },
-  resetSelection ({commit}) {
+  resetSelection ({ commit }) {
     commit('TRIGGER', 'RESET_SELECTION')
   },
-  reComputeConvertedTracks ({commit}) {
+  reComputeConvertedTracks ({ commit }) {
     // commit('TRIGGER', 'PLAYLIST_TRACKS_RE_COMPUTED')
-    global.VUE_ROOT.$controllers.core.formatConvertedTracks()
+    VueInstance.$controllers.core.formatConvertedTracks()
   },
-  playlistTracksReComputed ({commit}) {
+  playlistTracksReComputed ({ commit }) {
     commit('TRIGGER', 'PLAYLIST_TRACKS_RE_COMPUTED')
   },
-  playlistStateChanged ({commit}) {
+  playlistStateChanged ({ commit }) {
     commit('TRIGGER', 'PLAYLIST_STATE_CHANGED')
   },
-  routerAnimation ({commit}, animation) {
-    commit('SET', {key: 'ROUTER_ANIMATION', value: animation})
+  routerAnimation ({ commit }, animation) {
+    commit('SET', { key: 'ROUTER_ANIMATION', value: animation })
   },
-  downloadStarted ({commit}, tracks) {
+  downloadStarted ({ commit }, tracks) {
     commit('DOWNLOAD_STARTED', tracks)
   },
-  async downloadFinished ({commit}, tracks) {
+  async downloadFinished ({ commit }, tracks) {
     try {
       commit('DOWNLOAD_FINISHED', tracks)
     } catch (error) {
       throw error
     }
   },
-  downloadEvent ({commit}, params) {
+  downloadEvent ({ commit }, params) {
     commit('DOWNLOAD_EVENT', params)
   },
-  loadingEvent ({commit}, payload) {
+  loadingEvent ({ commit }, payload) {
     commit('LOADING_EVENT', payload)
   },
-  catchGlobalError ({commit}, {type, error}) {
+  catchGlobalError ({ commit }, { type, error }) {
     return new Promise((resolve, reject) => {
-      commit('CATCH_GLOBAL_ERROR', {type, error})
+      commit('CATCH_GLOBAL_ERROR', { type, error })
       resolve()
     })
   }
@@ -77,12 +78,12 @@ const mutations = {
   TRIGGER (state, key) {
     state[key] = !state[key]
   },
-  SET (state, {key, value}) {
+  SET (state, { key, value }) {
     SET(key, value)
   },
   DOWNLOAD_STARTED (state, tracks) {
     state.DOWNLOADED_TRACKS = 0
-    state.DOWNLOAD_QUEUE = tracks.map(({id, info}) => {
+    state.DOWNLOAD_QUEUE = tracks.map(({ id, info }) => {
       (info.finished || info.currentStatus.includes('error')) && ++state.DOWNLOADED_TRACKS
       return {
         id, // song id
@@ -95,14 +96,14 @@ const mutations = {
   DOWNLOAD_FINISHED (state, tracks) {
     onDownloadEnd()
   },
-  LOADING_EVENT (state, {target, value, ptg}) {
+  LOADING_EVENT (state, { target, value, ptg }) {
     const formatted = getLoadingEvent(target)
     formatted.target = target
     formatted.value = value
     formatted.ptg = ptg || 0
     SET('LOADING_STATE', formatted)
   },
-  DOWNLOAD_EVENT (state, {id, ptg, type}) {
+  DOWNLOAD_EVENT (state, { id, ptg, type }) {
     const track = state.DOWNLOAD_QUEUE.find(t => t.id === id)
     if (!track) return
     type = type.split(':')
@@ -162,7 +163,7 @@ const mutations = {
       onTrackProgress(ptg / 2 + (type[0] === 'extraction' ? 50 : 0))
     }
   },
-  CATCH_GLOBAL_ERROR (state, {type, error}) {
+  CATCH_GLOBAL_ERROR (state, { type, error }) {
     SET('GLOBAL_ERROR', getErrorType(type, error))
   }
 }
@@ -170,17 +171,17 @@ const mutations = {
 const onTrackProgress = ptg => {
   // TODO check this func
   console.log('progress')
-  mutations.LOADING_EVENT(null, {target: 'DOWNLOAD', value: true, ptg: (state.DOWNLOADED_TRACKS / state.DOWNLOAD_QUEUE.length) + (1 / state.DOWNLOAD_QUEUE.length) * (ptg * 0.01)})
+  mutations.LOADING_EVENT(null, { target: 'DOWNLOAD', value: true, ptg: (state.DOWNLOADED_TRACKS / state.DOWNLOAD_QUEUE.length) + (1 / state.DOWNLOAD_QUEUE.length) * (ptg * 0.01) })
 }
 const onTrackFinished = () => {
   console.log('track finished')
   // TODO better solution
   if (!state.LOADING_STATE.value) return
-  mutations.LOADING_EVENT(null, {target: 'DOWNLOAD', value: true, ptg: ++state.DOWNLOADED_TRACKS / state.DOWNLOAD_QUEUE.length})
+  mutations.LOADING_EVENT(null, { target: 'DOWNLOAD', value: true, ptg: ++state.DOWNLOADED_TRACKS / state.DOWNLOAD_QUEUE.length })
 }
 const onDownloadEnd = () => {
   console.log('download end')
-  mutations.LOADING_EVENT(null, {target: 'DOWNLOAD', value: false, ptg: 1})
+  mutations.LOADING_EVENT(null, { target: 'DOWNLOAD', value: false, ptg: 1 })
 }
 
 const loadingEventTypes = {

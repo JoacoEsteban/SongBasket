@@ -1381,6 +1381,13 @@
   "resolved" "https://registry.npmjs.org/@tsconfig/node16/-/node16-1.0.1.tgz"
   "version" "1.0.1"
 
+"@types/change-case@^2.3.1":
+  "integrity" "sha1-269O+2OthYariBkXmnkJBMy2qDc="
+  "resolved" "https://registry.npmjs.org/@types/change-case/-/change-case-2.3.1.tgz"
+  "version" "2.3.1"
+  dependencies:
+    "change-case" "*"
+
 "@types/debug@^4.1.5":
   "integrity" "sha512-Q1y515GcOdTHgagaVFhHnIFQ38ygs/kmxdNpvpou+raI9UO3YZcHDngBSYKQklcKlvA7iuQlmIKbzvmxcOE9CQ=="
   "resolved" "https://registry.npmjs.org/@types/debug/-/debug-4.1.5.tgz"
@@ -1400,6 +1407,13 @@
   dependencies:
     "@types/minimatch" "*"
     "@types/node" "*"
+
+"@types/jquery@^3.5.5":
+  "integrity" "sha512-6RXU9Xzpc6vxNrS6FPPapN1SxSHgQ336WC6Jj/N8q30OiaBZ00l1GBgeP7usjVZPivSkGUfL1z/WW6TX989M+w=="
+  "resolved" "https://registry.npmjs.org/@types/jquery/-/jquery-3.5.5.tgz"
+  "version" "3.5.5"
+  dependencies:
+    "@types/sizzle" "*"
 
 "@types/json-schema@^7.0.5":
   "integrity" "sha512-cxWFQVseBm6O9Gbw1IWb8r6OS4OhSt3hPZLkFApLjM8TEXROBuQGLAH2i2gZpcXdLBIrpXuTDhH7Vbm1iXmNGA=="
@@ -1438,6 +1452,16 @@
   "integrity" "sha512-0caWDWmpCp0uifxFh+FaqK3CuZ2SkRR/ZRxAV5+zNdC3QVUi6wyOJnefhPvtNt8NQWXB5OA93BUvZsXpWat2Xw=="
   "resolved" "https://registry.npmjs.org/@types/semver/-/semver-7.3.6.tgz"
   "version" "7.3.6"
+
+"@types/sizzle@*":
+  "integrity" "sha512-JYM8x9EGF163bEyhdJBpR2QX1R5naCJHC8ucJylJ3w9/CVBaskdQ8WqBf8MmQrd1kRvp/a4TS8HJ+bxzR7ZJYQ=="
+  "resolved" "https://registry.npmjs.org/@types/sizzle/-/sizzle-2.3.3.tgz"
+  "version" "2.3.3"
+
+"@types/uuid@^8.3.0":
+  "integrity" "sha512-eQ9qFW/fhfGJF8WKHGEHZEyVWfZxrT+6CLIJGBcZPfxUh/+BnEj+UCGYMlr9qZuX/2AltsvwrGqp0LhEW8D0zQ=="
+  "resolved" "https://registry.npmjs.org/@types/uuid/-/uuid-8.3.0.tgz"
+  "version" "8.3.0"
 
 "@types/verror@^1.10.3":
   "integrity" "sha512-OjJdqx6QlbyZw9LShPwRW+Kmiegeg3eWNI41MQQKaG3vjdU2L9SRElntM51HmHBY1cu7izxQJ1lMYioQh3XMBg=="
@@ -3875,7 +3899,7 @@
     "ansi-styles" "^4.1.0"
     "supports-color" "^7.1.0"
 
-"change-case@3.0.x":
+"change-case@*", "change-case@^3.0.2", "change-case@3.0.x":
   "integrity" "sha512-Mww+SLF6MZ0U6kdg11algyKd5BARbyM4TbFBepwowYSR5ClfQGCGtxNXgykpN0uF/bstWeaGDT4JWaDh8zWAHA=="
   "resolved" "https://registry.npmjs.org/change-case/-/change-case-3.0.2.tgz"
   "version" "3.0.2"

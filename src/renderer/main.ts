@@ -7,7 +7,7 @@ import setEnvironment from './environment'
 
 setEnvironment(Vue)
 
-export default global.VUE_ROOT = new Vue({
+export default new Vue({
   components: {
     App
   },

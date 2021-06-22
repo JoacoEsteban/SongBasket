@@ -5,6 +5,8 @@
     "target": "es5",
     "module": "es2015",
     "strict": true,
-    "moduleResolution": "node"
-  }
+    "moduleResolution": "node",
+    "typeRoots": ["src/@types", "./node_modules/@types"],
+  },
+  "include": ["src", "@types"]
 }

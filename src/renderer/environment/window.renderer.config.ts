@@ -1,9 +1,10 @@
-import $ from 'jquery'
+import * as $ from 'jquery'
 import vue from '../controllers/VueInstance'
+import * as changeCase from 'change-case'
 
 window.SHOW_KEYCODES = false
 
-export default function (window) {
+export default function (window: Window) {
   $(window).on('mousewheel', invalidatePlTransformCache)
   $(window).on('resize', invalidatePlTransformCache)
 
@@ -12,6 +13,7 @@ export default function (window) {
 
   window.ROOT_VARS = {}
   window.$ = $
+  window.changeCase = changeCase
   $(window).on('mousedown', () => window.MOUSE_BEING_CLICKED = true)
   $(window).on('mouseup', () => window.MOUSE_BEING_CLICKED = false)
   $(window).on('dblclick', checkToggleMaximization)
@@ -50,16 +52,18 @@ function handleMetaKeyCombo (keyCode, e) {
       (vue.sbRouter.push({ name: 'home', params: { which: 'tracks-list' } }) + (e && e.preventDefault()))
       break
     case 191:
-      global.CONSTANTS.IS_DEV && $('html').toggleClass('debug-outlines')
+      window.CONSTANTS.IS_DEV && $('html').toggleClass('debug-outlines')
       break
     default:
   }
 }
-function isCommandKey (meta, control) {
+function isCommandKey (meta: boolean, control: boolean) {
   if (window.CONSTANTS.PLATFORM === 'mac') return meta
   return control
 }
-function handleWindowKey (e) {
+
+// eslint-disable-next-line no-undef
+function handleWindowKey (e: JQueryEventObject) {
   const { keyCode, metaKey, ctrlKey } = e
   if (window.SHOW_KEYCODES) console.log(keyCode)
   if (isCommandKey(metaKey, ctrlKey) && keyCode !== 8) return handleMetaKeyCombo(keyCode, e)
@@ -68,7 +72,10 @@ function handleWindowKey (e) {
 function focusSearchbar () {
   vue.root.searchInputElement && vue.root.searchInputElement.focus()
 }
-function handleMouseKey ({ button }) {
+
+// eslint-disable-next-line no-undef
+function handleMouseKey (e: JQueryEventObject) {
+  const { button } = e
   switch (button) {
     case 3:
       vue.sbRouter.goBack()
@@ -78,6 +85,7 @@ function handleMouseKey ({ button }) {
       break
   }
 }
-function isAscii (code) {
+
+function isAscii (code: number) {
   return code >= 48 && code <= 90
 }

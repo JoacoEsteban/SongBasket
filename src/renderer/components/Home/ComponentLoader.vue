@@ -104,7 +104,7 @@ export default {
       this.routerAnimation = 'release'
 
       await sleep(100)
-      this.transitioning = this.$sbRouter.setTransitioningState()
+      this.transitioning = this.$sbRouter.setTransitioningState(3)
     },
     makeTransition (to) {
       this.currentPath = to

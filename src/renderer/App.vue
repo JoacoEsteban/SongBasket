@@ -7,8 +7,8 @@
 </template>
 
 <script lang="ts">
-import Modal from './components/Modal/Modal'
-import StylesLoader from './CSS/styles-loader'
+import Modal from './components/Modal/Modal.vue'
+import StylesLoader from './CSS/styles-loader.vue'
 export default {
   name: 'SongBasket',
   components: {
@@ -35,8 +35,8 @@ export default {
       value: ''
     }
     window.ROOT = this.$root
-    window.VUEX = this.$store
-    window.VUEX_CURRENT_USER = this.$store.state.CurrentUser
+    // window.VUEX = this.$store
+    // window.VUEX_CURRENT_USER = this.$store.state.CurrentUser
     window.sbDebug = this
   },
   created () {

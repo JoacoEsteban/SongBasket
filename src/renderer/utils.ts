@@ -10,7 +10,7 @@ export function convertMS (milliseconds) {
 }
 
 export function logme (...log) { return log && console.log(...log) }
-export const sleep = time => new Promise((resolve, reject) => setTimeout(resolve, time))
+export const sleep = (time: number): Promise<void> => new Promise((resolve, reject) => setTimeout(resolve, time))
 export const jsonClone = obj => JSON.parse(JSON.stringify(obj))
 
 export function dateFormatter (dateParam) {
@@ -41,5 +41,5 @@ export function dateFormatter (dateParam) {
   time.minutes = ((time.rawMinutes < 10 ? '0' : '') + time.rawMinutes).toString()
   time.seconds = ((time.rawSeconds < 10 ? '0' : '') + time.rawSeconds).toString()
 
-  return {date, time}
+  return { date, time }
 }

@@ -1,4 +1,5 @@
-import electron from 'electron'
+import * as electron from 'electron'
+import { VueConstructor } from 'vue'
 import '../../main/controllers/Prototype/Array'
 import '../../main/controllers/Prototype/Object'
 
@@ -10,23 +11,23 @@ const { BrowserWindow, getGlobal } = electron.remote
 const GLOBAL = window.CONSTANTS = getGlobal('CONSTANTS')
 console.log('gl', GLOBAL)
 
-export default (Vue) => {
+export default (Vue: VueConstructor) => {
   // -----------------PROTOTYPES-----------------
   // -----------------VUE-----------------
-  VueRendererConfig(Vue)
+  VueRendererConfig()
   // -----------------WINDOW-----------------
   WindowRendererConfig(window)
 
-  let electronWindow
+  let electronWindow: electron.BrowserWindow
 
   const platform = GLOBAL.PLATFORM
 
   function toggleFullscreen () {
     let isFullscreen = false
-    if (document.webkitFullscreenElement) {
+    if (document.fullscreenElement) {
       isFullscreen = true
-      document.webkitExitFullscreen()
-    } else document.documentElement.webkitRequestFullscreen()
+      document.exitFullscreen()
+    } else document.documentElement.requestFullscreen()
 
     document.getElementById('max-btn').classList.remove('button-' + (isFullscreen ? 'un' : '') + 'maximize')
     document.getElementById('max-btn').classList.add('button-' + (!isFullscreen ? 'un' : '') + 'maximize')
@@ -46,11 +47,11 @@ export default (Vue) => {
       document.getElementById('min-btn').addEventListener('click', function (e) {
         window.minimize()
       })
-      window.on('maximize', (e) => {
+      window.on('maximize', () => {
         document.getElementById('max-btn').classList.remove('button-maximize')
         document.getElementById('max-btn').classList.add('button-unmaximize')
       })
-      window.on('unmaximize', (e) => {
+      window.on('unmaximize', () => {
         document.getElementById('max-btn').classList.remove('button-unmaximize')
         document.getElementById('max-btn').classList.add('button-maximize')
       })
