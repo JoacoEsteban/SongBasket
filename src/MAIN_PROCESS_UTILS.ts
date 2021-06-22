@@ -1,16 +1,16 @@
-import fs from 'fs'
-import PATH from 'path'
+import * as fs from 'fs'
+import * as PATH from 'path'
 
-export function cloneObject (aObject) {
+export function cloneObject (aObject: any) {
   return clone(aObject)
 }
-function clone (aObject) {
+function clone (aObject: any) {
   if (!aObject) {
     return aObject
   }
 
   let v
-  let bObject = Array.isArray(aObject) ? [] : {}
+  let bObject: { [key: string]: any } = Array.isArray(aObject) ? [] : {}
   for (const k in aObject) {
     v = aObject[k]
     bObject[k] = (typeof v === 'object') ? clone(v) : v
@@ -19,7 +19,7 @@ function clone (aObject) {
   return bObject
 }
 
-export function removeDuplication (array) {
+export function removeDuplication (array: any[]) {
   if (!Array.isArray(array)) return
   for (let i = 0; i < array.length; i++) {
     array = [array[i], ...array.filter(item => item !== array[i])]
@@ -27,7 +27,7 @@ export function removeDuplication (array) {
   return array
 }
 
-export function removeDuplicationId (array) {
+export function removeDuplicationId (array: any[]) {
   if (!Array.isArray(array)) return
   for (let i = 0; i < array.length; i++) {
     array = [array[i], ...array.filter(item => item.id !== array[i].id)]
@@ -35,12 +35,12 @@ export function removeDuplicationId (array) {
   return array
 }
 
-export function encodeIntoFilename (text) {
+export function encodeIntoFilename (text: string) {
   let reg = /\\|\/|\*|\?|:|\*|\||"|<|>/g
   return text.replace(reg, '-')
 }
 
-export async function createDirRecursive (path) {
+export async function createDirRecursive (path: string) {
   let pathArray = path.split(/\/|\\/)
   if (await pathDoesExist(path)) return
 
@@ -58,41 +58,41 @@ export async function createDirRecursive (path) {
   }
 }
 
-export function pathDoesExist (path) {
+export function pathDoesExist (path: string) {
   return new Promise((resolve, reject) => {
     fs.stat(path, err => resolve(!err))
   })
 }
-export function readFile (path) {
+export function readFile (path: string) {
   return new Promise((resolve, reject) => {
     fs.readFile(path, (err, data) => err ? reject(err) : resolve(data))
   })
 }
-export function writeFile (...args) {
+export function writeFile (...args): Promise<void> {
   return new Promise((resolve, reject) => {
     fs.writeFile(...args, err => err ? reject(err) : resolve())
   })
 }
-export function link (path, path2) {
+export function link (path: string, path2: string): Promise<void> {
   return new Promise((resolve, reject) => {
     fs.link(path, path2, err => err ? reject(err) : resolve())
   })
 }
-export function unlink (path) {
+export function unlink (path: string): Promise<void> {
   return new Promise((resolve, reject) => {
     fs.unlink(path, err => err ? reject(err) : resolve())
   })
 }
-export async function unlinkSafe (path) {
+export async function unlinkSafe (path: string) {
   if (await pathDoesExist(path)) await unlink(path)
 }
-export function createDir (path) {
+export function createDir (path: string): Promise<void> {
   return new Promise((resolve, reject) => {
     fs.mkdir(path, err => err ? reject(err) : resolve())
   })
 }
 
-export function linkNRemove (path1, path2) {
+export function linkNRemove (path1: string, path2: string) {
   return new Promise((resolve, reject) => {
     link(path1, path2)
       .then(() => {
@@ -103,11 +103,11 @@ export function linkNRemove (path1, path2) {
       .catch(reject)
   })
 }
-export function copyNRemove (path1, path2) {
+export function copyNRemove (path1: string, path2: string): Promise<void> {
   return new Promise((resolve, reject) => fs.copyFile(path1, path2, err => err ? reject(err) : fs.unlink(path1, err => err ? reject(err) : resolve())))
 }
 
-export function isSameDisk (path1, path2) {
+export function isSameDisk (path1: string, path2: string) {
   path1 = path1.toLowerCase()
   path2 = path2.toLowerCase()
   switch (global.CONSTANTS.PLATFORM) {
@@ -115,7 +115,7 @@ export function isSameDisk (path1, path2) {
       if (path1.indexOf('/volumes') === 0) {
         if (path2.indexOf('/volumes') === 0) {
           // Not OS Disk, check disk
-          const getDisk = (path) => {
+          const getDisk = (path: string) => {
             let shorten = path.substring('/volumnes'.length)
             return shorten.slice(0, shorten.indexOf('/'))
           }

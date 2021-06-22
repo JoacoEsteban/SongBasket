@@ -1,7 +1,7 @@
 import * as electron from 'electron'
 // import { VueConstructor } from 'vue'
-import '../../main/controllers/Prototype/Array'
-import '../../main/controllers/Prototype/Object'
+import '../../main/controllers/Prototype/Array.ts'
+import '../../main/controllers/Prototype/Object.ts'
 
 import { vueProtoConfig, vueAppConfig } from './vue.renderer.config'
 import WindowRendererConfig from './window.renderer.config'

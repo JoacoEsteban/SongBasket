@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * This file is used specifically and only for development. It installs
  * `electron-debug` & `vue-devtools`. There shouldn't be any need to
@@ -14,7 +15,7 @@ require('electron-debug')({ showDevTools: false })
 require('electron').app.on('ready', () => {
   let installExtension = require('electron-devtools-installer')
   installExtension.default(installExtension.VUEJS_DEVTOOLS)
-    .then(() => {})
+    .then(() => { })
     .catch(err => {
       console.log('Unable to install `vue-devtools`: \n', err)
     })
