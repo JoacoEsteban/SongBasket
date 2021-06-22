@@ -1,5 +1,5 @@
 const Utils = {
-  minsFromSecs (total) {
+  minsFromSecs (total: number) {
     const x = total / 60
     const mins = Math.floor(x)
     const secs = Math.floor((x - mins) * 60)

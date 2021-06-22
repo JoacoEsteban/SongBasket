@@ -70,10 +70,11 @@ export default {
     },
     handleClick () {
       if (this.clickCB === undefined) this.clickCB = this.getCallback()
+      console.log(this.clickCB)
       typeof this.clickCB === 'function' && this.clickCB()
     },
     reviewTrack () {
-      this.$controllers.core.reviewTrack(this.item)
+      this.$root.$controllers.core.reviewTrack(this.item)
     }
   },
   data () {
@@ -87,7 +88,7 @@ export default {
         size: this.isNew || this.isRemoved ? '.8em' : ''
       },
       rowClasses: this.isReviewing ? 'col-sm-12' : 'col-lg-3 col-md-4 col-s-6 col-xs-12',
-      trackController: this.$controllers.track,
+      trackController: this.$root.$controllers.track,
       clickCB: undefined
     }
   }

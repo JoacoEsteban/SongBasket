@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import env from './VueInstance'
 const PlaylistController = {
   getObject (id) {
@@ -20,7 +22,7 @@ const PlaylistController = {
     let doubtly = 0
     let dirts = 0
     let toDownload = 0
-    playlist.tracks.items.map(t => env.root.CONVERTED_TRACKS_FORMATTED.find(track => track.id === t.id)).forEach(({flags, selectionObj, status}) => {
+    playlist.tracks.items.map(t => env.root.CONVERTED_TRACKS_FORMATTED.find(track => track.id === t.id)).forEach(({ flags, selectionObj, status }) => {
       switch (status && status.slug) {
         case undefined:
         case 'error':

@@ -1,7 +1,9 @@
+// @ts-nocheck
+
 import env from './VueInstance'
 const TrackController = {
-  getArtistsString: (item) => (item.artists || item.data.artists).map(({name}) => name).join(', '),
-  getPlaylistsString: (item) => item.playlists.map(({id}) => env.instance.$store.getters.PlaylistById(id)).map(({name}) => name).join(', '),
+  getArtistsString: (item) => (item.artists || item.data.artists).map(({ name }) => name).join(', '),
+  getPlaylistsString: (item) => item.playlists.map(({ id }) => env.instance.$store.getters.PlaylistById(id)).map(({ name }) => name).join(', '),
   populateTrackSelection: track => {
     if (track.flags.conversionError) return null
     let selectionId = track.selection
@@ -13,7 +15,7 @@ const TrackController = {
   },
   getStatus: function (t) {
     const slug = (() => {
-      const f = t.flags || {converted: false}
+      const f = t.flags || { converted: false }
       if (f.paused) return 'paused'
       if (f.conversionError) return 'error'
       if (!f.converted) return 'awaiting-conversion'
@@ -39,7 +41,7 @@ const TrackController = {
 
     return aOrd - bOrd
   },
-  isDownloaded: function ({id, selectionObj}) {
+  isDownloaded: function ({ id, selectionObj }) {
     const dlTrack = env.instance.DOWNLOADED_TRACKS[id]
     return !!(dlTrack && dlTrack[selectionObj.youtube_id])
   }

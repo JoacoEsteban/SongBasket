@@ -41,7 +41,7 @@ export default {
   },
   data () {
     return {
-      controller: this.$controllers.playlist,
+      controller: this.$root.$controllers.playlist,
       statusObj: {}
     }
   },
@@ -95,9 +95,9 @@ export default {
         this.addPlaylistToSyncQueue()
       }
     },
-    addPlaylistToSyncQueue () {
+    async addPlaylistToSyncQueue () {
       // if (!this.isQueued) this.restoreTransformation(true)
-      this.$controllers.core.queuePlaylist(this.playlist.id)
+      await this.$root.$controllers.core.queuePlaylist(this.playlist.id)
     },
     unsync () {
       this.$root.OPEN_MODAL({

@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import env from './VueInstance'
 
 const CoreController = {
@@ -12,7 +14,7 @@ const CoreController = {
     await env.store.dispatch('playlistUnsynced')
   },
   async changeYtTrackSelection ({ trackId, newId }) {
-    env.ipc.callMain('TRACK:CHANGE_SELECTION', { trackId, newId })
+    await env.ipc.callMain('TRACK:CHANGE_SELECTION', { trackId, newId })
     CoreController.formatConvertedTracks({ trackFilter: [trackId] })
   },
   formatConvertedTracks (params = { plFilter: null, trackFilter: null }) {

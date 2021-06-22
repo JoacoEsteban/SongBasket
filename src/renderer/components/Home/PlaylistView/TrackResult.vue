@@ -76,7 +76,7 @@ export default {
         paddingX: 'var(--card-padding-x)'
       },
       rowClasses: 'col-sm-12',
-      trackController: this.$controllers.track
+      trackController: this.$root.$controllers.track
     }
   }
 }

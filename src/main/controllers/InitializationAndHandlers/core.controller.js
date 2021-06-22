@@ -1,3 +1,4 @@
+// @ts-nocheck
 import keytar from 'keytar'
 
 import * as API from './sbFetch'

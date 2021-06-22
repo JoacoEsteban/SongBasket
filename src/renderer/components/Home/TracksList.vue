@@ -67,7 +67,7 @@ export default {
   },
   methods: {
     isMounted () {
-      const path = this.$sbRouter.giveMeCurrent()
+      const path = this.$root.$sbRouter.giveMeCurrent()
       return path.name === 'home' && path.params.which === 'tracks-list'
     },
     handleInputConfirm () {
@@ -78,7 +78,7 @@ export default {
     },
     async transitionTracks (what) {
       this.listAnimationClass = what
-      await this.$sleep(this.listAnimationTime)
+      await this.$root.$sleep(this.listAnimationTime)
       return (!(this.transitioning = false))
     },
     async hideTracks () {
@@ -88,13 +88,13 @@ export default {
       await this.transitionTracks('show')
     },
     refreshAll () {
-      this.tracks = (this.$root.CONVERTED_TRACKS_FORMATTED || []).sort(this.$controllers.track.sort)
+      this.tracks = (this.$root.CONVERTED_TRACKS_FORMATTED || []).sort(this.$root.$controllers.track.sort)
       this.scheduleFilter()
     },
     calcScrollOpacity () {
       let ratio = (this.getContainerElement().scrollTop / 100)
       if (ratio > 1) ratio = 1
-      this.$setRootVar(this.scrollOpKey, (this.filterBackgroundOpacity = ratio))
+      this.$root.$setRootVar(this.scrollOpKey, (this.filterBackgroundOpacity = ratio))
     },
     getContainerElement () {
       return (this.containerElement || (this.containerElement = this.$root.$refs['home-router']))
@@ -128,7 +128,7 @@ export default {
     // this.$root.onComponentLoaderMount = function () {
     //   console.log('dousinho')
     //   const env = this.$root.plListEnv
-    //   this.$(env.getContainerElement()).on('scroll', env.calcScrollOpacity)
+    //   this.$root.$(env.getContainerElement()).on('scroll', env.calcScrollOpacity)
     //   env.calcScrollOpacity()
     // }
   }

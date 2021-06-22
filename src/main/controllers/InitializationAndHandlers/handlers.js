@@ -216,7 +216,7 @@ export async function youtubize () {
   }
 }
 
-export async function download (e, plFilter) {
+export async function download (plFilter) {
   if (!loadingController.canRequest) return console.log('CANT REQUEST')
   console.log('About to download')
   if (plFilter && !Array.isArray(plFilter)) plFilter = [plFilter]
@@ -233,7 +233,7 @@ export async function download (e, plFilter) {
 
 export async function queuePlaylist (id) {
   VUEX_MAIN.COMMIT.QUEUE_PLAYLIST(id)
-  REFLECT_RENDERER_KEY('queuedPlaylists')
+  await REFLECT_RENDERER_KEY('queuedPlaylists')
 }
 
 export async function unsyncPlaylist (id) {

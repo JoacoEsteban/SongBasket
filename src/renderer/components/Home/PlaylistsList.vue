@@ -91,17 +91,17 @@ export default {
   },
   methods: {
     isMounted () {
-      const path = this.$sbRouter.giveMeCurrent()
+      const path = this.$root.$sbRouter.giveMeCurrent()
       return path.name === 'home' && path.params.which === 'playlists-list'
     },
     formatPlaylist (playlist) {
       return ({
         playlist,
-        status: this.$controllers.playlist.getStatus(playlist)
+        status: this.$root.$controllers.playlist.getStatus(playlist)
       })
     },
     loadMore () {
-      this.$controllers.core.loadMorePlaylists()
+      this.$root.$controllers.core.loadMorePlaylists()
     },
     handleInputConfirm () {
       if (this.syncedPlaylistsFiltered && this.syncedPlaylistsFiltered.length === 1) {
@@ -128,13 +128,13 @@ export default {
       this.refreshSynced()
     },
     refreshSynced () {
-      this.syncedPlaylists = this.$store.state.CurrentUser.syncedPlaylists.map(id => this.playlists.find(pl => pl.id === id)).filter(pl => pl).map(this.formatPlaylist).sort(this.$controllers.playlist.sort)
+      this.syncedPlaylists = this.$store.state.CurrentUser.syncedPlaylists.map(id => this.playlists.find(pl => pl.id === id)).filter(pl => pl).map(this.formatPlaylist).sort(this.$root.$controllers.playlist.sort)
       this.scheduleFilter()
     },
     calcScrollOpacity () {
       let ratio = (this.getContainerElement().scrollTop / 100)
       if (ratio > 1) ratio = 1
-      this.$setRootVar(this.scrollOpKey, (this.filterBackgroundOpacity = ratio))
+      this.$root.$setRootVar(this.scrollOpKey, (this.filterBackgroundOpacity = ratio))
     },
     getContainerElement () {
       return (this.containerElement || (this.containerElement = this.$root.$refs['home-router']))
@@ -163,7 +163,7 @@ export default {
   },
   mounted () {
     console.log('from pllist rebefo', this.searchInput, this.$root.SEARCH_INPUT)
-    this.$IPC.answerMain('done loading', async () => {
+    this.$root.$IPC.answerMain('done loading', async () => {
       this.loading = false
     })
     this.refreshAll()
@@ -172,7 +172,7 @@ export default {
     this.$root.onComponentLoaderMount = function () {
       console.log('dousinho')
       const env = this.$root.plListEnv
-      this.$(env.getContainerElement()).on('scroll', env.calcScrollOpacity)
+      this.$root.$(env.getContainerElement()).on('scroll', env.calcScrollOpacity)
       env.calcScrollOpacity()
     }
   }

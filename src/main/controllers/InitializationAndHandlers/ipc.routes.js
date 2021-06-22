@@ -1,7 +1,7 @@
 import * as handlers from './handlers'
 import * as sbFetch from './sbFetch'
 import WindowController from './window.controller'
-import store from '../../../renderer/store'
+// import store from '../../../renderer/store/index.js'
 import FileWatchers from '../FileSystem/FileWatchers'
 import { ipcMain } from 'electron-better-ipc'
 
@@ -32,7 +32,7 @@ export default function () {
 
   // on('APP_UPDATE:CONFIRM', updater.handlers.onUserUpdateConfirmation)
 
-  on('guestSignIn', function (event, { mode, query }) { // TODO deprecate
+  on('guestSignIn', function ({ mode, query }) { // TODO deprecate
     console.log('Guest:: Type:', mode, query)
     if (mode === 'user') {
       if (!query) return
@@ -50,28 +50,28 @@ export default function () {
         })
         .catch(err => console.log(err))
     }
-    if (mode === 'playlist') {
-      // TODO delete this
-      sbFetch.getTracks(store.getters.RequestParams, { id: query }, false)
-        .then(response => {
-          console.log('responseta', response)
-          if (response.error) {
-            console.log('ERROR DUD', response)
-          } else {
-            console.log('DOUU', response)
-          }
-          // store.dispatch('playlistStoreTracks', response.playlist).then(() => {
-          //   count--
-          //   if (count === 0) resolve()
-          // })
-        })
-        .catch(error => {
-          console.log('a ver si lo aachea', error)
-        })
-    }
+    // if (mode === 'playlist') {
+    //   // TODO delete this
+    //   sbFetch.getTracks(store.getters.RequestParams, { id: query }, false)
+    //     .then(response => {
+    //       console.log('responseta', response)
+    //       if (response.error) {
+    //         console.log('ERROR DUD', response)
+    //       } else {
+    //         console.log('DOUU', response)
+    //       }
+    //       // store.dispatch('playlistStoreTracks', response.playlist).then(() => {
+    //       //   count--
+    //       //   if (count === 0) resolve()
+    //       // })
+    //     })
+    //     .catch(error => {
+    //       console.log('a ver si lo aachea', error)
+    //     })
+    // }
   })
 
-  on('guestConfirm', async function (event, userID) { // TODO deprecate
+  on('guestConfirm', async function (userID) { // TODO deprecate
     // Saving Home folder to .songbasket-userdata
     try {
       console.log(`Fetching Playlists from Guest user ${userID}`)
@@ -85,16 +85,16 @@ export default function () {
     await handlers.loadMorePlaylists()
   })
 
-  on('get tracks from', function (event, id) { // TODO deprecate
+  on('get tracks from', function (id) { // TODO deprecate
     console.log('wtf')
   })
 
   on('Youtube Convert', handlers.youtubize)
 
-  on('PLAYLISTS:QUEUE', async function (event, id) {
-    handlers.queuePlaylist(id)
+  on('PLAYLISTS:QUEUE', async function (id) {
+    await handlers.queuePlaylist(id)
   })
-  on('PLAYLISTS:UNSYNC', async function (event, { id, listenerId }) {
+  on('PLAYLISTS:UNSYNC', async function ({ id, listenerId }) {
     let error
     try {
       await handlers.unsyncPlaylist(id)

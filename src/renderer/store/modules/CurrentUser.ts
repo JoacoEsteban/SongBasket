@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* eslint-disable camelcase */
 import Vue from 'vue'
 
@@ -28,25 +29,25 @@ const dispatchAppropiateEvent = {
   },
   async send (env, key) {
     const events = this.getEvent(key)
-    if (events.length) events.asyncForEach(async event => env.dispatch(event, {}, {root: true}))
+    if (events.length) events.asyncForEach(async event => env.dispatch(event, {}, { root: true }))
   }
 }
 
 const actions = {
-  set ({commit}, {key, value}) {
+  set ({ commit }, { key, value }) {
     return new Promise((resolve, reject) => {
-      commit('SET', {key, value})
+      commit('SET', { key, value })
       dispatchAppropiateEvent.send(this, key)
       resolve()
     })
   },
-  setState ({commit}, newState) {
+  setState ({ commit }, newState) {
     return new Promise((resolve, reject) => {
       commit('SET_STATE', newState)
       resolve()
     })
   },
-  setUser ({commit}, userData) {
+  setUser ({ commit }, userData) {
     return new Promise((resolve, reject) => {
       commit('SET_USER', userData)
       resolve()
@@ -57,7 +58,7 @@ const actions = {
   },
   setCurrentPlaylist ({ commit }, id) {
     commit('SET_CURRENT_PLAYLIST', id)
-    this.dispatch('currentPlaylistSet', {}, {root: true})
+    this.dispatch('currentPlaylistSet', {}, { root: true })
   }
 }
 
@@ -144,7 +145,7 @@ const getters = {
   // Number of Queued playlists and tracks to show in View
   SelectedPlaylistsCompute: (state) => {
     let q = state.queuedPlaylists
-    let p = [ ...state.playlists ]
+    let p = [...state.playlists]
 
     let selectedPlaylists = {
       playlists: q.length,
@@ -194,7 +195,7 @@ const getters = {
       }
     } else removed = []
 
-    return {added, removed}
+    return { added, removed }
   }
 }
 

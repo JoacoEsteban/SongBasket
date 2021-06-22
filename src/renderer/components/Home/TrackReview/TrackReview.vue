@@ -44,14 +44,14 @@ export default {
     }
   },
   created () {
-    this.$ComponentRefs.TrackReview = this
+    this.$root.$ComponentRefs.TrackReview = this
   },
   methods: {
     refreshTrack () {
-      const track = this.$sbRouter.giveMeCurrent().params.track
+      const track = this.$root.$sbRouter.giveMeCurrent().params.track
       if (!track) return
       this.track = this.$root.CONVERTED_TRACKS_FORMATTED.find(t => t.id === track.id)
-      this.$ComponentRefs.slides.TrackReview.setTrack(this.track)
+      this.$root.$ComponentRefs.slides.TrackReview.setTrack(this.track)
       console.log(this.track)
     },
     isSelected (id) {
@@ -61,7 +61,7 @@ export default {
       try {
         const newId = (item === null || item === false) ? item : item.youtube_id
         if (newId === undefined || !this.track) throw new Error('NO TRACK')
-        await this.$controllers.core.changeYtTrackSelection({trackId: this.track.id, newId})
+        await this.$root.$controllers.core.changeYtTrackSelection({trackId: this.track.id, newId})
         this.refreshTrack()
       } catch (error) {
         throw error

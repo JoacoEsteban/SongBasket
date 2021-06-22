@@ -55,7 +55,7 @@
           </div>
           <div v-if="!isConversion" class="ellipsis">
             <span class="playlists">
-              Inside <b>{{$controllers.track.getPlaylistsString(track)}}</b>
+              Inside <b>{{$root.$controllers.track.getPlaylistsString(track)}}</b>
             </span>
           </div>
           <div v-if="!isConversion && !isDownload" class="df">
@@ -108,7 +108,7 @@ export default {
       return itm && {
         name: this.isConversion ? itm.isCustomTrack ? snippet.title : itm.nameFormatted : itm.data.name,
         image,
-        creator: this.isConversion ? snippet.channelTitle : this.$controllers.track.getArtistsString(itm),
+        creator: this.isConversion ? snippet.channelTitle : this.$root.$controllers.track.getArtistsString(itm),
         status: itm.status,
         issue: (() => {
           if (!this.isConversion) return null
@@ -131,7 +131,7 @@ export default {
       // return {str: Math.round(this.track.duration || this.track.data.duration_ms / 1000) + "''", color: this.durationColor()}
       const durationDiff = this.isConversion && (this.parentRef.duration || this.parentRef.data.duration_ms / 1000) - this.track.duration
       const obj = {
-        str: this.$controllers.utils.minsFromSecs(Math.round(this.track.duration || this.track.data.duration_ms / 1000)),
+        str: this.$root.$controllers.utils.minsFromSecs(Math.round(this.track.duration || this.track.data.duration_ms / 1000)),
         color: this.durationColor(durationDiff)
       }
       return obj
@@ -152,7 +152,7 @@ export default {
       this.$emit('select')
     },
     openVideo () {
-      this.$controllers.core.openVideo(this.track.youtube_id || this.track.id)
+      this.$root.$controllers.core.openVideo(this.track.youtube_id || this.track.id)
     }
   },
   props: {

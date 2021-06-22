@@ -116,7 +116,7 @@ export default {
       this.animateHover()
     },
     setMouseListener () {
-      this.$(window).on('mouseup', this.restoreTransformation)
+      this.$root.$(window).on('mouseup', this.restoreTransformation)
     },
     promiseNextTick () {
       return new Promise((resolve, reject) => this.$nextTick(resolve))
@@ -157,15 +157,15 @@ export default {
     },
     restoreTransformation (force) {
       if (!force && (window.MOUSE_BEING_CLICKED || this.hovering)) return
-      this.$(window).off('mouseup', this.restoreTransformation)
+      this.$root.$(window).off('mouseup', this.restoreTransformation)
       this.getRotationElement().css('transform', `perspective(1000px) rotateX(0deg) rotateY(0deg)`)
       this.getLightShineElement().css({'background-position': '', transform: ''})
     },
     getRotationElement () {
-      return this.rotationElement || (this.rotationElement = this.$(this.$refs['content-container']))
+      return this.rotationElement || (this.rotationElement = this.$root.$(this.$refs['content-container']))
     },
     getLightShineElement () {
-      return this.lightShineElement || (this.lightShineElement = this.$(this.$refs['light-shine']))
+      return this.lightShineElement || (this.lightShineElement = this.$root.$(this.$refs['light-shine']))
     }
   }
 }

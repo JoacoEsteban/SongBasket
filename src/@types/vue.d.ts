@@ -1,3 +1,4 @@
+import { RendererProcessIpc } from 'electron-better-ipc'
 import Vue from 'vue'
 import SbRouter from '../renderer/environment/sbRouter'
 
@@ -6,7 +7,18 @@ type shared = {
   $uuid: uuidv4,
   $sleep: (time: number) => Promise<void>,
   $jsonClone: (obj: {}) => {},
-  $setRootVar: (key: string, val: any, valJs: any) => void
+  $setRootVar: (key: string, val: any, valJs: any) => void,
+  $sbRouter: SbRouter,
+  $ComponentRefs: {},
+  $IPC: RendererProcessIpc,
+  $controllers: {
+    setup: {},
+    core: {},
+    track: {},
+    playlist: {},
+    utils: {},
+    modal: {},
+  }
 }
 
 declare module 'vue/types/vue' {
@@ -16,7 +28,6 @@ declare module 'vue/types/vue' {
       writeEvent: boolean,
       value: string
     },
-    $sbRouter: SbRouter,
     cardTransformInvalidation: number,
     OPEN_MODAL: () => void
   }

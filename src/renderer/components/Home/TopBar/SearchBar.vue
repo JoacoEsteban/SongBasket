@@ -40,7 +40,7 @@ export default {
   },
   mounted () {
     this.searchInputOnBlur()
-    this.$sbRouter.beforeTransition(this.onBeforeTransition)
+    this.$root.$sbRouter.beforeTransition(this.onBeforeTransition)
   },
   computed: {
   },
@@ -58,11 +58,11 @@ export default {
     },
     checkVisibility (to) {
       if (this.hideOn.includes(to.name)) {
-        this.$setRootVar('filters-container-height', '0')
+        this.$root.$setRootVar('filters-container-height', '0')
         this.hide = true
         return
       }
-      this.$setRootVar('filters-container-height', '4em')
+      this.$root.$setRootVar('filters-container-height', '4em')
       this.hide = false
     },
     searchInputOnFocus () {

@@ -40,8 +40,8 @@ export default {
   },
   data () {
     return {
-      currentPath: this.$sbRouter.path,
-      componentBeingShown: this.$sbRouter.path.name,
+      currentPath: this.$root.$sbRouter.path,
+      componentBeingShown: this.$root.$sbRouter.path.name,
       transitioning: false,
       routerAnimation: ''
     }
@@ -55,8 +55,8 @@ export default {
     }
   },
   created () {
-    sleep = this.$sleep
-    this.$sbRouter.beforeTransition(this.handleRouteChange)
+    sleep = this.$root.$sleep
+    this.$root.$sbRouter.beforeTransition(this.handleRouteChange)
   },
   mounted () {
     this.$root.$refs['home-router'] = this.$refs['home-router']
@@ -66,7 +66,7 @@ export default {
     async handleAnimation (to, from) {
       if (this.transitioning) return
       this.$refs['home-router'] && (this.$refs['home-router'].scrollTop = 0)
-      this.transitioning = this.$sbRouter.setTransitioningState(true)
+      this.transitioning = this.$root.$sbRouter.setTransitioningState(true)
       let anim1
       let anim2 = 'fast '
       const pull = 'pull'
@@ -104,7 +104,7 @@ export default {
       this.routerAnimation = 'release'
 
       await sleep(100)
-      this.transitioning = this.$sbRouter.setTransitioningState(3)
+      this.transitioning = this.$root.$sbRouter.setTransitioningState(false)
     },
     makeTransition (to) {
       this.currentPath = to

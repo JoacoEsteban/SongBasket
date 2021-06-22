@@ -57,7 +57,7 @@ export default {
       const id = this.item && this.item.id
       try {
         if (!id) throw new Error('NO TRACK ID')
-        await this.$controllers.core.pauseTrack(id)
+        await this.$root.$controllers.core.pauseTrack(id)
       } catch (error) {
         console.error(error)
       }
@@ -69,8 +69,8 @@ export default {
       if (item.isBestMatch) newId = null
 
       try {
-        await this.$controllers.core.changeYtTrackSelection({trackId: this.item.id, newId})
-        this.$controllers.track.populateTrackSelection(this.item)
+        await this.$root.$controllers.core.changeYtTrackSelection({trackId: this.item.id, newId})
+        this.$root.$controllers.track.populateTrackSelection(this.item)
       } catch (error) {
         console.error(error)
       }

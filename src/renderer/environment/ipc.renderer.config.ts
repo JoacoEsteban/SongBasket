@@ -1,8 +1,11 @@
+// @ts-nocheck
 // import { ipcRenderer } from 'electron'
 import { ipcRenderer } from 'electron-better-ipc'
-import $ from 'jquery'
+import * as $ from 'jquery'
 import { sleep } from '../utils'
 import vue from '../controllers/VueInstance'
+// import Vue, { VueConstructor } from 'vue'
+import VueApp from '../main'
 
 const ipc = ipcRenderer
 
@@ -10,8 +13,8 @@ const env = {
   propagationTimeout: null,
   propagationTrackQueue: []
 }
-export default function (Vue) {
-  Vue.prototype.$IPC = ipcRenderer
+export default function () {
+  VueApp.$IPC = ipcRenderer
   console.log(ipc)
 
   ipc.answerMain('STATUS:SET', onDocumentReady)

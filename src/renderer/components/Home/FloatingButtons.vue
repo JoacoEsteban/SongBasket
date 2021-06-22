@@ -133,10 +133,10 @@ export default {
     }
   },
   created () {
-    this.$sbRouter.beforeTransition(this.handleTransition)
+    this.$root.$sbRouter.beforeTransition(this.handleTransition)
   },
   async mounted () {
-    await this.$sleep(1000)
+    await this.$root.$sleep(1000)
     this.handleTransition()
   },
   watch: {
@@ -155,7 +155,7 @@ export default {
   },
   methods: {
     handleTransition (to) {
-      this.route = (to && to.name) || this.$sbRouter.path.name
+      this.route = (to && to.name) || this.$root.$sbRouter.path.name
     },
     async handleError (val, autoHide = {
       val: true,
@@ -165,35 +165,35 @@ export default {
       this.errorPill.message = val.message
 
       this.forceHide.all = true
-      await this.$sleep(400)
+      await this.$root.$sleep(400)
       this.forceKill.all = true
       this.errorPill.kill = false
-      await this.$sleep(100)
+      await this.$root.$sleep(100)
       this.errorPill.show = true
 
       if (autoHide.val) this.errorTimeout = setTimeout(this.hideErrorPill, autoHide.time)
     },
     async hideErrorPill () {
       this.errorPill.show = false
-      await this.$sleep(400)
+      await this.$root.$sleep(400)
       this.errorPill.kill = true
       this.forceKill.all = false
-      await this.$sleep(100)
+      await this.$root.$sleep(100)
       this.forceHide.all = false
-      await this.$sleep(400)
+      await this.$root.$sleep(400)
     },
     refresh () {
-      this.$controllers.core.refresh()
+      this.$root.$controllers.core.refresh()
     },
     sync () {
       this.$emit('youtubeConvert')
     },
     download () {
-      this.$controllers.core.download()
+      this.$root.$controllers.core.download()
     },
     toggleDropdown () {
       // this.showingDropdown = !this.showingDropdown
-      this.$controllers.core.logOut()
+      this.$root.$controllers.core.logOut()
     }
   }
 

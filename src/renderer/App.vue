@@ -7,6 +7,8 @@
 </template>
 
 <script lang="ts">
+// @ts-nocheck
+
 import Modal from './components/Modal/Modal.vue'
 import StylesLoader from './CSS/styles-loader.vue'
 
@@ -18,7 +20,7 @@ export default {
   },
   watch: {
     isConnected (val) {
-      this.$('html')[val ? 'removeClass' : 'addClass']('disconnected')
+      this.$root.$('html')[val ? 'removeClass' : 'addClass']('disconnected')
     }
   },
   computed: {
@@ -41,13 +43,14 @@ export default {
     window.sbDebug = this
   },
   created () {
-    this.$sbRouter.push({name: 'home', params: {which: 'playlists-list'}})
+    this.$root.$sbRouter.push({name: 'home', params: {which: 'playlists-list'}})
   },
   async mounted () {
     this.$root.cardTransformInvalidation = 0
     this.$root.OPEN_MODAL = this.$store._actions.openModal[0]
     // TODO fix router push without timeout
-    await this.$sleep(1000)
+    console.log(this)
+    await this.$root.$sleep(1000)
     window.VUE_HAS_MOUNTED = true
   }
 }

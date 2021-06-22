@@ -82,7 +82,7 @@ export default {
     }
   },
   created () {
-    this.$ComponentRefs.slides.TrackReview = this
+    this.$root.$ComponentRefs.slides.TrackReview = this
   },
   computed: {
     showReset () {
@@ -106,7 +106,7 @@ export default {
   methods: {
     refresh () {
       console.log('onrefresh')
-      this.$ComponentRefs.TrackReview && this.$ComponentRefs.TrackReview.refreshTrack()
+      this.$root.$ComponentRefs.TrackReview && this.$root.$ComponentRefs.TrackReview.refreshTrack()
     },
     setTrack (track) {
       this.track = track
@@ -115,7 +115,7 @@ export default {
       const id = this.track && this.track.id
       try {
         if (!id) throw new Error('NO TRACK ID')
-        await this.$controllers.core.pauseTrack(id)
+        await this.$root.$controllers.core.pauseTrack(id)
         this.refresh()
       } catch (error) {
         console.error(error)
@@ -125,17 +125,17 @@ export default {
       const id = this.track && this.track.id
       try {
         if (!id) throw new Error('NO TRACK ID')
-        await this.$controllers.core.askTrackCustomUrl(id)
+        await this.$root.$controllers.core.askTrackCustomUrl(id)
         this.refresh()
       } catch (error) {
         console.error(error)
       }
     },
     async reset () {
-      await this.$ComponentRefs.TrackReview && this.$ComponentRefs.TrackReview.selectVideo(null)
+      await this.$root.$ComponentRefs.TrackReview && this.$root.$ComponentRefs.TrackReview.selectVideo(null)
     },
     searchYt () {
-      this.$controllers.core.searchYt(this.track)
+      this.$root.$controllers.core.searchYt(this.track)
     }
   }
 }

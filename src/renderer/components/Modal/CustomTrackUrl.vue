@@ -73,7 +73,7 @@ export default {
       this.hide = true
       this.hideControls = true
 
-      this.$IPC.callMain('YOUTUBE_DETAILS:GET', { url: this.url, trackId: this.payload.trackId })
+      this.$root.$IPC.callMain('YOUTUBE_DETAILS:GET', { url: this.url, trackId: this.payload.trackId })
         .then((details) => {
           this.$emit('close')
           this.payload.cb && this.payload.cb()

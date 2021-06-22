@@ -103,7 +103,7 @@ export default {
     }
   },
   created () {
-    this.$sbRouter.beforeTransition(this.getPlaylist)
+    this.$root.$sbRouter.beforeTransition(this.getPlaylist)
   },
   watch: {
     playlistTracksReComputed () {
@@ -114,7 +114,7 @@ export default {
     }
   },
   methods: {
-    getPlaylist (path = this.$sbRouter.giveMeCurrent()) {
+    getPlaylist (path = this.$root.$sbRouter.giveMeCurrent()) {
       if (path && path.name === 'home') return
       const {params} = path
       this.playlist = params && this.$store.getters.PlaylistById(params.id)
@@ -122,18 +122,18 @@ export default {
     },
     setStatus () {
       if (!this.playlist) return
-      this.statusObj = this.$controllers.playlist.getStatus(this.playlist)
+      this.statusObj = this.$root.$controllers.playlist.getStatus(this.playlist)
     },
     downloadPlaylist () {
       if (!(this.playlist && this.playlist.id)) return
-      this.$controllers.core.download(this.playlist.id)
-      this.$sbRouter.push({name: 'downloads-view'})
+      this.$root.$controllers.core.download(this.playlist.id)
+      this.$root.$sbRouter.push({name: 'downloads-view'})
     },
     unsyncPlaylist () {
       this.$store.dispatch('openModal', {wich: 'unsync', payload: {id: this.playlist.id}})
     },
     pausePlaylist () {
-      this.$controllers.core.pausePlaylist(this.playlist.id)
+      this.$root.$controllers.core.pausePlaylist(this.playlist.id)
     }
   }
 }

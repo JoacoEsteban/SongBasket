@@ -26,7 +26,7 @@ export default {
   methods: {
     close () {
       if (this.transitioning) return
-      this.$(window).off('keyup', this.onKeyUp)
+      this.$root.$(window).off('keyup', this.onKeyUp)
       this.$store._actions.closeModal[0]()
     },
     onKeyUp ({key}) {
@@ -45,7 +45,7 @@ export default {
     show (val) {
       this.transitioning = true
       setTimeout(() => {
-        if (val) this.$(window).on('keyup', this.onKeyUp)
+        if (val) this.$root.$(window).on('keyup', this.onKeyUp)
         this.showLocal = val
         setTimeout(() => {
           this.transitioning = false

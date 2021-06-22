@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import Vue from 'vue'
 
 const getDefaultState = () => {
@@ -33,27 +35,27 @@ const actions = {
       resolve()
     })
   },
-  connectionChange ({commit}, value) {
-    commit('SET', {key: 'CONNECTED_TO_INTERNET', value})
+  connectionChange ({ commit }, value) {
+    commit('SET', { key: 'CONNECTED_TO_INTERNET', value })
   },
-  apiConnectionChange ({commit}, value) {
-    commit('SET', {key: 'CONNECTED_TO_API', value})
+  apiConnectionChange ({ commit }, value) {
+    commit('SET', { key: 'CONNECTED_TO_API', value })
   },
-  openModal ({commit}, options) {
+  openModal ({ commit }, options) {
     return new Promise((resolve, reject) => {
       commit('OPEN_MODAL', options)
       resolve()
     })
   },
-  closeModal ({commit}) {
+  closeModal ({ commit }) {
     return new Promise((resolve, reject) => {
       commit('CLOSE_MODAL')
       resolve()
     })
   },
-  downloadChunk ({commit}, {id, current, size}) {
+  downloadChunk ({ commit }, { id, current, size }) {
     return new Promise((resolve, reject) => {
-      commit('DOWNLOAD_CHUNK', {id, current, size})
+      commit('DOWNLOAD_CHUNK', { id, current, size })
       resolve()
     })
   }
@@ -63,13 +65,13 @@ const mutations = {
   TRIGGER (state, key) {
     state[key] = !state[key]
   },
-  SET (state, {key, value}) {
+  SET (state, { key, value }) {
     Vue.set(state, key, value)
   },
   SETUP_LOADING_STATE (state, loadingState) {
     state.loadingState = loadingState
   },
-  OPEN_MODAL (state, {wich, payload}) {
+  OPEN_MODAL (state, { wich, payload }) {
     state.modal.show = true
     state.modal.options.wich = wich
     state.modal.options.payload = payload
@@ -77,7 +79,7 @@ const mutations = {
   CLOSE_MODAL (state, options) {
     state.modal.show = false
   },
-  DOWNLOAD_CHUNK (state, {id, current, size}) {
+  DOWNLOAD_CHUNK (state, { id, current, size }) {
 
   }
 }

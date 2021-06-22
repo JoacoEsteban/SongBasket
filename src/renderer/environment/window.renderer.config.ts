@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import * as $ from 'jquery'
 import vue from '../controllers/VueInstance'
 import * as changeCase from 'change-case'
@@ -19,7 +21,7 @@ export default function () {
   $(window).on('dblclick', checkToggleMaximization)
 }
 
-function checkToggleMaximization (e) {
+function checkToggleMaximization (e: JQueryEventObject) {
   $(e.target).css('-webkit-app-region') === 'drag' && window.toggleMaximization()
 }
 
@@ -27,7 +29,7 @@ function invalidatePlTransformCache () {
   vue.root.cardTransformInvalidation = Date.now()
 }
 
-function handleMetaKeyCombo (keyCode, e) {
+function handleMetaKeyCombo (keyCode: number, e: JQueryEventObject) {
   const { shiftKey } = e
   switch (keyCode) {
     case 219:

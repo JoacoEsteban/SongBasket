@@ -1,7 +1,6 @@
 /* eslint-disable import/first */
 import { app } from 'electron'
 import PATH from 'path'
-import VUEX from '../../renderer/store'
 import FEATURES from './core.FEATURES'
 
 const ENV_PROD = global.ENV_PROD = process.env.NODE_ENV === 'production'
@@ -62,7 +61,6 @@ const CONSTANTS = {
   MAIN_WINDOW: null,
   LOADING_WINDOW: null,
   LOGIN_WINDOW: null,
-  VUEX,
   SAVE_TO_DISK: null,
   // -------------
   PLATFORM: (() => {

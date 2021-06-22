@@ -30,7 +30,7 @@ export default {
   },
   methods: {
     async accept () {
-      await this.$controllers.core.unsyncPlaylist(this.id)
+      await this.$root.$controllers.core.unsyncPlaylist(this.id)
       this.$emit('close')
     }
   }

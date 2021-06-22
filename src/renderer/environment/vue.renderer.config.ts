@@ -10,7 +10,9 @@ import { v4 as uuidv4 } from 'uuid'
 import { camelCase } from 'change-case'
 import * as utils from '../utils'
 import SbRouter from './sbRouter'
+import setIpcRoutes from './ipc.renderer.config'
 import Vue, { VueConstructor } from 'vue'
+import VueApp from '../main'
 
 library.add(
   faArrowRight,
@@ -18,34 +20,40 @@ library.add(
   faChevronUp
 )
 
-const VueInstance: VueConstructor<Vue> = Vue
+const VueProto: VueConstructor<Vue> = Vue
 
-export default function () {
-  if (!process.env.IS_WEB) VueInstance.use(require('vue-electron'))
+export function vueProtoConfig () {
+  if (!process.env.IS_WEB) VueProto.use(require('vue-electron'))
 
-  VueInstance.config.productionTip = false
+  VueProto.config.productionTip = false
 
-  VueInstance.component('font-awesome-icon', FontAwesomeIcon)
-  VueInstance.$ = $
-  VueInstance.$uuid = uuidv4
-  VueInstance.$sleep = utils.sleep
-  VueInstance.$jsonClone = utils.jsonClone
-  VueInstance.$setRootVar = (key, val, valJs) => {
+  VueProto.component('font-awesome-icon', FontAwesomeIcon)
+}
+
+export function vueAppConfig (): void {
+  VueApp.$ = $
+  VueApp.$uuid = uuidv4
+  VueApp.$sleep = utils.sleep
+  VueApp.$jsonClone = utils.jsonClone
+  VueApp.$setRootVar = (key, val, valJs) => {
     $(':root')[0].style.setProperty('--' + key, val)
     window.ROOT_VARS[camelCase(key)] = valJs || val
   }
 
-  VueInstance.$ComponentRefs = {
+  VueApp.$ComponentRefs = {
     slides: {}
   }
-  setControllers(VueInstance)
-  require('./ipc.renderer.config').default(VueInstance)
+  setControllers()
+  setIpcRoutes()
   // -----sb-router-----
-  VueInstance.$sbRouter = new SbRouter()
+  console.log('aber', VueApp)
+  // @ts-ignore
+  window.VUEAPP = VueApp
+  VueApp.$sbRouter = new SbRouter()
 }
 
-function setControllers (Vue) {
-  Vue.prototype.$controllers = {
+function setControllers () {
+  VueApp.$controllers = {
     setup: require('../controllers/Setup.controller').default,
     core: require('../controllers/Core.controller').default,
     track: require('../controllers/Track.controller').default,

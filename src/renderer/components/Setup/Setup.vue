@@ -77,7 +77,7 @@ export default {
       }
     },
     async transition () {
-      await this.$sleep(300)
+      await this.$root.$sleep(300)
     },
     async next () {
       // if ()
@@ -101,9 +101,9 @@ export default {
     async backLogin () {
       this.prevSub()
       await this.transition()
-      await this.$sleep(300)
-      this.$('#onboarding-login-button').focus()
-      await this.$sleep(500)
+      await this.$root.$sleep(300)
+      this.$root.$('#onboarding-login-button').focus()
+      await this.$root.$sleep(500)
       this.login()
     },
     login () {
@@ -112,7 +112,7 @@ export default {
     guestSearch (request) {
       if (this.loadingState !== 'Loading' && request.query !== '' && request.query !== undefined && request.query !== null) {
         this.$store.dispatch('SETUP_LOADING_STATE', 'loading')
-        this.$IPC.callMain('guestSignIn', request)
+        this.$root.$IPC.callMain('guestSignIn', request)
       }
     },
     redirect (path, payload) {
@@ -139,29 +139,29 @@ export default {
       }
     },
     confirmUser () {
-      this.$IPC.callMain('guestConfirm', this.userOnHold.id)
+      this.$root.$IPC.callMain('guestConfirm', this.userOnHold.id)
     }
 
   },
   mounted () {
-    this.$IPC.answerMain('continueToLogin', async () => {
+    this.$root.$IPC.answerMain('continueToLogin', async () => {
       this.redirect('login')
     })
 
-    this.$IPC.answerMain('not-found', async () => {
+    this.$root.$IPC.answerMain('not-found', async () => {
       this.$store.dispatch('SETUP_LOADING_STATE', 'not found')
     })
-    this.$IPC.answerMain('invalid', async () => {
+    this.$root.$IPC.answerMain('invalid', async () => {
       this.$store.dispatch('SETUP_LOADING_STATE', 'invalid id')
     })
 
-    this.$IPC.answerMain('user-found', async (user) => {
+    this.$root.$IPC.answerMain('user-found', async (user) => {
       this.$store.dispatch('SETUP_LOADING_STATE', 'found')
       this.userOnHold = user
       this.redirect('guest-verify', user)
     })
 
-    this.$IPC.answerMain('playlists done', async () => {
+    this.$root.$IPC.answerMain('playlists done', async () => {
       this.$store.dispatch('SETUP_LOADING_STATE', 'found')
       this.redirect('home')
     })

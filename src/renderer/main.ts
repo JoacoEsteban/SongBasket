@@ -1,17 +1,24 @@
+// @ts-nocheck
+
 import 'regenerator-runtime/runtime'
 import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
-import setEnvironment from './environment'
+import { setEnvironment, configureApp } from './environment'
 
-setEnvironment(Vue)
-
-export default new Vue({
+const VueApp = new Vue({
   components: {
     App
   },
   router,
   store,
   template: '<App/>'
-}).$mount('#app')
+})
+
+export default VueApp
+
+setEnvironment()
+configureApp()
+
+VueApp.$mount('#app')

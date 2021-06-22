@@ -35,7 +35,7 @@ export default {
   },
   methods: {
     openFolder (path) {
-      this.$controllers.core.setHomeFolder(path)
+      this.$root.$controllers.core.setHomeFolder(path)
     },
     editFolder (path) {
     },

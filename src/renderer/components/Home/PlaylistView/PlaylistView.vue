@@ -132,7 +132,7 @@ export default {
       this.calcChangesHeight()
     },
     playlistUnsynced () {
-      this.$sbRouter.push({name: 'home', params: {which: 'playlists-list'}})
+      this.$root.$sbRouter.push({name: 'home', params: {which: 'playlists-list'}})
     },
     searchInput () {
       if (!this.isMounted()) return
@@ -156,11 +156,11 @@ export default {
     },
     refreshPlaylist () {
       this.playlist = this.$store.getters.PlaylistById(this.plId) || {}
-      this.statusObj = this.$controllers.playlist.getStatus(this.playlist)
+      this.statusObj = this.$root.$controllers.playlist.getStatus(this.playlist)
       this.calcChangesHeight()
     },
     computeTracks () {
-      this.conversion = (this.$root.CONVERTED_TRACKS_FORMATTED && this.$root.CONVERTED_TRACKS_FORMATTED.filter(t => t.playlists.some(pl => pl.id === this.plId)).sort(this.$controllers.track.sort)) || []
+      this.conversion = (this.$root.CONVERTED_TRACKS_FORMATTED && this.$root.CONVERTED_TRACKS_FORMATTED.filter(t => t.playlists.some(pl => pl.id === this.plId)).sort(this.$root.$controllers.track.sort)) || []
     },
     setIterable () {
       this.iterableItems = this.isSynced ? this.conversion : this.items
@@ -175,19 +175,19 @@ export default {
       if (this.changesHeight !== null && !this.showingChanges) return
       this.$nextTick(() => {
         let height = 0
-        this.$('.changes-container').children().each((i, el) => height += parseInt(this.$(el).css('height')))
+        this.$root.$('.changes-container').children().each((i, el) => height += parseInt(this.$root.$(el).css('height')))
         this.changesHeight = height
       })
     },
     // --------
     isMounted () {
-      const path = this.$sbRouter.giveMeCurrent()
+      const path = this.$root.$sbRouter.giveMeCurrent()
       return path.name === 'playlist-view'
     },
     async transitionTracks (what) {
       // TODO encapsulate all this logic inside controller
       this.listAnimationClass = what
-      await this.$sleep(this.listAnimationTime)
+      await this.$root.$sleep(this.listAnimationTime)
       return (!(this.transitioning = false))
     },
     async hideTracks () {

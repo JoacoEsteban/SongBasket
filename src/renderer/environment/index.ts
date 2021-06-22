@@ -1,9 +1,9 @@
 import * as electron from 'electron'
-import { VueConstructor } from 'vue'
+// import { VueConstructor } from 'vue'
 import '../../main/controllers/Prototype/Array'
 import '../../main/controllers/Prototype/Object'
 
-import VueRendererConfig from './vue.renderer.config'
+import { vueProtoConfig, vueAppConfig } from './vue.renderer.config'
 import WindowRendererConfig from './window.renderer.config'
 
 const { BrowserWindow, getGlobal } = electron.remote
@@ -11,10 +11,10 @@ const { BrowserWindow, getGlobal } = electron.remote
 const GLOBAL = window.CONSTANTS = getGlobal('CONSTANTS')
 console.log('gl', GLOBAL)
 
-export default (Vue: VueConstructor) => {
+export const setEnvironment = () => {
   // -----------------PROTOTYPES-----------------
   // -----------------VUE-----------------
-  VueRendererConfig()
+  vueProtoConfig()
   // -----------------WINDOW-----------------
   WindowRendererConfig()
 
@@ -76,4 +76,8 @@ export default (Vue: VueConstructor) => {
       loop()
     }
   }
+}
+
+export const configureApp = () => {
+  vueAppConfig()
 }

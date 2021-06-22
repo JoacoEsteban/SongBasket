@@ -79,7 +79,7 @@
 </template>
 
 <script>
-import { dateFormatter } from '../../../utils'
+import { dateFormatter } from '../../../utils.ts'
 
 import PlaylistViewSlide from './slides/PlaylistViewSlide.vue'
 import TrackReviewSlide from './slides/TrackReviewSlide.vue'
@@ -118,8 +118,8 @@ export default {
       },
       currentPath: null,
       activeSection: null,
-      showPrevBtn: this.$sbRouter.pointer,
-      showForwBtn: this.$sbRouter.isLast(),
+      showPrevBtn: this.$root.$sbRouter.pointer,
+      showForwBtn: this.$root.$sbRouter.isLast(),
       sections: [
         {
           id: ++sectionId,
@@ -141,8 +141,8 @@ export default {
     // document.documentElement.style.setProperty('--loading-bar-animation-duration', (this.loadingBar.animationDuration / 100) + 's')
     this.activeSection = this.sections.find(s => s.title === 'Playlists').id
 
-    this.$sbRouter.beforeTransition(this.handleRouterNavigation)
-    this.$sbRouter.afterTransition(this.checkNavBtns)
+    this.$root.$sbRouter.beforeTransition(this.handleRouterNavigation)
+    this.$root.$sbRouter.afterTransition(this.checkNavBtns)
     this.checkNavBtns()
   },
   computed: {
@@ -179,14 +179,14 @@ export default {
   },
   methods: {
     checkNavBtns () {
-      this.showPrevBtn = !!this.$sbRouter.pointer
-      this.showForwBtn = !this.$sbRouter.isLast()
+      this.showPrevBtn = !!this.$root.$sbRouter.pointer
+      this.showForwBtn = !this.$root.$sbRouter.isLast()
     },
     navigationBack () {
-      this.$sbRouter.goBack()
+      this.$root.$sbRouter.goBack()
     },
     navigationForw () {
-      this.$sbRouter.goForward()
+      this.$root.$sbRouter.goForward()
     },
     handleRouterNavigation (to, from) {
       this.currentPath = to.name
@@ -248,7 +248,7 @@ export default {
       })
     },
     goTo (where) {
-      this.$sbRouter.push({name: 'home',
+      this.$root.$sbRouter.push({name: 'home',
         params: {
           which: where
         }})
