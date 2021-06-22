@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import Router from 'vue-router'
+import Router, { Route } from 'vue-router'
 import store from '../store'
 
 import LoadingScreen from '../components/LoadingScreen/LoadingScreen.vue'
@@ -49,7 +49,7 @@ let router = new Router({
   ]
 })
 let transitioning = false
-router.beforeEachQueue = [(to, from, next) => {
+const beforeEachQueue = [(to: Route, from: Route, next: () => void) => {
   if (transitioning) return
   transitioning = true
   let anim1
@@ -76,6 +76,6 @@ router.beforeEachQueue = [(to, from, next) => {
     }, 100)
   }, 300)
 }]
-router.beforeEach((to, from, next) => router.beforeEachQueue.forEach((func, index, arr) => func(to, from, index === arr.length - 1 ? next : () => {})))
+router.beforeEach((to, from, next) => beforeEachQueue.forEach((func, index, arr) => func(to, from, index === arr.length - 1 ? next : () => { })))
 
 export default router

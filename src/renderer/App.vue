@@ -9,6 +9,7 @@
 <script lang="ts">
 import Modal from './components/Modal/Modal.vue'
 import StylesLoader from './CSS/styles-loader.vue'
+
 export default {
   name: 'SongBasket',
   components: {
@@ -21,11 +22,11 @@ export default {
     }
   },
   computed: {
-    isConnected () {
-      return this.$store.state.SharedStates.CONNECTED_TO_INTERNET && this.isConnectedToApi
-    },
-    isConnectedToApi () {
+    isConnectedToApi (): boolean {
       return this.$store.state.SharedStates.CONNECTED_TO_API
+    },
+    isConnected (): boolean {
+      return this.$store.state.SharedStates.CONNECTED_TO_INTERNET && this.isConnectedToApi
     }
   },
   beforeCreate () {

@@ -18,6 +18,7 @@ declare module 'vue/types/vue' {
     },
     $sbRouter: SbRouter,
     cardTransformInvalidation: number,
+    OPEN_MODAL: () => void
   }
 
   interface VueConstructor extends shared { }

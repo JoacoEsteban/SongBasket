@@ -4,7 +4,7 @@ import * as changeCase from 'change-case'
 
 window.SHOW_KEYCODES = false
 
-export default function (window: Window) {
+export default function () {
   $(window).on('mousewheel', invalidatePlTransformCache)
   $(window).on('resize', invalidatePlTransformCache)
 

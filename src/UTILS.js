@@ -1,5 +1,3 @@
-exports.logme = (...log) => log && console.log(...log)
-
 exports.dateFormatter = (dateParam) => {
   const now = new Date()
   dateParam = new Date(dateParam)
@@ -18,5 +16,5 @@ exports.dateFormatter = (dateParam) => {
     minutes: dateParam.getMinutes() < 10 ? '0' + dateParam.getMinutes() : dateParam.getMinutes()
   }
 
-  return {date, time}
+  return { date, time }
 }

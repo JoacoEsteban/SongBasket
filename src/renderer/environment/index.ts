@@ -16,9 +16,9 @@ export default (Vue: VueConstructor) => {
   // -----------------VUE-----------------
   VueRendererConfig()
   // -----------------WINDOW-----------------
-  WindowRendererConfig(window)
+  WindowRendererConfig()
 
-  let electronWindow: electron.BrowserWindow
+  let electronWindow: electron.BrowserWindow | null
 
   const platform = GLOBAL.PLATFORM
 
@@ -29,47 +29,51 @@ export default (Vue: VueConstructor) => {
       document.exitFullscreen()
     } else document.documentElement.requestFullscreen()
 
-    document.getElementById('max-btn').classList.remove('button-' + (isFullscreen ? 'un' : '') + 'maximize')
-    document.getElementById('max-btn').classList.add('button-' + (!isFullscreen ? 'un' : '') + 'maximize')
+    document.getElementById('max-btn')?.classList.remove('button-' + (isFullscreen ? 'un' : '') + 'maximize')
+    document.getElementById('max-btn')?.classList.add('button-' + (!isFullscreen ? 'un' : '') + 'maximize')
   }
   window.toggleFullscreen = toggleFullscreen
 
   function toggleMaximization () {
     electronWindow && (electronWindow.isMaximized() ? electronWindow.unmaximize() : electronWindow.maximize())
   }
-  window.toggleMaximization = toggleMaximization;
+  window.toggleMaximization = toggleMaximization
 
-  (function () {
-    function init () {
-      // TODO improve this logic
-      const window = electronWindow = BrowserWindow.getFocusedWindow()
-      if (!window || !document.getElementById('min-btn') || !document.getElementById('max-btn') || !document.getElementById('close-btn')) return false
-      document.getElementById('min-btn').addEventListener('click', function (e) {
-        window.minimize()
-      })
-      window.on('maximize', () => {
-        document.getElementById('max-btn').classList.remove('button-maximize')
-        document.getElementById('max-btn').classList.add('button-unmaximize')
-      })
-      window.on('unmaximize', () => {
-        document.getElementById('max-btn').classList.remove('button-unmaximize')
-        document.getElementById('max-btn').classList.add('button-maximize')
-      })
-      document.getElementById('max-btn').addEventListener('click', platform === 'mac' ? toggleFullscreen : toggleMaximization)
+  function init () {
+    // TODO improve this logic
+    const window = electronWindow = BrowserWindow.getFocusedWindow()
 
-      document.getElementById('close-btn').addEventListener('click', function (e) {
-        window.close()
-      })
-      return true
+    const minBtn = document.getElementById('min-btn')
+    const maxBtn = document.getElementById('max-btn')
+    const closeBtn = document.getElementById('close-btn')
+
+    if (!window || !minBtn || !maxBtn || !closeBtn) return false
+
+    minBtn.addEventListener('click', function (e) {
+      window.minimize()
+    })
+    window.on('maximize', () => {
+      maxBtn.classList.remove('button-maximize')
+      maxBtn.classList.add('button-unmaximize')
+    })
+    window.on('unmaximize', () => {
+      maxBtn.classList.remove('button-unmaximize')
+      maxBtn.classList.add('button-maximize')
+    })
+    maxBtn.addEventListener('click', platform === 'mac' ? toggleFullscreen : toggleMaximization)
+
+    closeBtn.addEventListener('click', function (e) {
+      window.close()
+    })
+    return true
+  }
+
+  document.onreadystatechange = function () {
+    const loop = () => {
+      if (!init()) setTimeout(loop, 1000)
     }
-
-    document.onreadystatechange = function () {
-      const loop = () => {
-        if (!init()) setTimeout(loop, 1000)
-      }
-      if (document.readyState === 'complete') {
-        loop()
-      }
+    if (document.readyState === 'complete') {
+      loop()
     }
-  })()
+  }
 }

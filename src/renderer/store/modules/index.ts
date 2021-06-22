@@ -4,7 +4,7 @@
  */
 
 const files = require.context('.', false, /\.js$/)
-const modules = {}
+const modules: { [key: string]: {} } = {}
 
 files.keys().forEach(key => {
   if (key === './index.js') return
