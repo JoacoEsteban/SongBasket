@@ -1,12 +1,15 @@
 
-import * as utils from '../../../MAIN_PROCESS_UTILS'
-import fs from 'fs'
-import ffmpeg from 'fluent-ffmpeg'
+import { promises as fs } from 'fs'
+import * as ffmpeg from 'fluent-ffmpeg'
 
-import NodeID3 from 'node-id3'
+import * as NodeID3 from 'node-id3'
 import axios from 'axios'
 
-export function extractMp3 (pathmp3, pathmp4, inputFormat, progressCb) {
+type progressEvent = {
+  percent: number
+}
+
+export function extractMp3 (pathmp3: string, pathmp4: string, inputFormat: string, progressCb: (progress: progressEvent) => void): Promise<void> {
   return new Promise((resolve, reject) => {
     const command =
       ffmpeg(pathmp4)
@@ -14,7 +17,7 @@ export function extractMp3 (pathmp3, pathmp4, inputFormat, progressCb) {
         .on('progress', progressCb)
         .on('end', async () => {
           try {
-            await utils.promisify(fs.unlink, pathmp4)
+            await fs.unlink(pathmp4)
           } catch (err) {
             console.error(err)
           }
@@ -25,7 +28,7 @@ export function extractMp3 (pathmp3, pathmp4, inputFormat, progressCb) {
   })
 }
 
-export function applyTags (pathmp3, data, ytSelection) {
+export function applyTags (pathmp3: string, data, ytSelection) {
   let tags = {
     title: data.name,
     // artist: data.artists.map(a => a.name).join(';'), // TODO Try multiple artists
@@ -63,7 +66,7 @@ export function applyTags (pathmp3, data, ytSelection) {
   })
 }
 
-export function getPhoto (url) {
+export function getPhoto (url: string) {
   console.log('getting picture')
   return new Promise((resolve, reject) => {
     axios({

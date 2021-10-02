@@ -68,9 +68,9 @@ export function readFile (path: string) {
     fs.readFile(path, (err, data) => err ? reject(err) : resolve(data))
   })
 }
-export function writeFile (...args): Promise<void> {
+export function writeFile (path: string, data: string): Promise<void> {
   return new Promise((resolve, reject) => {
-    fs.writeFile(...args, err => err ? reject(err) : resolve())
+    fs.writeFile(path, data, err => err ? reject(err) : resolve())
   })
 }
 export function link (path: string, path2: string): Promise<void> {
@@ -132,11 +132,4 @@ export function isSameDisk (path1: string, path2: string) {
     case 'other':
       break
   }
-}
-
-export function promisify (func, params) {
-  if (!Array.isArray(params)) params = [params]
-  return new Promise((resolve, reject) => {
-    func(...params, (...args) => resolve(args))
-  })
 }

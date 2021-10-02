@@ -3,11 +3,13 @@ import customGetters from '../../Store/Helpers/customGetters'
 import * as utils from '../../../MAIN_PROCESS_UTILS'
 import Helpers from './Helpers'
 import REGEX from '../../Global/REGEX'
-import fs from 'fs'
-import PATH from 'path'
-import rimraf from 'rimraf'
+import { promises as fs } from 'fs'
+import * as fsCb from 'fs'
+import * as PATH from 'path'
+import * as rimraf from 'rimraf'
 // import NodeID3 from 'node-id3'
-import iconv from 'iconv-lite'
+import * as iconv from 'iconv-lite'
+type sessionPaths = typeof global.SESSION_FOLDER_PATHS
 
 const PATHS = {
   userDataPath: global.CONSTANTS.APP_SUPPORT_PATH,
@@ -41,45 +43,45 @@ console.log('Folder Path: ', PATHS.foldersJsonPath)
 const homeFolderPath = () => global.HOME_FOLDER
 
 const UserMethods = {
-  async getFolders () {
-    try {
-      if (await utils.pathDoesExist(PATHS.foldersJsonPath)) {
-        let paths = JSON.parse((await utils.promisify(fs.readFile, [PATHS.foldersJsonPath, 'utf8']))[1])
-        if (!this.isValidFolderStructure(paths)) paths = await this.resetFolderPaths()
-        return global.SESSION_FOLDER_PATHS = paths
-      }
-    } catch (error) {
-      throw error
+  async getFolders (): Promise<sessionPaths | null> {
+    if (await utils.pathDoesExist(PATHS.foldersJsonPath)) {
+      let paths: sessionPaths = JSON.parse(await fs.readFile(PATHS.foldersJsonPath, 'utf8'))
+      if (!this.isValidFolderStructure(paths)) paths = await this.resetFolderPaths()
+      return global.SESSION_FOLDER_PATHS = paths
     }
+    return null // TODO return safe
   },
-  isValidFolderStructure (paths) {
+  isValidFolderStructure (paths: sessionPaths) {
     const them = Object.keys(paths)
     const def = Object.keys(getEmptyFolders())
     return them.length === def.length && them.every(key => def.includes(key))
   },
-  async setCurrentFolder (path) {
+  async setCurrentFolder (path: string | null) {
     if (!path) path = null
     global.SESSION_FOLDER_PATHS.selected = path
     await this.writeHomeFolders()
   },
-  async addFolder (path, params = { set: true }) {
+  async addFolder (path: string, params = { set: true }) {
     console.log('path', path)
     const folders = await this.getFolders()
+    if (!folders) return
     if (!folders.paths.find(p => p === path)) folders.paths.push(path)
     global.SESSION_FOLDER_PATHS = folders
 
     if (params.set) await this.setCurrentFolder(path)
     else this.writeHomeFolders()
   },
-  async removeFolder (path) {
+  async removeFolder (path: string) {
     const folders = await this.getFolders()
+    if (!folders) return
     folders.paths = folders.paths.filter(p => p !== path)
     if (path === folders.selected) folders.selected = null
     global.SESSION_FOLDER_PATHS = folders
     this.writeHomeFolders()
   },
-  async unsetCurrentFolder (path) {
+  async unsetCurrentFolder (path: string) {
     const folders = await this.getFolders()
+    if (!folders) return
     folders.selected = null
     global.SESSION_FOLDER_PATHS = folders
     await this.writeHomeFolders()
@@ -105,48 +107,36 @@ const UserMethods = {
       throw error
     }
   },
-  writeHomeFolders: async function (folders = global.SESSION_FOLDER_PATHS) {
+  async writeHomeFolders (folders = global.SESSION_FOLDER_PATHS) {
     try {
-      await utils.promisify(fs.writeFile, [PATHS.foldersJsonPath, JSON.stringify(folders), 'utf8'])
+      await fs.writeFile(PATHS.foldersJsonPath, JSON.stringify(folders), 'utf8')
       global.SESSION_FOLDER_PATHS = folders
       return 'success'
     } catch (err) {
       throw err
     }
   },
-  saveState: async function ({ state, path }) {
+  async saveState (params: { state: any, path: string }) {
+    const { state, path } = params
     // console.log('Saving state to', path)
-    return new Promise(async (resolve, reject) => {
-      if (!(await utils.pathDoesExist(path))) {
-        // TODO Handle non existing folder
-      } else {
-        let jsonState = JSON.stringify(state)
-        try {
-          let err = await (utils.promisify(fs.writeFile, [path + PATHS.stateFileName, jsonState, 'utf8']))[0]
-          err ? reject(err) : resolve()
-        } catch (error) {
-          reject(error)
-        }
-      }
-    })
+    if (!(await utils.pathDoesExist(path))) {
+      // TODO Handle non existing folder
+    } else {
+      const jsonState = JSON.stringify(state)
+      await fs.writeFile(PATH.join(path, PATHS.stateFileName), jsonState, 'utf8')
+    }
   },
-  retrieveState: function (path) {
+  async retrieveState (path: string) {
     let filePath = path + PATHS.stateFileName
     console.log('retrieving from ', path)
-    return new Promise((resolve, reject) => {
-      fs.access(filePath, (err) => {
-        if (err) return reject(err)
-        fs.readFile(filePath, (err, data) => {
-          if (err) return reject(err)
-          try {
-            resolve(JSON.parse(data))
-          } catch (err) {
-            console.error('ERROR WHEN PARSING STATE JSON FILE::: FileSystem/index.js', err)
-            reject(err)
-          }
-        })
-      })
-    })
+    await fs.access(filePath)
+    const data: string = await fs.readFile(filePath, 'utf-8')
+    try {
+      return JSON.parse(data)
+    } catch (err) {
+      console.error('ERROR WHEN PARSING STATE JSON FILE::: FileSystem/index.js', err)
+      throw err
+    }
   },
   retrieveLocalTracks (plFilter = false) {
     return new Promise(async (resolve, reject) => {
@@ -203,29 +193,32 @@ const UserMethods = {
       })
     })
   },
-  renameFolder ({ oldName, newName }) {
-    return new Promise(async (resolve, reject) => {
-      newName = utils.encodeIntoFilename(newName)
-      oldName = utils.encodeIntoFilename(oldName)
-      let base = homeFolderPath() + '/'
-      if (!await utils.pathDoesExist(base + oldName)) return
-      console.log('RENAMING FOLDER: ' + oldName + ' => ' + newName)
-      fs.rename(base + oldName, base + newName, (err) => err ? reject(err) : resolve())
-    })
+  async renameFolder (params: { oldName: string, newName: string }) {
+    let { oldName, newName } = params
+    newName = utils.encodeIntoFilename(newName)
+    oldName = utils.encodeIntoFilename(oldName)
+
+    const base = homeFolderPath() + '/'
+    const oldPath = PATH.join(base, oldName)
+    const newPath = PATH.join(base, newName)
+    if (!await utils.pathDoesExist(oldPath)) return
+
+    console.log('RENAMING FOLDER: ' + oldName + ' => ' + newName)
+    await fs.rename(oldPath, newPath)
   },
-  retrieveMP3FileTags (path) {
-    return new Promise((resolve, reject) => {
-      fs.open(path, 'r', function (err, fd) {
+  retrieveMP3FileTags (path: string) {
+    return new Promise((resolve, reject) => { // TODO
+      fsCb.open(path, 'r', function (err, fd) {
         if (err) return reject(err)
 
-        fs.fstat(fd, function (err, stats) {
+        fsCb.fstat(fd, function (err, stats) {
           if (err) return closeFile(fd, err, null)
 
           const max = 1024
           let bufferSize = stats.size < max ? stats.size : max
           let buffer = new Buffer.alloc(bufferSize)
 
-          fs.read(fd, buffer, 0, bufferSize, 0, () => {
+          fsCb.read(fd, buffer, 0, bufferSize, 0, () => {
             let headerPointer = buffer.indexOf('TXXX')
             // Track doesn't contain SB tags
             if (headerPointer === -1) return closeFile(fd, null, null)
@@ -258,7 +251,7 @@ const UserMethods = {
         })
       })
 
-      function giveMeTagLength (name) {
+      function giveMeTagLength (name: 'songbasket_spotify_id' | 'songbasket_youtube_id') {
         switch (name) {
           case 'songbasket_spotify_id':
             return 22
@@ -290,9 +283,9 @@ const UserMethods = {
       downloader.exec()
     })
   },
-  async checkPathThenCreate (path) {
+  async checkPathThenCreate (path: string) {
     let pathExists = await utils.pathDoesExist(path)
-    if (!pathExists) await utils.promisify(fs.mkdir, path)
+    if (!pathExists) await fs.mkdir(path)
     return pathExists
   }
 }

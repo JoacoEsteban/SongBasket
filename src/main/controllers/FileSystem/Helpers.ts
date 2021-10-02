@@ -1,4 +1,5 @@
-import fs from 'fs'
+import { promises as fs } from 'fs'
+import * as fsCb from 'fs'
 import PATH from 'path'
 import axios from 'axios'
 import uuid from 'uuid'
@@ -29,7 +30,7 @@ export default {
       path,
       imageTempPath,
       iconSetterHelper,
-      writer: () => fs.createWriteStream(imageTempPath)
+      writer: () => fsCb.createWriteStream(imageTempPath)
     }
     instance.exec = function () {
       const { imageUrl, iconSetterHelper, path, writer } = this
@@ -45,7 +46,7 @@ export default {
         writerIns.on('finish', async () => {
           try {
             await iconSetterHelper.set(path, imageTempPath)
-            await utils.promisify(fs.unlink, imageTempPath)
+            await fs.unlink(imageTempPath)
             resolve()
           } catch (err) {
             reject(err)

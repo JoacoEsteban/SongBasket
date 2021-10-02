@@ -1,4 +1,4 @@
-import path from 'path'
+import * as path from 'path'
 
 (r => {
   const currentFile = path.basename(__filename)

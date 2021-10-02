@@ -32,20 +32,12 @@ const core = {
       await core.setAppStatus()
     }
   },
-  addHomeFolder: async (path) => {
-    try {
-      await FSController.UserMethods.addFolder(path)
-    } catch (err) {
-      throw err
-    }
+  addHomeFolder: async (path: string) => {
+    await FSController.UserMethods.addFolder(path)
   },
-  setHomeFolder: async (path) => {
-    try {
-      await core.addHomeFolder(path)
-      await core.retrieveAndStoreState()
-    } catch (err) {
-      throw err
-    }
+  setHomeFolder: async (path: string) => {
+    await core.addHomeFolder(path)
+    await core.retrieveAndStoreState()
   },
   retrieveAndStoreState: async (path = global.HOME_FOLDER) => {
     try {

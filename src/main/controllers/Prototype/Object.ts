@@ -1,35 +1,33 @@
-Object.defineProperty(Object, 'isObject', {
-  get () {
-    return function (object) {
-      return !!object && typeof object === 'object' && !Array.isArray(object)
-    }
-  }
+declare interface ObjectConstructor {
+  isObject: (obj: any) => boolean,
+  isSameObject: (obj: Object) => boolean,
+}
+
+Object.defineProperty(Object, 'isObject', function (object: any) {
+  return !!object && typeof object === 'object' && !Array.isArray(object)
 })
-Object.defineProperty(Object.prototype, 'isSameObject', {
-  get () {
-    return function (object) {
-      if (!this) throw new TypeError()
-      if (!object) return false
 
-      if (this === object) return true
+Object.defineProperty(Object.prototype, 'isSameObject', function (object: Object) {
+  if (!this) throw new TypeError()
+  if (!object) return false
 
-      const myKeys = Object.keys(this)
-      const theirKeys = Object.keys(object)
-      if (myKeys.length !== theirKeys.length) return false
+  if (this === object) return true
 
-      const isDifferent = myKeys.some(key => {
-        if (!object.propertyIsEnumerable(key)) return true
-        const myVal = this[key]
-        const theirVal = object[key]
+  const myKeys = Object.keys(this)
+  const theirKeys = Object.keys(object)
+  if (myKeys.length !== theirKeys.length) return false
 
-        if (typeof myVal !== typeof theirVal) return true
-        if (myVal !== theirVal) {
-          if (Object.isObject(myVal) && Object.isObject(theirVal)) return !myVal.isSameObject(theirVal)
-          return true
-        }
-      })
+  const isDifferent = myKeys.some(key => {
+    if (!object.propertyIsEnumerable(key)) return true
+    const myVal = this[key]
+    const theirVal = object[key]
 
-      return !isDifferent
+    if (typeof myVal !== typeof theirVal) return true
+    if (myVal !== theirVal) {
+      if (Object.isObject(myVal) && Object.isObject(theirVal)) return !myVal.isSameObject(theirVal)
+      return true
     }
-  }
+  })
+
+  return !isDifferent
 })

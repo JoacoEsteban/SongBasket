@@ -11,6 +11,12 @@ declare module NodeJS {
     log: (...args: any) => void,
     emptyFn: () => void,
     __static: string,
-    flushYtDlCache: () => Promise<string>
+    flushYtDlCache: () => Promise<string>,
+    FEATURES: {},
+    HOME_FOLDER: string,
+    SESSION_FOLDER_PATHS: {
+      paths: string[],
+      selected: string | null
+    }
   }
 }
