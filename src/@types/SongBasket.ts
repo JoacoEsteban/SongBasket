@@ -41,3 +41,10 @@ export type SongBasketSaveFile = {
   },
   lastSync: Date
 }
+
+export type SongbasketCustomMp3Tags = 'songbasket_spotify_id' | 'songbasket_youtube_id'
+
+export enum SongbasketCustomMp3Tag {
+  songbasket_spotify_id = 'songbasket_spotify_id',
+  songbasket_youtube_id = 'songbasket_youtube_id',
+}

@@ -75,7 +75,7 @@ const FileWatchers = {
   async retrieveTags (path) {
     try {
       const tags = await UserMethods.retrieveMP3FileTags(path)
-      if (!tags) return null
+      if (!tags.length) return null
 
       const normalized = {}
       tags.forEach(tag => {
@@ -159,9 +159,9 @@ const FileWatchers = {
   }
 }
 
-const isValidAudioPath = (path) => (REGEX.mp3File.test(path))
+const isValidAudioPath = (path: string) => (REGEX.mp3File.test(path))
 
-const getNameFromPath = (path) => {
+const getNameFromPath = (path: string) => {
   path = PATH.dirname(path)
   return path.substring(path.lastIndexOf('/') + 1)
 }
