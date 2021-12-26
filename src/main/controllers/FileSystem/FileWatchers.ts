@@ -4,7 +4,7 @@ import * as utils from '../../../MAIN_PROCESS_UTILS'
 import UserMethods from './UserMethods'
 import REGEX from '../../Global/REGEX'
 
-import PATH from 'path'
+import * as PATH from 'path'
 
 const homeFolderPath = () => global.HOME_FOLDER
 

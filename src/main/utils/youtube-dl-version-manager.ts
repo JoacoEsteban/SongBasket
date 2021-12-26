@@ -1,6 +1,6 @@
 import * as utils from '../../MAIN_PROCESS_UTILS'
 import youtubeDl from 'youtube-dl'
-import PATH from 'path'
+import * as PATH from 'path'
 import { promises as fs, createWriteStream } from 'fs'
 import axios from 'axios'
 

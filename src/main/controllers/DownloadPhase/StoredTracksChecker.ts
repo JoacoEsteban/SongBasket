@@ -1,7 +1,7 @@
 import customGetters from '../../Store/Helpers/customGetters'
 import * as utils from '../../../MAIN_PROCESS_UTILS'
-import PATH from 'path'
-import uuid from 'uuid'
+import * as PATH from 'path'
+import { v4 as uuid } from 'uuid'
 
 export async function downloadLinkRemove (localTracks, queryTracks, plFilter = []) {
   try {
