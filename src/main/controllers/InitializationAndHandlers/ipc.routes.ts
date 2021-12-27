@@ -2,7 +2,7 @@ import * as handlers from './handlers'
 import * as sbFetch from './sbFetch'
 import WindowController from './window.controller'
 // import store from '../../../renderer/store/index.js'
-import FileWatchers from '../FileSystem/FileWatchers'
+import FileWatchers, { SBWatcherEvent } from '../FileSystem/FileWatchers'
 import { ipcMain } from 'electron-better-ipc'
 
 // :::::::::::::::::::::::::::::::::IPC:::::::::::::::::::::::::::::::::
@@ -123,10 +123,10 @@ export default function () {
     ipcSend('FileWatchers:RETRIEVED_TRACKS', FileWatchers.retrieveTracks())
   })
 
-  FileWatchers.on('added', track => {
+  FileWatchers.on(SBWatcherEvent.ADDED, track => {
     ipcSend('FileWatchers:ADDED', track)
   })
-  FileWatchers.on('removed', track => {
+  FileWatchers.on(SBWatcherEvent.REMOVED, track => {
     ipcSend('FileWatchers:REMOVED', track)
   })
 }

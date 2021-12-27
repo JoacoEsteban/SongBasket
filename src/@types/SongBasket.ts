@@ -43,8 +43,14 @@ export type SongBasketSaveFile = {
 }
 
 export type SongbasketCustomMp3Tags = 'songbasket_spotify_id' | 'songbasket_youtube_id'
+export type SongbasketCustomMp3TagsNormalized = 'spotify_id' | 'youtube_id'
 
 export enum SongbasketCustomMp3Tag {
   songbasket_spotify_id = 'songbasket_spotify_id',
   songbasket_youtube_id = 'songbasket_youtube_id',
+}
+
+export enum SongbasketCustomMp3TagNormalized {
+  spotify_id = 'spotify_id',
+  youtube_id = 'youtube_id',
 }
