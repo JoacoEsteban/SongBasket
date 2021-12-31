@@ -56,5 +56,6 @@ export type YouTubeResult = {
   durationScore: number,
   wordScore: number,
   isDoubtlyConversion: boolean,
-  isBestMatch: boolean
+  isBestMatch: boolean,
+  isCustomTrack?: boolean,
 }

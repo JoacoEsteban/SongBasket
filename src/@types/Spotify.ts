@@ -2,6 +2,8 @@ export type ExternalUrls = {
   spotify: string
 }
 
+export type SpotifySnapshotId = string
+
 export type Image = {
   height: number,
   url: string,
@@ -21,7 +23,7 @@ export type SpotifyUser = {
   country: string,
   display_name: string,
   email: string,
-  explicit_content: {
+  explicit_content?: {
     filter_enabled: boolean,
     filter_locked: boolean
   },
@@ -81,5 +83,18 @@ export type SpotifyPlaylist = {
     removed: SpotifyTrack[]
   },
   type: 'playlist',
-  uri: string
+  uri: string,
+  isPaused?: boolean,
+  folderName?: string | null,
+}
+
+// API Responses
+export type SpotifyApiPlaylistsResponse = {
+  href: string,
+  items: SpotifyPlaylist[],
+  limit: number,
+  next: string,
+  offset: number,
+  previous: string,
+  total: number
 }

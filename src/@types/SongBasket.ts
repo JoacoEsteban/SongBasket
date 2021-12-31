@@ -1,7 +1,7 @@
 import { TrackList } from '../main/controllers/FileSystem/FileWatchers'
 import { Constants } from './constants'
-import { SpotifyPlaylist, SpotifyPlaylistId, SpotifyTrack, SpotifyTrackId, SpotifyUser } from './Spotify'
-import { TrackConversionResponse, YouTubeResultId } from './YouTube'
+import { SpotifyPlaylist, SpotifyPlaylistId, SpotifySnapshotId, SpotifyTrack, SpotifyTrackId, SpotifyUser } from './Spotify'
+import { TrackConversionResponse, YouTubeResult, YouTubeResultId } from './YouTube'
 
 export type SongBasketTrackQuery = {
   query: string,
@@ -10,6 +10,7 @@ export type SongBasketTrackQuery = {
   id: SpotifyTrackId
 }
 
+export type SongBasketTrackConversionSelection = null | false | YouTubeResultId
 
 export type SongBasketTrack = {
   id: string,
@@ -18,15 +19,23 @@ export type SongBasketTrack = {
     id: SpotifyPlaylistId
   })[],
   conversion: TrackConversionResponse | null,
-  selection: null | false | YouTubeResultId,
-  custom: null | YouTubeResultId,
+  selection: SongBasketTrackConversionSelection,
+  custom: null | YouTubeResult,
   query?: SongBasketTrackQuery | null,
   flags: {
     converted: boolean,
     conversionError: boolean,
     processed: boolean,
+    paused: boolean,
+    selectionIsApplied: boolean,
   },
   duration: number | null,
+}
+
+export type SongBasketCachedPlaylistEntry = {
+  id: SpotifyPlaylistId,
+  time: number,
+  snapshot_id: SpotifySnapshotId
 }
 
 export type SongBasketSaveFile = {
@@ -34,15 +43,15 @@ export type SongBasketSaveFile = {
   playlists: SpotifyPlaylist[],
   syncedPlaylists: SpotifyPlaylistId[],
   queuedPlaylists: SpotifyPlaylistId[],
-  cachedPlaylists: SpotifyPlaylistId[],
-  deletedPlaylists: SpotifyPlaylistId[],
+  cachedPlaylists: SongBasketCachedPlaylistEntry[],
+  deletedPlaylists: SpotifyPlaylist[],
   convertedTracks: SongBasketTrack[],
-  currentPlaylist: string,
+  currentPlaylist: SpotifyPlaylistId | null,
   control: {
     total: number,
     offset: number
   },
-  lastSync: Date
+  lastSync: Date | null
 }
 
 export type SongbasketCustomMp3Tags = 'songbasket_spotify_id' | 'songbasket_youtube_id'
