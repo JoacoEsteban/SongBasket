@@ -2,7 +2,7 @@ type IterationCallback = (item: {}, index: number, array: any[]) => any
 
 Object.defineProperty(Array.prototype, 'lastIndex', {
   get () {
-    return this.length ? this.length - 1 : null
+    return this.length - 1
   }
 })
 Object.defineProperty(Array.prototype, 'last', {
@@ -16,7 +16,7 @@ Object.defineProperty(Array.prototype, 'head', {
   }
 })
 Object.defineProperty(Array.prototype, 'indexOfSearch',
-  function indexOfSearch (cb: IterationCallback) {
+  function indexOfSearch (this: any[], cb: IterationCallback): number {
     for (let i = 0; i < this.length; i++) {
       if (cb(this[i], i, this)) return i
     }
@@ -24,7 +24,7 @@ Object.defineProperty(Array.prototype, 'indexOfSearch',
   })
 
 Object.defineProperty(Array.prototype, 'lastIndexOfSearch',
-  function lastIndexOfSearch (cb: IterationCallback): void {
+  function lastIndexOfSearch (this: any[], cb: IterationCallback): number {
     for (let i = this.length - 1; i > -1; i--) {
       if (cb(this[i], i, this)) return i
     }
@@ -32,19 +32,23 @@ Object.defineProperty(Array.prototype, 'lastIndexOfSearch',
   })
 
 Object.defineProperty(Array.prototype, 'asyncForEach',
-  async function (cb: IterationCallback) {
-    for (let i = 0; i < this.length; i++) {
-      await cb(this[i], i, this)
+  async function (this: any[], cb: IterationCallback) {
+    let i = 0
+    for (const item of this) {
+      await cb(item, i++, this)
     }
   })
 
 Object.defineProperty(Array.prototype, 'asyncFilter',
-  async function (cb: IterationCallback) {
-    const cloned = [...this]
-    for (let i = 0; i < cloned.length; i++) {
-      if (!await cb(cloned[i], i, cloned)) cloned.splice(i--, 1)
+  async function (this: any[], cb: IterationCallback) {
+    const filtered = []
+    let i = 0
+    for (const item of this) {
+      if (await cb(item, i, this)) filtered.push(item)
+      i++
     }
-    return cloned
+    return filtered
   })
 
 export default null
+
