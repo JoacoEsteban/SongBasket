@@ -11,7 +11,7 @@ const IS_DEV = global.IS_DEV = !ENV_PROD
 const height = 500
 const width = 1000
 
-const cons: any = {
+const cons: Partial<Constants> = {
   // STATES
   ENV_PROD,
   IS_DEV,

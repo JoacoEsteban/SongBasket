@@ -15,7 +15,7 @@ const CATCH_TO_FILE = false;
 (function setErrorHandling () {
   if (PROD || CATCH_TO_FILE) {
     console.log = console.info
-    const toLogFile: NodeJS.UncaughtExceptionListener = error => {
+    const toLogFile: (error: Error) => void = error => {
       console.error('----------UNCAUGHT----------\n', error)
       logFile.error(error)
     }
@@ -46,4 +46,4 @@ const CATCH_TO_FILE = false;
   }
 })()
 
-global.emptyFn = () => { }
+global.emptyFn = () => {}

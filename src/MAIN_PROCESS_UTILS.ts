@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import * as PATH from 'path'
 
-export function cloneObject (aObject: any) {
+export function cloneObject<T> (aObject: T): T {
   return clone(aObject)
 }
 function clone (aObject: any) {
