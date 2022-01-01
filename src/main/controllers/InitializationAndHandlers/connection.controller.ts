@@ -1,12 +1,14 @@
-import dns from 'dns'
+import * as dns from 'dns'
 import axios from 'axios'
 
-let CB
-let API_CB
+let CB: (connected: boolean) => void
+let API_CB: (connected: boolean) => void
+
 export default {
-  init ({ connectionChangeCallback, apiConnectionChangeCallback }) {
-    CB = connectionChangeCallback || (() => { })
-    API_CB = apiConnectionChangeCallback || (() => { })
+  init (params: { connectionChangeCallback: typeof CB, apiConnectionChangeCallback: typeof API_CB }) {
+    const { connectionChangeCallback, apiConnectionChangeCallback } = params
+    CB = connectionChangeCallback || (() => {})
+    API_CB = apiConnectionChangeCallback || (() => {})
     checkInternet()
     pingApi()
   }
@@ -30,7 +32,10 @@ const pingApi = async () => {
   } catch (err) {
     connected = false
   }
-  if (global.CONNECTED_TO_API !== connected) (global.CONNECTED_TO_API = connected) + API_CB(connected)
-  const time = global.CONNECTED_TO_API ? global.CONSTANTS.HEROKU_PING_INTERVAL : 5000
+  if (global.CONNECTED_TO_API !== connected) {
+    global.CONNECTED_TO_API = connected
+    API_CB(connected)
+  }
+  const time: number = global.CONNECTED_TO_API ? global.CONSTANTS.HEROKU_PING_INTERVAL : 5000
   setTimeout(pingApi, time)
 }
