@@ -1,4 +1,4 @@
-import { SongBasketId } from './SongBasket'
+import { SongbasketFoldersFile, SongBasketId } from './SongBasket'
 import { SpotifyUser } from './Spotify'
 
 declare module NodeJS {
@@ -21,10 +21,7 @@ declare module NodeJS {
     flushYtDlCache: () => Promise<string>,
     FEATURES: {},
     HOME_FOLDER: string,
-    SESSION_FOLDER_PATHS: {
-      paths: string[],
-      selected: string | null
-    },
+    SESSION_FOLDER_PATHS: SongbasketFoldersFile,
     openUrl: typeof import('open'),
   }
 }

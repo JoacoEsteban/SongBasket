@@ -10,6 +10,12 @@ export type SongBasketTrackQuery = {
   id: SpotifyTrackId
 }
 
+export type SongBasketId = string
+
+export type SongBasketLoggedUser = SpotifyUser & {
+  songbasket_id: SongBasketId | null
+}
+
 export type SongBasketTrackConversionSelection = null | false | YouTubeResultId
 
 export type SongBasketTrack = {
@@ -39,7 +45,7 @@ export type SongBasketCachedPlaylistEntry = {
 }
 
 export type SongBasketSaveFile = {
-  user: SpotifyUser,
+  user: SongBasketLoggedUser,
   playlists: SpotifyPlaylist[],
   syncedPlaylists: SpotifyPlaylistId[],
   queuedPlaylists: SpotifyPlaylistId[],
@@ -94,4 +100,7 @@ export type AppStatus = {
   error: Error | null
 }
 
-export type SongBasketId = string
+export type SongbasketFoldersFile = {
+  paths: string[],
+  selected: string | null
+}
