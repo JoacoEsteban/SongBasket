@@ -1,7 +1,8 @@
-import he from 'he'
+import * as he from 'he'
+import { SongBasketTrack } from '../../../@types/SongBasket'
 
 export default {
-  calculateBestMatch (track, force) {
+  calculateBestMatch (track: SongBasketTrack, force: boolean = false) {
     // TODO Handle conversion errors
     if ((!force && track.flags.processed) || track.flags.conversionError) return track
     track = cloneObject(track)

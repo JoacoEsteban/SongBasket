@@ -13,6 +13,13 @@ import { YouTubeResultId } from '../../../@types/YouTube'
 type NormalizedTagMap = {
   [key in SongbasketCustomMp3TagsNormalized]?: string
 }
+export type TrackList = {
+  [key: SpotifyTrackId]: {
+    [key: YouTubeResultId]: {
+      playlists: string[]
+    }
+  }
+}
 export type TrackFileEntry = NormalizedTagMap & { playlist: string }
 export enum FSWatcherEvent {
   ADD = 'add',
@@ -51,7 +58,7 @@ const FileWatchers: {
   clearAll: () => Promise<void>,
   rebuildWatchers: () => Promise<void>,
   retrieveTags: (path: string) => Promise<NormalizedTagMap>,
-  retrieveTracks: () => void,
+  retrieveTracks: () => TrackList,
   addTrack: (path: string, params: NormalizedTagMap) => void,
   removeTrack: (path: string) => void,
   handleWatcherEvent: (event: FSWatcherEvent, args?: any) => void,
@@ -129,13 +136,7 @@ const FileWatchers: {
     return normalized
   },
   retrieveTracks () {
-    const tracksFormatted: {
-      [key: SpotifyTrackId]: {
-        [key: YouTubeResultId]: {
-          playlists: string[]
-        }
-      }
-    } = {}
+    const tracksFormatted: TrackList = {}
 
     for (const key in this.tracks) {
       if (!this.tracks[key]) continue // TODO Remove this (tracks should be deleted and not be null)

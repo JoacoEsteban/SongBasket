@@ -4,6 +4,8 @@ import * as ffmpeg from 'fluent-ffmpeg'
 
 import * as NodeID3 from 'node-id3'
 import axios from 'axios'
+import { SpotifyTrack } from '../../../@types/Spotify'
+import { YouTubeResultId } from '../../../@types/YouTube'
 
 type progressEvent = {
   percent: number
@@ -28,8 +30,15 @@ export function extractMp3 (pathmp3: string, pathmp4: string, inputFormat: strin
   })
 }
 
-export function applyTags (pathmp3: string, data, ytSelection) {
-  let tags = {
+export async function applyTags (pathmp3: string, data: SpotifyTrack, ytSelection: YouTubeResultId) {
+  let imageBuffer: Buffer | null = null
+  try {
+    imageBuffer = (await getPhoto(data.album.images[0].url)) || null
+  } catch (error) {
+    console.error('Error when getting track photo, applying tracks anyway')
+  }
+
+  const tags: NodeID3.Tags = {
     title: data.name,
     // artist: data.artists.map(a => a.name).join(';'), // TODO Try multiple artists
     artist: data.artists[0].name,
@@ -40,50 +49,49 @@ export function applyTags (pathmp3: string, data, ytSelection) {
     }, {
       description: 'songbasket_youtube_id',
       value: ytSelection
-    }]
+    }],
+    image: {
+      mime: 'png/jpeg', // TODO Check if this is correct
+      type: {
+        id: 3,
+        name: 'front cover'
+      },
+      description: 'Cover',
+      imageBuffer: imageBuffer || Buffer.alloc(0)
+    }
   }
-  return new Promise((resolve, reject) => {
-    console.log('applying tags')
-    getPhoto(data.album.images[0].url)
-      .then(imageBuffer => {
-        tags.image = {
-          mime: 'png/jpeg' / undefined,
-          type: {
-            id: 3,
-            name: 'front cover'
-          },
-          imageBuffer
-        }
-      })
-      .catch(() => console.error('Error when getting track photo, applying tracks anyway'))
-      .finally(() => {
-        console.log('writing tags')
-        NodeID3.write(tags, pathmp3, err => {
-          if (err) return reject(err)
-          resolve()
-        })
-      })
-  })
+
+  if (!imageBuffer) delete tags.image
+
+  console.log('writing tags')
+  await new Promise<void>((resolve, reject) => NodeID3.write(tags, pathmp3, (err) => {
+    if (err) return reject(err)
+    resolve()
+  }))
 }
 
-export function getPhoto (url: string) {
+export async function getPhoto (url: string): Promise<Buffer> {
   console.log('getting picture')
-  return new Promise((resolve, reject) => {
-    axios({
-      url,
-      method: 'GET',
-      responseType: 'stream'
-    }).then(resp => {
-      let buffer = Buffer.alloc(0)
-      resp.data
-        .on('data', (chunk) => {
-          buffer = Buffer.concat([buffer, chunk])
-        })
-        .on('end', () => {
-          console.log('photo retrieved')
-          resolve(buffer)
-        })
-    })
-      .catch((err) => reject(err))
+
+  const resp = await axios({
+    url,
+    method: 'GET',
+    responseType: 'stream'
   })
+
+  let buffer = Buffer.alloc(0)
+
+  await new Promise<void>((resolve, reject) => {
+    resp.data
+      .on('data', (chunk: Uint8Array) => {
+        buffer = Buffer.concat([buffer, chunk])
+      })
+      .on('end', () => {
+        console.log('photo retrieved')
+        resolve()
+      })
+      .catch((err: unknown) => reject(err))
+  })
+
+  return buffer
 }

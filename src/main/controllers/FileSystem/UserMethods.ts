@@ -9,9 +9,9 @@ import * as PATH from 'path'
 import * as rimraf from 'rimraf'
 // import NodeID3 from 'node-id3'
 import * as iconv from 'iconv-lite'
-import { SongbasketCustomMp3Tag, SongbasketCustomMp3Tags, SongBasketSaveFile } from '../../../@types/SongBasket'
+import { SongbasketCustomMp3Tag, SongbasketCustomMp3Tags, SongbasketFoldersFile, SongBasketSaveFile } from '../../../@types/SongBasket'
 import { SpotifyPlaylistId } from '../../../@types/Spotify'
-type sessionPaths = typeof global.SESSION_FOLDER_PATHS
+
 type _tag = {
   name: SongbasketCustomMp3Tag,
   value: string
@@ -56,15 +56,15 @@ console.log('Folder Path: ', PATHS.foldersJsonPath)
 const homeFolderPath = () => global.HOME_FOLDER
 
 const UserMethods = {
-  async getFolders (): Promise<sessionPaths | null> {
+  async getFolders (): Promise<SongbasketFoldersFile | null> {
     if (await utils.pathDoesExist(PATHS.foldersJsonPath)) {
-      let paths: sessionPaths = JSON.parse(await fs.readFile(PATHS.foldersJsonPath, 'utf8'))
+      let paths: SongbasketFoldersFile = JSON.parse(await fs.readFile(PATHS.foldersJsonPath, 'utf8'))
       if (!this.isValidFolderStructure(paths)) paths = await this.resetFolderPaths()
       return global.SESSION_FOLDER_PATHS = paths
     }
     return null // TODO return safe
   },
-  isValidFolderStructure (paths: sessionPaths): boolean {
+  isValidFolderStructure (paths: SongbasketFoldersFile): boolean {
     const them = Object.keys(paths)
     const def = Object.keys(getEmptyFolders())
     return them.length === def.length && them.every(key => def.includes(key))
@@ -99,7 +99,7 @@ const UserMethods = {
     global.SESSION_FOLDER_PATHS = folders
     await this.writeHomeFolders()
   },
-  async retrieveFolders (): Promise<sessionPaths> {
+  async retrieveFolders (): Promise<SongbasketFoldersFile> {
     try {
       let folders = await this.getFolders()
       if (!folders) {
@@ -112,7 +112,7 @@ const UserMethods = {
       throw error
     }
   },
-  async resetFolderPaths (): Promise<sessionPaths> {
+  async resetFolderPaths (): Promise<SongbasketFoldersFile> {
     try {
       const emptyFolders = getEmptyFolders()
       await this.writeHomeFolders(emptyFolders)
@@ -285,13 +285,14 @@ const UserMethods = {
       }
     })
   },
-  async setFolderIcons (plFilter: SpotifyPlaylistId | SpotifyPlaylistId[], params = { force: false }) {
+  async setFolderIcons (plFilter?: SpotifyPlaylistId | SpotifyPlaylistId[], params = { force: false }) {
+    if (!plFilter) plFilter = []
     if (typeof plFilter === 'string') plFilter = [plFilter]
     if (!Array.isArray(plFilter)) plFilter = []
 
     const iconSetter = Helpers.getIconSetterHelper()
     if (!iconSetter) return console.error('NO ICONSETTER FOR THIS PLATFORM')
-    const pls = customGetters.SyncedPlaylistsSp_SAFE().filter(p => !plFilter.length || plFilter.includes(p.id)).map(({ folderName, name, images }) => ({ path: PATH.join((homeFolderPath()), utils.encodeIntoFilename(folderName || name)).replace(/ /g, '\\ '), imageUrl: images && images[0] && images[0].url })).filter(pl => pl.path && pl.imageUrl)
+    const pls = customGetters.SyncedPlaylistsSp_SAFE().filter(p => !plFilter?.length || plFilter.includes(p.id)).map(({ folderName, name, images }) => ({ path: PATH.join((homeFolderPath()), utils.encodeIntoFilename(folderName || name)).replace(/ /g, '\\ '), imageUrl: images && images[0] && images[0].url })).filter(pl => pl.path && pl.imageUrl)
 
     pls.forEach(async pl => {
       if (!params.force && await iconSetter.test(pl.path)) return

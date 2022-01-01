@@ -1,4 +1,4 @@
-import open from 'open'
+import * as open from 'open'
 
 import FSController from '../FileSystem/index'
 // import customGetters from '../Store/Helpers/customGetters'
@@ -10,6 +10,9 @@ import VUEX_MAIN from '../../Store/mainProcessStore'
 // import { v4 as uuid } from 'uuid'
 
 import core from './core.controller'
+import { AppStatus, LoadingController, SongBasketSaveFile } from '../../../@types/SongBasket'
+import { SpotifyPlaylistId, SpotifyTrackId } from '../../../@types/Spotify'
+import { YouTubeResultId } from '../../../@types/YouTube'
 
 const openBrowser = global.openUrl = open
 
@@ -17,7 +20,7 @@ const openBrowser = global.openUrl = open
 
 console.log('NODE ENV', process.env.NODE_ENV)
 
-const loadingController = {
+const loadingController: LoadingController = {
   target: [],
   count: 0,
   // -----------------------
@@ -30,7 +33,7 @@ const loadingController = {
     this.reflect({ value: this.isLoading, target })
     return this.isLoading
   },
-  reflect (payload = this.instance) {
+  reflect (payload = loadingController.instance) {
     console.log('current', this.instance)
     global.ipcSend('LOADING_EVENT', payload)
   },
@@ -58,25 +61,29 @@ const loadingController = {
     this.reflect({ target: target, value: this.isLoading, ptg })
   },
   fn (val) {
-    return function (target) {
+    return (target) => {
       return this.set(target, val)
     }
   }
 }
 
-export function normalizeError (error) {
-  if (error && error.response) return { status: error.response.status, data: error.response.data }
+export function normalizeError (error: any) {
+  if (error && error.response) {
+    const { status, data } = error.response
+    return { status, data }
+  }
   return error
 }
 
 export async function REFLECT_RENDERER () {
   await global.ipcSend('VUEX:STORE', { state: VUEX_MAIN.STATE_SAFE() })
 }
-export async function REFLECT_RENDERER_KEY (key) {
-  const value = VUEX_MAIN.STATE_SAFE(key)[key]
+export async function REFLECT_RENDERER_KEY (key: keyof SongBasketSaveFile) {
+  const value = VUEX_MAIN.STATE_SAFE([key])[key]
   await global.ipcSend('VUEX:SET', { key, value })
 }
-export async function SEND_ERROR ({ type, error }) {
+export async function SEND_ERROR (err: any) {
+  const { type, error } = err || {}
   await global.ipcSend('ERROR:CATCH', { type, error: normalizeError(error) })
 }
 
@@ -87,6 +94,8 @@ export async function askHomeFolder () {
   let error = null
 
   try {
+    if (!global.CONSTANTS.MAIN_WINDOW) throw new Error('MAIN_WINDOW is not defined')
+
     const { canceled, filePaths } = await global.CONSTANTS.DIALOG.showOpenDialog(global.CONSTANTS.MAIN_WINDOW, {
       properties: ['openDirectory']
     })
@@ -105,15 +114,15 @@ export async function askHomeFolder () {
   return ({ isLogged, error })
 }
 
-export async function addHomeFolder ({ path }) {
+export async function addHomeFolder (params: { path: string }): Promise<void> {
+  const { path } = params
   await core.addHomeFolder(path)
-  return {}
 }
 
-export async function setHomeFolder ({ path }) {
+export async function setHomeFolder (params: { path: string }): Promise<void> {
+  const { path } = params
   await addHomeFolder({ path })
   await core.setAppStatus()
-  return {}
 }
 
 export async function openHomeFolder () {
@@ -135,19 +144,20 @@ export async function logout () {
     SEND_ERROR(err)
   }
   const status = getAppStatus()
-  status.error = error
+  if (error instanceof Error) status.error = error
   return status
 }
 
 const getAppStatus = () => {
   const status = global.CONSTANTS.APP_STATUS
-  const all = {
+  const all: AppStatus = {
     APP_STATUS: status,
-    state: status.IS_LOGGED ? VUEX_MAIN.STATE_SAFE() : null,
+    state: status.IS_LOGGED ? (VUEX_MAIN.STATE_SAFE() as SongBasketSaveFile) : null,
     downloadedTracks: status.IS_LOGGED ? FileWatchers.retrieveTracks() : null,
     FFMPEG_BINS_DOWNLOADED: global.CONSTANTS.FFMPEG_BINS_DOWNLOADED,
     CONNECTED_TO_INTERNET: global.CONNECTED_TO_INTERNET,
-    CONNECTED_TO_API: global.CONNECTED_TO_API
+    CONNECTED_TO_API: global.CONNECTED_TO_API,
+    error: null
   }
   if (loadingController.instance.value && loadingController.instance.target === 'DOWNLOAD') setTimeout(youtubeDl.onDowloadStart)
   return all
@@ -216,7 +226,7 @@ export async function youtubize () {
   }
 }
 
-export async function download (plFilter) {
+export async function download (plFilter?: SpotifyPlaylistId[]) {
   if (!loadingController.canRequest) return console.log('CANT REQUEST')
   console.log('About to download')
   if (plFilter && !Array.isArray(plFilter)) plFilter = [plFilter]
@@ -231,12 +241,12 @@ export async function download (plFilter) {
   }
 }
 
-export async function queuePlaylist (id) {
+export async function queuePlaylist (id: SpotifyPlaylistId) {
   VUEX_MAIN.COMMIT.QUEUE_PLAYLIST(id)
   await REFLECT_RENDERER_KEY('queuedPlaylists')
 }
 
-export async function unsyncPlaylist (id) {
+export async function unsyncPlaylist (id: SpotifyPlaylistId) {
   try {
     if (loadingController.isLoading) return
     loadingController.on('PLAYLIST:UNSYNC')
@@ -251,7 +261,7 @@ export async function unsyncPlaylist (id) {
   }
 }
 
-export async function pausePlaylist (id) {
+export async function pausePlaylist (id: SpotifyPlaylistId) {
   try {
     if (loadingController.isLoading) return
     VUEX_MAIN.COMMIT.PAUSE_PLAYLIST(id)
@@ -264,7 +274,7 @@ export async function pausePlaylist (id) {
   }
 }
 
-export async function pauseTrack (id) {
+export async function pauseTrack (id: SpotifyTrackId) {
   try {
     if (loadingController.isLoading) return
     VUEX_MAIN.COMMIT.PAUSE_TRACK(id)
@@ -277,7 +287,8 @@ export async function pauseTrack (id) {
   }
 }
 
-export async function changeYtTrackSelection ({ trackId, newId }) {
+export async function changeYtTrackSelection (params: { trackId: SpotifyTrackId, newId: YouTubeResultId }) {
+  const { trackId, newId } = params
   try {
     if (loadingController.isLoading) return
     VUEX_MAIN.COMMIT.CHANGE_YT_TRACK_SELECTION({ trackId, newId })
@@ -289,7 +300,8 @@ export async function changeYtTrackSelection ({ trackId, newId }) {
   }
 }
 
-export async function getYtTrackDetails ({ url, trackId }) {
+export async function getYtTrackDetails (params: { url: string, trackId: SpotifyTrackId }) {
+  const { url, trackId } = params
   if (!loadingController.canRequest) return
   try {
     const details = await sbFetch.ytDetails(url)
@@ -302,16 +314,16 @@ export async function getYtTrackDetails ({ url, trackId }) {
   }
 }
 
-export async function openYtVideo (id) {
+export async function openYtVideo (id: YouTubeResultId) {
   if (!id) return
   openBrowser('https://www.youtube.com/watch?v=' + id)
 }
 
-export async function searchYtVideo (query) {
+export async function searchYtVideo (query: string) {
   if (!query) return
   openBrowser('https://www.youtube.com/results?search_query=' + query)
 }
 
-export async function showChangelog (query) {
+export async function showChangelog () {
   global.openUrl(global.CONSTANTS.CHANGELOG_URL)
 }

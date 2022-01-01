@@ -50,25 +50,6 @@ export default function () {
         })
         .catch(err => console.log(err))
     }
-    // if (mode === 'playlist') {
-    //   // TODO delete this
-    //   sbFetch.getTracks(store.getters.RequestParams, { id: query }, false)
-    //     .then(response => {
-    //       console.log('responseta', response)
-    //       if (response.error) {
-    //         console.log('ERROR DUD', response)
-    //       } else {
-    //         console.log('DOUU', response)
-    //       }
-    //       // store.dispatch('playlistStoreTracks', response.playlist).then(() => {
-    //       //   count--
-    //       //   if (count === 0) resolve()
-    //       // })
-    //     })
-    //     .catch(error => {
-    //       console.log('a ver si lo aachea', error)
-    //     })
-    // }
   })
 
   on('guestConfirm', async function (userID) { // TODO deprecate

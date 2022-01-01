@@ -1,5 +1,8 @@
 /* eslint-disable camelcase */
-import axios from 'axios'
+import axios, { AxiosInstance } from 'axios'
+import { SongBasketTrack, SongBasketTrackQuery } from '../../../@types/SongBasket'
+import { SpotifyApiPlaylistsResponse, SpotifyPlaylist, SpotifyPlaylistId, SpotifySnapshotId, SpotifyUser } from '../../../@types/Spotify'
+import { YouTubeResult, YouTubeResultId } from '../../../@types/YouTube'
 
 import PATHS from '../../Global/PATHS'
 import REGEX from '../../Global/REGEX'
@@ -7,9 +10,10 @@ const URL = PATHS.makeUrl
 
 console.log('BACKEND: ', PATHS.BASE)
 
-let Api
-export function createAxiosInstance () {
-  Api = axios.create({
+let Api: AxiosInstance = getAxiosInstance()
+
+function getAxiosInstance () {
+  return axios.create({
     baseURL: PATHS.BASE,
     timeout: 20000,
     headers: {
@@ -20,101 +24,60 @@ export function createAxiosInstance () {
   })
 }
 
+export function createAxiosInstance () {
+  Api = getAxiosInstance()
+}
+
 const Backend = process.env.BACKEND
 
 // Brings back user information
-export async function guestCheck (userId) {
-  try {
-    let res = await Api.get(URL(PATHS.USER, userId))
-    return res && res.data
-  } catch (err) {
-    throw err
-  }
+export async function guestCheck (userId: SpotifyUser['id']): Promise<SpotifyUser> {
+  let res = await Api.get(URL(PATHS.USER, userId))
+  return res && res.data
 }
 
-export async function getTracks ({userId, logged, SBID, control}, {id, snapshot_id}, checkVersion) {
-  // TODO Deprecate
-  let url = Backend + '/retrieve'
-  let params = {
-    user_id: userId,
-    logged,
-    SBID,
-    retrieve: 'playlist_tracks',
-    playlist_id: id,
-    retrieve_user_data: false
-  }
-  if (checkVersion) params.snapshot_id = snapshot_id
-  console.log('snapshot_id', snapshot_id)
-  try {
-    let res = await axios.get(url, { params })
-    return res.data
-  } catch (err) {
-    // TODO Check on timeouts being fucking high
-    console.error('ERROR AT sbFetch, getTracks::::', err.data, err.data.reason.join(', '))
-    throw err
-  } finally {
-  }
-}
-
-export async function ytDetails (id) {
-  try {
-    let reg = REGEX.videoUrl.exec(id)
-    if (!reg && !REGEX.videoId.test(id)) throw new Error('INVALID YOUTUBE VIDEO ID')
-    if (reg) id = reg[1]
-    console.log('gettin', PATHS.VIDEO(id))
-    const resp = await Api.get(PATHS.VIDEO(id))
-    return resp && resp.data
-  } catch (error) {
-    throw error
-  }
+export async function ytDetails (id: YouTubeResultId) {
+  let reg = REGEX.videoUrl.exec(id)
+  if (!reg && !REGEX.videoId.test(id)) throw new Error('INVALID YOUTUBE VIDEO ID')
+  if (reg) id = reg[1]
+  console.log('gettin', PATHS.VIDEO(id))
+  const resp = await Api.get<YouTubeResult>(PATHS.VIDEO(id))
+  return resp && resp.data
 }
 
 // ------------ revision 2 ------------
 
-export const getMe = async () => {
-  try {
-    const res = await Api.get(PATHS.ME)
-    return res && res.data
-  } catch (error) {
-    throw error
-  }
+export const getMe = async (): Promise<SpotifyUser> => {
+  const res = await Api.get<SpotifyUser>(PATHS.ME)
+  return res.data
 }
 
-export const getUserPlaylists = async (user_id, p = { offset: null }) => {
-  try {
-    const params = {}
-    p.offset && (params.offset = p.offset)
-    const res = await Api.get(PATHS.USER_PLAYLISTS(user_id), { params })
-    return res && res.data
-  } catch (error) {
-    throw error
+export const getUserPlaylists = async (user_id: SpotifyUser['id'], p: { offset: number | null } = { offset: null }) => {
+  const params = {
+    offset: p.offset || 0,
   }
+  const res = await Api.get<SpotifyApiPlaylistsResponse>(PATHS.USER_PLAYLISTS(user_id), { params })
+  return res.data
 }
 
-export const getPlaylist = async ({ id, snapshot_id }) => {
-  try {
-    const params = {}
-    if (snapshot_id) params.snapshot_id = snapshot_id
+export const getPlaylist = async (params: { id: SpotifyPlaylistId, snapshot_id?: SpotifySnapshotId }) => {
+  const { id, snapshot_id } = params
 
-    const res = await Api.get(PATHS.PLAYLIST(id), { params })
-    if (res.status === 304) return null
+  const res = await Api.get<SpotifyPlaylist>(PATHS.PLAYLIST(id), {
+    params: {
+      snapshot_id: snapshot_id || null
+    }
+  })
 
-    return res && res.data
-  } catch (error) {
-    throw error
-  }
+  if (res.status === 304) return null
+
+  return res.data
 }
 
-export async function youtubizeAll (tracks, isConvertable, completionCallback) {
+export async function youtubizeAll (tracks: SongBasketTrack[], isConvertable: (track: SongBasketTrack) => boolean, completionCallback: ((total: number) => void) | null): Promise<{ tracks: SongBasketTrack[], failed: number }> {
   let totalTracks = 0
   let succeded = 0
   let failed = 0
-
-  // try {
-
-  // } catch (error) {
-
-  // }
 
   return new Promise((resolve, reject) => {
     if (!tracks) return reject(new Error('TRACK OBJECT UNDEFINED'))
@@ -150,9 +113,9 @@ export async function youtubizeAll (tracks, isConvertable, completionCallback) {
     if (!totalTracks) areAllFinished(resolve)
   })
 
-  function areAllFinished (resolve) {
+  function areAllFinished (resolve: Function) {
     if (succeded + failed === totalTracks) {
-      resolve({tracks, failed})
+      resolve({ tracks, failed })
     }
   }
 }

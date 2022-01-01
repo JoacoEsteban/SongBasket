@@ -1,9 +1,11 @@
+import { SongBasketTrack, SongBasketTrackQuery } from '../@types/SongBasket'
+import { SpotifyPlaylist } from '../@types/Spotify'
 import customGetters from './Store/Helpers/customGetters'
 
-let ALL_PLAYLISTS = []
-let ALL_TRACKS = []
+let ALL_PLAYLISTS: SpotifyPlaylist[] = []
+let ALL_TRACKS: SongBasketTrack[] = []
 
-export function makeConversionQueries () {
+export function makeConversionQueries (): SongBasketTrack[] {
   let syncedPlaylists = customGetters.SyncedPlaylistsSp().map(pl => {
     if (pl.isPaused) return null
     return {
@@ -70,7 +72,7 @@ function findDuplicatedTracks () {
       } else {
         console.log('new track', dirtyTrack.name, dirtyTrack.id)
         // Create new track entry if not found
-        ALL_TRACKS.push({ // TODO centralize models
+        ALL_TRACKS.push({
           id: dirtyTrack.id,
           data: dirtyTrack,
           playlists: [plTrackModel],
@@ -82,7 +84,8 @@ function findDuplicatedTracks () {
             converted: false,
             conversionError: false,
             processed: false
-          }
+          },
+          duration: null
         })
       }
     }
@@ -100,10 +103,11 @@ function makeQueries () {
     const track = ALL_TRACKS[o].data
 
     const query = `${track.name} ${track.artists[0].name}`
-    let duration = track.duration_ms / 1000 / 60
-    if (duration > 20) duration = 'long'
-    if (duration <= 20 && duration >= 4) duration = 'medium'
-    if (duration < 4) duration = 'short'
+    let duration: SongBasketTrackQuery['duration'] = ((dur) => {
+      if (dur > 20) return 'long'
+      if (dur <= 20 && dur >= 4) return 'medium'
+      return 'short'
+    })(track.duration_ms / 1000 / 60)
 
     ALL_TRACKS[o].query = { query, duration, duration_s: track.duration_ms / 1000, id: track.id }
   }
