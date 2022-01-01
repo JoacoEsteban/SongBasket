@@ -1,10 +1,18 @@
-const paths = global.CONSTANTS.PROTOCOL_PATHS
+import * as electron from 'electron'
 
-const CBS = {
+type UrlDecomposed = {
+  full: string,
+  base: string, // TODO rename to path
+  payload: any
 }
 
-const getUrl = url => {
-  if (!url) return
+const paths = global.CONSTANTS.PROTOCOL_PATHS
+
+const CBS: {
+  [key: string]: Function[]
+} = {}
+
+const getUrl = (url: string): UrlDecomposed => {
   url = decodeURI(url)
   const full = decodeURI(url.replace(new RegExp(paths.BASE + '://', 'g'), ''))
   const base = (full.indexOf('?') !== -1 && full.slice(0, full.indexOf('?'))) || full
@@ -19,10 +27,10 @@ const getUrl = url => {
   }
 }
 
-const getCb = path => {
+const getCb = (path: UrlDecomposed) => {
   const cbs = {
     cbs: CBS[path.base] || [],
-    callAll (...args) {
+    callAll (...args: any[]) {
       this.cbs.forEach(fn => fn(...args))
     }
   }
@@ -38,19 +46,19 @@ export default {
   off
 }
 
-function startProtocols (electron) {
+function startProtocols () {
   const protocol = electron.protocol
   protocol.registerHttpProtocol(paths.BASE, onRequest)
 }
 
-function onRequest (req, cb) {
+function onRequest (req: electron.Request) {
   const parsed = getUrl(req.url)
   console.log('----> ' + parsed.base)
   const actualCb = getCb(parsed)
   actualCb && actualCb.callAll(parsed)
 }
 
-function on (path, cb) {
+function on (path: string, cb: Function) {
   if (!path) throw new Error('PATH NOT SPECIFIED')
   if (typeof cb !== 'function') throw new Error('INVALID CALLBACK')
 
@@ -62,7 +70,7 @@ function on (path, cb) {
   return true
 }
 
-function off (path, cb) {
+function off (path: string, cb: Function) {
   if (!path) throw new Error('PATH NOT SPECIFIED')
   if (typeof cb !== 'function') throw new Error('INVALID CALLBACK')
 
