@@ -1,4 +1,5 @@
 type IterationCallback = (item: {}, index: number, array: any[]) => any
+type AsyncIterationCallback = (item: {}, index: number, array: any[]) => Promise<any>
 
 Object.defineProperty(Array.prototype, 'lastIndex', {
   get () {
@@ -31,8 +32,13 @@ Object.defineProperty(Array.prototype, 'lastIndexOfSearch',
     return -1
   })
 
+Object.defineProperty(Array.prototype, 'asyncForEachParallel',
+  async function (this: any[], cb: AsyncIterationCallback) {
+    await Promise.all(this.map(async (item, index) => cb(item, index, this)))
+  })
+
 Object.defineProperty(Array.prototype, 'asyncForEach',
-  async function (this: any[], cb: IterationCallback) {
+  async function (this: any[], cb: AsyncIterationCallback) {
     let i = 0
     for (const item of this) {
       await cb(item, i++, this)
@@ -40,7 +46,7 @@ Object.defineProperty(Array.prototype, 'asyncForEach',
   })
 
 Object.defineProperty(Array.prototype, 'asyncFilter',
-  async function (this: any[], cb: IterationCallback) {
+  async function (this: any[], cb: AsyncIterationCallback) {
     const filtered = []
     let i = 0
     for (const item of this) {
