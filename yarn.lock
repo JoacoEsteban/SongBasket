@@ -1956,9 +1956,9 @@
     "zip-stream" "^1.2.0"
 
 "are-we-there-yet@~1.1.2":
-  "integrity" "sha512-5hYdAkZlcG8tOLujVDTgCT+uPX0VnpAH28gWsLfzpXYm7wP6mp5Q/gYyR7YQ0cKVJcXJnl3j2kpBan13PtQf6w=="
-  "resolved" "https://registry.npmjs.org/are-we-there-yet/-/are-we-there-yet-1.1.5.tgz"
-  "version" "1.1.5"
+  "integrity" "sha512-nxwy40TuMiUGqMyRHgCSWZ9FM4VAoRP4xUYSTv5ImRog+h9yISPbVH7H8fASCIzYn9wlEv4zvFL7uKDMCFQm3g=="
+  "resolved" "https://registry.npmjs.org/are-we-there-yet/-/are-we-there-yet-1.1.7.tgz"
+  "version" "1.1.7"
   dependencies:
     "delegates" "^1.0.0"
     "readable-stream" "^2.0.6"
@@ -8270,13 +8270,13 @@
   "resolved" "https://registry.npmjs.org/keyboardevents-areequal/-/keyboardevents-areequal-0.2.2.tgz"
   "version" "0.2.2"
 
-"keytar@^5.4.0":
-  "integrity" "sha512-ueulhshHSGoryfRXaIvTj0BV1yB0KddBGhGoqCxSN9LR1Ks1GKuuCdVhF+2/YOs5fMl6MlTI9On1a4DHDXoTow=="
-  "resolved" "https://registry.npmjs.org/keytar/-/keytar-5.6.0.tgz"
-  "version" "5.6.0"
+"keytar@^7.7.0":
+  "integrity" "sha512-YEY9HWqThQc5q5xbXbRwsZTh2PJ36OSYRjSv3NN2xf5s5dpLTjEZnC2YikR29OaVybf9nQ0dJ/80i40RS97t/A=="
+  "resolved" "https://registry.npmjs.org/keytar/-/keytar-7.7.0.tgz"
+  "version" "7.7.0"
   dependencies:
-    "nan" "2.14.1"
-    "prebuild-install" "5.3.3"
+    "node-addon-api" "^3.0.0"
+    "prebuild-install" "^6.0.0"
 
 "keyv@^3.0.0":
   "integrity" "sha512-9ykJ/46SN/9KPM/sichzQ7OvXyGDYKGTaDlKMGCAlg2UK8KRy4jb0d8sFc+0Tt0YYnThq8X2RZgCg74RPxgcVA=="
@@ -9145,7 +9145,7 @@
     "for-in" "^1.0.2"
     "is-extendable" "^1.0.1"
 
-"mkdirp-classic@^0.5.2":
+"mkdirp-classic@^0.5.2", "mkdirp-classic@^0.5.3":
   "integrity" "sha512-gKLcREMhtuZRwRAfqP3RFW+TK4JqApVBtOIftVgjuABpAtpxhPGaDcfvbhNvD0B8iD1oUr/txX35NjcaY6Ns/A=="
   "resolved" "https://registry.npmjs.org/mkdirp-classic/-/mkdirp-classic-0.5.3.tgz"
   "version" "0.5.3"
@@ -10535,18 +10535,16 @@
     "detect-libc" "^1.0.3"
     "expand-template" "^2.0.3"
     "github-from-package" "0.0.0"
-    "minimist" "^1.2.0"
-    "mkdirp" "^0.5.1"
+    "minimist" "^1.2.3"
+    "mkdirp-classic" "^0.5.3"
     "napi-build-utils" "^1.0.1"
-    "node-abi" "^2.7.0"
-    "noop-logger" "^0.1.1"
+    "node-abi" "^2.21.0"
     "npmlog" "^4.0.1"
     "pump" "^3.0.0"
     "rc" "^1.2.7"
     "simple-get" "^3.0.3"
     "tar-fs" "^2.0.0"
     "tunnel-agent" "^0.6.0"
-    "which-pm-runs" "^1.0.0"
 
 "prelude-ls@~1.1.2":
   "integrity" "sha1-IZMqVJ9eUv/ZqCf1cOBL5iqX2lQ="
