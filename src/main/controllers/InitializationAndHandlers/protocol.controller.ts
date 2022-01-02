@@ -51,7 +51,7 @@ function startProtocols () {
   protocol.registerHttpProtocol(paths.BASE, onRequest)
 }
 
-function onRequest (req: electron.Request) {
+function onRequest (req: electron.ProtocolRequest) {
   const parsed = getUrl(req.url)
   console.log('----> ' + parsed.base)
   const actualCb = getCb(parsed)

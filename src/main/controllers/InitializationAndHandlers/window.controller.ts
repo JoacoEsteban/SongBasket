@@ -1,4 +1,4 @@
-import windowStateKeeper from 'electron-window-state'
+import * as windowStateKeeper from 'electron-window-state'
 import Positioner from 'electron-positioner'
 import { BrowserWindow } from 'electron'
 
