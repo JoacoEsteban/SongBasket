@@ -1,6 +1,7 @@
 import * as handlers from './handlers'
 
 import { autoUpdater } from 'electron-updater'
+import { dialog } from 'electron'
 const FLAGS = global.CONSTANTS.APP_STATUS.UPDATES
 
 function init () {
@@ -61,7 +62,7 @@ const onUpdateDownloaded = async info => {
 
   // ipcSend('READY_TO_UPDATE', FLAGS)
   const message = `Version ${FLAGS.updateVersion} has been downloaded\nDo you want to install it now?`
-  const res = await global.CONSTANTS.DIALOG.showMessageBox(global.CONSTANTS.MAIN_WINDOW, { message, buttons: ['Yes', 'No', 'See changelog'] })
+  const res = await dialog.showMessageBox(global.CONSTANTS.MAIN_WINDOW, { message, buttons: ['Yes', 'No', 'See changelog'] })
   console.log(res)
   switch (res.response) {
     case 0:

@@ -9,6 +9,7 @@ import FSController from '../FileSystem'
 import ProtocolController from './protocol.controller'
 import { SpotifyPlaylist, SpotifyPlaylistId, SpotifySnapshotId, SpotifyUser } from '../../../@types/Spotify'
 import { SongBasketId, SongBasketLoggedUser, SongBasketTrack } from '../../../@types/SongBasket'
+import { BrowserWindow } from 'electron'
 
 type PlaylistVersionMap = { id: SpotifyPlaylistId, snapshot_id?: SpotifySnapshotId }
 type CompletionCb = (err: Error | null, pl: PlaylistVersionMap, playlists: PlaylistVersionMap[]) => void
@@ -76,7 +77,7 @@ const core = {
   initializeLogin: async () => {
     if (global.CONSTANTS.LOGIN_WINDOW) throw new Error('LOGIN WINDOW EXISTS')
 
-    const loginWindow = global.CONSTANTS.LOGIN_WINDOW = new global.CONSTANTS.BROWSER_WINDOW(global.CONSTANTS.POPUP_WINDOW_CONFIG) // TODO initialize in window.controller
+    const loginWindow = global.CONSTANTS.LOGIN_WINDOW = new BrowserWindow(global.CONSTANTS.POPUP_WINDOW_CONFIG) // TODO initialize in window.controller
 
     loginWindow.loadURL(`${global.CONSTANTS.BACKEND}/init`, { 'extraHeaders': 'pragma: no-cache\n' })
     ProtocolController.on('auth', core.onLogin)
@@ -119,15 +120,15 @@ const core = {
   setCredentials: async (id: SpotifyUser['id'], songbasket_id: SongBasketId) => {
     await keytar.setPassword('songbasket', id, songbasket_id)
   },
-  removeCredentials: async (id: SpotifyUser['id'] = global.USER_ID) => {
+  removeCredentials: async (id = global.USER_ID) => {
     if (!id) throw new Error('CURRENT USER ID MISSING')
     await keytar.deletePassword('songbasket', id)
   },
-  getCredentials: async (id: SpotifyUser['id'] = global.USER_ID) => {
+  getCredentials: async (id = global.USER_ID) => {
     if (!id) throw new Error('CURRENT USER ID MISSING')
     return await keytar.getPassword('songbasket', id)
   },
-  setSongbasketIdGlobally: async (id: SpotifyUser['id'] = GETTERS.currentUserId()) => {
+  setSongbasketIdGlobally: async (id = GETTERS.currentUserId()) => {
     if (!id) throw new Error('USER ID DOESN\'T EXIST')
     global.USER_ID = id
     global.SONGBASKET_ID = await core.getCredentials()
@@ -144,13 +145,13 @@ const core = {
     VUEX_MAIN.COMMIT.SET_USER(await API.getMe())
   },
   loadMorePlaylists: async () => {
-    const res = await API.getUserPlaylists(global.USER_ID, { offset: GETTERS.playlistsOffset })
+    const res = global.USER_ID && await API.getUserPlaylists(global.USER_ID, { offset: GETTERS.playlistsOffset })
     res && VUEX_MAIN.COMMIT.UPDATE_USER_ENTITIES(res, { isLoadMore: true })
   },
   updatePlaylists: async (completionCb?: CompletionCb | null) => {
     const playlists = GETTERS.syncedPlaylistsSnapshots()
     await core.getAndStorePlaylists(playlists, completionCb || null)
-    const res = await API.getUserPlaylists(global.USER_ID)
+    const res = global.USER_ID && await API.getUserPlaylists(global.USER_ID)
     res && VUEX_MAIN.COMMIT.UPDATE_USER_ENTITIES(res)
   },
   getAndStorePlaylists: async (playlists: PlaylistVersionMap[], completionCb?: CompletionCb | null): Promise<void> => {

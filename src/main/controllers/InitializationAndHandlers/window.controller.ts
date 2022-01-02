@@ -1,5 +1,6 @@
 import windowStateKeeper from 'electron-window-state'
 import Positioner from 'electron-positioner'
+import { BrowserWindow } from 'electron'
 
 const windowController = {
   windowState: null,
@@ -33,7 +34,7 @@ const windowController = {
       defaultWidth: global.CONSTANTS.MAIN_WINDOW_CONFIG.width,
       defaultHeight: global.CONSTANTS.MAIN_WINDOW_CONFIG.height
     })
-    const window = global.CONSTANTS.MAIN_WINDOW = new global.CONSTANTS.BROWSER_WINDOW({
+    const window = global.CONSTANTS.MAIN_WINDOW = new BrowserWindow({
       ...global.CONSTANTS.MAIN_WINDOW_CONFIG,
       width: global.CONSTANTS.MAIN_WINDOW_CONFIG.width,
       height: global.CONSTANTS.MAIN_WINDOW_CONFIG.height
@@ -51,7 +52,7 @@ const windowController = {
     })
   },
   createLoadingWindow () {
-    const window = global.CONSTANTS.LOADING_WINDOW = new global.CONSTANTS.BROWSER_WINDOW(global.CONSTANTS.LOADING_WINDOW_CONFIG)
+    const window = global.CONSTANTS.LOADING_WINDOW = new BrowserWindow(global.CONSTANTS.LOADING_WINDOW_CONFIG)
 
     window.loadURL(process.env.NODE_ENV === 'development' ? `http://localhost:9080` : `file://${__dirname}/index.html`)
     window.on('closed', () => {

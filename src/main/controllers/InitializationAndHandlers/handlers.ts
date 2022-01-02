@@ -13,6 +13,7 @@ import core from './core.controller'
 import { AppStatus, LoadingController, SongBasketSaveFile } from '../../../@types/SongBasket'
 import { SpotifyPlaylistId, SpotifyTrackId } from '../../../@types/Spotify'
 import { YouTubeResultId } from '../../../@types/YouTube'
+import { dialog, shell } from 'electron'
 
 const openBrowser = global.openUrl = open
 
@@ -96,7 +97,7 @@ export async function askHomeFolder () {
   try {
     if (!global.CONSTANTS.MAIN_WINDOW) throw new Error('MAIN_WINDOW is not defined')
 
-    const { canceled, filePaths } = await global.CONSTANTS.DIALOG.showOpenDialog(global.CONSTANTS.MAIN_WINDOW, {
+    const { canceled, filePaths } = await dialog.showOpenDialog(global.CONSTANTS.MAIN_WINDOW, {
       properties: ['openDirectory']
     })
     if (canceled) throw new Error('CANCELLED')
@@ -126,7 +127,7 @@ export async function setHomeFolder (params: { path: string }): Promise<void> {
 }
 
 export async function openHomeFolder () {
-  await global.CONSTANTS.SHELL_OPEN(global.HOME_FOLDER)
+  await shell.openPath(global.HOME_FOLDER)
 }
 
 export async function login () {

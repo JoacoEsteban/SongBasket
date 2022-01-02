@@ -1,4 +1,4 @@
-import { App, BrowserWindow, Dialog, Session, shell } from 'electron'
+import { BrowserWindow } from 'electron'
 import { Platform } from './App'
 
 type WindowConfig = {
@@ -36,14 +36,6 @@ export type Constants = {
   },
   FFMPEG_BINS_DOWNLOADED: boolean,
   CLEAN_CREDS_ON_LOGOUT: boolean,
-  // -------------
-
-  // ELECTRON DEFAULTS
-  APP: App,
-  BROWSER_WINDOW: typeof BrowserWindow,
-  SESSION: typeof Session,
-  DIALOG: Dialog,
-  SHELL_OPEN: typeof shell.openPath,
   // -------------
 
   // PATHS
