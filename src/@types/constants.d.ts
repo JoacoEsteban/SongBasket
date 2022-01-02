@@ -1,4 +1,5 @@
 import { App, BrowserWindow, Dialog, Session, shell } from 'electron'
+import { Platform } from './App'
 
 type WindowConfig = {
   width: number,
@@ -65,7 +66,7 @@ export type Constants = {
   LOADING_WINDOW: BrowserWindow | null,
   LOGIN_WINDOW: BrowserWindow | null,
   // -------------
-  PLATFORM: 'mac' | 'windows' | 'other',
+  PLATFORM: Platform,
   MAIN_WINDOW_CONFIG: WindowConfig,
   LOADING_WINDOW_CONFIG: WindowConfig,
   POPUP_WINDOW_CONFIG: WindowConfig,

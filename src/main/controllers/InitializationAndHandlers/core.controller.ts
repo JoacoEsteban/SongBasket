@@ -33,7 +33,7 @@ const core = {
       return status.IS_LOGGED = true
     } catch (error) {
       if (!folders) throw error
-      await FSController.UserMethods.removeFolder(folders.selected)
+      folders.selected && await FSController.UserMethods.removeFolder(folders.selected)
       await core.setAppStatus()
     }
     return false

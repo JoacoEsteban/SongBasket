@@ -1,5 +1,6 @@
 import * as fs from 'fs'
 import * as PATH from 'path'
+import { Platform } from './@types/App'
 
 export function cloneObject<T> (aObject: T): T {
   return clone(aObject)
@@ -44,7 +45,7 @@ export async function createDirRecursive (path: string) {
   let pathArray = path.split(/\/|\\/)
   if (await pathDoesExist(path)) return
 
-  let subPath = (global.CONSTANTS.PLATFORM === 'windows' ? pathArray.splice(0, 1) : '') + '/'
+  let subPath = (global.CONSTANTS.PLATFORM === Platform.windows ? pathArray.splice(0, 1) : '') + '/'
   for (let i = 0; i < pathArray.length; i++) {
     subPath = PATH.join(subPath, pathArray[i])
     if (!await pathDoesExist(subPath)) {
@@ -110,8 +111,8 @@ export function copyNRemove (path1: string, path2: string): Promise<void> {
 export function isSameDisk (path1: string, path2: string) {
   path1 = path1.toLowerCase()
   path2 = path2.toLowerCase()
-  switch (global.CONSTANTS.PLATFORM) {
-    case 'mac':
+  switch (global.CONSTANTS.PLATFORM as Platform) {
+    case Platform.mac:
       if (path1.indexOf('/volumes') === 0) {
         if (path2.indexOf('/volumes') === 0) {
           // Not OS Disk, check disk
@@ -127,9 +128,9 @@ export function isSameDisk (path1: string, path2: string) {
       } else {
         return path2.indexOf('/volumes') !== 0
       }
-    case 'windows':
+    case Platform.windows:
       return path1.slice(0, path1.indexOf(':')) === path2.slice(0, path2.indexOf(':'))
-    case 'other':
-      break
+    // case 'other': // TODO add linux case
+    //   break
   }
 }

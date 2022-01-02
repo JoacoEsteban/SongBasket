@@ -16,6 +16,7 @@ import WindowController from './controllers/InitializationAndHandlers/window.con
 import core from './controllers/InitializationAndHandlers/core.controller'
 import YoutubeDlVersionManager from './utils/youtube-dl-version-manager'
 import ipcRoutes from './controllers/InitializationAndHandlers/ipc.routes'
+import { Platform } from '../@types/App'
 // import ipcMain from 'electron-better-ipc'
 // ---------------------utlis---------------------
 global.pathExists = pathExists
@@ -88,7 +89,7 @@ export default async () => {
     electron.app.allowRendererProcessReuse = true
 
     electron.app.on('window-all-closed', () => {
-      if (global.CONSTANTS.PLATFORM !== 'mac') {
+      if (global.CONSTANTS.PLATFORM !== Platform.mac) {
         // TODO Manage background processing on every platform
         electron.app.quit()
       }

@@ -1,19 +1,28 @@
 import * as utils from '../../MAIN_PROCESS_UTILS'
-import youtubeDl from 'youtube-dl'
+import * as youtubeDl from 'youtube-dl'
 import * as PATH from 'path'
 import { promises as fs, createWriteStream } from 'fs'
 import axios from 'axios'
+import { YouTubeDlAssetName } from '../../@types/Lib'
+import { Platform } from '../../@types/App'
 
 class YoutubeDlVersionManager {
   apiUrl = 'https://api.github.com/repos/ytdl-org/youtube-dl/releases/latest'
   fetch = axios.get
   binariesPath = global.CONSTANTS.YTDL_BINARIES_PATH
   versionControlPath = global.CONSTANTS.YTDL_VERSION_CONTROL_PATH
-  assetName = ({
-    windows: 'youtube-dl.exe',
-    mac: 'youtube-dl',
-    linux: 'youtube-dl'
-  })[global.CONSTANTS.PLATFORM]
+  assetName: YouTubeDlAssetName = (() => {
+    switch (global.CONSTANTS.PLATFORM as Platform) {
+      case Platform.windows:
+        return YouTubeDlAssetName.windows
+      case Platform.mac:
+        return YouTubeDlAssetName.mac
+      case Platform.linux:
+        return YouTubeDlAssetName.linux
+      default:
+        return YouTubeDlAssetName.linux
+    }
+  })()
 
   // constructor () { }
 

@@ -3,38 +3,47 @@ import * as fsCb from 'fs'
 import * as PATH from 'path'
 import axios from 'axios'
 import { v4 as uuid } from 'uuid'
-import toIco from 'to-ico'
-import Jimp from 'Jimp'
+import * as toIco from 'to-ico'
+import * as Jimp from 'Jimp'
 import { exec } from 'child_process'
 
 import * as utils from '../../../MAIN_PROCESS_UTILS'
 import UserMethods from './UserMethods'
+import { Platform } from '../../../@types/App'
+
+type FolderIconController = {
+  [key: string]: any,
+  set: (path: string, imageTempPath: string) => Promise<void>,
+  test: (path: string) => Promise<boolean>,
+  remove: (path: string) => Promise<void>
+}
 
 const { PLATFORM, TEMP_PATH } = global.CONSTANTS
 const tempPath = TEMP_PATH + '/image/'
-const computed = {
+const computed: { folderIconFnc: FolderIconController | null } = {
   folderIconFnc: null
 }
 
 export default {
-  getIconSetterHelper: () => computed.folderIconFnc || (computed.folderIconFnc = folderFns[PLATFORM]),
-  plIconDownloader: (pl, iconSetterHelper) => {
+  getIconSetterHelper: () => computed.folderIconFnc || (computed.folderIconFnc = folderFns[PLATFORM as Platform]),
+  plIconDownloader: (pl: { path: string, imageUrl: string }, iconSetterHelper: FolderIconController) => {
     if (!pl || !pl.path || !pl.imageUrl) return null
     UserMethods.checkPathThenCreate(tempPath)
 
     const { path, imageUrl } = pl
-    const imageTempPath = PATH.join(tempPath, uuid.v4())
+    const imageTempPath = PATH.join(tempPath, uuid())
 
     const instance = {
       imageUrl,
       path,
       imageTempPath,
       iconSetterHelper,
-      writer: () => fsCb.createWriteStream(imageTempPath)
+      writer: () => fsCb.createWriteStream(imageTempPath),
+      exec: () => {}
     }
     instance.exec = function () {
       const { imageUrl, iconSetterHelper, path, writer } = this
-      return new Promise(async (resolve, reject) => {
+      return new Promise<void>(async (resolve, reject) => {
         const response = await axios({
           method: 'GET',
           url: imageUrl,
@@ -59,8 +68,10 @@ export default {
   }
 }
 
-const folderFns = {
-  mac: {
+const folderFns: {
+  [key in Platform]: FolderIconController
+} = {
+  [Platform.mac]: {
     get fileIconPath () {
       return PATH.join(global.CONSTANTS.NODE_MODULES_PATH, 'fileicon', 'bin', 'fileicon')
     },
@@ -107,7 +118,7 @@ const folderFns = {
       })
     }
   },
-  windows: {
+  [Platform.windows]: {
     guidelines: {
       iconName: 'foldericon.ico',
       iniName: 'desktop.ini',
@@ -117,9 +128,9 @@ const folderFns = {
       get iniContents () {
         return `[.ShellClassInfo]\r\n${this.iconInIniTest}\r\n[ViewState]\r\nMode=\r\nVid=\r\nFolderType=Pictures\r\n`
       },
-      setSysProtectedCmd: path => `attrib +s +h ${path} /S /D`
+      setSysProtectedCmd: (path: string) => `attrib +s +h ${path} /S /D`
     },
-    validateIcon (imagePath) {
+    validateIcon (imagePath: string): Promise<Buffer> {
       return new Promise(async (resolve, reject) => {
         const img = await Jimp.read(imagePath)
         img.cover(256, 256, async (err, img) => {
@@ -128,67 +139,64 @@ const folderFns = {
         })
       })
     },
-    async convertIcon (path) {
+    async convertIcon (path: string): Promise<Buffer> {
       const buff = await this.validateIcon(path)
       return toIco(buff)
     },
-    hideFile (path) {
+    hideFile (path: string): Promise<void> {
       return new Promise((resolve, reject) => {
         exec(this.guidelines.setSysProtectedCmd(path), err => err ? reject(err) : resolve())
       })
       // ... TODO MAKE THIS GLOBALLY AVAILABLE
     },
-    async makeIcon (path, buff) {
-      try {
-        await utils.writeFile(path, buff)
-        await this.hideFile(path)
-      } catch (error) {
-        throw error
-      }
+    async makeIcon (path: string, buff: Buffer): Promise<void> {
+      await fs.writeFile(path, buff)
+      await this.hideFile(path)
     },
-    async createIniFile (path) {
+    async createIniFile (path: string): Promise<void> {
       const inipath = PATH.join(path, this.guidelines.iniName)
-      try {
-        if (await utils.pathDoesExist(inipath))
-          if (await (utils.readFile(inipath)).includes(this.guidelines.iconInIniTest)) return
-        await utils.writeFile(inipath, this.guidelines.iniContents, 'utf16le')
-        // await utils.link('C:/Users/Temp/Music/SB/template.ini', inipath)
-        await this.hideFile(inipath)
-      } catch (error) {
-        throw error
-      }
+      if (await utils.pathDoesExist(inipath))
+        if ((await fs.readFile(inipath, 'utf-8')).includes(this.guidelines.iconInIniTest)) return
+
+      await fs.writeFile(inipath, this.guidelines.iniContents, 'utf16le')
+      // await utils.link('C:/Users/Temp/Music/SB/template.ini', inipath)
+      await this.hideFile(inipath)
     },
-    async set (folderPath, imagePath) {
+    async set (folderPath: string, imagePath: string): Promise<void> {
       if (!folderPath) throw new Error('NO FOLDER PATH')
       if (!imagePath) throw new Error('NO ICON PATH')
       const finalIconPath = PATH.join(folderPath, this.guidelines.iconName)
-      try {
-        await this.remove(folderPath)
-        const buff = await this.convertIcon(imagePath)
-        await this.makeIcon(finalIconPath, buff)
-        await this.createIniFile(folderPath)
-      } catch (error) {
-        throw error
-      }
+
+      await this.remove(folderPath)
+      const buff = await this.convertIcon(imagePath)
+      await this.makeIcon(finalIconPath, buff)
+      await this.createIniFile(folderPath)
     },
     async test (path) {
       if (!path) throw new Error('NO PATH')
-      try {
-        const { iconName, iniName, iconInIniTest } = this.guidelines
-        const join = p => PATH.join(path, p)
-        const exists = async p => utils.pathDoesExist(join(p))
 
-        if (!await exists(iconName)) return false
-        if (!await exists(iniName)) return false
+      const { iconName, iniName, iconInIniTest } = this.guidelines
+      const join = (p: string) => PATH.join(path, p)
+      const exists = async (p: string) => utils.pathDoesExist(join(p))
 
-        return (await utils.readFile(join(iniName))).includes(iconInIniTest)
-      } catch (error) {
-        throw error
-      }
+      if (!await exists(iconName)) return false
+      if (!await exists(iniName)) return false
+
+      return (await fs.readFile(join(iniName))).includes(iconInIniTest)
     },
     async remove (path) {
       await utils.unlinkSafe(PATH.join(path, this.guidelines.iniName))
       await utils.unlinkSafe(PATH.join(path, this.guidelines.iconName))
+    }
+  },
+  [Platform.linux]: {
+    // TODO mplmement
+    async set (path, imageTempPath) {
+    },
+    async test (path) {
+      return false
+    },
+    async remove (path) {
     }
   }
 }

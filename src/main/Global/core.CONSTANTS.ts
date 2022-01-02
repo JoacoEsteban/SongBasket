@@ -1,6 +1,7 @@
 /* eslint-disable import/first */
 import { app, BrowserWindow, session, dialog, shell } from 'electron'
 import * as PATH from 'path'
+import { Platform } from '../../@types/App'
 import { Constants } from '../../@types/constants'
 import FEATURES from './core.FEATURES'
 
@@ -64,10 +65,10 @@ const cons: Partial<Constants> = {
   PLATFORM: (() => {
     switch (process.platform) {
       case 'darwin':
-        return 'mac'
+        return Platform.mac
       default:
-        if (process.platform.includes('win')) return 'windows'
-        return 'other'
+        if (process.platform.includes('win')) return Platform.windows
+        return Platform.linux
     }
   })(),
   MAIN_WINDOW_CONFIG: {
