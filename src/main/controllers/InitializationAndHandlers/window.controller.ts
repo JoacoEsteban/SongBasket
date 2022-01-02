@@ -1,28 +1,29 @@
 import * as windowStateKeeper from 'electron-window-state'
-import Positioner from 'electron-positioner'
+import * as Positioner from 'electron-positioner'
 import { BrowserWindow } from 'electron'
 
 const windowController = {
-  windowState: null,
-  positioner: null,
-  lockWindow (e, setSize = true) {
+  windowState: null as windowStateKeeper.State | null,
+  positioner: null as Positioner | null,
+  lockWindow (e: any, setSize = true) {
     const window = global.CONSTANTS.MAIN_WINDOW
     if (!window) return
     setSize && window.setSize(global.CONSTANTS.MAIN_WINDOW_CONFIG.width, global.CONSTANTS.MAIN_WINDOW_CONFIG.height)
     window.resizable = false
-    windowController.positioner.move('center')
+    windowController.positioner?.move('center')
   },
-  unlockWindow (e, setSize = true, setPosition = true) {
+  unlockWindow (e: any, setSize = true, setPosition = true) {
     const window = global.CONSTANTS.MAIN_WINDOW
     if (!window) return
 
-    const windowState = windowController.windowState
-
     window.resizable = true
     setTimeout(() => {
-      setSize && window.setSize(windowState.width, windowState.height)
-      setPosition && windowState.x && windowState.y && window.setPosition(windowState.x, windowState.y, true)
-      windowState.manage(window)
+      const windowState = windowController.windowState
+      if (windowState) {
+        setSize && window.setSize(windowState.width, windowState.height)
+        setPosition && windowState.x && windowState.y && window.setPosition(windowState.x, windowState.y, true)
+        windowState.manage(window)
+      }
     }, 500)
   },
   onAppInit () {
