@@ -20,13 +20,10 @@ export type YouTubeResultId = string
 export type TrackConversionResponse = {
   id: string,
   yt: YouTubeResult[],
-  nameTokens: [{
+  nameTokens: ({
     str: string,
     regex: string,
-  }, {
-    str: string,
-    regex: RegExp
-  }],
+  })[],
   bestMatch: YouTubeResultId
 }
 
