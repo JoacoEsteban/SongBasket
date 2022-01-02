@@ -2,7 +2,7 @@
   "compilerOptions": {
     "outDir": "./dist/ts/",
     "noImplicitAny": true,
-    "target": "es5",
+    "target": "ES2022",
     "module": "es2015",
     "strict": true,
     "moduleResolution": "node",
