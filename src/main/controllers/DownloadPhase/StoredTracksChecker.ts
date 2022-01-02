@@ -7,7 +7,7 @@ import { SpotifyPlaylistId } from '../../../@types/Spotify'
 
 type _track = SongBasketTrackFile
 
-type QueryTrack = SongBasketTrack & {
+export type QueryTrack = SongBasketTrack & {
   downloadFlags: {
     download: boolean,
     path?: string,
@@ -35,7 +35,7 @@ export async function link (path: string, newPath: string) {
   return true
 }
 
-async function VTWO (_localTracks: _track[], _queryTracks: SongBasketTrack[] = [], plFilter: SpotifyPlaylistId[] = []) {
+async function VTWO (_localTracks: _track[], _queryTracks: SongBasketTrack[] = [], plFilter: SpotifyPlaylistId[] = []): Promise<QueryTrack[]> {
   const pausedPlaylists = customGetters.pausedPlaylists
   const dontUnlinkFrom = [...plFilter, ...pausedPlaylists]
 

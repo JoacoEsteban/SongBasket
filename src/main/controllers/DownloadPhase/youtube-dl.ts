@@ -7,17 +7,116 @@ import customGetters from '../../Store/Helpers/customGetters'
 import * as utils from '../../../MAIN_PROCESS_UTILS'
 import ipc from '../InitializationAndHandlers/ipc.controller'
 
-import { downloadLinkRemove } from './StoredTracksChecker'
+import { downloadLinkRemove, QueryTrack } from './StoredTracksChecker'
+import { SongBasketTrackConversionSelection, SongBasketTrackFile } from '../../../@types/SongBasket'
+import { SpotifyPlaylistId, SpotifyTrack } from '../../../@types/Spotify'
+
+export enum DownloadStatus {
+  Awaiting = 'awaiting',
+  Downloading = 'downloading',
+  DownloadError = 'download_error',
+  DownloadEnd = 'download_end',
+  Extracting = 'extracting',
+  ExtractionError = 'extraction_error',
+  ExtractionEnd = 'extraction_end',
+  Tags = 'tags',
+  TagsError = 'tags_error',
+  TagsEnd = 'tags_end',
+}
+
+enum LifeCycle {
+  Start = 'start',
+  Progress = 'progress',
+  Error = 'error',
+  End = 'end',
+}
+
+type DownloadEvent = {
+  type: LifeCycle,
+  id: string,
+  ptg?: number,
+}
+
+type RendererDownloadEvent = DownloadEvent & {
+  type: string,
+}
+
+type DownloaderInstance = {
+  info: {
+    size: number,
+    currentSize: number,
+  },
+  downloader: youtubedl.Youtubedl | null,
+  downloadVideo: () => Promise<void>,
+}
+
+type ExtractorInstance = {
+  converter: {
+    convert: () => Promise<void>,
+    move: () => Promise<void>,
+  }
+}
+
+type DownloadInstance = {
+  id: string,
+  downloadFormat: string, // TODO make this an enum of webm/mp4
+  info: {
+    download: {
+      ptg: number,
+      finished: boolean,
+      error: Error | null,
+      size: number,
+      currentSize: number
+    },
+    extraction: {
+      ptg: number,
+      finished: boolean,
+      error: Error | null,
+    },
+    tags: {
+      finished: boolean,
+      error: Error | null,
+    },
+    currentStatus: DownloadStatus,
+    ptg: number,
+    finished: boolean,
+  },
+  yt: string,
+  data: SpotifyTrack,
+  playlists: {
+    id: SpotifyPlaylistId,
+    folderName: string | null,
+  }[],
+  paths: {
+    downloadCWD: string,
+    mp4FilePath: string,
+    mp3FilePath: string,
+    mp3FilePathFinal: string,
+    mp3FilePathFinalAlt: string,
+    fileName: string,
+    fileNameAlt: string,
+  },
+  controller: {
+    setFormat: () => Promise<void>,
+    constructDownload: () => void,
+    constructExtraction: () => void,
+    execute: () => Promise<void>
+  },
+  download: DownloaderInstance | null,
+  extraction: ExtractorInstance | null,
+}
 
 const tempDownloadsFolderPath = () => PATH.join(global.CONSTANTS.APP_SUPPORT_PATH, 'temp', 'downloads')
 
 const emitEvent = {
   send: ipc.send,
-  lastEvent: null,
+  lastEvent: null as RendererDownloadEvent | null,
   timeoutInProgress: false,
-  makeTimeout: (params, key) => {
-    params.type = key + ':' + params.type
-    emitEvent.lastEvent = params
+  makeTimeout: (params: DownloadEvent, key: string) => {
+    emitEvent.lastEvent = {
+      ...params,
+      type: key + ':' + params.type
+    } as RendererDownloadEvent
 
     if (emitEvent.timeoutInProgress) return
     emitEvent.timeoutInProgress = true
@@ -26,30 +125,30 @@ const emitEvent = {
       emitEvent.timeoutInProgress = false
     }, 300)
   },
-  downloadStarted: (tracks) => {
+  downloadStarted: (tracks: DownloadInstance[]) => {
     emitEvent.send('DOWNLOAD:START', tracks.map(({ id, info }) => ({ id, info })))
   },
-  downloadFinished: (tracks) => {
+  downloadFinished: () => {
     emitEvent.send('DOWNLOAD:END')
   },
-  download: (params) => {
+  download: (params: DownloadEvent) => {
     emitEvent.makeTimeout(params, 'download')
   },
-  extraction: (params) => {
+  extraction: (params: DownloadEvent) => {
     emitEvent.makeTimeout(params, 'extraction')
   },
-  tags: (params) => {
+  tags: (params: DownloadEvent) => {
     emitEvent.makeTimeout(params, 'tags')
   }
 }
 
-let ALL_TRACKS
+let ALL_TRACKS: DownloadInstance[] = []
 export default {
   async onDowloadStart () {
     console.log('--------------DOWNLOAD STARTED--------------')
-    ALL_TRACKS && emitEvent.downloadStarted(ALL_TRACKS)
+    ALL_TRACKS.length && emitEvent.downloadStarted(ALL_TRACKS)
   },
-  async downloadSyncedPlaylists (localTracks, plFilter) {
+  async downloadSyncedPlaylists (localTracks: SongBasketTrackFile[], plFilter: SpotifyPlaylistId[]) {
     console.log('Stored tracks: ', localTracks.length)
     let tracksToDownload = customGetters.convertedTracks_SAFE()
     if (plFilter) tracksToDownload = tracksToDownload.filter(t => t.playlists.some(pl => plFilter.includes(pl.id)))
@@ -71,68 +170,26 @@ export default {
     if (hasErrors) console.error('ERRORS DURING DOWNLOAD')
     else console.log('ALL TRACKS DOWNLOADED')
     emitEvent.downloadFinished()
-    ALL_TRACKS = null
+    ALL_TRACKS = []
   }
 }
 
-function constructDownloads (tracks) {
+function constructDownloads (tracks: QueryTrack[]) {
   const exec = () => tracks.map(generateDownloadObject).filter(track => track)
 
   // CONSTRUCTOR FUNCTIONS
-  const generateDownloadObject = (track) => {
-    /*
-      {
-        id: spid,
-        yt: ytid,
-        playlists: [
-          {
-            id: plid,
-            folderName: ''
-          }
-        ],
-        paths: {
-          downloadCWD: '',
-          mp4FilePath: '',
-          mp3FilePath: '',
-          mp3FilePathFinal: '',
-          mp3FilePathFinalAlt: '',
-        },
-        controller: {
-          getFormat: () => {},
-          constructDownload: () => {},
-          constructExtraction: () => {},
-          endCallback: () => {},
-        },
-        info: {
-          download: {
-            ptg: 0,
-            finished: false,
-            error: null
-          },
-          extraction: {
-            ptg: 0,
-            finished: false,
-            error: null
-          },
-          tags: {
-            finished: false,
-            error: null
-          },
-          currentStatus: 'awaiting',
-          finished: false
-        }
-      }
-    */
+  const generateDownloadObject = (track: QueryTrack): DownloadInstance => {
     const { id, playlists, data, selection } = track
-    const instance = {
+    const instance: DownloadInstance = {
       id,
+      downloadFormat: '',
       info: {
         download: {
           ptg: 0,
           finished: false,
           error: null,
-          size: null,
-          currentSize: null
+          size: 0,
+          currentSize: 0
         },
         extraction: {
           ptg: 0,
@@ -143,38 +200,55 @@ function constructDownloads (tracks) {
           finished: false,
           error: null
         },
-        currentStatus: 'awaiting',
+        currentStatus: DownloadStatus.Awaiting,
         ptg: 0,
         finished: false
       },
-      yt: selection,
+      yt: (() => { // TODO centralize this logic somewhere else
+        if (selection === null) return track.conversion?.bestMatch!
+        if (selection === false) return track.custom?.id!
+        return selection
+      })(),
       data,
       playlists: playlists.map(({ id }) => ({
         id,
         folderName: customGetters.giveMePlFolderName(id)
-      }))
+      })),
+      paths: {
+        downloadCWD: '',
+        mp4FilePath: '',
+        mp3FilePath: '',
+        mp3FilePathFinal: '',
+        mp3FilePathFinalAlt: '',
+        fileName: '',
+        fileNameAlt: '',
+      },
+      controller: {
+        setFormat: async () => getTrackFormat(instance),
+        constructDownload: () => constructVideoDownload(instance),
+        constructExtraction: () => constructVideoExtraction(instance),
+        execute: async () => executeDownload(instance)
+      },
+      download: null,
+      extraction: null
     }
-    const paths = instance.paths = {}
+
+    const paths = instance.paths
     const fileName = paths.fileName = utils.encodeIntoFilename(data.name) // colons turnt into hyphens & etc
     const fileNameAlt = paths.fileNameAlt = `${fileName} - ${id}`
     if (!instance.playlists.length) global.log(instance, 'passed?')
     paths.downloadCWD = PATH.join(tempDownloadsFolderPath(), instance.playlists[0].id)
     paths.mp4FilePath = PATH.join(paths.downloadCWD, id + '.songbasket_preprocessed_file')
     paths.mp3FilePath = PATH.join(paths.downloadCWD, id + '.mp3')
-    paths.mp3FilePathFinal = PATH.join(global.HOME_FOLDER, utils.encodeIntoFilename(instance.playlists[0].folderName), fileName + '.mp3')
-    paths.mp3FilePathFinalAlt = PATH.join(global.HOME_FOLDER, utils.encodeIntoFilename(instance.playlists[0].folderName), fileNameAlt + '.mp3')
-
-    instance.controller = {
-      getFormat: async () => getTrackFormat(instance),
-      constructDownload: () => constructVideoDownload(instance),
-      constructExtraction: () => constructVideoExtraction(instance),
-      execute: () => executeDownload(instance)
+    if (instance.playlists[0].folderName) {
+      paths.mp3FilePathFinal = PATH.join(global.HOME_FOLDER, utils.encodeIntoFilename(instance.playlists[0].folderName), fileName + '.mp3')
+      paths.mp3FilePathFinalAlt = PATH.join(global.HOME_FOLDER, utils.encodeIntoFilename(instance.playlists[0].folderName), fileNameAlt + '.mp3')
     }
 
     return instance
   }
 
-  const getTrackFormat = (track) => {
+  const getTrackFormat = (track: DownloadInstance): Promise<void> => {
     // TODO evaluate going for webm again or not
     return new Promise((resolve, reject) => {
       track.downloadFormat = 'mp4'
@@ -188,10 +262,10 @@ function constructDownloads (tracks) {
     })
   }
 
-  const constructVideoDownload = (instance) => {
+  const constructVideoDownload = (instance: DownloadInstance) => {
     instance.download = {
       info: {
-        size: null,
+        size: 0,
         currentSize: 0
       },
       downloader: null,
@@ -199,7 +273,7 @@ function constructDownloads (tracks) {
         return new Promise(async (resolve, reject) => {
           if (!instance.yt) return reject(new Error('NO TRACK SELECTION'))
           console.log('about to download', instance.yt)
-          const download = instance.download.downloader = youtubedl(instance.yt,
+          const download = instance.download!.downloader = youtubedl(instance.yt,
             ['--format=' + getDownloadFormatId(instance.downloadFormat)],
             { cwd: instance.paths.downloadCWD })
 
@@ -207,22 +281,22 @@ function constructDownloads (tracks) {
           // Will be called when the download starts.
           download.on('info', info => {
             instance.info.download.size = info.size
-            instance.info.currentStatus = 'downloading'
-            emitEvent.download({ type: 'start', id: instance.id })
+            instance.info.currentStatus = DownloadStatus.Downloading
+            emitEvent.download({ type: LifeCycle.Start, id: instance.id })
           })
 
           download.on('data', chunk => {
             instance.info.download.currentSize += chunk.length
             const ptg = Math.round(instance.info.download.currentSize / instance.info.download.size * 100)
             instance.info.ptg = instance.info.download.ptg = ptg
-            emitEvent.download({ type: 'progress', id: instance.id, ptg })
+            emitEvent.download({ type: LifeCycle.Progress, id: instance.id, ptg })
           })
 
           download.on('error', (error) => {
             console.error('Error when downloading video::::', error)
             instance.info.download.error = error
-            instance.info.currentStatus = 'download_error'
-            emitEvent.download({ type: 'error', id: instance.id })
+            instance.info.currentStatus = DownloadStatus.DownloadError
+            emitEvent.download({ type: LifeCycle.Error, id: instance.id })
             return reject(error)
           })
 
@@ -230,9 +304,9 @@ function constructDownloads (tracks) {
             instance.info.download.finished = true
             if (instance.info.download.error) return
             instance.info.download.ptg = 100
-            instance.info.currentStatus = 'download_end'
+            instance.info.currentStatus = DownloadStatus.DownloadEnd
             console.log('video downloaded')
-            emitEvent.download({ type: 'end', id: instance.id })
+            emitEvent.download({ type: LifeCycle.End, id: instance.id })
             return resolve()
           })
 
@@ -242,46 +316,43 @@ function constructDownloads (tracks) {
     }
   }
 
-  const constructVideoExtraction = (instance) => {
+  const constructVideoExtraction = (instance: DownloadInstance) => {
     instance.extraction = {
-      info: {
-
-      },
       converter: {
         convert: async () => {
           try {
-            instance.info.currentStatus = 'extracting'
-            emitEvent.extraction({ type: 'start', id: instance.id })
+            instance.info.currentStatus = DownloadStatus.Extracting
+            emitEvent.extraction({ type: LifeCycle.Start, id: instance.id })
             instance.info.ptg = 0
             await extractMp3(instance.paths.mp3FilePath, instance.paths.mp4FilePath, instance.downloadFormat, progress => {
               const ptg = Math.round(progress.percent)
               instance.info.ptg = instance.info.extraction.ptg = ptg
-              emitEvent.extraction({ type: 'progress', id: instance.id, ptg })
+              emitEvent.extraction({ type: LifeCycle.Progress, id: instance.id, ptg })
             })
           } catch (err) {
-            instance.info.extraction.error = err
-            instance.info.currentStatus = 'extraction_error'
-            emitEvent.extraction({ type: 'error', id: instance.id })
+            if (err instanceof Error) instance.info.extraction.error = err
+            instance.info.currentStatus = DownloadStatus.ExtractionError
+            emitEvent.extraction({ type: LifeCycle.Error, id: instance.id })
             throw err
           } finally {
             instance.info.extraction.finished = true
-            !instance.info.extraction.error && (instance.info.extraction.ptg = 100) + (instance.info.currentStatus = 'extraction_end')
-            emitEvent.extraction({ type: 'end', id: instance.id })
+            !instance.info.extraction.error && (instance.info.extraction.ptg = 100) + (instance.info.currentStatus = DownloadStatus.ExtractionEnd)
+            emitEvent.extraction({ type: LifeCycle.End, id: instance.id })
           }
 
           try {
-            instance.info.currentStatus = 'tags'
-            emitEvent.tags({ type: 'start', id: instance.id })
+            instance.info.currentStatus = DownloadStatus.Tags
+            emitEvent.tags({ type: LifeCycle.Start, id: instance.id })
             await applyTags(instance.paths.mp3FilePath, instance.data, instance.yt)
             console.log('finished tags')
-            emitEvent.tags({ type: 'end', id: instance.id })
+            emitEvent.tags({ type: LifeCycle.End, id: instance.id })
           } catch (err) {
-            instance.info.tags.error = err
-            instance.info.currentStatus = 'tags_error'
-            emitEvent.tags({ type: 'error', id: instance.id })
+            if (err instanceof Error) instance.info.tags.error = err
+            instance.info.currentStatus = DownloadStatus.TagsError
+            emitEvent.tags({ type: LifeCycle.Error, id: instance.id })
             throw err
           } finally {
-            !instance.info.tags.error && (instance.info.currentStatus = 'tags_end')
+            !instance.info.tags.error && (instance.info.currentStatus = DownloadStatus.TagsEnd)
             instance.info.tags.finished = true
             instance.info.finished = true
           }
@@ -290,18 +361,18 @@ function constructDownloads (tracks) {
           let moveFunction = utils.copyNRemove
           if (await utils.pathDoesExist(instance.paths.mp3FilePathFinal)) instance.paths.mp3FilePathFinal = instance.paths.mp3FilePathFinalAlt
           if (utils.isSameDisk(instance.paths.mp3FilePath, instance.paths.mp3FilePathFinal)) moveFunction = utils.linkNRemove
-          try {
-            await moveFunction(instance.paths.mp3FilePath, instance.paths.mp3FilePathFinal)
-          } catch (err) {
-            throw err
-          }
+
+          await moveFunction(instance.paths.mp3FilePath, instance.paths.mp3FilePathFinal)
         }
       }
     }
   }
 
-  const executeDownload = async instance => {
-    await instance.controller.getFormat()
+  const executeDownload = async (instance: DownloadInstance) => {
+    if (!instance.download) throw new Error('NO DOWNLOADER')
+    if (!instance.extraction) throw new Error('NO EXTRACTOR')
+
+    await instance.controller.setFormat()
     instance.controller.constructDownload()
     instance.controller.constructExtraction()
 
@@ -337,7 +408,8 @@ function constructDownloads (tracks) {
 
     if (instance.playlists.length === 1) return
 
-    instance.playlists.forEach(async pl => {
+    instance.playlists.forEach(async pl => { // TODO: make this async
+      if (!pl.folderName) throw new Error('NO FOLDER NAME')
       const folderPath = PATH.join(global.HOME_FOLDER, pl.folderName)
 
       let fullPath = PATH.join(folderPath, instance.paths.fileName + '.mp3')
@@ -354,7 +426,7 @@ function constructDownloads (tracks) {
   return exec()
 }
 
-function getDownloadFormatId (format) {
+function getDownloadFormatId (format: string) {
   switch (format) {
     case 'webm':
       return '251'

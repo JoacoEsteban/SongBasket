@@ -93,7 +93,7 @@ export function createDir (path: string): Promise<void> {
   })
 }
 
-export function linkNRemove (path1: string, path2: string) {
+export function linkNRemove (path1: string, path2: string): Promise<void> {
   return new Promise((resolve, reject) => {
     link(path1, path2)
       .then(() => {
