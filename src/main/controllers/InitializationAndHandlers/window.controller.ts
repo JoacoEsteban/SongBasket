@@ -5,14 +5,14 @@ import { BrowserWindow } from 'electron'
 const windowController = {
   windowState: null as windowStateKeeper.State | null,
   positioner: null as Positioner | null,
-  lockWindow (e: any, setSize = true) {
+  lockWindow ({ setSize = true }) {
     const window = global.CONSTANTS.MAIN_WINDOW
     if (!window) return
     setSize && window.setSize(global.CONSTANTS.MAIN_WINDOW_CONFIG.width, global.CONSTANTS.MAIN_WINDOW_CONFIG.height)
     window.resizable = false
     windowController.positioner?.move('center')
   },
-  unlockWindow (e: any, setSize = true, setPosition = true) {
+  unlockWindow ({ setSize = true, setPosition = true }) {
     const window = global.CONSTANTS.MAIN_WINDOW
     if (!window) return
 
