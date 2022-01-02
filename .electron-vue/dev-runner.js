@@ -42,16 +42,18 @@ function startRenderer () {
     rendererConfig.entry.renderer = [path.join(__dirname, 'dev-client')].concat(rendererConfig.entry.renderer)
     rendererConfig.mode = 'development'
     const compiler = webpack(rendererConfig)
-    hotMiddleware = webpackHotMiddleware(compiler, {
-      log: false,
-      heartbeat: 2500
-    })
+    // hotMiddleware = webpackHotMiddleware(compiler, {
+    //   log: false,
+    //   heartbeat: 2500
+    // })
 
     compiler.hooks.compilation.tap('compilation', compilation => {
-      compilation.hooks.htmlWebpackPluginAfterEmit.tapAsync('html-webpack-plugin-after-emit', (data, cb) => {
-        hotMiddleware.publish({ action: 'reload' })
-        cb()
-      })
+      // console.log(Object.keys(compilation.hooks))
+      // console.log(compilation.hooks.afterEmit)
+      // compilation.hooks.afterEmit.tapAsync('html-webpack-plugin-after-emit', (data, cb) => {
+      //   hotMiddleware.publish({ action: 'reload' })
+      //   cb()
+      // })
     })
 
     compiler.hooks.done.tap('done', stats => {
@@ -65,7 +67,7 @@ function startRenderer () {
         },
         // quiet: true,
         onBeforeSetupMiddleware (server) {
-          server.app.use(hotMiddleware)
+          // server.app.use(hotMiddleware)
           // app, ctx
           // ctx.middleware.waitUntilValid(() => {
           //   resolve()
@@ -88,7 +90,7 @@ function startMain () {
 
     compiler.hooks.watchRun.tapAsync('watch-run', (compilation, done) => {
       logStats('Main', chalk.white.bold('compiling...'))
-      hotMiddleware.publish({ action: 'compiling' })
+      // hotMiddleware.publish({ action: 'compiling' })
       done()
     })
 

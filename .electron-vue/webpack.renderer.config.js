@@ -22,7 +22,8 @@ const { VueLoaderPlugin } = require('vue-loader')
 let whiteListedModules = ['vue']
 
 let rendererConfig = {
-  devtool: '#cheap-module-eval-source-map',
+  // devtool: '^(inline-|hidden-|eval-)?(nosources-)?(cheap-(module-)?)?source-map$',
+  devtool: 'eval-cheap-module-source-map',
   entry: {
     renderer: path.join(__dirname, '../src/renderer/main.ts')
   },
@@ -45,6 +46,17 @@ let rendererConfig = {
           }
         }
       },
+      // {
+      //   test: /\.(js|vue)$/,
+      //   enforce: 'pre',
+      //   exclude: /node_modules/,
+      //   use: {
+      //     loader: 'eslint-loader',
+      //     options: {
+      //       formatter: require('eslint-friendly-formatter')
+      //     }
+      //   }
+      // },
       {
         test: /\.[tj]s$/,
         loader: 'ts-loader',
@@ -76,18 +88,45 @@ let rendererConfig = {
         use: 'vue-html-loader'
       },
       {
+        test: /\.ts$/,
+        loader: 'ts-loader',
+        options: {
+          appendTsSuffixTo: [/\.vue$/],
+          transpileOnly: true,
+        },
+        exclude: /node_modules/,
+      },
+      {
+        test: /\.js$/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            sourceMap: true,
+            compact: false,
+            presets: [
+              ['@babel/preset-env']
+            ],
+            'plugins': [
+              'syntax-dynamic-import',
+              '@babel/plugin-proposal-class-properties',
+            ]
+          },
+        },
+        exclude: /node_modules/
+      },
+      {
         test: /\.node$/,
         use: 'node-loader'
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
-        use: {
+        use: [{
           loader: 'url-loader',
-          query: {
+          options: {
             limit: 10000,
             name: 'imgs/[name]--[folder].[ext]'
           }
-        }
+        }]
       },
       {
         test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
@@ -99,13 +138,13 @@ let rendererConfig = {
       },
       {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-        use: {
+        use: [{
           loader: 'url-loader',
-          query: {
+          options: {
             limit: 10000,
             name: 'fonts/[name]--[folder].[ext]'
           }
-        }
+        }]
       }
     ]
   },
@@ -124,11 +163,13 @@ let rendererConfig = {
         removeAttributeQuotes: true,
         removeComments: true
       },
-      nodeModules: process.env.NODE_ENV !== 'production'
-        ? path.resolve(__dirname, '../node_modules')
-        : false
+      // nodeModules: process.env.NODE_ENV !== 'production'
+      //   ? path.resolve(__dirname, '../node_modules')
+      //   : false
     }),
-    new webpack.HotModuleReplacementPlugin(),
+    new webpack.HotModuleReplacementPlugin({
+      multiStep: true,
+    }),
     new webpack.NoEmitOnErrorsPlugin()
   ],
   output: {
