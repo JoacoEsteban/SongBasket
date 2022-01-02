@@ -16,7 +16,9 @@
     "dev": "node .electron-vue/dev-runner.js",
     "lint": "eslint --ext .js,.vue -f ./node_modules/eslint-friendly-formatter src test",
     "lint:fix": "eslint --ext .js,.vue -f ./node_modules/eslint-friendly-formatter --fix src test",
-    "postinstall": "electron-rebuild"
+    "postinstall": "electron-rebuild",
+    "rebuild": "electron-rebuild",
+    "rebuild-arm64": "electron-rebuild --arch=arm64"
   },
   "repository": {
     "type": "git",
@@ -26,6 +28,7 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.27",
     "@fortawesome/free-solid-svg-icons": "^5.12.1",
     "@fortawesome/vue-fontawesome": "^0.1.9",
+    "@types/electron-positioner": "^4.1.1",
     "@types/he": "^1.1.2",
     "@types/to-ico": "^1.1.1",
     "axios": "^0.21.1",
