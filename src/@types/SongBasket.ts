@@ -104,3 +104,11 @@ export type SongbasketFoldersFile = {
   paths: string[],
   selected: string | null
 }
+
+export type SongBasketTrackFile = {
+  playlist: SpotifyPlaylistId,
+  path: string,
+  file: string,
+} & {
+    [key in SongbasketCustomMp3Tags]?: string
+  }

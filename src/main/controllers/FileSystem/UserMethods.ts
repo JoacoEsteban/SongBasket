@@ -9,21 +9,14 @@ import * as PATH from 'path'
 import * as rimraf from 'rimraf'
 // import NodeID3 from 'node-id3'
 import * as iconv from 'iconv-lite'
-import { SongbasketCustomMp3Tag, SongbasketCustomMp3Tags, SongbasketFoldersFile, SongBasketSaveFile } from '../../../@types/SongBasket'
+import { SongbasketCustomMp3Tag, SongbasketCustomMp3Tags, SongbasketFoldersFile, SongBasketSaveFile, SongBasketTrackFile } from '../../../@types/SongBasket'
 import { SpotifyPlaylistId } from '../../../@types/Spotify'
 
 type _tag = {
   name: SongbasketCustomMp3Tag,
   value: string
 }
-type _track = {
-  playlist: SpotifyPlaylistId,
-  path: string,
-  file: string,
-} & {
-    [key in SongbasketCustomMp3Tags]?: string
-  }
-
+type _track = SongBasketTrackFile
 const PATHS = {
   userDataPath: global.CONSTANTS.APP_SUPPORT_PATH,
   get foldersJsonPath () {

@@ -2,19 +2,32 @@ import customGetters from '../../Store/Helpers/customGetters'
 import * as utils from '../../../MAIN_PROCESS_UTILS'
 import * as PATH from 'path'
 import { v4 as uuid } from 'uuid'
+import { SongbasketCustomMp3Tags, SongBasketTrack, SongBasketTrackFile } from '../../../@types/SongBasket'
+import { SpotifyPlaylistId } from '../../../@types/Spotify'
 
-export async function downloadLinkRemove (localTracks, queryTracks, plFilter = []) {
-  try {
-    return VTWO(localTracks, queryTracks, plFilter || [])
-  } catch (error) {
-    throw error
+type _track = SongBasketTrackFile
+
+type QueryTrack = SongBasketTrack & {
+  downloadFlags: {
+    download: boolean,
+    path?: string,
+    file?: string,
+    linkData?: {
+      path: string,
+      file: string
+    }
   }
 }
 
-export async function unlink (path) {
+
+export async function downloadLinkRemove (localTracks: _track[], queryTracks: SongBasketTrack[], plFilter: SpotifyPlaylistId[] = []) {
+  return VTWO(localTracks, queryTracks, plFilter || [])
+}
+
+export async function unlink (path: string) {
   if (await utils.pathDoesExist(path)) await utils.unlink(path)
 }
-export async function link (path, newPath) {
+export async function link (path: string, newPath: string) {
   console.log('linking ', path, newPath)
   if (!await utils.pathDoesExist(path)) throw new Error()
   if (await utils.pathDoesExist(newPath)) return false
@@ -22,17 +35,24 @@ export async function link (path, newPath) {
   return true
 }
 
-async function VTWO (localTracks, queryTracks = [], plFilter = []) {
+async function VTWO (_localTracks: _track[], _queryTracks: SongBasketTrack[] = [], plFilter: SpotifyPlaylistId[] = []) {
   const pausedPlaylists = customGetters.pausedPlaylists
   const dontUnlinkFrom = [...plFilter, ...pausedPlaylists]
 
-  if (plFilter.length) localTracks.forEach(lTrack => lTrack.dontUnlink = !dontUnlinkFrom.includes(lTrack.playlist)) // prevents unlinking tracks when filtering playlist
+  const localTracks = (_localTracks as (_track & { dontUnlink?: boolean })[])
+  if (plFilter.length) {
+    localTracks.forEach(lTrack => lTrack.dontUnlink = !dontUnlinkFrom.includes(lTrack.playlist)) // prevents unlinking tracks when filtering playlist
+  }
 
-  queryTracks = queryTracks.filter(qTrack => {
+  let queryTracks = (_queryTracks as QueryTrack[]).filter(qTrack => {
+    // const qTrack = _qTrack as QueryTrack
     if (!qTrack.conversion) return false
 
     if (qTrack.selection === null) qTrack.selection = qTrack.conversion.bestMatch
-    if (qTrack.selection === false) qTrack.selection = qTrack.custom.youtube_id
+    if (qTrack.selection === false) {
+      const id = qTrack.custom?.youtube_id
+      if (id) qTrack.selection = id
+    }
 
     qTrack.downloadFlags = {
       download: !(qTrack.flags.paused || qTrack.playlists.every(({ id }) => pausedPlaylists.includes(id)))
@@ -77,20 +97,22 @@ async function VTWO (localTracks, queryTracks = [], plFilter = []) {
   return queryTracks
 }
 
-const linkTrackToPlaylists = async (track) => {
-  track.playlists.forEach(async pl => { // TODO make async with Promise.all
+const linkTrackToPlaylists = async (track: QueryTrack) => {
+  if (!track.downloadFlags.linkData) return
+
+  track.playlists.asyncForEachParallel(async pl => {
     let plPath = customGetters.giveMePlFolderName(pl.id)
     console.log(plPath)
     if (!plPath) return
     plPath = PATH.join(global.HOME_FOLDER, utils.encodeIntoFilename(plPath))
-    let fileName = track.downloadFlags.linkData.file.replace('.mp3', '')
+    let fileName = track.downloadFlags.linkData!.file.replace('.mp3', '')
     let didLink = false
 
-    for (let i = 0; !didLink && i < 10; i++) {
-      let suffix = i === 0 ? '' : (' - ' + uuid.v4())
+    for (let i = 0; !didLink && i < 10; i++) { // TODO Rethink this
+      let suffix = i === 0 ? '' : (' - ' + uuid())
       if (i > 1) suffix += (' - ' + i)
       try {
-        didLink = await link(track.downloadFlags.linkData.path, PATH.join(plPath, fileName + suffix + '.mp3'))
+        didLink = await link(track.downloadFlags.linkData!.path, PATH.join(plPath, fileName + suffix + '.mp3'))
         if (didLink) return
       } catch (error) {
         console.error(error || 'TRACK TO LINK DOESN\'T EXIST')
