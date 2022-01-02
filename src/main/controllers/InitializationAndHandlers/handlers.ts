@@ -234,7 +234,7 @@ export async function download (plFilter?: SpotifyPlaylistId[]) {
 
   loadingController.on('DOWNLOAD')
   const tracks = await FSController.UserMethods.retrieveLocalTracks()
-  await youtubeDl.downloadSyncedPlaylists(tracks, plFilter)
+  await youtubeDl.downloadSyncedPlaylists(tracks, plFilter || [])
   // await FileWatchers.rebuildWatchers()
   loadingController.off('DOWNLOAD')
 }

@@ -28,14 +28,6 @@ export function createAxiosInstance () {
   Api = getAxiosInstance()
 }
 
-const Backend = process.env.BACKEND
-
-// Brings back user information
-export async function guestCheck (userId: SpotifyUser['id']): Promise<SpotifyUser> {
-  let res = await Api.get(URL(PATHS.USER, userId))
-  return res && res.data
-}
-
 export async function ytDetails (id: YouTubeResultId) {
   let reg = REGEX.videoUrl.exec(id)
   if (!reg && !REGEX.videoId.test(id)) throw new Error('INVALID YOUTUBE VIDEO ID')

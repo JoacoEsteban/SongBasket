@@ -4,6 +4,7 @@ import WindowController from './window.controller'
 // import store from '../../../renderer/store/index.js'
 import FileWatchers, { SBWatcherEvent } from '../FileSystem/FileWatchers'
 import { ipcMain } from 'electron-better-ipc'
+import { SpotifyPlaylistId } from '../../../@types/Spotify'
 
 // :::::::::::::::::::::::::::::::::IPC:::::::::::::::::::::::::::::::::
 export default function () {
@@ -32,34 +33,6 @@ export default function () {
 
   // on('APP_UPDATE:CONFIRM', updater.handlers.onUserUpdateConfirmation)
 
-  on('guestSignIn', function ({ mode, query }) { // TODO deprecate
-    console.log('Guest:: Type:', mode, query)
-    if (mode === 'user') {
-      if (!query) return
-      sbFetch.guestCheck(query)
-        .then(resolve => {
-          if (resolve.status === 404) {
-            ipcSend('not-found')
-          }
-          if (resolve.status === 400) {
-            ipcSend('invalid')
-          }
-          if (resolve.status === 200) {
-            ipcSend('user-found', resolve)
-          }
-        })
-        .catch(err => console.log(err))
-    }
-  })
-
-  on('guestConfirm', async function (userID) { // TODO deprecate
-    // Saving Home folder to .songbasket-userdata
-    try {
-      console.log(`Fetching Playlists from Guest user ${userID}`)
-      handlers.guestFetch(userID, true)
-    } catch (err) { throw err }
-  })
-
   on('REFRESH', handlers.refresh)
 
   on('PLAYLISTS:LOAD_MORE', async () => {
@@ -72,18 +45,11 @@ export default function () {
 
   on('Youtube Convert', handlers.youtubize)
 
-  on('PLAYLISTS:QUEUE', async function (id) {
+  on('PLAYLISTS:QUEUE', async function (id: SpotifyPlaylistId) {
     await handlers.queuePlaylist(id)
   })
-  on('PLAYLISTS:UNSYNC', async function ({ id, listenerId }) {
-    let error
-    try {
-      await handlers.unsyncPlaylist(id)
-    } catch (err) {
-      error = err
-    } finally {
-      event.sender.send(listenerId, error)
-    }
+  on('PLAYLISTS:UNSYNC', async function ({ id }: { id: SpotifyPlaylistId }) {
+    await handlers.unsyncPlaylist(id)
   })
 
   on('PLAYLISTS:PAUSE', async function ({ id }) {

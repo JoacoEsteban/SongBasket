@@ -1,7 +1,7 @@
 import { SpotifyPlaylistId, SpotifyUser } from '../../@types/Spotify'
 import { YouTubeResultId } from '../../@types/YouTube'
 
-const makeUrl = (...paths) => paths.join('/')
+const makeUrl = (...paths: string[]) => paths.join('/')
 const PATHS = {
   makeUrl,
   get BASE () {
