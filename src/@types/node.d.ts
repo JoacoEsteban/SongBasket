@@ -1,3 +1,4 @@
+import * as NodeID3 from 'node-id3'
 import { SongbasketFoldersFile, SongBasketId } from './SongBasket'
 import { SpotifyUser } from './Spotify'
 
@@ -32,4 +33,24 @@ declare global {
       setPositionSafe: BrowserWindow['setPosition']
     }
   }
+}
+
+
+// declare module "node-id3" {
+//   namespace NodeID3 {
+//     interface Tags {
+//       userDefinedText?: ({
+//         description: string,
+//         value: string
+//       })[]
+//     }
+
+//   }
+// }
+
+export type Tags = NodeID3.Tags & {
+  userDefinedText?: ({
+    description: string,
+    value: string
+  })[]
 }

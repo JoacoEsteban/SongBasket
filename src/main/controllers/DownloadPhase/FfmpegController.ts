@@ -6,6 +6,7 @@ import * as NodeID3 from 'node-id3'
 import axios from 'axios'
 import { SpotifyTrack } from '../../../@types/Spotify'
 import { YouTubeResultId } from '../../../@types/YouTube'
+import { Tags } from '../../../@types/node'
 
 type progressEvent = {
   percent: number
@@ -38,12 +39,12 @@ export async function applyTags (pathmp3: string, data: SpotifyTrack, ytSelectio
     console.error('Error when getting track photo, applying tracks anyway')
   }
 
-  const tags: NodeID3.Tags = {
+  const tags: Tags = {
     title: data.name,
     // artist: data.artists.map(a => a.name).join(';'), // TODO Try multiple artists
     artist: data.artists[0].name,
     album: data.album.name,
-    userDefinedText: [{
+    userDefinedText: [{ // TODO fix type
       description: 'songbasket_spotify_id',
       value: data.id
     }, {
