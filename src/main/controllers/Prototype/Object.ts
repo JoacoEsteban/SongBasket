@@ -7,7 +7,11 @@ Object.defineProperty(Object, 'isObject', function (object: any) {
   return !!object && typeof object === 'object' && !Array.isArray(object)
 })
 
-Object.defineProperty(Object.prototype, 'isSameObject', function (object: Object) {
+Object.defineProperty(Object.prototype, 'isSameObject', function (this: {
+  [key: string]: any,
+}, object: {
+  [key: string]: any,
+}) {
   if (!this) throw new TypeError()
   if (!object) return false
 
