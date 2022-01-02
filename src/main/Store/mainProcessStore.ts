@@ -30,6 +30,7 @@ const getDefaultState: () => SongBasketSaveFile = () => {
   return {
     user: {
       country: '',
+      songbasket_id: null,
       display_name: '',
       email: '',
       external_urls: {

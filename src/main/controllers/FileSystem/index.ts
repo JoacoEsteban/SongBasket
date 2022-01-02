@@ -1,9 +1,9 @@
-import * as FileWatchers from './FileWatchers'
-import * as UserMethods from './UserMethods'
+import FileWatchers from './FileWatchers'
+import UserMethods from './UserMethods'
 
 const FSController = {
-  UserMethods: UserMethods.default,
-  FileWatchers: FileWatchers.default
+  UserMethods: UserMethods,
+  FileWatchers: FileWatchers
 }
 
 export default FSController
