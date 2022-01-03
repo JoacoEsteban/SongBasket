@@ -32,15 +32,28 @@ let rendererConfig = {
   module: {
     rules: [
       {
-        test: /\.(js|vue)$/,
-        enforce: 'pre',
-        exclude: /node_modules/,
+        test: /\.vue$/,
         use: {
-          loader: 'eslint-loader',
+          loader: 'vue-loader',
           options: {
-            formatter: require('eslint-friendly-formatter')
+            extractCSS: process.env.NODE_ENV === 'production',
+            loaders: {
+              sass: 'vue-style-loader!css-loader!sass-loader?indentedSyntax=1',
+              scss: 'vue-style-loader!css-loader!sass-loader',
+              less: 'vue-style-loader!css-loader!less-loader'
+            }
           }
         }
+      },
+      {
+        test: /\.[tj]s$/,
+        loader: 'ts-loader',
+        exclude: /node_modules/,
+        options: {
+          appendTsSuffixTo: [/\.vue$/],
+          // transpileOnly: true,
+        },
+        exclude: /node_modules/,
       },
       {
         test: /\.scss$/,
@@ -63,46 +76,8 @@ let rendererConfig = {
         use: 'vue-html-loader'
       },
       {
-        test: /\.ts$/,
-        loader: 'ts-loader',
-        options: { appendTsSuffixTo: [/\.vue$/] },
-        exclude: /node_modules/,
-      },
-      {
-        test: /\.js$/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            sourceMap: true,
-            compact: false,
-            presets: [
-              ['@babel/preset-env']
-            ],
-            'plugins': [
-              'syntax-dynamic-import',
-              '@babel/plugin-proposal-class-properties',
-            ]
-          },
-        },
-        exclude: /node_modules/
-      },
-      {
         test: /\.node$/,
         use: 'node-loader'
-      },
-      {
-        test: /\.vue$/,
-        use: {
-          loader: 'vue-loader',
-          options: {
-            extractCSS: process.env.NODE_ENV === 'production',
-            loaders: {
-              sass: 'vue-style-loader!css-loader!sass-loader?indentedSyntax=1',
-              scss: 'vue-style-loader!css-loader!sass-loader',
-              less: 'vue-style-loader!css-loader!less-loader'
-            }
-          }
-        }
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,

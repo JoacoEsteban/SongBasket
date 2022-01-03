@@ -20,15 +20,15 @@ export default function () {
   $(window).on('dblclick', checkToggleMaximization)
 }
 
-function checkToggleMaximization (e: JQueryEventObject) {
-  $(e.target).css('-webkit-app-region') === 'drag' && window.toggleMaximization()
+function checkToggleMaximization (e: Event) {
+  e.target && $(e.target).css('-webkit-app-region') === 'drag' && window.toggleMaximization()
 }
 
 function invalidatePlTransformCache () {
   vue.root.cardTransformInvalidation = Date.now()
 }
 
-function handleMetaKeyCombo (keyCode: number, e: JQueryEventObject) {
+function handleMetaKeyCombo (keyCode: number, e: Event) {
   const { shiftKey } = e
   switch (keyCode) {
     case 219:
@@ -64,7 +64,7 @@ function isCommandKey (meta: boolean, control: boolean) {
 }
 
 // eslint-disable-next-line no-undef
-function handleWindowKey (e: JQueryEventObject) {
+function handleWindowKey (e: Event) {
   const { keyCode, metaKey, ctrlKey } = e
   if (window.SHOW_KEYCODES) console.log(keyCode)
   if (isCommandKey(metaKey, ctrlKey) && keyCode !== 8) return handleMetaKeyCombo(keyCode, e)
@@ -75,7 +75,7 @@ function focusSearchbar () {
 }
 
 // eslint-disable-next-line no-undef
-function handleMouseKey (e: JQueryEventObject) {
+function handleMouseKey (e: Event) {
   const { button } = e
   switch (button) {
     case 3:
