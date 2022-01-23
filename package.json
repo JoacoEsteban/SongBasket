@@ -30,6 +30,7 @@
     "@fortawesome/vue-fontawesome": "^0.1.9",
     "@types/electron-positioner": "^4.1.1",
     "@types/he": "^1.1.2",
+    "@types/path-exists": "^4.0.2",
     "@types/to-ico": "^1.1.1",
     "axios": "^0.21.1",
     "bytenode": "^1.1.6",
