@@ -7,7 +7,7 @@ import * as QUERY_MAKER from '../../queryMaker'
 import VUEX_MAIN from '../../Store/mainProcessStore'
 import FSController from '../FileSystem'
 import ProtocolController from './protocol.controller'
-import { SpotifyPlaylist, SpotifyPlaylistId, SpotifySnapshotId, SpotifyUser } from '../../../@types/Spotify'
+import { SpotifyPlaylist, SpotifyPlaylistId, SpotifySnapshotId, SpotifyUser, SpotifyUserId } from '../../../@types/Spotify'
 import { SongBasketId, SongBasketLoggedUser, SongBasketTrack } from '../../../@types/SongBasket'
 import { BrowserWindow } from 'electron'
 
@@ -119,7 +119,7 @@ const core = {
 
     console.log('Login successfull')
   },
-  setCredentials: async (id: SpotifyUser['id'], songbasket_id: SongBasketId) => {
+  setCredentials: async (id: SpotifyUserId, songbasket_id: SongBasketId) => {
     await keytar.setPassword('songbasket', id, songbasket_id)
   },
   removeCredentials: async (id = global.USER_ID) => {

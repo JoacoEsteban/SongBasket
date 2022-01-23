@@ -1,12 +1,12 @@
 /* eslint-disable camelcase */
 import axios, { AxiosInstance } from 'axios'
-import { SongBasketTrack, SongBasketTrackQuery } from '../../../@types/SongBasket'
-import { SpotifyApiPlaylistsResponse, SpotifyPlaylist, SpotifyPlaylistId, SpotifySnapshotId, SpotifyUser } from '../../../@types/Spotify'
+import { SongBasketTrack } from '../../../@types/SongBasket'
+import { SpotifyApiPlaylistsResponse, SpotifyPlaylist, SpotifyPlaylistId, SpotifySnapshotId, SpotifyUser, SpotifyUserId } from '../../../@types/Spotify'
 import { YouTubeResult, YouTubeResultId } from '../../../@types/YouTube'
 
 import PATHS from '../../Global/PATHS'
 import REGEX from '../../Global/REGEX'
-const URL = PATHS.makeUrl
+// const URL = PATHS.makeUrl
 
 console.log('BACKEND: ', PATHS.BASE)
 
@@ -44,7 +44,7 @@ export const getMe = async (): Promise<SpotifyUser> => {
   return res.data
 }
 
-export const getUserPlaylists = async (user_id: SpotifyUser['id'], p: { offset: number | null } = { offset: null }) => {
+export const getUserPlaylists = async (user_id: SpotifyUserId, p: { offset: number | null } = { offset: null }) => {
   const params = {
     offset: p.offset || 0,
   }

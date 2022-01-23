@@ -19,6 +19,7 @@ export type PlaylistUser = {
   uri: string
 }
 
+export type SpotifyUserId = string
 export type SpotifyUser = {
   country: string,
   display_name: string,
@@ -33,7 +34,7 @@ export type SpotifyUser = {
     total: number
   },
   href: string,
-  id: string,
+  id: SpotifyUserId,
   images: Image[],
   product: string,
   type: string,
