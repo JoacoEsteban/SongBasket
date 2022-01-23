@@ -45,7 +45,7 @@ export type SongBasketCachedPlaylistEntry = {
 }
 
 export type SongBasketSaveFile = {
-  user: SongBasketLoggedUser,
+  user: SpotifyUser,
   playlists: SpotifyPlaylist[],
   syncedPlaylists: SpotifyPlaylistId[],
   queuedPlaylists: SpotifyPlaylistId[],

@@ -107,8 +107,10 @@ const core = {
     await core.setCredentials(user_data.id, user_data.songbasket_id)
     await core.setSongbasketIdGlobally(user_data.id)
 
-    user_data.songbasket_id = null
-    core.setUser(user_data)
+    const userSafe: any = user_data as any
+    delete userSafe.songbasket_id // TODO find better-looking way to do this
+
+    core.setUser(userSafe as SpotifyUser)
 
     // await global.CONSTANTS.LOGIN_WINDOW.loadURL(`file://${process.cwd()}/src/renderer/landings/after-login-loading.html`)
     await core.updateAll()
@@ -134,7 +136,7 @@ const core = {
     global.SONGBASKET_ID = await core.getCredentials()
     API.createAxiosInstance()
   },
-  setUser: (userData: SongBasketLoggedUser) => {
+  setUser: (userData: SpotifyUser) => {
     VUEX_MAIN.COMMIT.SET_USER(userData)
   },
   updateAll: async (params: { playlistCompletionCallback: CompletionCb | null } = { playlistCompletionCallback: null }) => {
