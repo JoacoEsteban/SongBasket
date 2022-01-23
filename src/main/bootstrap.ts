@@ -69,7 +69,7 @@ export default async () => {
       WindowController.createLoadingWindow()
 
       global.CONSTANTS.ENV_PROD && updater.init()
-      protocolController.startProtocols(electron)
+      protocolController.startProtocols()
       connectionController.init({
         connectionChangeCallback: (value: boolean) => {
           global.ipcSend('CONNECTION:CHANGE', value)
