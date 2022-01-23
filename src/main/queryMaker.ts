@@ -2,26 +2,29 @@ import { SongBasketTrack, SongBasketTrackQuery } from '../@types/SongBasket'
 import { SpotifyPlaylist } from '../@types/Spotify'
 import customGetters from './Store/Helpers/customGetters'
 
-let ALL_PLAYLISTS: SpotifyPlaylist[] = []
+type _Playlist = (SpotifyPlaylist & { synced: boolean })
+let ALL_PLAYLISTS: _Playlist[] = []
 let ALL_TRACKS: SongBasketTrack[] = []
 
 export function makeConversionQueries (): SongBasketTrack[] {
-  let syncedPlaylists = customGetters.SyncedPlaylistsSp().map(pl => {
+  let syncedPlaylists: _Playlist[] = customGetters.SyncedPlaylistsSp().map(pl => {
     if (pl.isPaused) return null
     return {
       ...pl,
       synced: true
     }
-  }).filter(pl => pl)
-  let queuedPlaylists = customGetters.queuedPlaylistsObj().map(pl => {
-    pl.synced = false
-    return pl
+  }).filter(Boolean) as _Playlist[]
+  let queuedPlaylists: _Playlist[] = customGetters.queuedPlaylistsObj().map(pl => {
+    return {
+      ...pl,
+      synced: false
+    }
   })
-  if (!(queuedPlaylists.length + syncedPlaylists.length)) return
+  if (!(queuedPlaylists.length + syncedPlaylists.length)) return []
 
   ALL_PLAYLISTS = [...syncedPlaylists, ...queuedPlaylists]
   ALL_TRACKS = customGetters.convertedTracks()
-  if (!findDuplicatedTracks() && !ALL_TRACKS.some(track => track.flags.conversionError)) throw new Error('NOTHING')
+  if (!findDuplicatedTracks() && !ALL_TRACKS.some(track => track.flags.conversionError)) throw new Error('NOTHING') // TODO replace error throw with something else
 
   makeQueries()
 
@@ -52,7 +55,7 @@ function findDuplicatedTracks () {
     // TODO Turn into for...of array.entries()
     for (let o = 0; o < playlist.tracks.length; o++) {
       const dirtyTrack = playlist.tracks[o]
-      let found = false
+      let found: boolean | number = false
       for (let u = 0; u < ALL_TRACKS.length; u++) {
         let cleanTrack = ALL_TRACKS[u]
         if (dirtyTrack.id === cleanTrack.id) {
@@ -83,7 +86,9 @@ function findDuplicatedTracks () {
           flags: {
             converted: false,
             conversionError: false,
-            processed: false
+            processed: false,
+            paused: false,
+            selectionIsApplied: false,
           },
           duration: null
         })

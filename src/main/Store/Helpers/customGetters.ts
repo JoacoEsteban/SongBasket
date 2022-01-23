@@ -80,8 +80,8 @@ export default {
   anythingToConvert () {
 
   },
-  queuedPlaylistsObj: () => {
+  queuedPlaylistsObj (): SpotifyPlaylist[] {
     const state = store.state
-    return state.queuedPlaylists.map(id => state.playlists.find(pl => pl.id === id))
+    return state.queuedPlaylists.map(id => state.playlists.find(pl => pl.id === id)!).filter(Boolean)
   }
 }
