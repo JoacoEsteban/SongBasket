@@ -10,16 +10,8 @@ import { SongbasketCustomMp3Tag, SongbasketCustomMp3TagNormalized, SongbasketCus
 import { SpotifyTrackId } from '../../../@types/Spotify'
 import { YouTubeResultId } from '../../../@types/YouTube'
 
-type NormalizedTagMap = {
-  [key in SongbasketCustomMp3TagsNormalized]?: string
-}
-export type TrackList = {
-  [key: SpotifyTrackId]: {
-    [key: YouTubeResultId]: {
-      playlists: string[]
-    }
-  }
-}
+type NormalizedTagMap = Record<SongbasketCustomMp3TagsNormalized, string | null>
+export type TrackList = Record<SpotifyTrackId, Record<YouTubeResultId, { playlists: string[] }>>
 export type TrackFileEntry = NormalizedTagMap & { playlist: string }
 export enum FSWatcherEvent {
   ADD = 'add',
@@ -119,11 +111,10 @@ const FileWatchers: {
   },
   async retrieveTags (path) {
     const tags = await UserMethods.retrieveMP3FileTags(path)
-    if (!tags.length) return {}
-
-    const normalized: {
-      [key in SongbasketCustomMp3TagsNormalized]?: string
-    } = {}
+    const normalized: NormalizedTagMap = {
+      spotify_id: null,
+      youtube_id: null,
+    }
 
     tags.forEach(tag => {
       const normalizedTagName = ((tagName) => {
