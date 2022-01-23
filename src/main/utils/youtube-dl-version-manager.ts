@@ -3,7 +3,7 @@ import * as youtubeDl from 'youtube-dl'
 import * as PATH from 'path'
 import { promises as fs, createWriteStream } from 'fs'
 import axios from 'axios'
-import { YouTubeDlAssetName } from '../../@types/Lib'
+import { YoutubeDlVersionApiResponse, YouTubeDlAssetName, YoutubeDlVersionAsset } from '../../@types/Lib'
 import { Platform } from '../../@types/App'
 
 class YoutubeDlVersionManager {
@@ -12,7 +12,7 @@ class YoutubeDlVersionManager {
   binariesPath = global.CONSTANTS.YTDL_BINARIES_PATH
   versionControlPath = global.CONSTANTS.YTDL_VERSION_CONTROL_PATH
   assetName: YouTubeDlAssetName = (() => {
-    switch (global.CONSTANTS.PLATFORM as Platform) {
+    switch (global.CONSTANTS.PLATFORM) {
       case Platform.windows:
         return YouTubeDlAssetName.windows
       case Platform.mac:
@@ -23,6 +23,8 @@ class YoutubeDlVersionManager {
         return YouTubeDlAssetName.linux
     }
   })()
+  localVersion: YoutubeDlVersionApiResponse | null = null
+  latestVersion: YoutubeDlVersionApiResponse | null = null
 
   // constructor () { }
 
@@ -35,7 +37,8 @@ class YoutubeDlVersionManager {
     }
 
     const jsonExists = !!this.localVersion
-    const binaryExists = await global.pathExists(this.getBinaryPath())
+    const asset = this.getLocalAsset()
+    const binaryExists = asset && await global.pathExists(this.getBinaryPath(asset) || '')
 
     if (jsonExists ? !binaryExists : binaryExists) { // XOR
       console.log('youtube-dl ' + (jsonExists ? 'Binary' : 'JSON') + ' doesn\'t exist, wiping both')
@@ -50,21 +53,22 @@ class YoutubeDlVersionManager {
     this.localVersion = null
   }
 
-  async wipeBinary (binaryPath = this.getBinaryPath()) {
+  async wipeBinary (binaryPath: string) {
     fs.unlink(binaryPath).catch(global.emptyFn)
   }
 
-  async wipeAll (binaryPath) {
-    await Promise.all([
-      this.wipeVersionInfo(),
-      this.wipeBinary(binaryPath)
-    ])
+  async wipeAll (binaryPath?: string) {
+    const promiseList = []
+    promiseList.push(this.wipeVersionInfo())
+    binaryPath && promiseList.push(this.wipeBinary(binaryPath))
+
+    await Promise.all(promiseList)
   }
 
   async findLatestVersion () {
     console.log('Finding youtube-dl latest version info')
     try {
-      this.latestVersion = (await this.fetch(this.apiUrl))?.data
+      this.latestVersion = ((await this.fetch(this.apiUrl))?.data as YoutubeDlVersionApiResponse)
     } catch (error) {
       this.latestVersion = null
       console.error('UNABLE TO RETRIEVE LATEST YOUTUBE-DL VERSION:\n', error)
@@ -87,8 +91,8 @@ class YoutubeDlVersionManager {
     return this.localVersion?.id !== this.latestVersion?.id
   }
   // ---------------------
-  getBinaryPath (asset = this.getLocalAsset()) {
-    return asset && PATH.join(this.binariesPath, asset.name)
+  getBinaryPath (asset: YoutubeDlVersionAsset): string {
+    return PATH.join(this.binariesPath, asset.name)
   }
   getLocalAsset () {
     return this.localVersion?.assets.find(({ name }) => name === this.assetName)
@@ -98,7 +102,7 @@ class YoutubeDlVersionManager {
   }
 
   async update () {
-    console.log('about to update youtube-dl from', this.localVersion?.id || '?', 'to', this.latestVersion.id)
+    console.log('about to update youtube-dl from', this.localVersion?.id || '?', 'to', this.latestVersion?.id || '?')
     const asset = this.getLatestAsset()
     if (!asset) throw new Error('YOUTUBE-DL RELEASE ASSET NOT FOUND')
 
@@ -132,12 +136,13 @@ class YoutubeDlVersionManager {
   }
 
   async setExecutionPermissions () {
-    if (global.CONSTANTS.PLATFORM !== 'windows') {
+    if (global.CONSTANTS.PLATFORM !== Platform.windows) {
       try {
         console.log('setting execution permissions to yt-dl binary')
-        const binPath = this.getBinaryPath()
+        const asset = this.getLocalAsset()
+        const binPath = asset && this.getBinaryPath(asset)
         if (!binPath) throw new Error('NO BINARY PATH')
-        await new Promise((resolve, reject) => global.sudo.exec('chmod +x ' + `"${binPath}"`, { name: 'SongBasket' }, error => error ? reject(error) : resolve()))
+        await new Promise<void>((resolve, reject) => global.sudo.exec('chmod +x ' + `"${binPath}"`, { name: 'SongBasket' }, (error: Error) => error ? reject(error) : resolve()))
         console.log('execution permissions set to yt-dl binary')
       } catch (error) {
         console.error('ERROR SETTING EXECUTION PERMISSIONS', error)
@@ -152,8 +157,11 @@ class YoutubeDlVersionManager {
     this.updateLibraryPaths()
   }
   updateLibraryPaths () {
-    console.log('\n\nsetting youtube binary ', this.getBinaryPath())
-    youtubeDl.setYtdlBinary(this.getBinaryPath())
+    const asset = this.getLocalAsset()
+    if (!asset) throw new Error('NO YOUTUBE-DL ASSET FOUND')
+
+    console.log('\n\nsetting youtube binary ', this.getBinaryPath(asset))
+    youtubeDl.setYtdlBinary(this.getBinaryPath(asset))
   }
 }
 
