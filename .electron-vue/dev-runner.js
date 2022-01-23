@@ -160,14 +160,14 @@ function greeting () {
   const cols = process.stdout.columns
   let text = ''
 
-  if (cols > 104) text = 'electron-vue'
-  else if (cols > 76) text = 'electron-|vue'
+  if (cols > 180) text = 'songbasket'
+  else if (cols > 155) text = 'song|basket'
   else text = false
 
   if (text) {
     say(text, {
-      colors: ['yellow'],
-      font: 'simple3d',
+      colors: ['#9900cc', 'gray'],
+      font: '3d',
       space: false
     })
   } else console.log(chalk.yellow.bold('\n  electron-vue'))
