@@ -44,7 +44,7 @@ export async function applyTags (pathmp3: string, data: SpotifyTrack, ytSelectio
     // artist: data.artists.map(a => a.name).join(';'), // TODO Try multiple artists
     artist: data.artists[0].name,
     album: data.album.name,
-    userDefinedText: [{ // TODO fix type
+    userDefinedText: [{
       description: 'songbasket_spotify_id',
       value: data.id
     }, {

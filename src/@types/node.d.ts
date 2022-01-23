@@ -35,22 +35,9 @@ declare global {
   }
 }
 
-
-// declare module "node-id3" {
-//   namespace NodeID3 {
-//     interface Tags {
-//       userDefinedText?: ({
-//         description: string,
-//         value: string
-//       })[]
-//     }
-
-//   }
-// }
-
-export type Tags = NodeID3.Tags & {
-  userDefinedText?: ({
+export type Tags = Modify<NodeID3.Tags, {
+  userDefinedText?: Array<{
     description: string,
     value: string
-  })[]
-}
+  }>
+}>
