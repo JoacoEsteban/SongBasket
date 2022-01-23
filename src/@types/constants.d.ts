@@ -26,11 +26,11 @@ export type Constants = {
       selected: null | string
     },
     UPDATES: {
-      updateError: null,
+      updateError: Error | null,
       updateAvailable: boolean,
-      updateVersion: null,
+      updateVersion: string | null,
       downloadInProgress: boolean,
-      downloadPtg: null,
+      downloadPtg: number,
       updateDownloaded: boolean
     }
   },

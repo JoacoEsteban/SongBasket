@@ -1,6 +1,6 @@
 import * as handlers from './handlers'
 
-import { autoUpdater } from 'electron-updater'
+import { autoUpdater, ProgressInfo, UpdateDownloadedEvent, UpdateInfo } from 'electron-updater'
 import { dialog } from 'electron'
 const FLAGS = global.CONSTANTS.APP_STATUS.UPDATES
 
@@ -13,7 +13,7 @@ function resetFlags () {
   FLAGS.updateAvailable = false
   FLAGS.updateVersion = null
   FLAGS.downloadInProgress = false
-  FLAGS.downloadPtg = null
+  FLAGS.downloadPtg = 0
   FLAGS.updateDownloaded = false
 }
 
@@ -33,7 +33,7 @@ const setEventListeners = async () => {
   }
 }
 
-const onError = error => {
+const onError = (error: Error) => {
   console.error('ERROR UPDATING', error)
   FLAGS.updateError = error
 }
@@ -42,29 +42,29 @@ const onCheckingForUpdate = () => {
   console.log('checking for update')
   resetFlags()
 }
-const onUpdateAvailable = info => {
+const onUpdateAvailable = (info: UpdateInfo) => {
   console.log('update available')
   FLAGS.updateAvailable = true
   FLAGS.updateVersion = info.version
 }
-const onUpdateNotAvailable = info => {
+const onUpdateNotAvailable = () => {
   resetFlags()
   console.log('update NOT available')
 }
-const onDownloadProgress = progressObj => {
+const onDownloadProgress = (progressObj: ProgressInfo) => {
   FLAGS.downloadInProgress = true
-  FLAGS.updatePtg = progressObj.percent
+  FLAGS.downloadPtg = progressObj.percent
 }
-const onUpdateDownloaded = async info => {
+const onUpdateDownloaded = async (info: UpdateDownloadedEvent) => {
   FLAGS.downloadInProgress = false
   FLAGS.updateDownloaded = true
-  FLAGS.updatePtg = 100
+  FLAGS.downloadPtg = 100
 
   // ipcSend('READY_TO_UPDATE', FLAGS)
   const message = `Version ${FLAGS.updateVersion} has been downloaded\nDo you want to install it now?`
-  const res = await dialog.showMessageBox(global.CONSTANTS.MAIN_WINDOW, { message, buttons: ['Yes', 'No', 'See changelog'] })
+  const res = global.CONSTANTS.MAIN_WINDOW && await dialog.showMessageBox(global.CONSTANTS.MAIN_WINDOW, { message, buttons: ['Yes', 'No', 'See changelog'] })
   console.log(res)
-  switch (res.response) {
+  switch (res && res.response) {
     case 0:
       // Yes
       onUserUpdateConfirmation()
@@ -75,6 +75,9 @@ const onUpdateDownloaded = async info => {
     case 2:
       // See changelog
       handlers.showChangelog()
+      break
+    case null:
+      // TODO MAIN_WINDOW is null, handle this
       break
   }
 }

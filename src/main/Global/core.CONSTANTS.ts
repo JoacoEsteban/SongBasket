@@ -33,7 +33,7 @@ export default global.CONSTANTS = {
       updateAvailable: false,
       updateVersion: null,
       downloadInProgress: false,
-      downloadPtg: null,
+      downloadPtg: 0,
       updateDownloaded: false
     }
   },
