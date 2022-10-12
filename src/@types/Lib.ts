@@ -5,6 +5,12 @@ export enum YouTubeDlAssetName {
   linux = 'youtube-dl',
 }
 
+export enum YtDlpAssetName {
+  windows = 'yt-dlp.exe',
+  mac = 'yt-dlp_macos',
+  linux = 'yt-dlp_linux',
+}
+
 export type YoutubeDlVersionAsset = {
   url: string,
   id: number,

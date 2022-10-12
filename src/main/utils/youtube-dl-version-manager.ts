@@ -7,7 +7,7 @@ import { YoutubeDlVersionApiResponse, YouTubeDlAssetName, YoutubeDlVersionAsset 
 import { Platform } from '../../@types/App'
 
 class YoutubeDlVersionManager {
-  apiUrl = 'https://api.github.com/repos/ytdl-org/youtube-dl/releases/latest'
+  apiUrl = 'https://api.github.com/repos/ytdl-org/youtube-dl/releases/latest' // 'https://api.github.com/repos/yt-dlp/yt-dlp/releases/latest'
   fetch = axios.get
   binariesPath = global.CONSTANTS.YTDL_BINARIES_PATH
   versionControlPath = global.CONSTANTS.YTDL_VERSION_CONTROL_PATH
