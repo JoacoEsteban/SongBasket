@@ -34,7 +34,7 @@ import Card from '../Generic/Card.vue'
 export default {
   props: {
     item: {
-      Object,
+      type: Object,
       required: true
     },
     isNew: Boolean,
