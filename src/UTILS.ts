@@ -1,4 +1,4 @@
-exports.dateFormatter = (dateParam) => {
+export const dateFormatter = (dateParam: string | number | Date) => {
   const now = new Date()
   dateParam = new Date(dateParam)
   const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']

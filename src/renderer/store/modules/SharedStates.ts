@@ -29,7 +29,7 @@ const state = getDefaultState()
 
 const actions = {
   SETUP_LOADING_STATE ({ commit }, loadingState) {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       commit('SETUP_LOADING_STATE', loadingState)
       resolve()
     })
@@ -41,19 +41,19 @@ const actions = {
     commit('SET', { key: 'CONNECTED_TO_API', value })
   },
   openModal ({ commit }, options) {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       commit('OPEN_MODAL', options)
       resolve()
     })
   },
   closeModal ({ commit }) {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       commit('CLOSE_MODAL')
       resolve()
     })
   },
   downloadChunk ({ commit }, { id, current, size }) {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       commit('DOWNLOAD_CHUNK', { id, current, size })
       resolve()
     })

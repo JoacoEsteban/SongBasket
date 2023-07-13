@@ -75,7 +75,7 @@ function focusSearchbar () {
 }
 
 // eslint-disable-next-line no-undef
-function handleMouseKey (e: Event) {
+function handleMouseKey (e: MouseEvent) {
   const { button } = e
   switch (button) {
     case 3:
