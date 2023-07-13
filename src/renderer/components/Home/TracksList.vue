@@ -5,16 +5,13 @@
         No Tracks found
       </div>
       <div class="list row">
-        <Track v-for="track in tracksFiltered ? tracksFiltered : tracks"
-        :item="track"
-        :key="track.id"
-        />
+        <Track v-for="track in tracksFiltered ? tracksFiltered : tracks" :item="track" :key="track.id" />
       </div>
     </div>
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import Track from './PlaylistView/Track.vue'
 
 export default {
@@ -117,8 +114,8 @@ export default {
       this.noTracks = noTracks
     },
     filterFn (track, txt) {
-      const {name, artists} = track.data
-      return [name, ...artists.map(({name}) => name)].some(token => token.toLowerCase().includes(txt))
+      const { name, artists } = track.data
+      return [name, ...artists.map(({ name }) => name)].some(token => token.toLowerCase().includes(txt))
     }
   },
   mounted () {
@@ -150,11 +147,13 @@ $bezier-chill: cubic-bezier(0, 1, .5, 1);
   padding: var(--container-padding-x) 0;
   padding-top: 0;
 }
+
 .actual-list {
-   > .list {
+  >.list {
     padding: 0 var(--padding-x);
   }
 }
+
 .filters-container {
   pointer-events: none;
   padding: .5em;
@@ -162,6 +161,7 @@ $bezier-chill: cubic-bezier(0, 1, .5, 1);
   position: sticky;
   top: 0;
   z-index: 1;
+
   .filters-background {
     background: linear-gradient(180deg, var(--global-grey-secondary), transparent);
     position: absolute;
@@ -171,17 +171,21 @@ $bezier-chill: cubic-bezier(0, 1, .5, 1);
     bottom: 0;
     z-index: -1;
   }
+
   .filters-content {
     display: flex;
     align-items: center;
     justify-content: space-between;
     // padding: 0 1em;
   }
+
   .search-bar {
     pointer-events: all;
+
     .filters-background {
       background: var(--global-grey-secondary);
     }
+
     position: relative;
     overflow: hidden;
     display: flex;
@@ -191,14 +195,15 @@ $bezier-chill: cubic-bezier(0, 1, .5, 1);
     padding-right: .2em;
   }
 }
+
 .no-playlists {
   margin: 4em 0;
 }
+
 .background-container {
   position: sticky;
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
-}
-</style>
+}</style>

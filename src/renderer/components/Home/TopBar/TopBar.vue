@@ -1,5 +1,5 @@
 <template>
-  <div class="tb-container window-drag-recursive" :class="{'showing-loading-bar': showingLoadingBar}">
+  <div class="tb-container window-drag-recursive" :class="{ 'showing-loading-bar': showingLoadingBar }">
     <div class="drop-shadow abs-full show-on-scroll"></div>
     <div class="drop-gradient abs-full hide-on-scroll"></div>
 
@@ -19,15 +19,15 @@
       </div>
 
       <div class="tb-mid-section title-section df aliic jucc">
-        <div class="navigation-btn left window-nodrag" :class="{show: showPrevBtn}"  @click="navigationBack">
+        <div class="navigation-btn left window-nodrag" :class="{ show: showPrevBtn }" @click="navigationBack">
           <font-awesome-icon size="xs" icon="arrow-left" />
         </div>
         <div class="status-container">
           <span>
-            {{status}}
+            {{ status }}
           </span>
         </div>
-        <div class="navigation-btn right window-nodrag" :class="{show: showForwBtn}" @click="navigationForw">
+        <div class="navigation-btn right window-nodrag" :class="{ show: showForwBtn }" @click="navigationForw">
           <font-awesome-icon size="xs" icon="arrow-right" />
         </div>
       </div>
@@ -49,36 +49,36 @@
       </div>
     </div>
 
-    <div class="bar-slider-container h-fc rel-full df" :style="{'--position-ptg': sliderPosition + '%', '--animation-duration': loadingBar.animationDuration + 'ms'}">
+    <div class="bar-slider-container h-fc rel-full df"
+      :style="{ '--position-ptg': sliderPosition + '%', '--animation-duration': loadingBar.animationDuration + 'ms' }">
       <div class="df fldc aliend bar-slide h-fc show">
         <div class="section-switcher-container">
           <div class="section-switcher-list">
-            <div class="section-switch window-nodrag" v-for="(section, index) in sections" :key="index" :class="{active: activeSection === section.id}">
+            <div class="section-switch window-nodrag" v-for="(section, index) in sections" :key="index"
+              :class="{ active: activeSection === section.id }">
               <span class="section-title semibold" @click="section.cb">
-                {{section.title}}
+                {{ section.title }}
               </span>
             </div>
           </div>
         </div>
       </div>
-      <playlist-view-slide :class="{show: currentPath === 'playlist-view'}" class="bar-slide" style="--slide-height: 6em;"></playlist-view-slide>
-      <track-review-slide :class="{show: currentPath === 'track-review'}" class="bar-slide hidden-of" style="--slide-height: 10em;"></track-review-slide>
-      <downloads-view-slide :class="{show: currentPath === 'downloads-view'}" class="bar-slide"></downloads-view-slide>
+      <playlist-view-slide :class="{ show: currentPath === 'playlist-view' }" class="bar-slide"
+        style="--slide-height: 6em;"></playlist-view-slide>
+      <track-review-slide :class="{ show: currentPath === 'track-review' }" class="bar-slide hidden-of"
+        style="--slide-height: 10em;"></track-review-slide>
+      <downloads-view-slide :class="{ show: currentPath === 'downloads-view' }" class="bar-slide"></downloads-view-slide>
     </div>
 
 
-    <div class="loading-bar"
-      ref="loadingbar"
-      :style="{'--ptg': loadingBar.ptg}"
-      :class="loadingBar.classList"
-    >
+    <div class="loading-bar" ref="loadingbar" :style="{ '--ptg': loadingBar.ptg }" :class="loadingBar.classList">
       <div class="actual-loading-bar gradient-background-cycle-less">
       </div>
     </div>
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { dateFormatter } from '../../../utils.ts'
 
 import PlaylistViewSlide from './slides/PlaylistViewSlide.vue'
@@ -248,10 +248,12 @@ export default {
       })
     },
     goTo (where) {
-      this.$root.$sbRouter.push({name: 'home',
+      this.$root.$sbRouter.push({
+        name: 'home',
         params: {
           which: where
-        }})
+        }
+      })
     }
   }
 }
@@ -278,12 +280,14 @@ $loading-bar-height: 3px;
   // height: $tb-height;
   transition: height var(--ts-g);
   transition-timing-function: var(--bezier-symmetric);
+
   &.showing-loading-bar {
     .bar-slide {
       overflow: hidden;
     }
   }
 }
+
 .title-bar-container {
   z-index: 1;
   height: $tb-title-height;
@@ -293,17 +297,21 @@ $loading-bar-height: 3px;
   .title-section {
     width: 100%;
     display: flex;
+
     &:nth-child(1) {
       justify-content: flex-start
     }
+
     &:nth-child(2) {
       justify-content: center
     }
+
     &:nth-child(3) {
       justify-content: flex-end
     }
   }
 }
+
 .drop-gradient {
   bottom: -200%;
   top: 100%;
@@ -311,6 +319,7 @@ $loading-bar-height: 3px;
   background: linear-gradient(to bottom, var(--global-grey-secondary), transparent);
   opacity: var(--scroll-opacity-inverted);
 }
+
 .drop-shadow {
   top: 100%;
   bottom: -120%;
@@ -322,6 +331,7 @@ $loading-bar-height: 3px;
   padding-top: .25em;
   min-width: 50%;
   bottom: initial;
+
   .status-container {
     font-size: 0.5em;
     // pointer-events: none;
@@ -339,9 +349,11 @@ $loading-bar-height: 3px;
   box-sizing: border-box;
   transition: height var(--top-bar-slider-transition);
   height: var(--slide-height);
+
   &:not(.show) {
     --slide-height: 0 !important;
   }
+
   &.hidden-of {
     overflow: hidden;
   }
@@ -358,17 +370,21 @@ $loading-bar-height: 3px;
   // $transition: var(--animation-duration) var(--bezier-chill);
   $transition: var(--ts-g);
   transition: left $transition, right $transition, width $transition;
+
   .actual-loading-bar {
     height: $loading-bar-height;
     width: 100%;
   }
+
   --ptg: 0%;
   width: var(--ptg);
+
   &.show {
     &.static {
-      left:0;
+      left: 0;
       width: 100%;
     }
+
     &.dynamic {
       .actual-loading-bar {
         animation: none;
@@ -376,10 +392,12 @@ $loading-bar-height: 3px;
       }
     }
   }
+
   &.hide {
     left: 100%;
     width: 100%;
   }
+
   &.kill {
     opacity: 0;
   }
@@ -389,31 +407,39 @@ $loading-bar-height: 3px;
   margin: 1em var(--container-padding-x);
   // margin-top: 1em;
 }
+
 .section-switcher-list {
   display: flex;
   align-items: flex-end;
 }
+
 .section-switch {
   margin-left: .3em;
   cursor: pointer;
   opacity: 0.5;
+
   span.section-title {
     font-size: .75em;
     line-height: 1;
     transition: font-size var(--ts-g);
   }
+
   transition: var(--hover-n-active-transitions);
+
   &:not(.active) {
     &:hover {
       opacity: 0.8;
     }
+
     &:active {
       opacity: 0.5;
       transform: scale(.98);
     }
   }
+
   &.active {
     opacity: 1;
+
     span.section-title {
       font-size: 1.25em;
     }
@@ -424,13 +450,17 @@ $loading-bar-height: 3px;
   cursor: pointer;
   display: flex;
   $m: .5em;
+
   &.right {
     margin-left: $m;
   }
+
   &.left {
     margin-right: $m;
   }
-  transition: opacity var(--ts-g), transform var(--ts-g);
+
+  transition: opacity var(--ts-g),
+  transform var(--ts-g);
 
   opacity: .1;
   transform: scale(.8);
@@ -440,6 +470,7 @@ $loading-bar-height: 3px;
     transform: scale(1);
   }
 }
+
 .global-search-bar-container {
   position: absolute;
   $h: 4em;
@@ -447,5 +478,4 @@ $loading-bar-height: 3px;
   height: $h;
   bottom: -$h;
   outline: 1px solid red;
-}
-</style>
+}</style>

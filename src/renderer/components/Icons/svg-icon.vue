@@ -1,10 +1,10 @@
 <template>
-    <svg :style="'width: 1em; height: 1em; fill: ' + colorLocal">
-        <path :d="path" />
-    </svg>
+  <svg :style="'width: 1em; height: 1em; fill: ' + colorLocal">
+    <path :d="path" />
+  </svg>
 </template>
 
-<script>
+<script lang="ts">
 export default {
   props: {
     path: {
@@ -29,6 +29,4 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

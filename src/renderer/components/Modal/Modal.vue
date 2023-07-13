@@ -1,16 +1,16 @@
 <template>
   <div v-show="!(!transitioning && !showLocal)" class="modal-wrapper">
-    <div :class="{'show': showLocal}" class="modal-container">
+    <div :class="{ 'show': showLocal }" class="modal-container">
       <div class="content box-shadow">
         <modal-loader @close="close" />
       </div>
     </div>
-    <div @click="close" :class="{'show': showLocal}" class="dark-body" />
+    <div @click="close" :class="{ 'show': showLocal }" class="dark-body" />
   </div>
 </template>
 
-<script>
-import ModalLoader from './ModalLoader'
+<script lang="ts">
+import ModalLoader from './ModalLoader.vue'
 export default {
   data () {
     return {
@@ -29,7 +29,7 @@ export default {
       this.$root.$(window).off('keyup', this.onKeyUp)
       this.$store._actions.closeModal[0]()
     },
-    onKeyUp ({key}) {
+    onKeyUp ({ key }) {
       return key === 'Escape' ? this.close() : null
     }
   },
@@ -58,6 +58,7 @@ export default {
 
 <style lang="scss">
 $tst: var(--ts-g);
+
 .modal-wrapper {
   position: fixed;
   top: 0;
@@ -65,6 +66,7 @@ $tst: var(--ts-g);
   right: 0;
   bottom: 0;
   z-index: 1;
+
   .modal-container {
     position: absolute;
     display: flex;
@@ -86,6 +88,7 @@ $tst: var(--ts-g);
       transform: scale(1);
     }
   }
+
   .dark-body {
     position: relative;
     height: 100%;
@@ -98,24 +101,27 @@ $tst: var(--ts-g);
     opacity: 0;
 
     &.show {
-        opacity: .8;
+      opacity: .8;
     }
   }
+
   .content {
     background-color: var(--global-grey-secondary);
     pointer-events: all;
     border-radius: .2em;
   }
+
   .modal-body {
     font-size: .7em;
   }
+
   .modal-controls {
     margin-top: 1em;
+
     .button {
       margin: 0 .3em;
       min-width: 11em;
     }
+  }
 }
-}
-
 </style>

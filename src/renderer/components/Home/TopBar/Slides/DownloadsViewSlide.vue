@@ -6,16 +6,16 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
 
 }
 </script>
 
 <style lang="scss" scoped>
-  .downloads-view-slide-container {
-    padding-top: var(--tb-title-height);
-    padding-right: 1em;
-    text-align: right;
-  }
+.downloads-view-slide-container {
+  padding-top: var(--tb-title-height);
+  padding-right: 1em;
+  text-align: right;
+}
 </style>

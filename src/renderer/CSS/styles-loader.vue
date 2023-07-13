@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 import './Bootstrap/bootstrap.css'
 import './fonts.css'
 import './user-select.css'

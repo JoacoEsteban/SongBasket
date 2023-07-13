@@ -2,12 +2,13 @@
   <div class="plv-container w100">
     <div class="track-list row hideable-container" :class="listAnimationClass">
 
-      <div class="changes-container" :class="{show: showingChanges}" :style="{'--changes-height': changesHeightFormmated}">
+      <div class="changes-container" :class="{ show: showingChanges }"
+        :style="{ '--changes-height': changesHeightFormmated }">
         <div class="pb-1" v-if="added.length">
           <div class="list">
             <div class="label-container">
               <span class="point75-em">
-                Added <span class="color-green">+{{added.length}}</span>
+                Added <span class="color-green">+{{ added.length }}</span>
               </span>
             </div>
           </div>
@@ -20,7 +21,7 @@
           <div class="list">
             <div class="label-container">
               <span class="point75-em">
-                Removed <span class="color-red">-{{removed.length}}</span>
+                Removed <span class="color-red">-{{ removed.length }}</span>
               </span>
             </div>
           </div>
@@ -32,15 +33,14 @@
 
       <div class="list">
         <Track v-for="(item, index) in (iterableItemsFiltered || iterableItems)" :item="item" :key="index"
-          @review-track="reviewTrack(item)"
-        />
+          @review-track="reviewTrack(item)" />
       </div>
     </div>
   </div>
 </template>
 
-<script>
-import Track from './Track'
+<script lang="ts">
+import Track from './Track.vue'
 
 export default {
   data () {
@@ -132,7 +132,7 @@ export default {
       this.calcChangesHeight()
     },
     playlistUnsynced () {
-      this.$root.$sbRouter.push({name: 'home', params: {which: 'playlists-list'}})
+      this.$root.$sbRouter.push({ name: 'home', params: { which: 'playlists-list' } })
     },
     searchInput () {
       if (!this.isMounted()) return
@@ -214,8 +214,8 @@ export default {
       this.noTracks = noTracks
     },
     filterFn (track, txt) {
-      const {name, artists} = track.data || track
-      return [name, ...artists.map(({name}) => name)].some(token => token.toLowerCase().includes(txt))
+      const { name, artists } = track.data || track
+      return [name, ...artists.map(({ name }) => name)].some(token => token.toLowerCase().includes(txt))
     }
   }
 }
@@ -230,6 +230,7 @@ export default {
   padding: var(--padding-x) 0;
   padding-top: 0;
   box-sizing: border-box;
+
   .list {
     padding: 0 var(--padding-x);
   }
@@ -242,13 +243,19 @@ export default {
     text-align: left;
     padding-left: calc(.3em + var(--card-padding-x));
   }
+
   --changes-height: 0px;
   height: var(--changes-height);
   opacity: 0;
-  &, * {
+
+  &,
+  * {
     box-sizing: border-box;
   }
-  transition: var(--hover-n-active-transitions), height var(--ts-g);
+
+  transition: var(--hover-n-active-transitions),
+  height var(--ts-g);
+
   &.show {
     opacity: 1;
   }

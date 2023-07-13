@@ -1,33 +1,21 @@
 <template>
   <div :class="'router-view ' + routerAnimation" ref="home-router">
-    <playlists-list
-      v-show="showPlList"
-      @openPlaylist="$emit('openPlaylist', $event)"
-    ></playlists-list>
-    <tracks-list
-      v-show="showTracksList"
-      @openPlaylist="$emit('openPlaylist', $event)"
-    ></tracks-list>
-    <playlist-view
-      v-show="componentBeingShown === 'playlist-view'"
-      :currentPlaylist="currentPath.params && currentPath.params.id"
-    ></playlist-view>
-    <track-review
-      :refresh="componentBeingShown === 'track-review'"
-      v-show="componentBeingShown === 'track-review'"
-    ></track-review>
-    <downloads-view
-      v-show="componentBeingShown === 'downloads-view'"
-    ></downloads-view>
+    <playlists-list v-show="showPlList" @openPlaylist="$emit('openPlaylist', $event)"></playlists-list>
+    <tracks-list v-show="showTracksList" @openPlaylist="$emit('openPlaylist', $event)"></tracks-list>
+    <playlist-view v-show="componentBeingShown === 'playlist-view'"
+      :currentPlaylist="currentPath.params && currentPath.params.id"></playlist-view>
+    <track-review :refresh="componentBeingShown === 'track-review'"
+      v-show="componentBeingShown === 'track-review'"></track-review>
+    <downloads-view v-show="componentBeingShown === 'downloads-view'"></downloads-view>
   </div>
 </template>
 
-<script>
-import PlaylistsList from './PlaylistsList'
-import TracksList from './TracksList'
-import PlaylistView from './PlaylistView/PlaylistView'
-import TrackReview from './TrackReview/TrackReview'
-import DownloadsView from './DownloadsView/DownloadsView'
+<script lang="ts">
+import PlaylistsList from './PlaylistsList.vue'
+import TracksList from './TracksList.vue'
+import PlaylistView from './PlaylistView/PlaylistView.vue'
+import TrackReview from './TrackReview/TrackReview.vue'
+import DownloadsView from './DownloadsView/DownloadsView.vue'
 let sleep
 
 export default {
@@ -118,7 +106,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 .router-view {
   $transition: var(--home-transition);
   transition: transform $transition, opacity $transition;
@@ -136,25 +123,30 @@ export default {
   &.right {
     opacity: 0;
   }
+
   &.push {
     transform: scale(.75);
     opacity: 0;
   }
+
   &.pull {
     transform: scale(1.5);
     opacity: 0;
   }
+
   $x-offset: 3em;
+
   &.left {
     transform: translateX(-$x-offset);
   }
+
   &.right {
     transform: translateX($x-offset);
   }
+
   &.release {
     opacity: 1;
     transform: scale(1) translateX(0)
   }
 }
-
 </style>

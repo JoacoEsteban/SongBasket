@@ -1,29 +1,30 @@
 <template>
-  <Card :item="itemFormatted" :row-classes="rowClasses + (isSelected ? ' border-green' : ' border-transparent')" :options="cardOptions" @click="handleClick">
+  <Card :item="itemFormatted" :row-classes="rowClasses + (isSelected ? ' border-green' : ' border-transparent')"
+    :options="cardOptions" @click="handleClick">
     <div class="w100 point75-em df alic">
       <div class="ellipsis pr-2">
-        <div class="issue color-red point75-em semibold" v-if="itemFormatted.issue" >{{itemFormatted.issue}}</div>
+        <div class="issue color-red point75-em semibold" v-if="itemFormatted.issue">{{ itemFormatted.issue }}</div>
         <div class="ellipsis name">
           <span v-html="itemFormatted.name">
           </span>
         </div>
         <div class="ellipsis">
           <span class="regular point75-em">
-            <span class="semibold">{{itemFormatted.uploader}}</span>
+            <span class="semibold">{{ itemFormatted.uploader }}</span>
           </span>
         </div>
       </div>
       <div class="duration-diff">
-        <span class="bold" :style="{color: durationColor}">
-          {{itemFormatted.duration}}
+        <span class="bold" :style="{ color: durationColor }">
+          {{ itemFormatted.duration }}
         </span>
       </div>
     </div>
   </Card>
 </template>
 
-<script>
-import Card from '../Generic/Card'
+<script lang="ts">
+import Card from '../Generic/Card.vue'
 
 export default {
   props: {
@@ -91,7 +92,7 @@ span.matching-token {
 </style>
 <style lang="scss" scoped>
 .duration-diff {
-  > span {
+  >span {
     font-size: 3em;
   }
 }

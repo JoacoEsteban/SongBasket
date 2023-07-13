@@ -2,25 +2,21 @@
   <div ref="playlists-list" class="pll-container">
     <div ref="actual-list" class="actual-list row hideable-container" :class="listAnimationClass" v-if="showList">
       <div v-if="noPlaylists" class="no-playlists">
-        No Playlists found{{allLoaded ? '' : ', try loading some more'}}
+        No Playlists found{{ allLoaded ? '' : ', try loading some more' }}
       </div>
       <div class="horizontal-scroller">
         <playlist v-for="pl in syncedPlaylistsFiltered ? syncedPlaylistsFiltered : syncedPlaylists"
-        :playlist="pl.playlist"
-        :status="pl.status"
-        :key="pl.playlist.id"
-        @openPlaylist="$emit('openPlaylist', pl.playlist.id)" />
+          :playlist="pl.playlist" :status="pl.status" :key="pl.playlist.id"
+          @openPlaylist="$emit('openPlaylist', pl.playlist.id)" />
       </div>
       <div class="list">
         <playlist v-for="pl in unSyncedPlaylistsFiltered ? unSyncedPlaylistsFiltered : unSyncedPlaylists"
-        :playlist="pl.playlist"
-        :status="pl.status"
-        :key="pl.playlist.id"
-        @openPlaylist="$emit('openPlaylist', pl.playlist.id)" />
+          :playlist="pl.playlist" :status="pl.status" :key="pl.playlist.id"
+          @openPlaylist="$emit('openPlaylist', pl.playlist.id)" />
       </div>
 
       <div class="df aliic jucc col-xs-12 p-0" v-if="!allLoaded">
-        <button class="button" @click="loadMore">{{ loading ? 'Loading' : 'Load More'}}</button>
+        <button class="button" @click="loadMore">{{ loading ? 'Loading' : 'Load More' }}</button>
       </div>
     </div>
     <!-- <div class="background-container">
@@ -29,7 +25,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import Playlist from './Playlist.vue'
 
 export default {
@@ -154,8 +150,8 @@ export default {
         this.syncedPlaylistsFiltered = null
       } else {
         noPlaylists = (
-          (this.syncedPlaylistsFiltered = this.syncedPlaylists.filter(({playlist}) => playlist.name.toLowerCase().includes(txt))).length +
-          (this.unSyncedPlaylistsFiltered = this.unSyncedPlaylists.filter(({playlist}) => playlist.name.toLowerCase().includes(txt))).length
+          (this.syncedPlaylistsFiltered = this.syncedPlaylists.filter(({ playlist }) => playlist.name.toLowerCase().includes(txt))).length +
+          (this.unSyncedPlaylistsFiltered = this.unSyncedPlaylists.filter(({ playlist }) => playlist.name.toLowerCase().includes(txt))).length
         ) === 0
       }
       this.noPlaylists = noPlaylists
@@ -193,12 +189,15 @@ $bezier-chill: cubic-bezier(0, 1, .5, 1);
   padding: var(--container-padding-x) 0;
   padding-top: 0;
 }
+
 .actual-list {
+
   // TODO Adapt transition to global trasition scale factor
-  > .list {
+  >.list {
     padding: 0 var(--padding-x);
   }
 }
+
 .filters-container {
   pointer-events: none;
   padding: .5em;
@@ -206,6 +205,7 @@ $bezier-chill: cubic-bezier(0, 1, .5, 1);
   position: sticky;
   top: 0;
   z-index: 1;
+
   .filters-background {
     background: linear-gradient(180deg, var(--global-grey-secondary), transparent);
     position: absolute;
@@ -215,17 +215,21 @@ $bezier-chill: cubic-bezier(0, 1, .5, 1);
     bottom: 0;
     z-index: -1;
   }
+
   .filters-content {
     display: flex;
     align-items: center;
     justify-content: space-between;
     // padding: 0 1em;
   }
+
   .search-bar {
     pointer-events: all;
+
     .filters-background {
       background: var(--global-grey-secondary);
     }
+
     position: relative;
     overflow: hidden;
     display: flex;
@@ -235,14 +239,15 @@ $bezier-chill: cubic-bezier(0, 1, .5, 1);
     padding-right: .2em;
   }
 }
+
 .no-playlists {
   margin: 4em 0;
 }
+
 .background-container {
   position: sticky;
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
-}
-</style>
+}</style>

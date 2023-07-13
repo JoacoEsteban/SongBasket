@@ -1,15 +1,11 @@
 <template>
   <div class="tracklist-container">
-    <Track
-    v-for="(track, index) in items"
-    :key="index"
-    :item="track"
-  />
+    <Track v-for="(track, index) in items" :key="index" :item="track" />
   </div>
 </template>
 
-<script>
-import Card from './Card'
+<script lang="ts">
+import Card from './Card.vue'
 export default {
   components: {
     Track: Card
@@ -23,6 +19,4 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

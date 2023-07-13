@@ -2,25 +2,18 @@
   <div class="track-review-container">
     <div class="container-fluid text-left pt-2" style="--px: 2em">
       <div class="default-title text-secondary" style="--fz: 1.2em">
-        {{conversions.length ? 'Conversions' : 'No conversions found, try adding a custom url'}}
+        {{ conversions.length ? 'Conversions' : 'No conversions found, try adding a custom url' }}
       </div>
     </div>
     <div class="conversions-list" v-if="track">
-      <track-banner
-        v-for="(item, index) in conversions"
-        :track="item"
-        :parent-ref="track"
-        :key="index"
-        :is-conversion="true"
-        :is-selected="isSelected(item.youtube_id)"
-        @select="selectVideo(item)"
-        ></track-banner>
+      <track-banner v-for="(item, index) in conversions" :track="item" :parent-ref="track" :key="index"
+        :is-conversion="true" :is-selected="isSelected(item.youtube_id)" @select="selectVideo(item)"></track-banner>
     </div>
   </div>
 </template>
 
-<script>
-import TrackBanner from '../DownloadsView/TrackBanner'
+<script lang="ts">
+import TrackBanner from '../DownloadsView/TrackBanner.vue'
 export default {
   components: {
     TrackBanner
@@ -61,7 +54,7 @@ export default {
       try {
         const newId = (item === null || item === false) ? item : item.youtube_id
         if (newId === undefined || !this.track) throw new Error('NO TRACK')
-        await this.$root.$controllers.core.changeYtTrackSelection({trackId: this.track.id, newId})
+        await this.$root.$controllers.core.changeYtTrackSelection({ trackId: this.track.id, newId })
         this.refreshTrack()
       } catch (error) {
         throw error
@@ -82,6 +75,7 @@ export default {
   width: 100%;
   max-width: 100vw;
 }
+
 .parent-track-container {
   position: sticky;
   top: 0;

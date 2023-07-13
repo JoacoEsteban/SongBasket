@@ -1,12 +1,12 @@
 <template>
-<div class="home-folder-container">
+  <div class="home-folder-container">
     <div class="login-sb-welcome">welcome to</div>
     <div class="login-sb-title">SongBasket</div>
     <button class="button" @click="$emit('handleClick')">Set a Home Folder</button>
-</div>
+  </div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
 }
 </script>
@@ -19,14 +19,15 @@ export default {
   justify-content: center;
   align-items: center;
 }
-.login-sb-welcome{
+
+.login-sb-welcome {
   font-size: 1rem;
 }
+
 .login-sb-title {
   font-size: 4.2em;
   font-weight: 500;
   margin-bottom: 1.5rem;
   line-height: 1
 }
-
 </style>

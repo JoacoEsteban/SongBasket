@@ -6,7 +6,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
   mounted () {
     if (this.$store.state.CurrentUser.playlists.length) { this.$router.push('/home') }
@@ -24,11 +24,13 @@ export default {
   height: 100%;
   width: 100%;
 }
+
 .header {
   font-size: 2em;
   padding: 0.67em 0;
   font-weight: bold;
 }
+
 .info {
   font-size: 0.67em;
   margin-bottom: 2em;

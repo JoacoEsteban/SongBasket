@@ -1,12 +1,12 @@
 <template>
-    <div class="df fldc global-center">
-      <button class="button" id="onboarding-login-button" @click="$emit('login')">Login to Spotify</button>
-      <!-- <div>or</div>
+  <div class="df fldc global-center">
+    <button class="button" id="onboarding-login-button" @click="$emit('login')">Login to Spotify</button>
+    <!-- <div>or</div>
       <button tag="button" @click="$emit('guestLogin')" class="button">Continue without Logging in</button> -->
-    </div>
+  </div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
   methods: {
   }
@@ -17,5 +17,4 @@ export default {
 }
 </script>
 
-<style lang="scss">
-</style>
+<style lang="scss"></style>

@@ -1,38 +1,39 @@
 <template>
-  <Card @click="handleClick" :pressed="isQueued" :item="playlistFormatted" :options="cardOptions" :row-classes="rowClasses">
+  <Card @click="handleClick" :pressed="isQueued" :item="playlistFormatted" :options="cardOptions"
+    :row-classes="rowClasses">
     <div class="playlist-data">
       <div v-if="showChanges" class="track-changes-container">
         <div v-if="playlist.tracks.added && playlist.tracks.added.length" class="track-change added">
-          <span class="bold">+{{playlist.tracks.added.length}}</span>
+          <span class="bold">+{{ playlist.tracks.added.length }}</span>
         </div>
         <div v-if="playlist.tracks.removed && playlist.tracks.removed.length" class="track-change removed">
-          <span class="bold">-{{playlist.tracks.removed.length}}</span>
+          <span class="bold">-{{ playlist.tracks.removed.length }}</span>
         </div>
       </div>
 
-        <div class="title">
-          <span class="bold">
-            {{playlistName}}
-          </span>
-        </div>
-        <div class="track-ammount">
-          <span class="regular">
-            {{trackAmmountStr}}
-          </span>
-        </div>
-        <div class="playlist-status-indicator" :class="status.slug" :style="{'--status-color': status.color}">
-          <span class="bold uppercase">
-            {{status.msg}}
-          </span>
-        </div>
+      <div class="title">
+        <span class="bold">
+          {{ playlistName }}
+        </span>
+      </div>
+      <div class="track-ammount">
+        <span class="regular">
+          {{ trackAmmountStr }}
+        </span>
+      </div>
+      <div class="playlist-status-indicator" :class="status.slug" :style="{ '--status-color': status.color }">
+        <span class="bold uppercase">
+          {{ status.msg }}
+        </span>
+      </div>
     </div>
   </Card>
 </template>
 
-<script>
+<script lang="ts">
 import 'vuex'
 
-import Card from './Generic/Card'
+import Card from './Generic/Card.vue'
 
 export default {
   props: {
@@ -134,12 +135,14 @@ $title-size: .8em;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    > span {
+
+    >span {
       font-size: $title-size;
     }
   }
+
   .track-ammount {
-    > span {
+    >span {
       font-size: $title-size * .75;
     }
   }
@@ -150,6 +153,7 @@ $title-size: .8em;
   display: flex;
   bottom: 0;
   right: 0;
+
   .track-change {
     // $size: 1.5em;
     // width: $size;
@@ -163,7 +167,8 @@ $title-size: .8em;
     &:nth-last-child(1) {
       margin-left: .3em;
     }
-    > span {
+
+    >span {
       line-height: 1;
       font-size: 1.25em;
     }
@@ -171,6 +176,7 @@ $title-size: .8em;
     &.added {
       color: var(--green-accept);
     }
+
     &.removed {
       color: var(--red-cancel);
     }
@@ -180,10 +186,12 @@ $title-size: .8em;
 
 <style lang="scss">
 $title-size: .8em;
-  .playlist-status-indicator {
-    color: var(--status-color);
-    > span {
-      font-size: $title-size * .75;
-    }
+
+.playlist-status-indicator {
+  color: var(--status-color);
+
+  >span {
+    font-size: $title-size * .75;
   }
+}
 </style>

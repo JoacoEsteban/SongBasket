@@ -8,12 +8,12 @@
     </div>
 </template>
 
-<script>
-import Unsync from './Unsync'
-import CustomTrackUrl from './CustomTrackUrl'
-import ResetAllPlaylistTracks from './ResetAllPlaylistTracks'
-import TrackReview from './TrackReviewOld'
-import DeleteFolder from './DeleteFolder'
+<script lang="ts">
+import Unsync from './Unsync.vue'
+import CustomTrackUrl from './CustomTrackUrl.vue'
+import ResetAllPlaylistTracks from './ResetAllPlaylistTracks.vue'
+import TrackReview from './TrackReviewOld.vue'
+import DeleteFolder from './DeleteFolder.vue'
 export default {
   components: {
     Unsync,

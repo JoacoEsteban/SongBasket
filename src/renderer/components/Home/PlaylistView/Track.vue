@@ -3,12 +3,12 @@
     <div class="w100 point75-em">
       <div class="ellipsis">
         <span class="bold">
-          {{itemFormatted.name || itemFormatted.data.name}}
+          {{ itemFormatted.name || itemFormatted.data.name }}
         </span>
       </div>
       <div class="ellipsis">
         <span class="regular point75-em">
-          {{trackController.getArtistsString(itemFormatted)}}
+          {{ trackController.getArtistsString(itemFormatted) }}
         </span>
       </div>
       <div class="ellipsis track-status">
@@ -18,17 +18,18 @@
         <span class="bold uppercase point75-em color-red" v-if="isRemoved">
           removed
         </span>
-        
-        <span class="bold uppercase point75-em" v-if="itemFormatted.status" :style="{color: itemFormatted.status.color}">
-          {{itemFormatted.status.str}}
+
+        <span class="bold uppercase point75-em" v-if="itemFormatted.status"
+          :style="{ color: itemFormatted.status.color }">
+          {{ itemFormatted.status.str }}
         </span>
       </div>
     </div>
   </Card>
 </template>
 
-<script>
-import Card from '../Generic/Card'
+<script lang="ts">
+import Card from '../Generic/Card.vue'
 
 export default {
   props: {
@@ -96,6 +97,4 @@ export default {
 </script>
 
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

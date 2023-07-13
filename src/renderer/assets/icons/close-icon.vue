@@ -1,8 +1,8 @@
 <template>
-    <svg-icon :path="path" :icon-color="iconColor" :class-name="className" />
+  <svg-icon :path="path" :icon-color="iconColor" :class-name="className" />
 </template>
 
-<script>
+<script lang="ts">
 import SvgIcon from './SvgIcon.vue'
 
 export default {
@@ -19,6 +19,4 @@ export default {
 }
 </script>
 
-<style>
-
-</style>
+<style></style>

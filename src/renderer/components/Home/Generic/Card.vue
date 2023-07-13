@@ -1,28 +1,30 @@
 <template>
-<div class="card-container window-nodrag" :class="classObject" :style="styleObject">
-  <slot name="outside">
-  </slot>
-  <div class="transformation-parent rel-full" @mousemove="onMouseMove" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave" @mousedown="setMouseListener" @click="handleClick">
-    <div class="card-content" ref="content-container">
-      <div class="card-background abs-full">
-        <div class="rel-full ovfh">
-          <div class="card-img" :style="{backgroundImage: `url(${bgImage})`}">
+  <div class="card-container window-nodrag" :class="classObject" :style="styleObject">
+    <slot name="outside">
+    </slot>
+    <div class="transformation-parent rel-full" @mousemove="onMouseMove" @mouseenter="onMouseEnter"
+      @mouseleave="onMouseLeave" @mousedown="setMouseListener" @click="handleClick">
+      <div class="card-content" ref="content-container">
+        <div class="card-background abs-full">
+          <div class="rel-full ovfh">
+            <div class="card-img" :style="{ backgroundImage: `url(${bgImage})` }">
+            </div>
+            <div class="gradient">
+            </div>
+            <div class="light-shine" ref="light-shine"></div>
           </div>
-          <div class="gradient">
-          </div>
-          <div class="light-shine" ref="light-shine"></div>
         </div>
-      </div>
-      <div class="card-default-slot" :style="{height: this.options.height || '4em', 'font-size': this.options.size || ''}">
-        <slot>
-        </slot>
+        <div class="card-default-slot"
+          :style="{ height: this.options.height || '4em', 'font-size': this.options.size || '' }">
+          <slot>
+          </slot>
+        </div>
       </div>
     </div>
   </div>
-</div>
 </template>
 
-<script>
+<script lang="ts">
 
 let index = 0
 export default {
@@ -122,12 +124,14 @@ export default {
       return new Promise((resolve, reject) => this.$nextTick(resolve))
     },
     getBounds () {
-      return this.$root.cardTransformInvalidation < this.bounds.timeStamp ? this.bounds.bounds : (this.bounds = {timeStamp: Date.now(),
+      return this.$root.cardTransformInvalidation < this.bounds.timeStamp ? this.bounds.bounds : (this.bounds = {
+        timeStamp: Date.now(),
         bounds: (() => {
           let bounds = this.getRotationElement()[0].getBoundingClientRect();
           ['x', 'y', 'width', 'height'].forEach(k => bounds[k] = bounds[k].toFixed(2))
           return bounds
-        })()}).bounds
+        })()
+      }).bounds
     },
     transformContainer (e) {
       if (this.hoverTransitionsTimeout && Date.now() - index < 50) return
@@ -137,9 +141,9 @@ export default {
       this.getRotationElement().css('transform', vals[0])
       this.getLightShineElement().css(vals[1])
     },
-    getContainerTransformation ({clientX, clientY}) {
+    getContainerTransformation ({ clientX, clientY }) {
       const bounds = this.getBounds()
-      const {x, y, width, height} = bounds
+      const { x, y, width, height } = bounds
 
       const valX = (clientX - x) / width
       const valY = (clientY - y) / height
@@ -153,13 +157,13 @@ export default {
       if (tY < -4) tY = -4
       if (tY > 4) tY = 4
       return [`perspective(1000px) rotateX(${tY}deg) rotateY(${tX}deg) ${this.pressed ? '' : this.tOptions.scaleFactor}`,
-        {transform: `rotate(${-tY / 2}deg) translateX(${valX * 5}%)`}]
+      { transform: `rotate(${-tY / 2}deg) translateX(${valX * 5}%)` }]
     },
     restoreTransformation (force) {
       if (!force && (window.MOUSE_BEING_CLICKED || this.hovering)) return
       this.$root.$(window).off('mouseup', this.restoreTransformation)
       this.getRotationElement().css('transform', `perspective(1000px) rotateX(0deg) rotateY(0deg)`)
-      this.getLightShineElement().css({'background-position': '', transform: ''})
+      this.getLightShineElement().css({ 'background-position': '', transform: '' })
     },
     getRotationElement () {
       return this.rotationElement || (this.rotationElement = this.$root.$(this.$refs['content-container']))
@@ -187,9 +191,11 @@ $transition-hard: var(--ts-g-hard);
   padding-top: 0;
   z-index: 0;
   flex-shrink: 0;
+
   &:not(.pressed).transformation-parent {
     &:hover {
       transform: scale(1.03);
+
       .card-background {
         .light-shine {
           transition: opacity $transition-soft;
@@ -198,9 +204,11 @@ $transition-hard: var(--ts-g-hard);
       }
     }
   }
+
   .transformation-parent {
     &:hover {
       transform: scale(1.03);
+
       .card-background {
         .light-shine {
           // transition: opacity $transition-soft;
@@ -208,9 +216,12 @@ $transition-hard: var(--ts-g-hard);
         }
       }
     }
-    transition: transform $transition-soft, opacity $transition-soft;
+
+    transition: transform $transition-soft,
+    opacity $transition-soft;
     perspective: 1000px;
     perspective-origin: 50% 100px;
+
     &:active {
       transition: transform $transition-hard, opacity $transition-hard;
       transition-delay: .0575s;
@@ -218,13 +229,13 @@ $transition-hard: var(--ts-g-hard);
       opacity: .7;
     }
 
-    > .card-content {
+    >.card-content {
       cursor: pointer;
       position: relative;
       background: $q-false-color;
       $transition: var(--card-hover-transition);
       transition: background-color $transition,
-      box-shadow $transition;
+        box-shadow $transition;
       border-radius: var(--borr);
       overflow: hidden;
       // transform $transition;
@@ -237,11 +248,13 @@ $transition-hard: var(--ts-g-hard);
 
   .card-background {
     --gradient-offset: 50%;
+
     .rel-full {
       display: flex;
       align-items: center;
       justify-content: flex-end;
     }
+
     .gradient {
       position: absolute;
       $offset: -3px;
@@ -251,6 +264,7 @@ $transition-hard: var(--ts-g-hard);
       left: $offset;
       background: linear-gradient(to right, $q-false-color var(--gradient-offset), transparent 200%);
     }
+
     .light-shine {
       position: absolute;
       pointer-events: none;
@@ -263,10 +277,11 @@ $transition-hard: var(--ts-g-hard);
       transition: opacity var(--card-hover-transition-fast);
       // transition: opacity $transition-soft;
       opacity: .5;
-      background: linear-gradient(31deg, transparent 50%, rgba(255,255,255,.045) 50%, transparent 100%);
+      background: linear-gradient(31deg, transparent 50%, rgba(255, 255, 255, .045) 50%, transparent 100%);
       // background: linear-gradient(31deg, transparent -100%,  rgba(0,0,0,.5) 50%, rgba(255,255,255,.045) 50%, transparent 100%);
       background-position: center;
     }
+
     .card-img {
       --card-img-width: 50%;
       background-size: cover;
@@ -290,6 +305,7 @@ $transition-hard: var(--ts-g-hard);
     .transformation-parent {
       transform: scale(.9);
       opacity: .7;
+
       &:active {
         transform: scale(.85);
         opacity: .5;
@@ -297,6 +313,4 @@ $transition-hard: var(--ts-g-hard);
     }
   }
 
-}
-
-</style>
+}</style>

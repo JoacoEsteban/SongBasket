@@ -1,13 +1,14 @@
 <template>
   <div class="w100">
     <div class="banner-list w100">
-      <track-banner :download-status="giveMeTrackDownloadStatus(track, index)" :is-download="true" v-for="(track, index) in downloads" :key="index" :track="track"></track-banner>
+      <track-banner :download-status="giveMeTrackDownloadStatus(track, index)" :is-download="true"
+        v-for="(track, index) in downloads" :key="index" :track="track"></track-banner>
     </div>
   </div>
 </template>
 
-<script>
-import TrackBanner from './TrackBanner'
+<script lang="ts">
+import TrackBanner from './TrackBanner.vue'
 export default {
   components: {
     TrackBanner
@@ -30,7 +31,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .banner-list {
-    position: relative;
-  }
+.banner-list {
+  position: relative;
+}
 </style>

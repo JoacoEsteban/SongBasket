@@ -1,24 +1,24 @@
 <template>
-    <div class="login-container window-drag-recursive" :style="'--offset: ' + offsetPtg + '%'">
-      <set-home-folder @handleClick="setHomeFolder" />
-      <div class="user-login-container">
-        <div class="setup-header">{{header.text}}</div>
-        <div class="slider-container">
-          <div class="slider" :style="{'--offset-x': offsetXPtg}">
-            <Login v-if="showLogin" @login="login" @guestLogin="nextSub" />
-            <Guest @backLogin="backLogin" v-if="showLogin" />
-            <guest-verify v-if="showLogin" />
-          </div>
+  <div class="login-container window-drag-recursive" :style="'--offset: ' + offsetPtg + '%'">
+    <set-home-folder @handleClick="setHomeFolder" />
+    <div class="user-login-container">
+      <div class="setup-header">{{ header.text }}</div>
+      <div class="slider-container">
+        <div class="slider" :style="{ '--offset-x': offsetXPtg }">
+          <Login v-if="showLogin" @login="login" @guestLogin="nextSub" />
+          <Guest @backLogin="backLogin" v-if="showLogin" />
+          <guest-verify v-if="showLogin" />
         </div>
       </div>
+    </div>
   </div>
 </template>
 
-<script>
-import SetHomeFolder from './SetHomeFolder'
-import Login from '../Login'
-import Guest from './Guest'
-import GuestVerify from './GuestVerify'
+<script lang="ts">
+import SetHomeFolder from './SetHomeFolder.vue'
+import Login from '../Login.vue'
+import Guest from './Guest.vue'
+import GuestVerify from './GuestVerify.vue'
 export default {
   components: {
     SetHomeFolder,
@@ -123,12 +123,12 @@ export default {
           break
         }
         case 'guest-verify': {
-          this.$router.push({name: 'guest-verify', params: { user: payload }})
+          this.$router.push({ name: 'guest-verify', params: { user: payload } })
           this.header.text = 'Is this You?'
           break
         }
         case 'home': {
-          this.$router.push({path: '/home'})
+          this.$router.push({ path: '/home' })
           break
         }
         case 'guest': {
@@ -180,7 +180,8 @@ export default {
   transition: bottom var(--ts-g-symmetric-inverted);
   transition-duration: 1.2s;
   bottom: calc(var(--offset) * -1);
-  > div {
+
+  >div {
     min-height: 100%;
     min-width: 100vw;
   }
@@ -196,6 +197,7 @@ export default {
     max-width: 100%;
     overflow: hidden;
   }
+
   .slider {
     position: relative;
     left: var(--offset-x);
@@ -203,7 +205,8 @@ export default {
     display: flex;
     width: auto;
     height: 100%;
-    > div {
+
+    >div {
       min-width: 100%;
       height: 100%;
     }

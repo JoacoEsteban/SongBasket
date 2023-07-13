@@ -4,15 +4,15 @@
     <div class="controls-container df alic container-fluid">
       <button class="link-button" @click="pauseTrack" v-if="showPause || showUnPause">
         <span>
-          {{showPause ? 'Pause' : 'Unpause'}}
+          {{ showPause ? 'Pause' : 'Unpause' }}
         </span>
-        <div class="icon-wrapper" :class="{show: showPause}">
+        <div class="icon-wrapper" :class="{ show: showPause }">
           <button class="icon window-nodrag">
             <pause-icon>
             </pause-icon>
           </button>
         </div>
-        <div class="icon-wrapper" :class="{show: showUnPause}">
+        <div class="icon-wrapper" :class="{ show: showUnPause }">
           <button class="icon window-nodrag">
             <play-icon>
             </play-icon>
@@ -41,7 +41,7 @@
           </button>
         </div>
       </button>
-      <button :class="{hidden: !showReset}" class="link-button hidable-item" @click="reset">
+      <button :class="{ hidden: !showReset }" class="link-button hidable-item" @click="reset">
         <span>
           Reset Selection
         </span>
@@ -56,8 +56,8 @@
   </div>
 </template>
 
-<script>
-import TrackBanner from '../../DownloadsView/TrackBanner'
+<script lang="ts">
+import TrackBanner from '../../DownloadsView/TrackBanner.vue'
 import DownloadIcon from '@/assets/icons/download-icon'
 import CloseIcon from '@/assets/icons/close-icon'
 import PauseIcon from '@/assets/icons/pause-icon'
@@ -145,11 +145,13 @@ export default {
 .track-review-slide-container {
   padding-top: var(--tb-title-height)
 }
+
 .controls-container {
   display: flex;
   align-items: center;
   // padding-left: .25em;
   $icon-size: 1.5em;
+
   .icon-wrapper {
     box-sizing: border-box;
     width: 0;
@@ -158,6 +160,7 @@ export default {
     transform: scale(.7);
     opacity: 0;
     pointer-events: none;
+
     &.show {
       $p: .2em;
       pointer-events: all;
@@ -167,14 +170,17 @@ export default {
       width: $icon-size + 2 * $p;
     }
   }
+
   button.icon {
     display: flex;
     box-shadow: none;
     transition: box-shadow var(--ts-g), var(--hover-n-active-transitions);
+
     &:active {
       opacity: 0.7;
       transform: scale(.95);
     }
+
     background-color: transparent;
     border-radius: 50%;
     padding: .3em;
@@ -182,6 +188,7 @@ export default {
     height: $icon-size;
     outline: 0;
     border: 0;
+
     svg {
       padding: 0;
     }

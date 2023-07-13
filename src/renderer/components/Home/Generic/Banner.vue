@@ -6,16 +6,16 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
 
 }
 </script>
 
 <style lang="scss" scoped>
-  .banner-container {
-    width: 100%;
-    min-height: 4em;
-    height: 100%;
-  }
+.banner-container {
+  width: 100%;
+  min-height: 4em;
+  height: 100%;
+}
 </style>

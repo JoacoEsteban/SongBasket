@@ -2,23 +2,19 @@
   <div class="whole-container">
     <div class="home-container">
       <div class="rel-full" style="height: initial">
-        <top-bar/>
-        <search-bar/>
+        <top-bar />
+        <search-bar />
       </div>
 
-        <component-loader class="home-router"
-        @openPlaylist="openPlaylist($event)"
-        @openYtVideo="openYtVideo($event)"
-        ></component-loader>
+      <component-loader class="home-router" @openPlaylist="openPlaylist($event)"
+        @openYtVideo="openYtVideo($event)"></component-loader>
 
-      <floating-buttons style="z-index: 1"
-      @youtubeConvert="youtubeConvert"
-      ></floating-buttons>
+      <floating-buttons style="z-index: 1" @youtubeConvert="youtubeConvert"></floating-buttons>
     </div>
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import 'vuex'
 
 import TopBar from './TopBar/TopBar.vue'
@@ -81,7 +77,7 @@ export default {
       this.$root.$IPC.callMain('get tracks from', id)
     },
     setPlaylistNPush (id) {
-      this.$root.$sbRouter.push({name: 'playlist-view', params: {id}})
+      this.$root.$sbRouter.push({ name: 'playlist-view', params: { id } })
     },
     playlistSynced (id) {
       return this.syncedPlaylists.some(p => p === id)
@@ -110,6 +106,7 @@ export default {
 .whole-container {
   z-index: 0;
 }
+
 .home-container {
   z-index: 0;
   position: relative;
@@ -119,7 +116,8 @@ export default {
   overflow: hidden;
   flex-direction: column;
 }
-.home-router{
+
+.home-router {
   z-index: 1;
   max-height: 100%;
   transition: padding var(--ts-g);
@@ -128,7 +126,6 @@ export default {
   box-sizing: border-box;
   overflow: auto;
 }
-
 </style>
 
 <style lang="scss" scoped>

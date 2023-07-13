@@ -1,44 +1,44 @@
 <template>
-<div class="floating-buttons-container" :class="{show: showComponent}">
-  <div class="gradient"></div>
-  <div class="df jucb">
-    <div class="df floater-container">
-      <div class="floater rel" v-if="!forceKill.all && !forceKill.dropdown">
-        <!-- <div class="dropdown"></div> -->
-        <div class="sb-fab" @click="toggleDropdown" :class="{show: showDropdown}">
-          <font-awesome-icon size="xs" icon="chevron-up" />
+  <div class="floating-buttons-container" :class="{ show: showComponent }">
+    <div class="gradient"></div>
+    <div class="df jucb">
+      <div class="df floater-container">
+        <div class="floater rel" v-if="!forceKill.all && !forceKill.dropdown">
+          <!-- <div class="dropdown"></div> -->
+          <div class="sb-fab" @click="toggleDropdown" :class="{ show: showDropdown }">
+            <font-awesome-icon size="xs" icon="chevron-up" />
+          </div>
         </div>
       </div>
-    </div>
-    <div class="df floater-container">
-      <div class="floater" v-if="!forceKill.all && !forceKill.refresh">
-        <div class="sb-fab" @click="refresh" :class="{show: showRefresh}">
-          <sync-icon></sync-icon>
+      <div class="df floater-container">
+        <div class="floater" v-if="!forceKill.all && !forceKill.refresh">
+          <div class="sb-fab" @click="refresh" :class="{ show: showRefresh }">
+            <sync-icon></sync-icon>
+          </div>
         </div>
-      </div>
-      <div class="floater" v-if="!forceKill.all && !forceKill.sync">
-        <div class="sb-fab" @click="sync" :class="{show: showSync}">
-          <cloud-search-icon></cloud-search-icon>
+        <div class="floater" v-if="!forceKill.all && !forceKill.sync">
+          <div class="sb-fab" @click="sync" :class="{ show: showSync }">
+            <cloud-search-icon></cloud-search-icon>
+          </div>
         </div>
-      </div>
-      <div class="floater" v-if="!forceKill.all && !forceKill.download">
-        <div class="sb-fab" @click="download" :class="{show: showDl}">
-          <download-icon></download-icon>
+        <div class="floater" v-if="!forceKill.all && !forceKill.download">
+          <div class="sb-fab" @click="download" :class="{ show: showDl }">
+            <download-icon></download-icon>
+          </div>
         </div>
-      </div>
-      <div class="floater error-floater" v-if="!errorPill.kill">
-        <div class="sb-fab error-pill-container" :class="{show: showError}">
-          <span>
-            <span v-html="errorPill.message"></span>
-          </span>
+        <div class="floater error-floater" v-if="!errorPill.kill">
+          <div class="sb-fab error-pill-container" :class="{ show: showError }">
+            <span>
+              <span v-html="errorPill.message"></span>
+            </span>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 </template>
 
-<script>
+<script lang="ts">
 
 import SyncIcon from '../../assets/icons/sync-icon.vue'
 import CloudSearchIcon from '../../assets/icons/cloud-search-icon.vue'
@@ -205,6 +205,7 @@ $t: var(--ts-g);
 $offsetY: .5em;
 $gradient-height: 5em;
 $whole-height: 5em;
+
 .floating-buttons-container {
   pointer-events: none;
   position: fixed;
@@ -212,9 +213,11 @@ $whole-height: 5em;
   left: 0;
   right: 0;
   transition: bottom $t;
+
   .floater-container {
     padding: $offsetY var(--container-padding-x);
   }
+
   z-index: 10;
 
   &.show {
@@ -241,21 +244,26 @@ $whole-height: 5em;
   // width: 100%;
   margin-left: .5em;
   margin-right: .5em;
-    &:nth-child(1) {
-      justify-content: flex-start
-    }
-    &:nth-child(2), &.error-floater {
-      justify-content: center
-    }
-    &:nth-child(3) {
-      justify-content: flex-end
-    }
+
+  &:nth-child(1) {
+    justify-content: flex-start
+  }
+
+  &:nth-child(2),
+  &.error-floater {
+    justify-content: center
+  }
+
+  &:nth-child(3) {
+    justify-content: flex-end
+  }
 }
 </style>
 
 <style lang="scss">
 $offsetY: .5em;
 $t: var(--ts-g);
+
 .sb-fab {
   -webkit-app-region: no-drag;
   box-sizing: border-box;
@@ -267,7 +275,7 @@ $t: var(--ts-g);
   background-color: var(--button-purple);
   color: var(--text-white);
   border-radius: 10em;
-  $sh-color: rgba(0,0,0,.2);
+  $sh-color: rgba(0, 0, 0, .2);
 
   box-shadow: inset 3px 3px 10px $sh-color, 0 4px 7px 2px $sh-color;
 
@@ -288,13 +296,15 @@ $t: var(--ts-g);
 
   transition: transform $t, opacity $t, bottom $t;
 
-  &.show, &.error-pill-container.show {
+  &.show,
+  &.error-pill-container.show {
     bottom: 0;
   }
 
   &:hover {
     transform: scale(1.15)
   }
+
   &:active {
     transform: scale(.95);
     opacity: .7;
@@ -304,10 +314,12 @@ $t: var(--ts-g);
     &:hover {
       transform: scale(1.03)
     }
+
     &:active {
       transform: scale(.98);
       opacity: .7;
     }
+
     width: initial;
     height: initial;
 
@@ -329,5 +341,4 @@ $t: var(--ts-g);
     }
 
   }
-}
-</style>
+}</style>

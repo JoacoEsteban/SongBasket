@@ -2,10 +2,10 @@
   <!-- <div class="background-container" :style="{top: offsetTop + 'px'}"> -->
   <div class="background-container">
     <canvas id="background-canvas"></canvas>
-  </div>  
+  </div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
   data () {
     return {
@@ -37,10 +37,10 @@ export default {
         let ctx = document.createElement('canvas').getContext('2d')
         let dpr = window.devicePixelRatio || 1
         let bsr = ctx.webkitBackingStorePixelRatio ||
-        ctx.mozBackingStorePixelRatio ||
-        ctx.msBackingStorePixelRatio ||
-        ctx.oBackingStorePixelRatio ||
-        ctx.backingStorePixelRatio || 1
+          ctx.mozBackingStorePixelRatio ||
+          ctx.msBackingStorePixelRatio ||
+          ctx.oBackingStorePixelRatio ||
+          ctx.backingStorePixelRatio || 1
 
         return dpr / bsr
       })()
@@ -135,22 +135,24 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .background-container {
-    pointer-events: none;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: -1;
-    transition: transform var(--home-transition), filter var(--home-transition);
-    &.transitioning {
-      transform: scale(.85);
-      filter: blur(20px);
-    }
-    #background-canvas {
-      // height: 100%;
-      // width: 100%;
-    }
+.background-container {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  transition: transform var(--home-transition), filter var(--home-transition);
+
+  &.transitioning {
+    transform: scale(.85);
+    filter: blur(20px);
   }
+
+  #background-canvas {
+    // height: 100%;
+    // width: 100%;
+  }
+}
 </style>

@@ -4,12 +4,12 @@
       Loading
     </div>
     <div class="regular point5-em mt-2">
-      Version {{version}}
+      Version {{ version }}
     </div>
   </div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
   data () {
     return {
