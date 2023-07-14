@@ -11,6 +11,7 @@ import * as rimraf from 'rimraf'
 import * as iconv from 'iconv-lite'
 import { SongbasketCustomMp3Tag, SongbasketCustomMp3Tags, SongbasketFoldersFile, SongBasketSaveFile, SongBasketTrackFile } from '../../../@types/SongBasket'
 import { SpotifyPlaylistId } from '../../../@types/Spotify'
+import { Constants } from '../../../@types/constants'
 
 type _tag = {
   name: SongbasketCustomMp3Tag,
@@ -25,7 +26,7 @@ const PATHS = {
   stateFileName: '/.songbasket'
 }
 
-const getEmptyFolders = () => ({ paths: [], selected: null })
+const getEmptyFolders: () => Constants['APP_STATUS']['FOLDERS'] = () => ({ paths: [], selected: null })
 
 global.CONSTANTS.APP_STATUS.FOLDERS = getEmptyFolders()
 
@@ -48,7 +49,9 @@ Object.defineProperties(global, {
 console.log('Folder Path: ', PATHS.foldersJsonPath)
 const homeFolderPath = () => global.HOME_FOLDER
 
-const UserMethods = {
+class UserMethods {
+  constructor() {}
+
   async getFolders (): Promise<SongbasketFoldersFile | null> {
     if (await utils.pathDoesExist(PATHS.foldersJsonPath)) {
       let paths: SongbasketFoldersFile = JSON.parse(await fs.readFile(PATHS.foldersJsonPath, 'utf8'))
@@ -56,17 +59,17 @@ const UserMethods = {
       return global.SESSION_FOLDER_PATHS = paths
     }
     return null // TODO return safe
-  },
+  }
   isValidFolderStructure (paths: SongbasketFoldersFile): boolean {
     const them = Object.keys(paths)
     const def = Object.keys(getEmptyFolders())
     return them.length === def.length && them.every(key => def.includes(key))
-  },
+  }
   async setCurrentFolder (path: string | null): Promise<void> {
     if (!path) path = null
     global.SESSION_FOLDER_PATHS.selected = path
     await this.writeHomeFolders()
-  },
+  }
   async addFolder (path: string, params = { set: true }): Promise<void> {
     console.log('path', path)
     const folders = await this.getFolders()
@@ -76,7 +79,7 @@ const UserMethods = {
 
     if (params.set) await this.setCurrentFolder(path)
     else this.writeHomeFolders()
-  },
+  }
   async removeFolder (path: string): Promise<void> {
     const folders = await this.getFolders()
     if (!folders) return
@@ -84,14 +87,14 @@ const UserMethods = {
     if (path === folders.selected) folders.selected = null
     global.SESSION_FOLDER_PATHS = folders
     this.writeHomeFolders()
-  },
+  }
   async unsetCurrentFolder (): Promise<void> {
     const folders = await this.getFolders()
     if (!folders) return
     folders.selected = null
     global.SESSION_FOLDER_PATHS = folders
     await this.writeHomeFolders()
-  },
+  }
   async retrieveFolders (): Promise<SongbasketFoldersFile> {
     try {
       let folders = await this.getFolders()
@@ -104,7 +107,7 @@ const UserMethods = {
       console.error('ERROR WHEN FOLDER PATHS JSON FILE::: FileSystem/index.js', PATHS.foldersJsonPath, error)
       throw error
     }
-  },
+  }
   async resetFolderPaths (): Promise<SongbasketFoldersFile> {
     try {
       const emptyFolders = getEmptyFolders()
@@ -113,11 +116,11 @@ const UserMethods = {
     } catch (error) {
       throw error
     }
-  },
+  }
   async writeHomeFolders (folders = global.SESSION_FOLDER_PATHS): Promise<void> {
     await fs.writeFile(PATHS.foldersJsonPath, JSON.stringify(folders), 'utf8')
     global.SESSION_FOLDER_PATHS = folders
-  },
+  }
   async saveState (params: { state: SongBasketSaveFile, path: string }): Promise<void> {
     const { state, path } = params
     // console.log('Saving state to', path)
@@ -127,7 +130,7 @@ const UserMethods = {
       const jsonState = JSON.stringify(state)
       await fs.writeFile(PATH.join(path, PATHS.stateFileName), jsonState, 'utf8')
     }
-  },
+  }
   async retrieveState (path: string): Promise<SongBasketSaveFile> {
     let filePath = path + PATHS.stateFileName
     console.log('retrieving from ', path)
@@ -139,10 +142,13 @@ const UserMethods = {
       console.error('ERROR WHEN PARSING STATE JSON FILE::: FileSystem/index.js', err)
       throw err
     }
-  },
+  }
   retrieveLocalTracks (plFilter: SpotifyPlaylistId[] = []): Promise<_track[]> {
     return new Promise(async (resolve, reject) => {
-      let syncedPlaylists = customGetters.SyncedPlaylistsSp().filter(pl => plFilter ? plFilter.includes(pl.id) : true).map(pl => ({ id: pl.id, path: PATH.join((homeFolderPath()), utils.encodeIntoFilename(pl.folderName || pl.name)) }))
+      let syncedPlaylists: { id: string, path: string }[] = customGetters.SyncedPlaylistsSp().filter(pl => !plFilter || plFilter.some(toExclude => toExclude === pl.id)).map(pl => ({
+        id: pl.id,
+        path: PATH.join(homeFolderPath(), utils.encodeIntoFilename(pl.folderName || pl.name))
+      }))
       let processedPls = 0
       let allTracks: _track[] = []
 
@@ -153,7 +159,7 @@ const UserMethods = {
         if (!await this.checkPathThenCreate(pl.path)) checkNResolve()
         else {
           // Get all files from playlist dir
-          fsCb.readdir(pl.path, function (err, filenames) {
+          fsCb.readdir(pl.path, (err, filenames: string[]) => {
             if (err) return reject(err)
             filenames = filenames.filter(f => REGEX.mp3File.test(f)) // filter to just MP3 files
             if (!filenames.length) checkNResolve()
@@ -161,7 +167,7 @@ const UserMethods = {
               let processedTracks = 0
               filenames.forEach(file => {
                 const filePath = PATH.join(pl.path, file)
-                UserMethods.retrieveMP3FileTags(filePath)
+                this.retrieveMP3FileTags(filePath)
                   .then(tags => {
                     if (tags.length) allTracks.push((() => {
                       const track: _track = {
@@ -184,7 +190,7 @@ const UserMethods = {
         }
       }
     })
-  },
+  }
   deletePlaylist (playlistName: string): Promise<void> {
     return new Promise((resolve, reject) => {
       playlistName = utils.encodeIntoFilename(playlistName)
@@ -194,7 +200,7 @@ const UserMethods = {
         resolve()
       })
     })
-  },
+  }
   async renameFolder (params: { oldName: string, newName: string }) {
     let { oldName, newName } = params
     newName = utils.encodeIntoFilename(newName)
@@ -207,7 +213,7 @@ const UserMethods = {
 
     console.log('RENAMING FOLDER: ' + oldName + ' => ' + newName)
     await fs.rename(oldPath, newPath)
-  },
+  }
   retrieveMP3FileTags (path: string): Promise<_tag[]> {
 
     return new Promise((resolve, reject) => { // TODO
@@ -277,7 +283,7 @@ const UserMethods = {
         })
       }
     })
-  },
+  }
   async setFolderIcons (plFilter?: SpotifyPlaylistId | SpotifyPlaylistId[], params = { force: false }) {
     if (!plFilter) plFilter = []
     if (typeof plFilter === 'string') plFilter = [plFilter]
@@ -292,7 +298,7 @@ const UserMethods = {
       const downloader = new (Helpers.plIconDownloader as any)(pl, iconSetter)
       downloader.exec()
     })
-  },
+  }
   async checkPathThenCreate (path: string) {
     let pathExists = await utils.pathDoesExist(path)
     if (!pathExists) await fs.mkdir(path)
@@ -300,4 +306,4 @@ const UserMethods = {
   }
 }
 
-export default UserMethods
+export default new UserMethods()
