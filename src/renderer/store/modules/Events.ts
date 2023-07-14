@@ -1,7 +1,51 @@
 import Vue from 'vue'
 import VueInstance from '../../main'
+import { ActionContext } from 'vuex'
+import { DownloadStartedEventPayload } from '../../../main/controllers/DownloadPhase/youtube-dl'
 
-const getDefaultState = () => ({
+
+type TriggerableProp =
+  'CURRENT_PLAYLIST_SET' |
+  'FFMPEG_BINS_DOWNLOADED' |
+  'STATE_REPLACED' |
+  'PLAYLIST_UNSYNCED' |
+  'RESET_SELECTION' |
+  'PLAYLIST_TRACKS_RE_COMPUTED' |
+  'PLAYLIST_STATE_CHANGED' // TODO turn this into an enum
+
+type LoadingEventTarget = 'PLAYLISTS:REFRESH' | 'YOUTUBIZE' | 'DOWNLOAD' | 'PLAYLIST:UNSYNC' | '' // TODO turn this into an enum
+
+type LoadingEvent = {
+  value: boolean
+  target: LoadingEventTarget
+  showPtg: boolean
+  ptg: number | null
+  message: string
+}
+interface EventsState {
+  CURRENT_PLAYLIST_SET: boolean
+  FFMPEG_BINS_DOWNLOADED: boolean
+  STATE_REPLACED: boolean
+  PLAYLIST_UNSYNCED: boolean
+  RESET_SELECTION: boolean
+  PLAYLIST_TRACKS_RE_COMPUTED: boolean
+  PLAYLIST_STATE_CHANGED: boolean
+  // 
+  ROUTER_ANIMATION: string
+  LOADING_STATE: LoadingEvent,
+  DOWNLOADED_TRACKS: number
+  DOWNLOAD_QUEUE: {
+    id: string
+    state: string
+    ptg: number
+  }[]
+  CURRENT_DOWNLOAD: string | null
+  GLOBAL_ERROR: {
+    message: string
+  } | null
+}
+
+const getDefaultState: () => EventsState = () => ({
   CURRENT_PLAYLIST_SET: false,
   FFMPEG_BINS_DOWNLOADED: false,
   STATE_REPLACED: false,
@@ -17,7 +61,10 @@ const getDefaultState = () => ({
   GLOBAL_ERROR: null
 })
 
-const actions = {
+
+const actions: {
+  [key: string]: (context: ActionContext<EventsState, any>, payload?: any) => Promise<void> | void
+} = {
   trigger ({ commit }, key) {
     commit('TRIGGER', window.changeCase.constantCase(key))
   },
@@ -49,7 +96,7 @@ const actions = {
   routerAnimation ({ commit }, animation) {
     commit('SET', { key: 'ROUTER_ANIMATION', value: animation })
   },
-  downloadStarted ({ commit }, tracks) {
+  downloadStarted ({ commit }, tracks: DownloadStartedEventPayload) { // TODO typecheck payload
     commit('DOWNLOAD_STARTED', tracks)
   },
   async downloadFinished ({ commit }, tracks) {
@@ -73,15 +120,18 @@ const actions = {
   }
 }
 
-const SET = (key, value) => Vue.set(state, key, value)
-const mutations = {
-  TRIGGER (state, key) {
+const SET = (key: keyof EventsState, value: any) => Vue.set(state, key, value) // TODO type
+
+const mutations: {
+  [key: string]: (state: EventsState, payload?: any) => void
+} = {
+  TRIGGER (state, key: TriggerableProp) {
     state[key] = !state[key]
   },
   SET (state, { key, value }) {
     SET(key, value)
   },
-  DOWNLOAD_STARTED (state, tracks) {
+  DOWNLOAD_STARTED (state, tracks: DownloadStartedEventPayload) {
     state.DOWNLOADED_TRACKS = 0
     state.DOWNLOAD_QUEUE = tracks.map(({ id, info }) => {
       (info.finished || info.currentStatus.includes('error')) && ++state.DOWNLOADED_TRACKS
@@ -184,7 +234,14 @@ const onDownloadEnd = () => {
   mutations.LOADING_EVENT(null, { target: 'DOWNLOAD', value: false, ptg: 1 })
 }
 
-const loadingEventTypes = {
+const loadingEventTypes: {
+  messages: {
+    [key: string]: string
+  },
+  defaultMessage: (env: LoadingEvent) => string
+  default: LoadingEvent
+  percentable: LoadingEvent
+} = {
   messages: {
     'PLAYLISTS:REFRESH': 'Updating Playlists',
     'YOUTUBIZE': 'Converting Tracks',
@@ -205,12 +262,12 @@ const loadingEventTypes = {
       get message () {
         return loadingEventTypes.defaultMessage(this)
       }
-    }
+    } as LoadingEvent
   },
   get percentable () {
     return {
       value: false,
-      target: '',
+      target: '' as LoadingEventTarget,
       showPtg: true,
       ptg: 0,
       get message () {
@@ -220,7 +277,7 @@ const loadingEventTypes = {
   }
 }
 
-function getLoadingEvent (target) {
+function getLoadingEvent (target: LoadingEventTarget) {
   switch (target) {
     case 'PLAYLISTS:REFRESH':
       return loadingEventTypes.percentable
@@ -235,7 +292,7 @@ function getLoadingEvent (target) {
   }
 }
 
-function getErrorType (type, error) {
+function getErrorType (type: string, error: Error) { // TODO typecheck
   switch (type) {
     // case 'PLAYLISTS:REFRESH':
     default:
